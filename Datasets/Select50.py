@@ -26,7 +26,7 @@ def load_data(json_file):
 # theorem P{k}_{short_slug} {binders_if_any} : {formal_statement} := by sorry
 # -- END_PAIR {k}
 
-def save_data(data, output_file):
+def Gaokao_save_data(data, output_file):
     index = 0
     with open(output_file, 'w') as f:
         for item in data[:50]:
@@ -36,12 +36,12 @@ def save_data(data, output_file):
             f.write(formatted_item + '\n')
             index += 1
 
+
+
 def main():
     data = load_data(json_file)
-    # save_data(data, output_file)
-    # print(data[0]['NL_English'])
-    # print(data[0]['formal_statement'])
-    save_data(data, output_file)
+
+    Gaokao_save_data(data, output_file)
 
 if __name__ == "__main__":
     main()
