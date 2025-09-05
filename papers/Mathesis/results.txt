@@ -1,0 +1,630 @@
+Mathesis Model Test Results
+==================================================
+
+--- Prompt 1 ---
+Input: Prove that if $a > 0$ and $b > 0$ then $\sqrt{ab} \leq \frac{a+b}{2}$.
+Output:   (Square root of a * b) (h₀ : 0 < a) (h₁ : 0 < b) :
+    Real.sqrt (a * b) ≤ (a + b) / 2 := by sorry
+------------------------------
+
+--- Prompt 2 ---
+Input: If $x^2 - 5x + 6 = 0$, find all real solutions for $x$.
+Output:  
+
+- 2
+- 3
+import Mathlib
+
+/- -/ abbrev solution_set : Set ℝ := {2, 3}
+
+/- -/ def equation (x : ℝ) : Prop := x ^ 2 - 5 * x + 6 = 0
+
+/- -/ def linear_eq (x : ℝ) : Prop := x - 2 = 0 ∨ x - 3 = 0
+
+/- -/ def quadratic_eq (x : ℝ) : Prop := (x - 2) * (x - 3) = 0
+
+/- -/ def quadratic_eq (x : ℝ) : Prop := x ^ 2 - 5 * x + 6 = 0
+
+/- -/ abbrev solution_set : Set ℝ := {2, 3}
+
+theorem linear_eq_solution_set : ∀ x, linear_eq x → x ∈ solution_set := by sorry
+
+theorem quadratic_eq_solution_set : ∀ x, quadratic_eq x → x ∈ solution_set := by sorry
+
+theorem solution_set_eq : ∀ x, x ∈ solution_set ↔ linear_eq x := by sorry
+------------------------------
+
+--- Prompt 3 ---
+Input: Show that $\sum_{k=1}^n k = \frac{n(n+1)}{2}$ for all $n \in \mathbb{N}$.
+Output:  
+import Mathlib
+
+theorem sumOfIntegers (n : ℕ) : ∑ k in Finset.Icc 1 n, k = n * (n + 1) / 2 := by sorry
+------------------------------
+
+--- Prompt 4 ---
+Input: Prove that if $x > 0$ then $\ln(1+x) < x$.
+Output:  
+import Mathlib
+
+open Real
+
+theorem log_1 (x : ℝ) (hx : x > 0) : log (1 + x) < x := by sorry
+------------------------------
+
+--- Prompt 5 ---
+Input: Find the derivative of $f(x) = x^3 + 3x^2 - 2x + 1$.
+Output:  
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+
+/- The derivative of $f(x) = x^3 + 3x^2 - 2x + 1$. 
+import Mathlib
+------------------------------
+
+--- Prompt 6 ---
+Input: Show that $\int_0^1 x^2 \, dx = \frac{1}{3}$.
+Output:  
+  • • • • • • • • • •import Mathlib
+
+/- Show that $\int_0^1 x^2 \, dx = \frac{1}{3}$. 
+  • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •import Mathlib
+
+/- Show that $\int_0^1 x^2 \, dx = \frac{1}{3}$. 
+  • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
+------------------------------
+
+--- Prompt 7 ---
+Input: If $\frac{1}{p} + \frac{1}{q} = 1$, prove that $(p-1)(q-1) = 1$.
+Output:  {p q : ℕ} (hp : p ≠ 0) (hq : q ≠ 0)
+    (h : (1 : ℚ) / p + 1 / q = 1) : (p - 1) * (q - 1) = 1 := by sorry
+------------------------------
+
+--- Prompt 8 ---
+Input: Prove that $\gcd(a,b) \cdot \mathrm{lcm}(a,b) = ab$ for all positive integers $a$ and $b$.
+Output:  
+
+The result is a product of two integer functions: the gcd (greatest common divisor) and lcm (least common multiple). 
+Theorem in number_theory_9999 : ∀ a b : ℕ, 0 < a → 0 < b → Nat.gcd a b * Nat.lcm a b = a * b := by sorry
+------------------------------
+
+--- Prompt 9 ---
+Input: Show that the sequence $a_n = \frac{1}{n}$ converges to $0$.
+Output:   (Topological Filter Real Complex Topology MvPolynomial)
+import Mathlib
+
+open Topology Filter Real Complex TopologicalSpace Finset
+open scoped BigOperators
+
+/- Show that the sequence $a_n = \frac{1}{n}$ converges to $0$.  (Topological Filter Real Complex Topology MvPolynomial)
+import Mathlib
+
+theorem a_seq_converge (a : ℕ → ℝ) (ha : ∀ n, a n = 1 / n) :
+  Tendsto a atTop (𝓝 0) :=
+sorry
+------------------------------
+
+--- Prompt 10 ---
+Input: If $a+b=10$ and $ab=21$, find $a^2 + b^2$.
+Output:  
+I have a solution for this in the image below. 
+import Mathlib
+
+/- $a+b=10$ and $ab=21$, find $a^2 + b^2$. 
+I have a solution for this in the image below.  -/
+theorem image_42722 (a b : ℝ) (h₀ : a + b = 10) (h₁ : a * b = 21) :
+    a ^ 2 + b ^ 2 = 50 := by sorry
+------------------------------
+
+--- Prompt 11 ---
+Input: Prove that for all $n \in \mathbb{N}$, $2^n > n+1$.
+Output:  0 < n → 2 ^ n > n + 1 := by sorry
+------------------------------
+
+--- Prompt 12 ---
+Input: If $A$ is a $2\times 2$ matrix with $\det(A) = 0$, prove that its rows are linearly dependent.
+Output:   
+import Mathlib
+
+/- $A$ is a $2\times 2$ matrix with $\det(A) = 0$, prove that its rows are linearly dependent.  
+import Mathlib
+
+/- $A$ is a $2\times 2$ matrix with $\det(A) = 0$, prove that its rows are linearly dependent.  
+import Mathlib
+
+/- $A$ is a $2\times 2$ matrix with $\det(A) = 0$, prove that its rows are linearly dependent.  
+import Mathlib -/
+theorem linear_dependency_of_matrix {A : Matrix (Fin 2) (Fin 2) ℝ} (hA : A.det = 0) :
+    ∃ c1 c2 : ℝ, c1 ≠ 0 ∨ c2 ≠ 0 ∧ c1 * A 0 0 + c2 * A 1 0 = 0 ∧
+      c1 * A 0 1 + c2 * A 1 1 = 0 := by sorry
+------------------------------
+
+--- Prompt 13 ---
+Input: Show that $\frac{d}{dx}(\sin x) = \cos x$.
+Output:   
+  (d / dx : ℝ → ℝ) (h : d = Real.sin) :
+  deriv d = Real.cos := by sorry
+------------------------------
+
+--- Prompt 14 ---
+Input: Evaluate $\lim_{x \to 0} \frac{\sin x}{x}$.
+Output:   
+[Topological Filter Real Complex Topology MvPolynomial]
+
+open Topology Filter Real Complex TopologicalSpace Finset
+open scoped BigOperators
+
+theorem lim_468847 :
+  Tendsto (λ x => Real.sin x / x) (𝓝[≠] 0) (𝓝 (Real.sin 0 / 0)) :=
+sorry
+------------------------------
+
+--- Prompt 15 ---
+Input: Prove that $\sqrt{2}$ is irrational.
+Output:  Irrational numbers are numbers that cannot be written as a rational (or ratio) of integers. Real numbers with this property are those that are not part of the countable set of such ratios.
+
+theorem irrat : Irrational (Real.sqrt 2) := by sorry
+------------------------------
+
+--- Prompt 16 ---
+Input: If $f'(x) > 0$ for all $x$ in an interval, prove that $f$ is increasing on that interval.
+Output:  
+import Mathlib
+
+open Topology Filter Real Complex TopologicalSpace Finset
+open scoped BigOperators
+
+/- If $f'(x) > 0$ for all $x$ in an interval, prove that $f$ is increasing on that interval. 
+import Mathlib
+
+open Topology Filter Real Complex TopologicalSpace Finset
+open scoped BigOperators
+
+/- If $f'(x) > 0$ for all $x$ in an interval, prove that $f$ is increasing on that interval. 
+import Mathlib
+
+theorem by sorry
+------------------------------
+
+--- Prompt 17 ---
+Input: Show that $\binom{n}{k} = \binom{n}{n-k}$.
+Output:  
+
+Reference : Nat.choose = Nat.choose n k 
+
+Nat.choose n k = Nat.choose n (n - k)
+
+Reference : Nat.choose = Nat.choose n (n - k) 
+
+Nat.choose n (n - k) = Nat.choose n (n - (n - k))
+
+Reference : Nat.choose = Nat.choose n (n - (n - k)) 
+
+Nat.choose n (n - (n - k)) = Nat.choose n (k)
+
+Referenceimport Mathlib
+
+/- Reference : Nat.choose = Nat.choose n k 
+
+Nat.choose n k = Nat.choose n (n - k)
+
+Reference : Nat.choose = Nat.choose n (n - k) 
+
+Nat.choose n (n - k) = Nat.choose n (n - (n - k))
+
+Reference : Nat.choose = Nat.choose n (n - (n - k)) 
+
+Nat.choose n (n - (n - k)) = Nat.choose n k
+
+Reference : Nat.choose = Nat.choose n k 
+
+Hence, Nat.choose n k = Nat.choose n (n - k) := by sorry
+------------------------------
+
+--- Prompt 18 ---
+Input: If $x+y=6$ and $xy=5$, find $x^2 + y^2$.
+Output:  \import Mathlib
+
+/- $x+y=6$ and $xy=5$, find $x^2 + y^2$. \import Mathlib
+
+/- $x+y=6$ and $xy=5$, find $x^2 + y^2$. \import Mathlib
+
+/- $x+y=6$ and $xy=5$, find $x^2 + y^2$. \import Mathlib -/
+theorem algebra_447305 {x y : ℝ} (h₀ : x + y = 6) (h₁ : x * y = 5) :
+    x ^ 2 + y ^ 2 = 30 := by sorry
+------------------------------
+
+--- Prompt 19 ---
+Input: Prove that $(a+b)^2 = a^2 + 2ab + b^2$.
+Output:  ∀ a b : ℝ, (a + b)^2 = a^2 + 2 * a * b + b^2 := by sorry
+------------------------------
+
+--- Prompt 20 ---
+Input: Evaluate $\int e^x \, dx$.
+Output:  \import Mathlib
+
+/- Evaluate $\int e^x \, dx$. \import Mathlib
+
+/- Evaluate $\int e^x \, dx$. \import Mathlib
+
+/- Evaluate $\int e^x \, dx$. \import Mathlib -/
+theorem : ∫ x, Real.exp x = Real.exp x + C := by sorry
+------------------------------
+
+--- Prompt 21 ---
+Input: Prove that $1 + \frac12 + \frac13 + \cdots + \frac1n > \ln(n+1)$ for all $n \ge 1$.
+Output: import Mathlib
+
+open Real
+
+/- Prove that $1 + \frac12 + \frac13 + \cdots + \frac1n > \ln(n+1)$ for all $n \ge 1$. -/
+theorem sum_of_fractions (n : ℕ) (hn : 1 ≤ n) :
+    ∑ i ∈ Finset.Icc 1 n, (1 / i : ℝ) > log (n + 1) := by sorry
+------------------------------
+
+--- Prompt 22 ---
+Input: If $x^2 + y^2 = 25$ and $x = 3$, find $y$.
+Output:  
+import Mathlib
+
+/- $x^2 + y^2 = 25$ and $x = 3$, find $y$. 
+import Mathlib
+
+/- $x^2 + y^2 = 25$ and $x = 3$, find $y$. 
+import Mathlib
+
+/- $x^2 + y^2 = 25$ and $x = 3$, find $y$. 
+import Mathlib -/
+theorem x2y2 (x y : ℝ) (h₀ : x^2 + y^2 = 25) (h₁ : x = 3) : y = 4 ∨ y = -4 := by sorry
+------------------------------
+
+--- Prompt 23 ---
+Input: Prove that if $n$ is odd then $n^2$ is also odd.
+Output:  
+    Odd n → Odd (n ^ 2) := by sorry
+------------------------------
+
+--- Prompt 24 ---
+Input: Find the Taylor series for $\sin x$ around $x=0$.
+Output:  
+import Mathlib
+
+open Real Set
+open scoped BigOperators
+
+/- determine -/ abbrev taylor_series : ℕ → ℝ → ℝ
+| 0, _ => fun x => sin x
+| n + 1, _ => fun x => (deriv (taylor_series n) x) * x ^ n
+
+/- The Taylor series for $\sin x$ around $x=0$. 
+The $n$th term of the series is the coefficient of $x ^ n$ in the Taylor series.  -/
+theorem taylor_series_eval : ∀ x, ∑' n : ℕ, (taylor_series n x) = sin x :=
+sorry
+------------------------------
+
+--- Prompt 25 ---
+Input: Prove that the set of prime numbers is infinite.
+Output:  Infinite set is a set that is not Finite, i.e., a set that is large enough to have an indefinite number of members.
+
+theorem set_infinite :
+    ¬Finite {p : ℕ | Nat.Prime p} := by sorry
+------------------------------
+
+--- Prompt 26 ---
+Input: If $z = 3 + 4i$, find $|z|$.
+Output:  Complex.abs (3 + 4 * .I : ℂ) = 5 := by sorry
+------------------------------
+
+--- Prompt 27 ---
+Input: Prove that the sum of angles in a triangle is $180^\circ$.
+Output:  
+
+In a triangle, let A, B, C be the three interior angles of a triangle. 
+
+A + B + C = 180 ∧ A ∈ Set.Ioo 0 π ∧ B ∈ Set.Ioo 0 π ∧ C ∈ Set.Ioo 0 π ∧ A + B + C = π := by sorry
+------------------------------
+
+--- Prompt 28 ---
+Input: If $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$.
+Output:  
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+/- $a > b > 0$, prove that $\frac{a+b}{2} > \sqrt{ab}$. 
+import Mathlib
+
+theorem algebra_477284 (a b : ℝ) (ha : 0 < b) (hb : b < a) :
+    (a + b) / 2 > Real.sqrt (a * b) := by sorry
+------------------------------
+
+--- Prompt 29 ---
+Input: Show that $\int_0^\pi \sin x \, dx = 2$.
+Output:   Even if you have to, start by finding the antiderivative of $\sin x$.
+
+theorem : ∫ x in (0)..Real.pi, Real.sin x = 2 := by sorry
+------------------------------
+
+--- Prompt 30 ---
+Input: Prove that $n! > 2^n$ for $n \ge 4$.
+Output:  
+import Mathlib
+
+theorem fact_447380 (n : ℕ) (hn : 4 ≤ n) : Nat.factorial n > 2 ^ n := by sorry
+------------------------------
+
+--- Prompt 31 ---
+Input: Find the eigenvalues of the matrix $\begin{pmatrix}2 & 1 \\ 1 & 2\end{pmatrix}$.
+Output:  
+
+To find the eigens, we solve the equation $\begin{pmatrix}2 & 1 \\ 1 & 2\end{pmatrix} * v = c * v$, whereimport Mathlib
+
+/- The eigenvalues of the matrix $\begin{pmatrix}2 & 1 \\ 1 & 2\end{pmatrix}$. 
+
+To find the eigens, we solve the equation $\begin{pmatrix}2 & 1 \\ 1 & 2\end{pmatrix} * v = c * v$, where $c$ is the eigenvalue and $v$ is the eigenvector. 
+
+The solution to this equation is $c = 3$ and the eigenvector is $\begin{pmatrix}1, 2\end{pmatrix}$.  -/
+theorem findEigenvalues (A : Matrix (Fin 2) (Fin 2) ℝ) (hA : A = !![2, 1; 1, 2]) :
+    ∃ c : ℝ, c = 3 ∧ ∃ v : ℝ × ℝ, v.1 = 1 ∧ v.2 = 2 ∧ A * !![v.1; v.2] = c * !![v.1; v.2] := by sorry
+------------------------------
+
+--- Prompt 32 ---
+Input: Show that $\cos^2 x + \sin^2 x = 1$.
+Output:  (x : ℝ) := by sorry
+------------------------------
+
+--- Prompt 33 ---
+Input: If $f''(x) > 0$ for all $x$, prove that $f$ is convex.
+Output:  Convexity is a property where, for any $x y$, $\frac{f x + f y}{2} ≤ f ((x + y) / 2) + \frac{f x + f y}{4}$.import Mathlib
+
+open Real
+
+/- convexity is the property where, for any $x y$, $\frac{f x + f y}{2} ≤ f ((x + y) / 2) + \frac{f x + f y}{4}$. -/
+theorem convexity {f : ℝ → ℝ} (hf : ∀ x, iteratedDeriv 2 f x > 0) :
+    ∀ x y, (f x + f y) / 2 ≤ f ((x + y) / 2) + (f x + f y) / 4 := by sorry
+------------------------------
+
+--- Prompt 34 ---
+Input: Evaluate $\sum_{k=0}^n \binom{n}{k} = 2^n$.
+Output:  1
+
+import Mathlib
+
+/- $\sum_{k=0}^n \binom{n}{k} = 2^n$. 1
+
+import Mathlib
+
+/- $\sum_{k=0}^n \binom{n}{k} = 2^n$. 1 -/
+theorem sum_of_n.choose : ∀ n : ℕ, ∑ k in Finset.Icc 0 n, Nat.choose n k = 2 ^ n := by sorry
+------------------------------
+
+--- Prompt 35 ---
+Input: Prove that $\int_0^1 \ln(x) \, dx = -1$.
+Output:  
+
+## Solution
+
+import Mathlib
+
+/- Prove that $\int_0^1 \ln(x) \, dx = -1$. 
+
+## Solution -/
+theorem log_solution : ∫ x in (0)..1, Real.log x = -1 := by sorry
+------------------------------
+
+--- Prompt 36 ---
+Input: If $x^3 - 2x + 4 = 0$ has a real root $r$, prove that $r$ lies between $-2$ and $-1$.
+Output:  
+import Mathlib
+
+/- $x^3 - 2x + 4 = 0$ has a real root $r$, prove that $r$ lies between $-2$ and $-1$.  -/
+theorem PolynomialRoot (f : ℝ → ℝ) (hf : f = fun x => x ^ 3 - 2 * x + 4) :
+    ∃ r, f r = 0 ∧ -2 < r ∧ r < -1 := by sorry
+------------------------------
+
+--- Prompt 37 ---
+Input: Find the area under $y = x^2$ between $x=0$ and $x=3$.
+Output:  ∫ x in (0)..3, x ^ 2 = 9.549251406591987 := by sorry
+------------------------------
+
+--- Prompt 38 ---
+Input: Prove that $\lim_{n\to\infty} \frac{n}{n+1} = 1$.
+Output:  := by sorry
+
+theorem lim_477430 : Topology Filter.Real.Basic.lim (fun n => (n / (n + 1 : ℝ))) := by sorry
+------------------------------
+
+--- Prompt 39 ---
+Input: If $x > 0$, prove that $e^x > 1 + x$.
+Output:  
+import Mathlib
+
+open Real
+
+/- open Real
+
+/- if x > 0, exp x > 1 + x. 
+theorem exp_lt_1 (x : ℝ) (hx : 0 < x) : exp x > 1 + x := by sorry -/
+theorem exp_lt_1 (x : ℝ) (hx : 0 < x) : exp x > 1 + x := by sorry
+------------------------------
+
+--- Prompt 40 ---
+Input: Evaluate $\int_0^{\pi/2} \cos x \, dx$.
+Output:  -/
+theorem ∫x in (0)..(Real.pi / 2), Real.cos x = Real.sin (Real.pi / 2) := by sorry
+------------------------------
+
+--- Prompt 41 ---
+Input: Prove that if $|a| < 1$, then $\sum_{n=0}^\infty a^n = \frac{1}{1-a}$.
+Output:  
+import Mathlib
+
+open Real
+
+/- Prove that if $|a| < 1$, then $\sum_{n=0}^\infty a^n = \frac{1}{1-a}$. 
+import Mathlib
+
+/- Prove that if $|a| < 1$, then $\sum_{n=0}^\infty a^n = \frac{1}{1-a}$. 
+import Mathlib
+
+theorem sum_infinite (a : ℝ) (ha : |a| < 1) :
+    ∑' n : ℕ, a ^ n = 1 / (1 - a) := by sorry
+------------------------------
+
+--- Prompt 42 ---
+Input: If $A$ is invertible, prove that $(A^{-1})^{-1} = A$.
+Output:   
+    (Invertible is the property where a matrix has a rightInverse) 
+
+    (A : Matrix (Fin 2) (Fin 2) ℝ) (hA : Nonempty (Invertible A)) :
+    ((A⁻¹)⁻¹ : Matrix (Fin 2) (Fin 2) ℝ) = A := by sorry
+------------------------------
+
+--- Prompt 43 ---
+Input: Show that $\nabla \cdot (\nabla \times \mathbf{F}) = 0$.
+Output:  
+  (F : Fin 3 → ℝ) (hF : ∀ i, F i ≠ 0) :
+  ∑ i, (deriv (fun x => ∑ j, x * F j) (F i)) * (deriv (fun x => ∑ j, x * F j) (F (i - 1))) = 0 := by sorry
+------------------------------
+
+--- Prompt 44 ---
+Input: Prove that $x^2 \ge 0$ for all real $x$.
+Output:  
+  (x : ℝ) → x ^ 2 ≥ 0 := by sorry
+------------------------------
+
+--- Prompt 45 ---
+Input: If $u = \ln(x)$, find $\frac{du}{dx}$.
+Output:  
+
+ \import Mathlib
+
+/- $u = \ln(x)$, find $\frac{du}{dx}$. 
+
+ \import Mathlib -/
+theorem log (u : ℝ → ℝ) (hu : u = fun x => Real.log x) :
+    deriv u = fun x => 1 / x := by sorry
+------------------------------
+
+--- Prompt 46 ---
+Input: Prove that if $x > y$ then $e^x > e^y$.
+Output:  
+import Mathlib
+
+open Real
+
+/- Prove that if $x > y$ then $e^x > e^y$. 
+import Mathlib
+
+open Real
+
+/- Prove that if $x > y$ then $e^x > e^y$. 
+import Mathlib
+
+open Real
+
+/- Prove that if $x > y$ then $e^x > e^y$. 
+import Mathlib
+
+open Real
+
+theorem exp_ine (x y : ℝ) (h : x > y) : exp x > exp y := by sorry
+------------------------------
+
+--- Prompt 47 ---
+Input: Find $\frac{d}{dx}(x^x)$.
+Output:  
+Differentiable ℝ (fun x => x ^ x) ∧
+deriv (fun x => x ^ x) = (fun x => x * (x ^ (x - 1))) := by sorry
+------------------------------
+
+--- Prompt 48 ---
+Input: If $f(x) = \frac{1}{x}$, find $f'(x)$.
+Output:  DifferentiableOn ℝ f (Set.Ioo 0 1) ∧ ∀ x ∈ Set.Ioo 0 1, deriv f x = -1 / x ^ 2 := by sorry
+------------------------------
+
+--- Prompt 49 ---
+Input: Prove that $\int_0^1 (1-x) \, dx = \frac12$.
+Output:  
+import Mathlib
+
+/- Prove that $\int_0^1 (1-x) \, dx = \frac12$. 
+import Mathlib
+
+/- Prove that $\int_0^1 (1-x) \, dx = \frac12$. 
+import Mathlib
+
+/- Prove that $\int_0^1 (1-x) \, dx = \frac12$. 
+import Mathlib
+
+/- Prove that $\int_0^1 (1-x) \, dx = \frac12$. 
+import Mathlib -/
+theorem : ∫ x in (0)..1, (1 - x) = 1 / 2 := by sorry
+------------------------------
+
