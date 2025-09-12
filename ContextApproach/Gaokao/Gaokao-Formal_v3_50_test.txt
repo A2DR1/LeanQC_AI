@@ -1,0 +1,352 @@
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=(x - 1)e^{x}-ax^{2}+b\). 
+Choose one of the following two conditions and prove that \(f(x)\) has exactly one zero: 
+① \(\frac{1}{2}< a\leq\frac{e^{2}}{2}\)，\(b > 2a\)；
+② \(0 < a<\frac{1}{2}\)，\(b\leq2a\)．  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(a\), \(b\) be real numbers, and \(a > 1\). The function \(f(x) = a^{x} - bx + e^{x}\) (where \(x \in \mathbf{R}\)) when \(a = e\), prove that for any \(b > e^{4}\), the function \(f(x)\) has two distinct zeros \(x_{1}\), \(x_{2}\) satisfying \(x_{2} > \frac{b \ln b}{2e^{2}}x_{1} + \frac{e^{2}}{b}\). (Note: \(e = 2.71828\cdots\) is the base of the natural logarithm.)  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given an infinite sequence \(\{ a_{n}\}\) with no zero term, two properties are provided: 
+① For any two terms \(a_{i}, a_{j} (i > j)\) in \(\{ a_{n}\}\), 
+there exists a term \(a_{m}\) in \(\{ a_{n}\}\) such that \(\frac{a_{i}^{2}}{a_{j}} = a_{m}\);
+② For any term \(a_{n} (n \geq 3)\) in \(\{ a_{n}\}\), 
+there exist two terms \(a_{k}, a_{l} (k > l)\) in \(\{ a_{n}\}\) such that \(a_{n} = \frac{a_{k}^{2}}{a_{l}}\). 
+If \(\{ a_{n}\}\) is a strictly increasing sequence and satisfies both property ① and property ②, 
+prove that \(\{ a_{n}\}\) is a geometric sequence.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given functions \(y = f(x)\), \(y = g(x)\), and \(h(x) = kx + b\) (\(k, b \in \mathbf{R}\)) defined on an interval \(D\), such that \(f(x) \geq h(x) \geq g(x)\) holds for all \(x\) in \(D\). If \(f(x) = x^{4} - 2x^{2}\), \(g(x) = 4x^{2} - 8\), \(h(x) = 4(t^{2} - t)x - 3t^{4} + 2t^{2}\) (\(0 < |t| \leq \sqrt{2}\)), and \(D = [m, n] \subseteq [-\sqrt{2}, \sqrt{2}]\), prove that \(n - m \leq \sqrt{7}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given \(A\) and \(B\) as the left and right vertices of the ellipse \(E:\frac{x^{2}}{a^{2}}+y^{2}=1\) (\(a > 1\)), respectively, 
+and \(G\) as the top vertex of \(E\), with \(\overrightarrow{AG}\cdot\overrightarrow{GB}=8\). 
+Let \(P\) be a moving point on the line \(x = 6\), \(PA\) intersects \(E\) at another point \(C\), and \(PB\) intersects \(E\) at another point \(D\). 
+Prove that the line \(CD\) passes through a fixed point.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\sin^{2}x\sin2x\), prove that \(\vert f(x)\vert\leq\frac{3\sqrt{3}}{8}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: For \(n\in\mathbf{N}^{*}\) and \(x∈ ℝ\), prove that \(\sin^{2}x\sin^{2}2x\sin^{2}4x\cdots\sin^{2}2^{n}x\leq\frac{3^{n}}{4^{n}}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the sequence \(\{ a_{n}\}\) satisfy \(a_{1}=3\) and \(a_{n + 1}=3a_{n}-4n\). Given that \(a_{2}=5\) and \(a_{3}=7\), prove that \(\{ a_{n}\}=2n+1\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=x^{3}+bx + c\), 
+and the tangent line to the curve \(y = f(x)\) at the point \((\frac{1}{2},f(\frac{1}{2}))\) is perpendicular to the \(y\)-axis. 
+If \(f(x)\) has a zero whose absolute value does not exceed \(1\), 
+prove that the absolute values of all zeros of \(f(x)\) do not exceed \(1\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(a, b, c \in \mathbf{R}\), \(a + b + c = 0\), \(abc = 1\). Prove that \(ab + bc + ca < 0\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(a, b, c \in \mathbf{R}\), \(a + b + c = 0\), \(abc = 1\). Denote \(\max\{a, b, c\}\) as the maximum of \(a\), \(b\), \(c\). Prove that \(\max\{a, b, c\} \geq \sqrt[3]{4}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given that \(\{ a_{n}\}\) is an arithmetic sequence and \(\{ b_{n}\}\) is a geometric sequence, 
+with \(a_{1}=b_{1}=1\), \(a_{5}=5(a_{4}-a_{3})\), and \(b_{5}=4(b_{4}-b_{3})\). 
+Let \(S_{n}\) denote the sum of the first \(n\) terms of \(\{ a_{n}\}\). 
+Prove that \(S_{n}S_{n + 2}< S_{n + 1}^{2}\) for \(n\in\mathbf{N}^{*}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=x^{3}+k\ln x\) (\(k\in\mathbf{R}\)), where \(f^{\prime}(x)\) is the derivative of \(f(x)\). When \(k\geq - 3\), prove that for any \(x_{1}\), \(x_{2}\in[1,+\infty)\) with \(x_{1}>x_{2}\), the inequality \(\frac{f^{\prime}(x_{1})+f^{\prime}(x_{2})}{2}>\frac{f(x_{1})-f(x_{2})}{x_{1}-x_{2}}\) holds.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: In triangle \(ABC\), the sides opposite to angles \(A\), \(B\), \(C\) are \(a\), \(b\), \(c\) respectively. 
+It is given that \(\cos^{2}\left(\frac{\pi}{2}+A\right)+\cos A=\frac{5}{4}\). 
+If \(b - c=\frac{\sqrt{3}}{3}a\), prove that \(\triangle ABC\) is a right-angled triangle.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given sequences \(\{a_n\}\), \(\{b_n\}\), and \(\{c_n\}\) with \(a_1 = b_1 = c_1 = 1\), \(c_{n + 1} = a_{n + 1} - a_n\), and \(c_{n + 1} = \frac{b_n}{b_{n + 2}} \cdot c_n\) (\(n \in \mathbf{N}^{*}\)). If \(\{b_n\}\) is an arithmetic sequence with common difference \(d > 0\), prove that \(c_1 + c_2 + \cdots + c_n < 1 + \frac{1}{d}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given \(1 < a \leq 2\), the function \(f(x) = e^{x} - x - a\), where \(e = 2.71828\cdots\) is the base of the natural logarithm. 
+Prove that the function \(y = f(x)\) has a unique zero in \((0, +\infty)\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given \(1 < a \leq 2\), the function \(f(x) = e^{x} - x - a\), where \(e = 2.71828\cdots\) is the base of the natural logarithm. 
+Let \(x_{0}\) be the zero of the function \(y = f(x)\) on the interval \((0, +\infty)\). 
+Prove that \(\sqrt{a - 1} \leq x_{0} \leq \sqrt{2(a - 1)}\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given \(1 < a \leq 2\), the function \(f(x) = e^{x} - x - a\), where \(e = 2.71828\cdots\) is the base of the natural logarithm. Let \(x_{0}\) be the zero of the function \(y = f(x)\) on \((0,+\infty)\). Prove that \(x_{0}f(e^{x_{0}}) \geq (e - 1)(a - 1)a\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=(x - a)(x - b)(x - c)\), where \(a,b,c\in\mathbf{R}\), 
+and \(f^{\prime}(x)\) be the derivative of \(f(x)\). 
+Given \(a = 0\), \(0 < b < 1\), \(c = 1\), 
+and the maximum extreme value of \(f(x)\) is \(M\), prove that \(M\leq\frac{4}{27}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Define a geometric sequence with the first term \(1\) and a positive common ratio as an "\(M -\)sequence". 
+Given a geometric sequence \(\{ a_{n}\}(n\in\mathbf{N}^{*})\) satisfies: \(a_{2}a_{4}=a_{5}\), \(a_{3}-4a_{2}+4a_{1}=0\), 
+prove that the sequence \(\{ a_{n}\}\) is an "\(M -\)sequence".  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the parabola \(C:x^{2}=-2py\) passing through the point \((2,-1)\). 
+Let \(O\) be the origin, and a line \(l\) with non-zero slope passes through the focus of \(C\) and intersects \(C\) at points \(M\) and \(N\). 
+The lines \(y = -1\) intersect the lines \(OM\) and \(ON\) at points \(A\) and \(B\), respectively. 
+Prove that the circle with diameter \(AB\) passes through two fixed points on the y-axis.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\frac{1}{4}x^{3}-x^{2}+x\), when \(x\in[-2,4]\), prove that \(x - 6\leq f(x)\leq x\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given a sequence \(\{ a_{n}\}\), selecting the \(i_{1}\)-th, \(i_{2}\)-th, ..., \(i_{m}\)-th terms \((i_{1} < i_{2}<\cdots < i_{m})\), 
+if \(a_{i_{1}} < a_{i_{2}}<\cdots < a_{i_{m}}\), 
+then the new sequence \(a_{i_{1}},a_{i_{2}},\cdots,a_{i_{m}}\) is called an increasing subsequence of \(\{ a_{n}\}\) with length \(m\). 
+It is stipulated that any single term of \(\{ a_{n}\}\) is an increasing subsequence of \(\{ a_{n}\}\) with length \(1\). 
+Given that the minimum last term of an increasing subsequence of \(\{ a_{n}\}\) with length \(p\) is \(a_{m_{0}}\), 
+and the minimum last term of an increasing subsequence of \(\{ a_{n}\}\) with length \(q\) is \(a_{n_{0}}\). 
+If \(p < q\), prove that \(a_{m_{0}}< a_{n_{0}}\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=e^{x}\cos x\), and \(g(x)\) be the derivative of \(f(x)\). 
+Prove that when \(x\in[ \frac{\pi}{4},\frac{\pi}{2} ]\), the inequality \(f(x)+g(x)(\frac{\pi}{2}-x)\geq0\) holds.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=e^{x}\cos x\). 
+Let \(x_{n}\) be the zero of the function \(u(x)=f(x)-1\) in the interval \((2n\pi+\frac{\pi}{4},2n\pi+\frac{\pi}{2})\), 
+where \(n\in\mathbf{N}\). 
+Prove that \(2n\pi+\frac{\pi}{2}-x_{n}<\frac{e^{-2n\pi}}{\sin x_{0}-\cos x_{0}}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\sin x-\ln(1 + x)\), where \(f^{\prime}(x)\) is the derivative of \(f(x)\). 
+Prove that \(f^{\prime}(x)\) has a unique maximum point in the interval \((-1,\frac{\pi}{2})\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\sin x-\ln(1 + x)\). Prove that \(f(x)\) has exactly two zeros.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: To treat a certain disease, two new drugs, A and B, have been developed, and it is desired to know which one is more effective.
+For this purpose, an animal experiment is conducted. The experimental protocol is as follows:
+in each round, two white mice are selected for a comparative test of the drugs' efficacy.
+For the two mice, one is randomly chosen to receive drug A, and the other receives drug B.
+After the results of one round of treatment are obtained, the next round of experiment is arranged.
+The experiment stops when one drug has cured 4 more mice than the other, and the drug with more cures is considered more effective.
+For convenience in describing the problem, it is agreed that:
+for each round of the experiment,
+if the mouse receiving drug A is cured and the mouse receiving drug B is not cured, then drug A scores 1 point and drug B scores -1 point;
+if the mouse receiving drug B is cured and the mouse receiving drug A is not cured, then drug B scores 1 point and drug A scores -1 point;
+if both are cured or both are not cured, then both drugs score 0 points.
+The cure rates of drugs A and B are denoted by \(\alpha\) and \(\beta\), respectively,
+and the score of drug A in one round of the experiment is denoted by \(X\).
+If both drugs A and B are initially assigned 4 points at the start of the experiment,
+\(p_{i}(i = 0,1,\cdots,8)\) represents the probability that
+"when the cumulative score of drug A is \(i\), drug A is ultimately considered more effective than drug B."
+Then, \(p_{0}=0\), \(p_{8}=1\), \(p_{i}=ap_{i - 1}+bp_{i}+cp_{i + 1}(i = 1,2,\cdots,7)\),
+where \(a = P(X = - 1)\), \(b = P(X = 0)\), \(c = P(X = 1)\).
+Assuming \(\alpha = 0.5\), \(\beta = 0.8\), prove that \(\{p_{i + 1}-p_{i}\}(i = 0,1,2,\cdots,7)\) is a geometric sequence.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given \(a\), \(b\), \(c\) are positive numbers and satisfy \(abc = 1\). Prove that \(\frac{1}{a}+\frac{1}{b}+\frac{1}{c}\leq a^{2}+b^{2}+c^{2}\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given that \(a\), \(b\), \(c\) are positive numbers and satisfy \(abc = 1\), prove that \((a + b)^{3}+(b + c)^{3}+(c + a)^{3}\geq24\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the sequences \(\{ a_{n}\}\) and \(\{ b_{n}\}\) satisfy \(a_{1}=1\), \(b_{1}=0\), \(4a_{n + 1}=3a_{n}-b_{n}+4\), and \(4b_{n + 1}=3b_{n}-a_{n}-4\). Prove that \(\{ a_{n}+b_{n}\}\) is a geometric sequence and \(\{ a_{n}-b_{n}\}\) is an arithmetic sequence.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\ln x-\frac{x + 1}{x - 1}\), prove that \(f(x)\) has exactly two zeros.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=\ln x-\frac{x + 1}{x - 1}\). Let \(x_{0}\) be a zero of \(f(x)\). 
+Prove that the tangent to the curve \(y = \ln x\) at the point \(A(x_{0},\ln x_{0})\) is also a tangent to the curve \(y = e^{x}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given points \(A(-2,0)\) and \(B(2,0)\), 
+a moving point \(M(x,y)\) satisfies that the product of the slopes of lines \(AM\) and \(BM\) is \(-\frac{1}{2}\). 
+The trajectory of \(M\) is denoted as curve \(C\). 
+A line passing through the origin intersects \(C\) at points \(P\) and \(Q\), 
+with \(P\) in the first quadrant. From \(P\), 
+a perpendicular is dropped to the x-axis at \(E\). 
+The line \(QE\) is extended to intersect \(C\) again at \(G\). 
+Prove that \(\triangle PQG\) is a right-angled triangle.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the curve \(C: y = \frac{x^{2}}{2}\), and \(D\) is a moving point on the line \(y = -\frac{1}{2}\). 
+Two tangent lines are drawn from \(D\) to \(C\), with points of tangency \(A\) and \(B\), respectively. 
+Prove that the line \(AB\) passes through a fixed point.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let $a$ be a real number.
+Prove that if \((x - 2)^{2}+(y - 1)^{2}+(z - a)^{2}\geq\frac{1}{3}\) holds for all $x,y,z ∈ ℝ$ such that $x+y+z=1$,
+then \(a\leq - 3\) or \(a\geq - 1\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given an ellipse \(C:\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}} = 1\) with its right focus at \((1,0)\) and passing through the point \(A(0,1)\). 
+Let \(O\) be the origin, and the line \(l:y = kx + t(t\neq\pm1)\) intersects the ellipse \(C\) at two distinct points \(P\) and \(Q\). 
+The line \(AP\) intersects the \(x\)-axis at point \(M\), and the line \(AQ\) intersects the \(x\)-axis at point \(N\). 
+If \(\vert OM\vert\cdot\vert ON\vert = 2\), prove that the line \(l\) passes through a fixed point.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=\ln x - a(x - 1)e^{x}\), where \(a\in\mathbf{R}\). If \(0 < a < \frac{1}{e}\), prove that \(f(x)\) has exactly two zeros.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the function \(f(x)=\ln x - a(x - 1)e^{x}\), where \(a\in\mathbf{R}\). 
+If \(0 < a < \frac{1}{e}\), let \(x_{0}\) be the extremum point of \(f(x)\), \(x_{1}\) be the zero of \(f(x)\), and \(x_{1}>x_{0}\). 
+Prove that \(3x_{0}-x_{1}>2\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=2\sin x - x\cos x - x\), where \(f^{\prime}(x)\) is the derivative of \(f(x)\). Prove that \(f^{\prime}(x)\) has exactly one zero in the interval \((0,\pi)\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=(x - 1)\ln x - x - 1\), prove that \(f(x)\) has a unique extreme point.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the function \(f(x)=(x - 1)\ln x - x - 1\), prove that the equation \(f(x)=0\) has exactly two real roots, and these two roots are reciprocals of each other.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(\{ a_{n}\}\) be an arithmetic sequence with the first \(n\) terms summing to \(S_{n}\), where \(a_{3}=4\) and \(a_{4}=S_{3}\). 
+The sequence \(\{ b_{n}\}\) satisfies: for each \(n\in\mathbf{N}^{*}\), \(S_{n}+b_{n}\), \(S_{n + 1}+b_{n}\), \(S_{n + 2}+b_{n}\) form a geometric sequence. 
+Let \(c_{n}=\sqrt{\frac{a_{n}}{2b_{n}}}\) for \(n\in\mathbf{N}^{*}\). Prove that \(c_{1}+c_{2}+\cdots +c_{n}<2\sqrt{n}\) for all \(n\in\mathbf{N}^{*}\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(f^{\prime}(x)\) and \(g^{\prime}(x)\) denote the derivative functions of \(f(x)\) and \(g(x)\), respectively. 
+If there exists \(x_{0}\in\mathbf{R}\) such that \(f(x_{0}) = g(x_{0})\) and \(f^{\prime}(x_{0})=g^{\prime}(x_{0})\), 
+then \(x_{0}\) is called an "\(S\) point" of the functions \(f(x)\) and \(g(x)\). 
+Prove that the functions \(f(x)=x\) and \(g(x)=x^{2}+2x - 2\) do not have any "\(S\) point".  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(\{ a_{n}\}\) be an arithmetic sequence with the first term \(a_{1}\) and common difference \(d\), 
+and \(\{ b_{n}\}\) be a geometric sequence with the first term \(b_{1}\) and common ratio \(q\). 
+Given \(a_{1}=b_{1}>0\), \(m\in N^{*}\), \(q\in(1,\sqrt[m]{2}]\), 
+prove that there exists \(d\in\mathbf{R}\) such that \(\vert a_{n}-b_{n}\vert\leq b_{1}\) holds for \(n = 2,3,\cdots,m + 1\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the parabola \(C: y^2 = 2px\) passing through the point \(P(1,2)\), 
+a line \(l\) through \(Q(0,1)\) intersects \(C\) at two distinct points \(A\) and \(B\). 
+The lines \(PA\) and \(PB\) intersect the \(y\)-axis at \(M\) and \(N\) respectively. 
+Let \(O\) be the origin, \(\overrightarrow{QM} = \lambda \overrightarrow{QO}\), and \(\overrightarrow{QN} = \mu \overrightarrow{QO}\). 
+Prove that \(\frac{1}{\lambda} + \frac{1}{\mu}\) is a constant.  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let \(\{ a_{n}\}\) be a geometric sequence with a common ratio greater than \(0\), and its first \(n\) terms sum to \(S_{n}(n\in\mathbf{N}^{*})\). 
+Let \(\{ b_{n}\}\) be an arithmetic sequence. 
+Given that \(a_{1}=1\), \(a_{3}=a_{2}+2\), \(a_{4}=b_{3}+b_{5}\), and \(a_{5}=b_{4}+2b_{6}\). 
+Let \(T_{n}(n\in\mathbf{N}^{*})\) denote the sum of the first \(n\) terms of the sequence \(\{ S_{n}\}\). 
+Prove that \(\sum_{k = 1}^{n}\frac{(T_{k}+b_{k + 2})b_{k}}{(k + 1)(k + 2)}=\frac{2^{n + 2}}{n + 2}-2(n\in\mathbf{N}^{*})\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the functions \(f(x) = a^{x}\) and \(g(x) = \log_{a}x\), where \(a > 1\). 
+If the tangent line to the curve \(y = f(x)\) at the point \((x_{1},f(x_{1}))\) 
+is parallel to the tangent line to the curve \(y = g(x)\) at the point \((x_{2},g(x_{2}))\), 
+prove that \(x_{1}+g(x_{2})=-\frac{2\ln\ln a}{\ln a}\);  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Given the functions \(f(x)=a^{x}\) and \(g(x)=\log_{a}x\) where \(a > 1\), 
+prove that when \(a\geq e^{\frac{1}{e}}\), 
+there exists a line \(l\) that is tangent to both the curve \(y = f(x)\) and the curve \(y = g(x)\).  
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: Let the right focus of the ellipse \(C:\frac{x^{2}}{2}+y^{2}=1\) be \(F\). 
+The line \(l\) passing through \(F\) intersects \(C\) at points \(A\) and \(B\). 
+The coordinates of point \(M\) are \((2,0)\). 
+Let \(O\) be the origin. 
+Prove that \(\angle OMA = \angle OMB\).  
+

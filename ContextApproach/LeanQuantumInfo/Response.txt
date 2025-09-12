@@ -1,0 +1,51 @@
+/-- A quantum gate is a unitary matrix. -/
+theorem IsUnitaryMatrix.is_gate {d : Type*} [Fintype d] [DecidableEq d] (U : Matrix d d ℂ) (h : IsUnitaryMatrix U) : U.IsGate := sorry
+
+/-- The time evolution of a closed quantum system is linear. -/
+theorem linear_time_evolution {d : Type*} [Fintype d] [DecidableEq d] (t : ℝ) : LinearMap ℂ (MState d) (MState d) := by sorry
+
+/-- The probability of measuring state `|ψ⟩` in basis `|ϕ⟩` is given by `|⟨ϕ|ψ⟩|²`. -/
+theorem probability_of_measurement {d : Type*} [Fintype d] (ψ : Ket d) (ϕ : Ket d) :
+    (Complex.normSq (Braket.dot (Ket.to_bra ϕ) ψ)) = sorry := by sorry
+
+/-- There does not exist a unitary operation that clones arbitrary quantum states. -/
+theorem no_cloning_theorem {d : Type*} [Fintype d] [DecidableEq d] (h_card : Fintype.card d > 1) :
+    ¬ ∃ (U : 𝐔[d × d]) (ψ : Ket d),
+    (U.toMatrix) *ᵥ (Braket.prod ψ ψ).vec = (Braket.prod ψ ψ).vec := by sorry
+
+/-- The commutation relation between the Pauli `σₓ` and `σᵧ` matrices is `[σₓ, σᵧ] = 2iσ_z`. -/
+theorem commutator_sigma_x_sigma_y_eq_2i_sigma_z :
+    let σ_x : Matrix (Fin 2) (Fin 2) ℂ := !![0, 1; 1, 0]
+    let σ_y : Matrix (Fin 2) (Fin 2) ℂ := !![0, -I; I, 0]
+    let σ_z : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, -1]
+    σ_x ⬝ σ_y - σ_y ⬝ σ_x = (2:ℂ) * I * σ_z := by sorry
+
+/-- The Kronecker product of two matrices is multiplicative. -/
+theorem Matrix.kronecker_mul {d₁ d₂ d₃ d₄ : Type*} [Fintype d₁] [Fintype d₂] [Fintype d₃] [Fintype d₄]
+    (A : Matrix d₁ d₂ ℂ) (B : Matrix d₃ d₄ ℂ) (C : Matrix d₂ d₅ ℂ) (D : Matrix d₄ d₆ ℂ) :
+    (A ⊗ₖ C) ⬝ (B ⊗ₖ D) = (A ⬝ B) ⊗ₖ (C ⬝ D) := by sorry
+
+open scoped Matrix
+open ComplexConjugate
+
+/-- The Hadamard gate is its own inverse, and its action on the basis state `|0⟩` is the uniform superposition `|+⟩`. -/
+theorem hadamard_gate_properties :
+    let H_mat : Matrix (Fin 2) (Fin 2) ℂ := (1 / Real.sqrt 2) • !![1, 1; 1, -1]
+    let ket_zero : Ket (Fin 2) := Ket.basis 0
+    H_mat ⬝ H_mat = 1 ∧ H_mat ⬝ᵥ ket_zero.vec = (uniform_superposition (d := Fin 2)).vec := by sorry
+
+/-- The controlled-NOT gate flips the target qubit if the control qubit is in state `|1⟩`. -/
+theorem cnot_gate_action :
+    let CNOT_mat : Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℂ := !![1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 0, 1; 0, 0, 1, 0]
+    ∀ (c t : Fin 2),
+    CNOT_mat ⬝ᵥ (Ket.basis (c, t)).vec = (Ket.basis (c, if c = 1 then 1 - t.val else t.val)).vec := by sorry
+
+/-- The Bell state `|Φ⁺⟩` is entangled. -/
+theorem bell_state_is_entangled :
+    (Ket.MES (Fin 2)).IsEntangled := by sorry
+
+/-- The eigenvalues of `σ_z` are `+1` and `-1`. -/
+theorem sigma_z_eigenvalues :
+    let σ_z_mat : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, -1]
+    let eigenvalues := σ_z_mat.eigenvalues
+    (eigenvalues = ![1, -1] ∨ eigenvalues = ![-1, 1]) := by sorry

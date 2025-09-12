@@ -1,0 +1,3695 @@
+[ROLE]  
+You are an expert in formal mathematics and quantum physics and Lean 4.  
+Your task is to translate each natural-language [Question] into a Lean 4 theorem **statement** that compiles.  
+Do not attempt to prove it — always end with `:= by sorry`.  
+Do not repeat the global imports/options. Use the provided global context.  
+Keep each theorem self-contained and faithful to the natural-language text. 
+
+[CONTEXT: GITHUB REPO FILES]
+Repo URL: https://github.com/Timeroot/Lean-QuantumInfo/tree/main 
+
+File: QuantumInfo/Finite/Braket.lean
+--- 
+import QuantumInfo.ForMathlib
+import ClassicalInfo.Distribution
+
+/-!
+Finite dimensional quantum pure states, bra and kets. Mixed states are `MState` in that file.
+
+These could be done with a Hilbert space of Fintype, which would look like
+```lean4
+(H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [FiniteDimensional ℂ H]
+```
+or by choosing a particular `Basis` and asserting it is `Fintype`. But frankly it seems easier to
+mostly focus on the basis-dependent notion of `Matrix`, which has the added benefit of an obvious
+"classical" interpretation (as the basis elements, or diagonal elements of a mixed state). In that
+sense, this quantum theory comes with the a particular classical theory always preferred.
+-/
+
+noncomputable section
+
+open Classical
+open BigOperators
+open ComplexConjugate
+open Kronecker
+open scoped Matrix ComplexOrder
+
+section
+variable (d : Type*) [Fintype d]
+
+/-- A ket as a vector of unit norm. We follow the convention in `Matrix` of vectors as simple functions
+ from a Fintype. Kets are distinctly not a vector space in our notion, as they represent only normalized
+ states and so cannot (in general) be added or scaled. -/
+structure Ket where
+  vec : d → ℂ
+  normalized' : ∑ x, ‖vec x‖ ^ 2 = 1
+  --TODO: change to `vec : EuclideanSpace ℂ d` / `normalized' : ‖vec‖ = 1`
+
+/-- A bra is identical in definition to a `Ket`, but are separate to avoid complex conjugation confusion.
+ They can be interconverted with the adjoint: `Ket.to_bra` and `Bra.to_ket` -/
+structure Bra where
+  vec : d → ℂ
+  normalized' : ∑ x, ‖vec x‖ ^ 2 =1
+
+end section
+
+namespace Braket
+
+scoped notation:max "〈" ψ:90 "∣" => (ψ : Bra _)
+
+scoped notation:max "∣" ψ:90 "〉" => (ψ : Ket _)
+
+variable {d : Type*} [Fintype d]
+
+instance instFunLikeKet : FunLike (Ket d) d ℂ where
+  coe ψ := ψ.vec
+  coe_injective' _ _ h := by rwa [Ket.mk.injEq]
+
+instance instFunLikeBra : FunLike (Bra d) d ℂ where
+  coe ψ := ψ.vec
+  coe_injective' _ _ h := by rwa [Bra.mk.injEq]
+
+def dot (ξ : Bra d) (ψ : Ket d) : ℂ := ∑ x, (ξ x) * (ψ x)
+
+scoped notation "〈" ξ:90 "‖" ψ:90 "〉" => dot (ξ : Bra _) (ψ : Ket _)
+
+end Braket
+
+section braket
+open Braket
+
+variable {d : Type*} [Fintype d]
+
+theorem Ket.apply (ψ : Ket d) (i : d) : ψ i = ψ.vec i :=
+  rfl
+
+theorem Bra.apply (ψ : Bra d) (i : d) : ψ i = ψ.vec i :=
+  rfl
+
+@[ext]
+theorem Ket.ext {ξ ψ : Ket d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
+  DFunLike.ext ξ ψ h
+
+@[ext]
+theorem Bra.ext {ξ ψ : Bra d} (h : ∀ x, ξ x = ψ x) : ξ = ψ :=
+  DFunLike.ext ξ ψ h
+
+theorem Ket.normalized (ψ : Ket d) : ∑ x, Complex.normSq (ψ x) = 1 := by
+  convert ψ.normalized'
+  rw [Complex.normSq_eq_norm_sq]
+  rfl
+
+theorem Bra.normalized (ψ : Bra d) : ∑ x, Complex.normSq (ψ x) = 1 := by
+  convert ψ.normalized'
+  rw [Complex.normSq_eq_norm_sq]
+  rfl
+
+/-- Any Bra can be turned into a Ket by conjugating the elements. -/
+@[coe]
+def Ket.to_bra (ψ : Ket d) : Bra d :=
+  ⟨conj ψ, by simpa using ψ.2⟩
+
+/-- Any Ket can be turned into a Bra by conjugating the elements. -/
+@[coe]
+def Bra.to_ket (ψ : Bra d) : Ket d :=
+  ⟨conj ψ, by simpa using ψ.2⟩
+
+instance instBraOfKet : Coe (Ket d) (Bra d) := ⟨Ket.to_bra⟩
+
+instance instKetOfBra : Coe (Bra d) (Ket d) := ⟨Bra.to_ket⟩
+
+@[simp]
+theorem Bra.eq_conj (ψ : Ket d) (x : d) :〈ψ∣ x = conj (∣ψ〉 x) :=
+  rfl
+
+theorem Bra.apply' (ψ : Ket d) (i : d) : 〈ψ∣ i = conj (ψ.vec i) :=
+  rfl
+
+theorem Ket.exists_ne_zero (ψ : Ket d) : ∃ x, ψ x ≠ 0 := by
+  have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
+  have hpos : ∃ x ∈ Finset.univ, 0 < Complex.normSq (ψ x) := Finset.exists_lt_of_sum_lt hzerolt
+  obtain ⟨x, _, hpos⟩ := hpos
+  rw [Complex.normSq_pos] at hpos
+  use x
+
+theorem Bra.exists_ne_zero (ψ : Bra d) : ∃ x, ψ x ≠ 0 := by
+  have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
+  have hpos : ∃ x ∈ Finset.univ, 0 < Complex.normSq (ψ x) := Finset.exists_lt_of_sum_lt hzerolt
+  obtain ⟨x, _, hpos⟩ := hpos
+  rw [Complex.normSq_pos] at hpos
+  use x
+
+/-- Create a ket out of a vector given it has a nonzero component -/
+def Ket.normalize (v : d → ℂ) (h : ∃ x, v x ≠ 0) : Ket d :=
+  { vec := fun x ↦ v x / √(∑ x : d, ‖v x‖ ^ 2),
+    normalized' := by
+      simp only [← Complex.normSq_eq_norm_sq, Complex.normSq_div,
+        Complex.normSq_ofReal, ←sq]
+      have hnonneg : ∑ x : d, Complex.normSq (v x) ≥ 0 := Fintype.sum_nonneg (fun x => Complex.normSq_nonneg (v x))
+      simp only [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
+      apply inv_mul_cancel₀
+      by_contra hzero
+      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (v x))] at hzero
+      obtain ⟨a, ha⟩ := h
+      have h₁ : (fun x => Complex.normSq (v x)) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact ha
+      exact h₁ (congrFun hzero a)
+  }
+
+/-- A ket is already normalized -/
+theorem Ket.normalize_ket_eq_self (ψ : Ket d) : Ket.normalize (ψ.vec) (Ket.exists_ne_zero ψ) = ψ := by
+  ext x
+  unfold normalize
+  simp only [apply, ψ.normalized', Real.sqrt_one, Complex.ofReal_one, div_one]
+
+/-- Create a bra out of a vector given it has a nonzero component -/
+def Bra.normalize (v : d → ℂ) (h : ∃ x, v x ≠ 0) : Bra d :=
+  { vec := fun x ↦ v x / √(∑ x : d, ‖v x‖ ^ 2),
+    normalized' := by
+      simp only [← Complex.normSq_eq_norm_sq, Complex.normSq_div,
+      Complex.normSq_ofReal, ←sq]
+      have hnonneg : ∑ x : d, Complex.normSq (v x) ≥ 0 := Fintype.sum_nonneg (fun x => Complex.normSq_nonneg (v x))
+      simp only [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
+      apply inv_mul_cancel₀
+      by_contra hzero
+      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (v x))] at hzero
+      obtain ⟨a, ha⟩ := h
+      have h₁ : (fun x => Complex.normSq (v x)) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact ha
+      exact h₁ (congrFun hzero a)
+  }
+
+/-- A bra is already normalized -/
+def Bra.normalize_ket_eq_self (ψ : Bra d) : Bra.normalize (ψ.vec) (Bra.exists_ne_zero ψ) = ψ := by
+  ext x
+  unfold normalize
+  simp only [Ket.to_bra, apply, ψ.normalized', Real.sqrt_one, Complex.ofReal_one, div_one]
+
+/-- Ket form by the superposition of all elements in `d`.
+Commonly denoted by |+⟩, especially for qubits -/
+def uniform_superposition [hdne : Nonempty d] : Ket d := by
+  let f : d → ℂ := fun _ ↦ 1
+  have hfnezero : ∃ x, f x ≠ 0 := by
+    obtain ⟨i⟩ := hdne
+    use i
+    simp only [f, ne_eq, one_ne_zero, not_false_eq_true]
+  exact Ket.normalize f hfnezero
+
+/-- There exists a ket for every nonempty `d`.
+Here, we use the uniform superposition -/
+instance instInhabited [Nonempty d] : Inhabited (Ket d) where
+  default := uniform_superposition
+
+/-- Construct the Ket corresponding to a basis vector, with a +1 phase. -/
+def Ket.basis (i : d) : Ket d :=
+  ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
+
+/-- Construct the Bra corresponding to a basis vector, with a +1 phase. -/
+def Bra.basis (i : d) : Bra d :=
+  ⟨fun j ↦ if i = j then 1 else 0, by simp [apply_ite]⟩
+
+/-- A Bra can be viewed as a function from Ket's to ℂ. -/
+instance instFunLikeBraket : FunLike (Bra d) (Ket d) ℂ where
+  coe ξ := dot ξ
+  coe_injective' x y h := by
+    ext i
+    simpa [Ket.basis, dot, Ket.apply] using congrFun h (Ket.basis i)
+
+/-- The inner product of any state with itself is 1. -/
+theorem Braket.dot_self_eq_one (ψ : Ket d) :〈ψ‖ψ〉= 1 := by
+  have h₁ : ∀x, conj (ψ x) * ψ x = Complex.normSq (ψ x) := fun x ↦ by
+    rw [Complex.normSq_eq_conj_mul_self]
+  simp only [dot, Bra.eq_conj, h₁]
+  have h₂ := congrArg Complex.ofReal ψ.normalized
+  simpa using h₂
+
+section prod
+variable {d d₁ d₂ : Type*} [Fintype d] [Fintype d₁] [Fintype d₂]
+
+/-- The outer product of two kets, creating an unentangled state. -/
+def Ket.prod (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : Ket (d₁ × d₂) where
+  vec := fun (i,j) ↦ ψ₁ i * ψ₂ j
+  normalized' := by
+    simp only [Fintype.sum_prod_type, norm_mul, ← Complex.normSq_eq_norm_sq, mul_pow,
+      ← Finset.mul_sum, ψ₂.normalized, mul_one, ψ₁.normalized]
+
+infixl:100 " ⊗ " => Ket.prod
+
+/-- A Ket is a product if it's `Ket.prod` of two kets. -/
+def Ket.IsProd (ψ : Ket (d₁ × d₂)) : Prop := ∃ ξ φ, ψ = ξ ⊗ φ
+
+/-- A Ket is entangled if it's not `Ket.prod` of two kets. -/
+def Ket.IsEntangled (ψ : Ket (d₁ × d₂)) : Prop := ¬ψ.IsProd
+
+/-- `Ket.prod` states are product states. -/
+@[simp]
+theorem Ket.IsProd_prod (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : (ψ₁.prod ψ₂).IsProd :=
+  ⟨ψ₁, ψ₂, rfl⟩
+
+/-- `Ket.prod` states are not entangled states. -/
+@[simp]
+theorem Ket.not_IsEntangled_prod (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : ¬(ψ₁.prod ψ₂).IsEntangled :=
+  (· (ψ₁.IsProd_prod ψ₂))
+
+/-- A ket is a product state iff its components are cross-multiplicative. -/
+theorem Ket.IsProd_iff_mul_eq_mul (ψ : Ket (d₁ × d₂)) : ψ.IsProd ↔
+    ∀ i₁ i₂ j₁ j₂, ψ (i₁,j₁)  * ψ (i₂,j₂) = ψ (i₁,j₂) * ψ (i₂,j₁) := by
+  constructor
+  · rintro ⟨ξ,φ,rfl⟩ i₁ i₂ j₁ j₂
+    simp only [prod, apply]
+    ring_nf
+  · intro hcrossm
+    obtain ⟨⟨a, b⟩, hψnonZero⟩ := Ket.exists_ne_zero ψ
+    -- May be able to simplify proof below by using Ket.normalize
+    let v₁ : d₁ → ℂ := fun x => ‖ψ (a, b)‖ / (ψ (a, b)) * ((ψ (x, b)) / √(∑ i : d₁, ‖ψ (i, b)‖^2))
+    let v₂ : d₂ → ℂ := fun y => ψ (a, y) / √(∑ j : d₂, ‖ψ (a, j)‖^2)
+    have hv1Norm : ∑ x, ‖v₁ x‖^2 = 1 := by
+      simp only [← Complex.normSq_eq_norm_sq, v₁, Complex.normSq_mul, Complex.normSq_div,
+      Complex.normSq_ofReal, ← sq]
+      rw [div_self _]
+      have hnonneg : ∑ i : d₁, Complex.normSq (ψ (i, b)) ≥ 0 := Fintype.sum_nonneg (fun i => Complex.normSq_nonneg (ψ (i, b)))
+      · simp_rw [Real.sq_sqrt hnonneg, one_mul, div_eq_inv_mul, ←Finset.mul_sum]
+        apply inv_mul_cancel₀
+        by_contra hzero
+        rw [Fintype.sum_eq_zero_iff_of_nonneg (fun i => Complex.normSq_nonneg (ψ (i, b)))] at hzero
+        have h₁ : (fun i => Complex.normSq (ψ (i,b))) a ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact hψnonZero
+        rw [hzero, Pi.zero_apply, ne_eq, eq_self, not_true_eq_false] at h₁
+        exact h₁
+      · simp_all only [ne_eq, map_eq_zero, not_false_eq_true]
+    have hv2Norm : ∑ x, ‖v₂ x‖^2 = 1 := by
+      simp only [← Complex.normSq_eq_norm_sq, v₂, Complex.normSq_div,
+      Complex.normSq_ofReal, ← sq]
+      have hnonneg : ∑ j : d₂, Complex.normSq (ψ (a, j)) ≥ 0 := Fintype.sum_nonneg (fun j => Complex.normSq_nonneg (ψ (a, j)))
+      simp_rw [Real.sq_sqrt hnonneg, div_eq_inv_mul, ←Finset.mul_sum]
+      apply inv_mul_cancel₀
+      by_contra hzero
+      rw [Fintype.sum_eq_zero_iff_of_nonneg (fun j => Complex.normSq_nonneg (ψ (a, j)))] at hzero
+      have h₁ : (fun j => Complex.normSq (ψ (a, j))) b ≠ 0 := by simp only [ne_eq, map_eq_zero]; exact hψnonZero
+      rw [hzero, Pi.zero_apply, ne_eq, eq_self, not_true_eq_false] at h₁
+      exact h₁
+    let ψ₁ : Ket d₁ := ⟨v₁, hv1Norm⟩
+    let ψ₂ : Ket d₂ := ⟨v₂, hv2Norm⟩
+    use ψ₁, ψ₂
+    ext ⟨x, y⟩
+    have hψfun : ψ (x, y) = (ψ (x, b) * ψ (a, y)) / ψ (a, b) := eq_div_of_mul_eq hψnonZero (hcrossm x a y b)
+    have hψnorm : (∑ z : d₁ × d₂, Complex.normSq (ψ.vec (z.1, b) * ψ.vec (a, z.2))) = Complex.normSq (ψ (a, b)) :=
+    calc
+      ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (z.1, b) * ψ.vec (a, z.2)) =
+        ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (a, b) * ψ.vec (z.1, z.2)) := by simp only [← apply, hcrossm, mul_comm]
+      _ = ∑ z : d₁ × d₂, Complex.normSq (ψ.vec (a, b)) * Complex.normSq (ψ.vec (z.1, z.2)) := by simp only [Complex.normSq_mul]
+      _ = Complex.normSq (ψ.vec (a, b)) * ∑ z : d₁ × d₂, Complex.normSq (ψ.vec z) := by rw [←Finset.mul_sum]
+      _ = Complex.normSq (ψ.vec (a, b)) := by simp only [← apply, ψ.normalized, mul_one]
+    simp [prod, apply, v₁, v₂]
+    rw [mul_assoc, ←mul_div_mul_comm, ←Complex.ofReal_mul, ←Real.sqrt_mul (Finset.sum_nonneg _)]
+    · -- simp_rw [Fintype.sum_mul_sum, ←Fintype.sum_prod_type',
+      -- Fintype.sum_congr _ _ (fun z : d₁ × d₂ => (Complex.normSq_mul (ψ.vec (z.1, b)) (ψ.vec (a, z.2))).symm),
+      -- hψnorm, Complex.normSq_eq_abs, Real.sqrt_sq_eq_abs, Complex.abs_abs, apply]
+      -- ring_nf
+      -- rw [mul_comm, ←mul_assoc, ←mul_assoc, ←mul_assoc]
+      -- nth_rw 2 [←inv_inv (Complex.ofReal (Complex.abs (ψ.vec (a, b))))]
+      -- rw [Complex.mul_inv_cancel _]
+      -- · rw [one_mul]
+      --   ring_nf at hψfun
+      --   simp_rw [apply, mul_comm, mul_comm (ψ.vec (a, y)) _, ←mul_assoc] at hψfun
+      --   exact hψfun
+      -- · simp only [ne_eq, inv_eq_zero, Complex.ofReal_eq_zero, map_eq_zero]
+      --   exact hψnonZero
+      sorry
+    · simp
+end prod
+
+section mes
+/-- The Maximally Entangled State, or MES, on a d×d system. In principle there are many, this
+is specifically the MES with an all-positive phase. For instance on `d := Fin 2`, this is the
+Bell state. -/
+def Ket.MES (d) [Fintype d] [Nonempty d] : Ket (d × d) where
+  vec := fun (i,j) ↦ if i = j then 1 / Real.sqrt (Fintype.card (α := d)) else 0
+  normalized' := by
+    simp [apply_ite, Fintype.sum_prod_type]
+
+/-- On any space of dimension at least two, the maximally entangled state `MES` is entangled. -/
+theorem Ket.MES_isEntangled [Nontrivial d] : (Ket.MES d).IsEntangled := by
+  obtain ⟨x, y, h⟩ := @Nontrivial.exists_pair_ne d _
+  rw [IsEntangled, MES, IsProd_iff_mul_eq_mul]
+  push_neg
+  use x, y, x, y
+  simp [apply, h]
+
+end mes
+
+section equiv
+
+/-- The equivalence relation on `Ket` where two kets equivalent if they are equal up to a global phase, i.e. `∃ z, ‖z‖ = 1 ∧ a.vec = z • b.vec -/
+def Ket.PhaseEquiv : Setoid (Ket d) where
+  r a b := ∃ z : ℂ, ‖z‖ = 1 ∧ a.vec = z • b.vec
+  iseqv := {
+    refl := fun x ↦ ⟨1, by simp⟩,
+    symm := fun ⟨z,h₁,h₂⟩ ↦ ⟨conj z,
+      by simp [h₁],
+      by simp [h₁, h₂, smul_smul, ← Complex.normSq_eq_conj_mul_self, Complex.normSq_eq_norm_sq]⟩,
+    trans := fun ⟨z₁,h₁₁,h₁₂⟩ ⟨z₂,h₂₁,h₂₂⟩ ↦ ⟨z₁ * z₂,
+      by simp [h₁₁, h₂₁],
+      by simp [h₁₂, h₂₂, smul_smul]⟩
+  }
+
+variable (d) in
+/-- The type of `Ket`s up to a global phase equivalence, as given by `Ket.PhaseEquiv`. In particular, `MState`s really only care about a KetUpToPhase, and not Kets themselves. -/
+def KetUpToPhase :=
+  @Quotient (Ket d) Ket.PhaseEquiv
+
+end equiv
+end braket
+--- 
+
+File: Mstate.lean
+---
+import QuantumInfo.ForMathlib
+import ClassicalInfo.Distribution
+import QuantumInfo.Finite.Braket
+
+import Mathlib.Logic.Equiv.Basic
+
+/-!
+Finite dimensional quantum mixed states, ρ.
+
+The same comments apply as in `Braket`:
+
+These could be done with a Hilbert space of Fintype, which would look like
+```lean4
+(H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [FiniteDimensional ℂ H]
+```
+or by choosing a particular `Basis` and asserting it is `Fintype`. But frankly it seems easier to
+mostly focus on the basis-dependent notion of `Matrix`, which has the added benefit of an obvious
+"classical" interpretation (as the basis elements, or diagonal elements of a mixed state). In that
+sense, this quantum theory comes with the a particular classical theory always preferred.
+
+Important definitions:
+ * `instMixable`: the `Mixable` instance allowing convex combinations of `MState`s
+ * `ofClassical`: Mixed states representing classical distributions
+ * `purity`: The purity `Tr[ρ^2]` of a state
+ * `spectrum`: The spectrum of the matrix
+ * `uniform`: The maximally mixed state
+ * `mix`: The total state corresponding to an ensemble
+ * `average`: Averages a function over an ensemble, with appropriate weights
+-/
+
+noncomputable section
+
+open BigOperators
+open ComplexConjugate
+open HermitianMat
+open scoped Matrix ComplexOrder
+
+/-- A **mixed quantum state** is a PSD matrix with trace 1.
+
+We don't `extend (M : HermitianMat d ℂ)` because that gives an annoying thing where
+`M` is actually a `Subtype`, which means `ρ.M.foo` notation doesn't work. -/
+@[ext]
+structure MState (d : Type*) [Fintype d] [DecidableEq d] where
+  M : HermitianMat d ℂ
+  zero_le : 0 ≤ M
+  tr : HermitianMat.trace M = 1
+
+namespace MState
+
+variable {d d₁ d₂ d₃ : Type*}
+variable [Fintype d] [Fintype d₁] [Fintype d₂] [Fintype d₃]
+variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂] [DecidableEq d₃]
+
+attribute [coe] MState.M
+instance instCoe : Coe (MState d) (HermitianMat d ℂ) := ⟨MState.M⟩
+
+attribute [simp] MState.tr
+
+/-- The underlying `Matrix` in an MState. Prefer `MState.M` for the `HermitianMat`. -/
+def m (ρ : MState d) : Matrix d d ℂ := ρ.M.toMat
+
+@[simp]
+theorem toMat_M (ρ : MState d) : ρ.M.toMat = ρ.m := by
+  rfl
+
+--XXX These are methods that directly reference the matrix, "m" or ".val".
+-- We'd like to remove these (where possible) so that mostly go through HermitianMat
+-- where possible.
+theorem pos (ρ : MState d) : ρ.m.PosSemidef :=
+  HermitianMat.zero_le_iff.mp ρ.zero_le
+
+/-- Every mixed state is Hermitian. -/
+theorem Hermitian (ρ : MState d) : ρ.m.IsHermitian :=
+  ρ.pos.left
+
+@[simp]
+theorem tr' (ρ : MState d) : ρ.m.trace = 1 := by
+  rw [MState.m.eq_def, ← HermitianMat.trace_eq_trace_rc, ρ.tr]
+  simp
+
+theorem ext_m {ρ₁ ρ₂ : MState d} (h : ρ₁.m = ρ₂.m) : ρ₁ = ρ₂ := by
+  rw [MState.mk.injEq]
+  ext1
+  exact h
+--XXX
+
+/-- The map from mixed states to their matrices is injective -/
+theorem toMat_inj : (MState.m (d := d)).Injective :=
+  fun _ _ h ↦ by ext1; ext1; exact h
+
+theorem M_Injective : Function.Injective (MState.M (d := d)) := by
+  intro _ _
+  exact MState.ext
+
+variable (d) in
+/-- The matrices corresponding to MStates are `Convex ℝ` -/
+theorem convex : Convex ℝ (Set.range (MState.M (d := d))) := by
+  simp only [Convex, Set.mem_range, StarConvex,
+    forall_exists_index, forall_apply_eq_imp_iff]
+  intro x y a b ha hb hab
+  replace hab : a + b = (1 : ℂ) := by norm_cast
+  have := HermitianMat.convex_cone x.zero_le y.zero_le ha hb
+  exact ⟨⟨_, this, by simpa using mod_cast hab⟩, rfl⟩
+
+instance instMixable : Mixable (HermitianMat d ℂ) (MState d) where
+  to_U := MState.M
+  to_U_inj := MState.ext
+  mkT {u} := fun h ↦
+    ⟨⟨u, h.casesOn fun t ht ↦ ht ▸ t.zero_le,
+      h.casesOn fun t ht ↦ ht ▸ t.tr⟩, rfl⟩
+  convex := convex d
+
+--An MState is a witness that d is nonempty.
+instance nonempty (ρ : MState d) : Nonempty d := by
+  by_contra h
+  simpa [HermitianMat.trace_eq_re_trace, not_nonempty_iff.mp h] using ρ.tr
+
+-- Could have used properties of ρ.spectrum
+theorem eigenvalue_nonneg (ρ : MState d) : ∀ i, 0 ≤ ρ.Hermitian.eigenvalues i := by
+  apply (Matrix.PosSemidef.nonneg_iff_eigenvalue_nonneg ρ.Hermitian).mp
+  exact ρ.zero_le
+
+-- Could have used properties of  ρ.spectrum
+theorem eigenvalue_le_one (ρ : MState d) : ∀ i, ρ.Hermitian.eigenvalues i ≤ 1 := by
+  intro i
+  convert Finset.single_le_sum (fun y _ ↦ ρ.pos.eigenvalues_nonneg y) (Finset.mem_univ i)
+  rw [ρ.M.sum_eigenvalues_eq_trace, ρ.tr]
+
+theorem le_one (ρ : MState d) : ρ.M ≤ 1 := by
+  rw [Subtype.mk_le_mk]
+  simp only [HermitianMat.val_eq_coe, selfAdjoint.val_one]
+  suffices h : ρ.m ≤ (1 : ℝ) • 1 by
+    rw [one_smul] at h
+    exact h
+  apply (Matrix.PosSemidef.le_smul_one_of_eigenvalues_iff ρ.pos 1).mp
+  exact eigenvalue_le_one ρ
+
+/-- The inner product of two MState's, as a real number between 0 and 1. -/
+def inner (ρ : MState d) (σ : MState d) : Prob :=
+  ⟨ρ.M.inner σ.M, ρ.M.inner_ge_zero ρ.zero_le σ.zero_le,
+    (ρ.M.inner_le_mul_trace ρ.zero_le σ.zero_le).trans (by simp)⟩
+
+section exp_val
+
+def exp_val_ℂ (ρ : MState d) (T : Matrix d d ℂ) : ℂ :=
+  (T * ρ.m).trace
+
+--TODO: Bundle as a ContinuousLinearMap.
+/-- The **expectation value** of an operator on a quantum state. -/
+def exp_val (ρ : MState d) (T : HermitianMat d ℂ) : ℝ :=
+  ρ.M.inner T
+
+theorem exp_val_nonneg {T : HermitianMat d ℂ} (h : 0 ≤ T) (ρ : MState d) : 0 ≤ ρ.exp_val T :=
+  HermitianMat.inner_ge_zero ρ.zero_le h
+
+@[simp]
+theorem exp_val_zero (ρ : MState d) : ρ.exp_val 0 = 0 := by
+  simp [MState.exp_val]
+
+@[simp]
+theorem exp_val_one (ρ : MState d) : ρ.exp_val 1 = 1 := by
+  simp [MState.exp_val]
+
+theorem exp_val_le_one {T : HermitianMat d ℂ} (h : T ≤ 1) (ρ : MState d) : ρ.exp_val T ≤ 1 := by
+  have hmono := HermitianMat.inner_mono ρ.zero_le h
+  rwa [HermitianMat.inner_one ρ.M, ρ.tr] at hmono
+
+theorem exp_val_prob {T : HermitianMat d ℂ} (h : 0 ≤ T ∧ T ≤ 1) (ρ : MState d) :
+    0 ≤ ρ.exp_val T ∧ ρ.exp_val T ≤ 1 :=
+  ⟨ρ.exp_val_nonneg h.1, ρ.exp_val_le_one h.2⟩
+
+theorem exp_val_sub (ρ : MState d) (A B : HermitianMat d ℂ) :
+    ρ.exp_val (A - B) = ρ.exp_val A - ρ.exp_val B := by
+  simp [exp_val, HermitianMat.inner_left_sub]
+
+/-- If a PSD observable `A` has expectation value of 0 on a state `ρ`, it must entirely contain the
+support of `ρ` in its kernel. -/
+theorem exp_val_eq_zero_iff (ρ : MState d) {A : HermitianMat d ℂ} (hA₁ : 0 ≤ A)   :
+    ρ.exp_val A = 0 ↔ ρ.M.support ≤ A.ker := by
+  exact ρ.M.inner_zero_iff ρ.zero_le hA₁
+
+/-- If an observable `A` has expectation value of 1 on a state `ρ`, it must entirely contain the
+support of `ρ` in its 1-eigenspace. -/
+theorem exp_val_eq_one_iff (ρ : MState d) {A : HermitianMat d ℂ} (hA₂ : A ≤ 1) :
+    ρ.exp_val A = 1 ↔ ρ.M.support ≤ (1 - A).ker := by
+  rw [← exp_val_eq_zero_iff ρ (A := 1 - A) (HermitianMat.zero_le_iff.mpr hA₂)]
+  rw [exp_val_sub, exp_val_one]
+  rw [sub_eq_zero, eq_comm]
+
+theorem exp_val_add (ρ : MState d) (A B : HermitianMat d ℂ) :
+    ρ.exp_val (A + B) = ρ.exp_val A + ρ.exp_val B := by
+  simp [MState.exp_val, HermitianMat.inner_left_distrib]
+
+@[simp]
+theorem exp_val_smul (ρ : MState d) (r : ℝ) (A : HermitianMat d ℂ) :
+    ρ.exp_val (r • A) = r * ρ.exp_val A := by
+  simp [MState.exp_val]
+
+@[gcongr]
+theorem exp_val_le_exp_val (ρ : MState d) {A B : HermitianMat d ℂ} (h : A ≤ B) :
+    ρ.exp_val A ≤ ρ.exp_val B := by
+  simp only [MState.exp_val]
+  refine ρ.M.inner_mono ρ.zero_le h
+
+end exp_val
+
+section pure
+
+/-- A mixed state can be constructed as a pure state arising from a ket. -/
+def pure (ψ : Ket d) : MState d where
+  M := {
+    val := Matrix.vecMulVec ψ (ψ : Bra d)
+    property := (Matrix.PosSemidef.outer_self_conj ψ).1
+  }
+  zero_le := HermitianMat.zero_le_iff.mpr (.outer_self_conj ψ)
+  tr := by
+    have h₁ (x) : ψ x * conj (ψ x) = Complex.normSq (ψ x) := by
+      rw [mul_comm, Complex.normSq_eq_conj_mul_self]
+    simp [HermitianMat.trace_eq_re_trace, Matrix.trace, Matrix.vecMulVec_apply, Bra.eq_conj, h₁]
+    exact ψ.normalized
+
+@[simp]
+theorem pure_of (ψ : Ket d) : (pure ψ).m i j = (ψ i) * conj (ψ j) := by
+  rfl
+
+/-- The purity of a state is Tr[ρ^2]. This is a `Prob`, because it is always between zero and one. -/
+def purity (ρ : MState d) : Prob :=
+  ⟨ρ.M.inner ρ.M, ⟨HermitianMat.inner_ge_zero ρ.zero_le ρ.zero_le,
+    by simpa using  HermitianMat.inner_le_mul_trace ρ.zero_le ρ.zero_le⟩⟩
+
+/-- The eigenvalue spectrum of a mixed quantum state, as a `Distribution`. -/
+def spectrum [DecidableEq d] (ρ : MState d) : Distribution d :=
+  Distribution.mk'
+    (ρ.M.H.eigenvalues ·)
+    (ρ.pos.eigenvalues_nonneg ·)
+    (by rw [ρ.M.sum_eigenvalues_eq_trace, ρ.tr])
+
+/-- The specturm of a pure state is (1,0,0,...), i.e. a constant distribution. -/
+theorem spectrum_pure_eq_constant (ψ : Ket d) :
+    ∃ i, (pure ψ).spectrum = Distribution.constant i := by
+  let ρ := pure ψ
+  -- Prove 1 is in the spectrum of pure ψ by exhibiting an eigenvector with value 1.
+  have : ∃i, (pure ψ).spectrum i = 1 := by
+    simp [spectrum, Distribution.mk']
+    have hEig : ∃i, (pure ψ).M.H.eigenvalues i = 1 := by
+      -- Prove ψ is an eigenvector of ρ = pure ψ
+      have hv : ρ.M *ᵥ ψ = ψ := by
+        ext
+        simp_rw [ρ, pure, Matrix.mulVec, HermitianMat.toMat, Matrix.vecMulVec_apply, dotProduct,
+        Bra.apply', Ket.apply, mul_assoc, ← Finset.mul_sum, ← Complex.normSq_eq_conj_mul_self,
+        ← Complex.ofReal_sum, ← Ket.apply, ψ.normalized, Complex.ofReal_one, mul_one]
+      let U : Matrix.unitaryGroup d ℂ := star ρ.M.H.eigenvectorUnitary -- Diagonalizing unitary of ρ
+      let w : d → ℂ := U *ᵥ ψ
+      -- Prove w = U ψ is an eigenvector of the diagonalized matrix of ρ = pure ψ
+      have hDiag : Matrix.diagonal (RCLike.ofReal ∘ ρ.M.H.eigenvalues) *ᵥ w = w := by
+        simp_rw [←Matrix.IsHermitian.star_mul_self_mul_eq_diagonal, eq_comm,
+        ←Matrix.mulVec_mulVec, w, U, Matrix.mulVec_mulVec] -- Uses spectral theorem
+        simp_all
+        rw [←Matrix.mulVec_mulVec, hv]
+      -- Prove w = U ψ is nonzero by contradiction
+      have hwNonZero : ∃j, w j ≠ 0 := by
+        by_contra hwZero
+        simp at hwZero
+        rw [←funext_iff] at hwZero
+        -- If w is zero, then ψ is zero, since U is invertible
+        have hψZero : ∀x, ψ x = 0 := by
+          apply congr_fun
+          -- Prove U is invertible
+          have hUdetNonZero : (U : Matrix d d ℂ).det ≠ 0 := by
+            by_contra hDetZero
+            obtain ⟨u, huUni⟩ := U
+            have h0uni: 0 ∈ unitary ℂ := by
+              rw [←hDetZero]
+              simp
+              exact Matrix.det_of_mem_unitary huUni
+            rw [unitary.mem_iff] at h0uni
+            simp_all
+          exact Matrix.eq_zero_of_mulVec_eq_zero hUdetNonZero hwZero
+        -- Reach an contradiction that ψ has norm 0
+        have hψn := Ket.normalized ψ
+        have hnormZero : ∀ x : d, Complex.normSq (ψ x) = 0 := fun x => by
+          rw [hψZero x, Complex.normSq_zero]
+        have hsumZero : ∑ x : d, Complex.normSq (ψ x) = 0 := by
+          apply Finset.sum_eq_zero
+          intros x _
+          exact hnormZero x
+        simp_all
+      obtain ⟨j, hwNonZero'⟩ := hwNonZero
+      have hDiagj := congr_fun hDiag j
+      rw [Matrix.mulVec_diagonal, mul_eq_right₀ hwNonZero'] at hDiagj
+      use j
+      simp_all
+    obtain ⟨i, hEig'⟩ := hEig
+    use i
+    ext
+    exact hEig'
+  --If 1 is in a distribution, the distribution is a constant.
+  obtain ⟨i, hi⟩ := this
+  use i
+  exact Distribution.constant_of_exists_one hi
+
+/-- If the specturm of a mixed state is (1,0,0...) i.e. a constant distribution, it is
+ a pure state. -/
+theorem pure_of_constant_spectrum (ρ : MState d) (h : ∃ i, ρ.spectrum = Distribution.constant i) :
+    ∃ ψ, ρ = pure ψ := by
+  obtain ⟨i, h'⟩ := h
+  -- Translate assumption to eigenvalues being (1,0,0,...)
+  have hEig : ρ.M.H.eigenvalues = fun x => if x = i then 1 else 0 := by
+    ext x
+    simp [spectrum, Distribution.constant, Distribution.mk'] at h'
+    rw [Subtype.mk.injEq] at h'
+    have h'x := congr_fun h' x
+    rw [if_congr (Eq.comm) (Eq.refl 1) (Eq.refl 0)]
+    rw [Prob.eq_iff] at h'x
+    dsimp at h'x
+    rw [h'x]
+    split_ifs
+    case pos => rfl
+    case neg => rfl
+  -- Choose the eigenvector v of ρ with eigenvalue 1 to make ψ
+  let ⟨u, huUni⟩ := ρ.M.H.eigenvectorUnitary -- Diagonalizing unitary of ρ
+  let D : Matrix d d ℂ := Matrix.diagonal (RCLike.ofReal ∘ ρ.M.H.eigenvalues) -- Diagonal matrix of ρ
+  let v : EuclideanSpace ℂ d := ρ.M.H.eigenvectorBasis i
+  -- Prove v is normalized
+  have hUvNorm : ∑ x, ‖v x‖^2 = 1 := by
+    have hinnerv : Inner.inner ℂ v v = 1 := by
+      have := ρ.M.H.eigenvectorBasis.orthonormal
+      rw [orthonormal_iff_ite] at this
+      convert this i i
+      simp
+    simp only [PiLp.inner_apply, RCLike.inner_apply, Complex.mul_conj'] at hinnerv
+    rw [← Fintype.sum_equiv (Equiv.refl d) _ (fun x => (Complex.ofReal ‖v x‖) ^ 2) (fun x => Complex.ofReal_pow ‖v x‖ 2)] at hinnerv
+    rw [← Complex.ofReal_sum Finset.univ (fun x => ‖v x‖ ^ 2), Complex.ofReal_eq_one] at hinnerv
+    exact hinnerv
+  let ψ : Ket d := ⟨v, hUvNorm⟩ -- Construct ψ
+  use ψ
+  ext j k
+  -- Use spectral theorem to prove that ρ = pure ψ
+  rw [Matrix.IsHermitian.spectral_theorem ρ.M.H, Matrix.mul_apply]
+  simp [ψ, v, hEig, -toMat_M]
+  have hsum : ∀ x ∈ Finset.univ, x ∉ ({i} : Finset d) → (ρ.M.H.eigenvectorBasis x j) * (↑(if x = i then 1 else 0) : ℝ) * (starRingEnd ℂ) (ρ.Hermitian.eigenvectorBasis x k) = 0 := by
+    intros x hx hxnoti
+    rw [Finset.mem_singleton] at hxnoti
+    rw [if_neg hxnoti, Complex.ofReal_zero]
+    ring
+  simp_rw [←Finset.sum_subset (Finset.subset_univ {i}) hsum, Finset.sum_singleton, reduceIte, Complex.ofReal_one, mul_one]
+  rfl
+
+/-- A state ρ is pure iff its spectrum is (1,0,0,...) i.e. a constant distribution. -/
+theorem pure_iff_constant_spectrum (ρ : MState d) : (∃ ψ, ρ = pure ψ) ↔
+    ∃ i, ρ.spectrum = Distribution.constant i :=
+  ⟨fun h ↦ h.rec fun ψ h₂ ↦ h₂ ▸ spectrum_pure_eq_constant ψ,
+  pure_of_constant_spectrum ρ⟩
+
+theorem pure_iff_purity_one (ρ : MState d) : (∃ ψ, ρ = pure ψ) ↔ ρ.purity = 1 := by
+  --purity = exp(-Collision entropy)
+  --purity eq 1 iff collision entropy is zero
+  --entropy is zero iff distribution is constant
+  --distribution is constant iff pure
+  sorry
+
+end pure
+
+section prod
+
+def prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : MState (d₁ × d₂) where
+  M := ρ₁.M ⊗ₖ ρ₂.M
+  zero_le := HermitianMat.zero_le_iff.mpr (ρ₁.pos.PosSemidef_kronecker ρ₂.pos)
+  tr := by simp
+
+infixl:100 " ⊗ " => MState.prod
+
+/-- The product of pure states is a pure product state , `Ket.prod`. -/
+theorem pure_prod_pure (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : pure (ψ₁ ⊗ ψ₂) = (pure ψ₁) ⊗ (pure ψ₂) := by
+  ext
+  simp [Ket.prod, Ket.apply, prod]
+  ac_rfl
+
+end prod
+
+/-- A representation of a classical distribution as a quantum state, diagonal in the given basis. -/
+def ofClassical (dist : Distribution d) : MState d where
+  M := HermitianMat.diagonal (fun x ↦ dist x)
+  zero_le := HermitianMat.zero_le_iff.mpr (by simp [HermitianMat.diagonal, Matrix.posSemidef_diagonal_iff])
+  tr := by simp [HermitianMat.trace_diagonal]
+
+@[simp]
+theorem coe_ofClassical (dist : Distribution d) :
+    (MState.ofClassical dist).M = HermitianMat.diagonal (dist ·) := by
+  rfl
+
+theorem ofClassical_pow (dist : Distribution d) (p : ℝ) :
+    (MState.ofClassical dist).M ^ p = HermitianMat.diagonal (fun i ↦ (dist i) ^ p) := by
+  rw [coe_ofClassical]
+  convert HermitianMat.diagonal_pow (dist ·) p
+
+/-- The maximally mixed state. -/
+def uniform [Nonempty d] : MState d := ofClassical Distribution.uniform
+
+/-- There is exactly one state on a dimension-1 system. -/
+--note that this still takes (and uses) the `Fintype d` and `DecidableEq d` instances on `MState d`.
+--Even though instances for those can be derived from `Unique d`, we want this `Unique` instance to
+--apply on `@MState d ?x ?y` for _any_ x and y.
+instance instUnique [Unique d] : Unique (MState d) where
+  default := @uniform _ _ _ _
+  uniq := by
+    intro ρ
+    ext
+    have h₁ := ρ.tr
+    have h₂ := (@uniform _ _ _ _ : MState d).tr
+    simp [Matrix.trace, Unique.eq_default, -MState.tr, HermitianMat.trace_eq_re_trace] at h₁ h₂ ⊢
+    apply Complex.ext
+    · exact h₁.trans h₂.symm
+    · trans 0
+      exact ρ.M.Complex_im_eq_zero default
+      exact (uniform.M.Complex_im_eq_zero default).symm
+
+/-- There exists a mixed state for every nonempty `d`.
+Here, the maximally mixed one is chosen. -/
+instance instInhabited [Nonempty d] : Inhabited (MState d) where
+  default := uniform
+
+section ptrace
+
+-- TODO:
+-- * Partial trace of direct product is the original state
+
+/-- Partial tracing out the left half of a system. -/
+def traceLeft (ρ : MState (d₁ × d₂)) : MState d₂ where
+  M := ⟨ρ.m.traceLeft, ρ.M.H.traceLeft⟩
+  zero_le :=  HermitianMat.zero_le_iff.mpr (ρ.pos.traceLeft)
+  tr := sorry --ρ.tr' ▸ ρ.m.traceLeft_trace
+
+/-- Partial tracing out the right half of a system. -/
+def traceRight (ρ : MState (d₁ × d₂)) : MState d₁ where
+  M := ⟨ρ.m.traceRight, ρ.M.H.traceRight⟩
+  zero_le := HermitianMat.zero_le_iff.mpr (ρ.pos.traceRight)
+  tr := sorry --ρ.tr ▸ ρ.m.traceRight_trace
+
+/-- Taking the direct product on the left and tracing it back out gives the same state. -/
+@[simp]
+theorem traceLeft_prod_eq (ρ₁ : MState d₁) (ρ₂ : MState d₂) : traceLeft (ρ₁ ⊗ ρ₂) = ρ₂ := by
+  ext
+  simp_rw [traceLeft, Matrix.traceLeft, prod]
+  have h : (∑ i : d₁, ρ₁.M.toMat i i) = 1 := ρ₁.tr'
+  simp [MState.m, ← Finset.sum_mul, h, -toMat_M]
+
+/-- Taking the direct product on the right and tracing it back out gives the same state. -/
+@[simp]
+theorem traceRight_prod_eq (ρ₁ : MState d₁) (ρ₂ : MState d₂) : traceRight (ρ₁ ⊗ ρ₂) = ρ₁ := by
+  ext
+  simp_rw [traceRight, Matrix.traceRight, prod]
+  have h : (∑ i : d₂, ρ₂.M.toMat i i) = 1 := ρ₂.tr'
+  simp [MState.m, ← Finset.mul_sum, h, -toMat_M]
+
+end ptrace
+
+-- TODO: direct sum (by zero-padding)
+
+--TODO: Spectra of left- and right- partial traces of a pure state are equal.
+
+/-- Spectrum of direct product. There is a permutation σ so that the spectrum of the direct product of
+  ρ₁ and ρ₂, as permuted under σ, is the pairwise products of the spectra of ρ₁ and ρ₂. -/
+theorem spectrum_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : ∃(σ : d₁ × d₂ ≃ d₁ × d₂),
+    ∀i, ∀j, MState.spectrum (ρ₁ ⊗ ρ₂) (σ (i, j)) = (ρ₁.spectrum i) * (ρ₂.spectrum j) := by
+  sorry
+
+--TODO: Spectrum of direct sum. Spectrum of partial trace?
+
+/-- A mixed state is separable iff it can be written as a convex combination of product mixed states. -/
+def IsSeparable (ρ : MState (d₁ × d₂)) : Prop :=
+  ∃ ρLRs : Finset (MState d₁ × MState d₂), --Finite set of (ρL, ρR) pairs
+    ∃ ps : Distribution ρLRs, --Distribution over those pairs, an ensemble
+      ρ.M = ∑ ρLR : ρLRs, (ps ρLR : ℝ) • (Prod.fst ρLR.val).M ⊗ₖ (Prod.snd ρLR.val).M
+
+/-- A product state `MState.prod` is separable. -/
+theorem IsSeparable_prod (ρ₁ : MState d₁) (ρ₂ : MState d₂) : IsSeparable (ρ₁ ⊗ ρ₂) := by
+  let only := (ρ₁, ρ₂)
+  use { only }, Distribution.constant ⟨only, Finset.mem_singleton_self only⟩
+  simp [prod, Unique.eq_default, only]
+
+/-- A pure state is separable iff the ket is a product state. -/
+theorem pure_separable_iff_IsProd (ψ : Ket (d₁ × d₂)) :
+    IsSeparable (pure ψ) ↔ ψ.IsProd := by
+  sorry
+
+/-- A pure state is separable iff the partial trace on the left is pure. -/
+theorem pure_separable_iff_traceLeft_pure (ψ : Ket (d₁ × d₂)) : IsSeparable (pure ψ) ↔
+    ∃ ψ₁, pure ψ₁ = (pure ψ).traceLeft := by
+  sorry
+
+--TODO: Separable states are convex
+
+section purification
+
+/-- The purification of a mixed state. Always uses the full dimension of the Hilbert space (d) to
+ purify, so e.g. an existing pure state with d=4 still becomes d=16 in the purification. The defining
+ property is `MState.traceRight_of_purify`; see also `MState.purify'` for the bundled version. -/
+def purify (ρ : MState d) : Ket (d × d) where
+  vec := fun (i,j) ↦
+    let ρ2 := ρ.Hermitian.eigenvectorUnitary i j
+    ρ2 * (ρ.Hermitian.eigenvalues j).sqrt
+  normalized' := by
+    have h₁ := fun i ↦ ρ.pos.eigenvalues_nonneg i
+    simp [mul_pow, Real.sq_sqrt, h₁, Fintype.sum_prod_type_right]
+    simp_rw [← Finset.sum_mul]
+    have : ∀x, ∑ i : d, ‖ρ.Hermitian.eigenvectorBasis x i‖ ^ 2 = 1 :=
+      sorry
+    apply @RCLike.ofReal_injective ℂ
+    simp_rw [this, one_mul, Matrix.IsHermitian.sum_eigenvalues_eq_trace]
+    exact ρ.tr'
+
+/-- The defining property of purification, that tracing out the purifying system gives the
+ original mixed state. -/
+@[simp]
+theorem purify_spec (ρ : MState d) : (pure ρ.purify).traceRight = ρ := by
+  ext i j
+  simp_rw [purify, traceRight, Matrix.traceRight]
+  simp only [pure_of, Ket.apply]
+  simp only [map_mul]
+  simp_rw [mul_assoc, mul_comm, ← mul_assoc (Complex.ofReal _), Complex.mul_conj]
+  sorry
+
+/-- `MState.purify` bundled with its defining property `MState.traceRight_of_purify`. -/
+def purifyX (ρ : MState d) : { ψ : Ket (d × d) // (pure ψ).traceRight = ρ } :=
+  ⟨ρ.purify, ρ.purify_spec⟩
+
+end purification
+
+def relabel (ρ : MState d₁) (e : d₂ ≃ d₁) : MState d₂ where
+  M := {
+    val := ρ.m.reindex e.symm e.symm
+    property := ((Matrix.posSemidef_submatrix_equiv e).mpr ρ.pos).1
+  }
+  zero_le := (HermitianMat.zero_le_iff.trans (Matrix.posSemidef_submatrix_equiv e)).mpr <| ρ.pos
+  tr := sorry --ρ.tr ▸ Fintype.sum_equiv _ _ _ (congrFun rfl)
+
+@[simp]
+theorem relabel_m (ρ : MState d₁) (e : d₂ ≃ d₁) :
+    (ρ.relabel e).m = ρ.m.submatrix e e := by
+  rfl
+
+@[simp]
+theorem relabel_refl {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
+    ρ.relabel (Equiv.refl d) = ρ := by
+  ext
+  simp
+
+@[simp]
+theorem relabel_relabel {d d₂ d₃ : Type*}
+    [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂] [Fintype d₃] [DecidableEq d₃]
+    (ρ : MState d) (e : d₂ ≃ d) (e₂ : d₃ ≃ d₂) : (ρ.relabel e).relabel e₂ = ρ.relabel (e₂.trans e) := by
+  rfl
+
+theorem eq_relabel_iff {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    (ρ : MState d₁) (σ : MState d₂) (h : d₁ ≃ d₂) :
+    ρ = σ.relabel h ↔ ρ.relabel h.symm = σ := by
+  sorry
+
+theorem relabel_comp {d₁ d₂ d₃ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      [Fintype d₃] [DecidableEq d₃] (ρ : MState d₁) (e : d₂ ≃ d₁) (f : d₃ ≃ d₂) :
+    (ρ.relabel e).relabel f = ρ.relabel (f.trans e) := by
+  ext
+  simp
+
+theorem relabel_cast {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁]
+    [Fintype d₂] [DecidableEq d₂]
+       (ρ : MState d₁) (e : d₂ = d₁) :
+    ρ.relabel (Equiv.cast e) = cast (by have := e.symm; congr <;> (apply Subsingleton.helim; congr)) ρ := by
+  ext i j
+  simp
+  rw [eq_comm] at e
+  congr
+  · apply Subsingleton.helim; congr
+  · apply Subsingleton.helim; congr
+  · symm; apply cast_heq
+  · apply cast_heq
+  · apply cast_heq
+
+--TODO: Swap and assoc for kets.
+--TODO: Connect these to unitaries (when they can be)
+
+/-- The heterogeneous SWAP gate that exchanges the left and right halves of a quantum system.
+  This can apply even when the two "halves" are of different types, as opposed to (say) the SWAP
+  gate on quantum circuits that leaves the qubit dimensions unchanged. Notably, it is not unitary. -/
+def SWAP (ρ : MState (d₁ × d₂)) : MState (d₂ × d₁) :=
+  ρ.relabel (Equiv.prodComm d₁ d₂).symm
+
+def spectrum_SWAP (ρ : MState (d₁ × d₂)) : ∃ e, ρ.SWAP.spectrum.relabel e = ρ.spectrum := by
+  sorry
+
+@[simp]
+theorem SWAP_SWAP (ρ : MState (d₁ × d₂)) : ρ.SWAP.SWAP = ρ :=
+  rfl
+
+@[simp]
+theorem traceLeft_SWAP (ρ : MState (d₁ × d₂)) : ρ.SWAP.traceLeft = ρ.traceRight :=
+  rfl
+
+@[simp]
+theorem traceRight_SWAP (ρ : MState (d₁ × d₂)) : ρ.SWAP.traceRight = ρ.traceLeft :=
+  rfl
+
+/-- The associator that re-clusters the parts of a quantum system. -/
+def assoc (ρ : MState ((d₁ × d₂) × d₃)) : MState (d₁ × d₂ × d₃) :=
+  ρ.relabel (Equiv.prodAssoc d₁ d₂ d₃).symm
+
+/-- The associator that re-clusters the parts of a quantum system. -/
+def assoc' (ρ : MState (d₁ × d₂ × d₃)) : MState ((d₁ × d₂) × d₃) :=
+  ρ.SWAP.assoc.SWAP.assoc.SWAP
+
+@[simp]
+theorem assoc_assoc' (ρ : MState (d₁ × d₂ × d₃)) : ρ.assoc'.assoc = ρ := by
+  rfl
+
+@[simp]
+theorem assoc'_assoc (ρ : MState ((d₁ × d₂) × d₃)) : ρ.assoc.assoc' = ρ := by
+  rfl
+
+@[simp]
+theorem traceLeft_right_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
+    ρ.assoc.traceLeft.traceRight = ρ.traceRight.traceLeft := by
+  ext
+  simpa [assoc, relabel, Matrix.traceLeft, traceLeft, Matrix.traceRight, traceRight]
+    using Finset.sum_comm
+
+@[simp]
+theorem traceRight_left_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
+    ρ.assoc'.traceRight.traceLeft = ρ.traceLeft.traceRight := by
+  rw [← ρ.assoc'.traceLeft_right_assoc, assoc_assoc']
+
+@[simp]
+theorem traceRight_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
+    ρ.assoc.traceRight = ρ.traceRight.traceRight := by
+  simp [Matrix.traceRight, traceRight, Fintype.sum_prod_type]
+  rfl
+
+@[simp]
+theorem traceLeft_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
+    ρ.assoc'.traceLeft = ρ.traceLeft.traceLeft := by
+  convert ρ.SWAP.assoc.SWAP.traceRight_assoc
+  simp
+
+@[simp]
+theorem traceLeft_left_assoc (ρ : MState ((d₁ × d₂) × d₃)) :
+    ρ.assoc.traceLeft.traceLeft = ρ.traceLeft := by
+  ext
+  simpa [assoc, relabel, traceLeft, Matrix.traceLeft, Matrix.of_apply, Fintype.sum_prod_type]
+    using Finset.sum_comm
+
+@[simp]
+theorem traceRight_right_assoc' (ρ : MState (d₁ × d₂ × d₃)) :
+    ρ.assoc'.traceRight.traceRight = ρ.traceRight := by
+  simp [assoc']
+
+@[simp]
+theorem traceNorm_eq_1 (ρ : MState d) : ρ.m.traceNorm = 1 :=
+  have := calc (ρ.m.traceNorm : ℂ)
+    _ = ρ.m.trace := ρ.pos.traceNorm_PSD_eq_trace
+    _ = 1 := ρ.tr'
+  Complex.ofReal_eq_one.mp this
+
+--TODO: This naming is very inconsistent. Should be better about "prod" vs "kron"
+
+theorem relabel_kron {d₁ d₂ d₃ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      [Fintype d₃] [DecidableEq d₃] (ρ : MState d₁) (σ : MState d₂) (e : d₃ ≃ d₁) :
+    ((ρ.relabel e) ⊗ σ) = (ρ ⊗ σ).relabel (e.prodCongr (Equiv.refl d₂)) := by
+  ext
+  rfl --is this defeq abuse? I don't know
+
+theorem kron_relabel {d₁ d₂ d₃ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      [Fintype d₃] [DecidableEq d₃] (ρ : MState d₁) (σ : MState d₂) (e : d₃ ≃ d₂) :
+    (ρ ⊗ σ.relabel e) = (ρ ⊗ σ).relabel ((Equiv.refl d₁).prodCongr e) := by
+  ext
+  rfl
+
+theorem prod_assoc {d₁ d₂ d₃ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      [Fintype d₃] [DecidableEq d₃] (ρ : MState d₁) (σ : MState d₂) (τ : MState d₃) :
+    (ρ ⊗ (σ ⊗ τ)) = (ρ ⊗ σ ⊗ τ).relabel (Equiv.prodAssoc d₁ d₂ d₃).symm := by
+  ext1; ext1; symm
+  simpa [MState.prod, MState.relabel, -Matrix.kronecker_assoc']
+    using Matrix.kronecker_assoc' ρ.m σ.m τ.m
+
+section topology
+
+/-- Mixed states inherit the subspace topology from matrices -/
+instance : TopologicalSpace (MState d) :=
+  TopologicalSpace.induced MState.M inferInstance
+
+/-- The projection from mixed states to their Hermitian matrices is an embedding -/
+theorem toMat_IsEmbedding : Topology.IsEmbedding (MState.M (d := d)) where
+  eq_induced := rfl
+  injective := @MState.ext _ _ _
+
+instance : T3Space (MState d) :=
+  Topology.IsEmbedding.t3Space toMat_IsEmbedding
+
+instance : CompactSpace (MState d) := by
+  constructor
+  rw [(Topology.IsInducing.induced MState.M).isCompact_iff]
+  suffices IsCompact (Set.Icc 0 1 ∩ { m | m.trace = 1} : Set (HermitianMat d ℂ)) by
+    convert this
+    ext1 m
+    constructor
+    · rintro ⟨ρ, _, rfl⟩
+      simp [ρ.zero_le, ρ.le_one]
+    · simpa using fun m_pos _ m_tr ↦ ⟨⟨m, m_pos, m_tr⟩, rfl⟩
+  apply isCompact_Icc.inter_right
+  refine isClosed_eq ?_ continuous_const
+  rw [funext trace_eq_re_trace]
+  fun_prop
+
+noncomputable instance : MetricSpace (MState d) :=
+  MetricSpace.induced MState.M MState.M_Injective inferInstance
+
+theorem dist_eq (x y : MState d) : dist x y = dist x.M y.M := by
+  rfl
+
+instance : BoundedSpace (MState d) where
+  bounded_univ := by
+    rw [Metric.isBounded_iff]
+    use 2 * (Fintype.card d) ^ 2 --d^2 elements, so max distance is d^2
+    intro x _ y _
+    rw [dist_eq, dist_eq_norm]
+    have hx := And.intro x.zero_le x.le_one
+    have hy := And.intro y.zero_le y.le_one
+    --at this point, this should be a theorem
+    sorry
+
+@[fun_prop]
+theorem Continuous_HermitianMat : Continuous (MState.M (d := d)) :=
+  continuous_iff_le_induced.mpr fun _ => id
+
+@[fun_prop]
+theorem Continuous_Matrix : Continuous (MState.m (d := d)) := by
+  unfold MState.m
+  fun_prop
+
+theorem image_M_isBounded (S : Set (MState d)) : Bornology.IsBounded (MState.M '' S) := by
+  rw [← Bornology.isBounded_induced]
+  exact Bornology.IsBounded.all S
+
+end topology
+
+section finprod
+
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
+
+def piProd (ρi : (i:ι) → MState (dI i)) : MState ((i:ι) → dI i) where
+  M := {
+    val j k := ∏ (i : ι), (ρi i).m (j i) (k i)
+    property := sorry
+  }
+  zero_le := by
+    rw [HermitianMat.zero_le_iff]
+    --Should be in Mathlib
+    constructor
+    · ext j k
+      dsimp
+      rw [map_prod]
+      congr! with i
+      exact Matrix.ext_iff.mpr ((ρi i).pos.isHermitian) (j i) (k i)
+    · intro v
+      sorry
+  tr := by
+    sorry
+    -- rw [HermitianMat.trace_eq_trace_rc]
+    -- convert (Finset.prod_univ_sum (κ := dI) (fun _ ↦ Finset.univ) (fun i_1 x ↦ (ρi i_1).m x x)).symm
+    -- symm
+    -- apply Finset.prod_eq_one
+    -- intro x hx
+    -- exact (ρi x).tr
+
+/-- The n-copy "power" of a mixed state, with the standard basis indexed by pi types. -/
+def npow (ρ : MState d) (n : ℕ) : MState (Fin n → d) :=
+  piProd (fun _ ↦ ρ)
+
+@[inherit_doc]
+infixl:110 "⊗^" => MState.npow
+
+end finprod
+
+section posdef
+
+theorem PosDef.kron {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {σ₁ : MState d₁} {σ₂ : MState d₂} (hσ₁ : σ₁.m.PosDef) (hσ₂ : σ₂.m.PosDef) : (σ₁ ⊗ σ₂).m.PosDef :=
+  hσ₁.kron hσ₂
+
+theorem PosDef.relabel {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    {ρ : MState d₁} (hρ : ρ.m.PosDef) (e : d₂ ≃ d₁) : (ρ.relabel e).m.PosDef :=
+  Matrix.PosDef.reindex hρ e.symm
+
+/-- If both states positive definite, so is their mixture. -/
+theorem PosDef_mix {d : Type*} [Fintype d] [DecidableEq d] {σ₁ σ₂ : MState d}
+    (hσ₁ : σ₁.m.PosDef) (hσ₂ : σ₂.m.PosDef) (p : Prob) : (p [σ₁ ↔ σ₂]).m.PosDef :=
+  Matrix.PosDef.Convex hσ₁ hσ₂ p.zero_le (1 - p).zero_le (by simp)
+
+/-- If one state is positive definite and the mixture is nondegenerate, their mixture is also positive definite. -/
+theorem PosDef_mix_of_ne_zero {d : Type*} [Fintype d] [DecidableEq d] {σ₁ σ₂ : MState d}
+    (hσ₁ : σ₁.m.PosDef) (p : Prob) (hp : p ≠ 0) : (p [σ₁ ↔ σ₂]).m.PosDef := by
+  rw [← zero_lt_iff] at hp
+  exact (hσ₁.smul hp).add_posSemidef (σ₂.pos.rsmul (1 - p).zero_le)
+
+/-- If the second state is positive definite and the mixture is nondegenerate, their mixture is also positive definite. -/
+theorem PosDef_mix_of_ne_one {d : Type*} [Fintype d] [DecidableEq d] {σ₁ σ₂ : MState d}
+    (hσ₂ : σ₂.m.PosDef) (p : Prob) (hp : p ≠ 1) : (p [σ₁ ↔ σ₂]).m.PosDef := by
+  have : 0 < 1 - p := by
+    --TODO this is ridiculous, move to Prob
+    contrapose! hp
+    have : (1 : ℝ) - (p : ℝ) = (0 : ℝ) := by
+      have := le_antisymm hp (1 - p).zero_le
+      rw [Subtype.ext_iff] at this
+      simpa using this
+    ext
+    change (p : ℝ) = 1
+    linarith
+  exact (hσ₂.smul this).posSemidef_add (σ₁.pos.rsmul p.zero_le)
+
+theorem uniform_posDef {d : Type*} [Nonempty d] [Fintype d] [DecidableEq d] :
+    (uniform (d := d)).m.PosDef := by
+  simp [uniform, ofClassical, m, HermitianMat.diagonal]
+  exact Fintype.card_pos
+
+theorem posDef_of_unique {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) [Unique d] : ρ.m.PosDef := by
+  rw [Subsingleton.allEq ρ uniform]
+  exact uniform_posDef
+
+end posdef
+
+end MState
+---
+
+File: QuantumInfo/Finite/Ensemble.lean
+---
+import QuantumInfo.Finite.MState
+
+open MState
+open BigOperators
+
+noncomputable section
+
+/-- A mixed-state ensemble is a random variable valued in `MState d`. That is,
+a collection of mixed states `var : α → MState d`, each with their own probability weight
+described by `distr : Distribution α`. -/
+abbrev MEnsemble (d : Type*) (α : Type*) [Fintype d] [DecidableEq d] [Fintype α] := Distribution.RandVar α (MState d)
+
+/-- A pure-state ensemble is a random variable valued in `Ket d`. That is,
+a collection of pure states `var : α → Ket d`, each with their own probability weight
+described by `distr : Distribution α`. -/
+abbrev PEnsemble (d : Type*) (α : Type*) [Fintype d] [Fintype α] := Distribution.RandVar α (Ket d)
+
+variable {α β d : Type*} [Fintype α] [Fintype β] [Fintype d] [DecidableEq d]
+
+/-- Alias for `Distribution.var` for mixed-state ensembles. -/
+abbrev MEnsemble.states [Fintype α] : MEnsemble d α → (α → MState d) := Distribution.RandVar.var
+
+/-- Alias for `Distribution.var` for pure-state ensembles. -/
+abbrev PEnsemble.states [Fintype α] : PEnsemble d α → (α → Ket d) := Distribution.RandVar.var
+
+namespace Ensemble
+
+/-- A pure-state ensemble is a mixed-state ensemble if all kets are interpreted as mixed states. -/
+@[coe] def toMEnsemble : PEnsemble d α → MEnsemble d α := Functor.map pure
+
+instance : Coe (PEnsemble d α) (MEnsemble d α) := ⟨toMEnsemble⟩
+
+@[simp]
+theorem toMEnsemble_mk : (toMEnsemble ⟨ps, distr⟩ : MEnsemble d α) = ⟨pure ∘ ps, distr⟩ :=
+  rfl
+
+/-- A mixed-state ensemble comes from a pure-state ensemble if and only if all states are pure. -/
+theorem coe_PEnsemble_iff_pure_states (me : MEnsemble d α): (∃ pe : PEnsemble d α, ↑pe = me) ↔ (∃ ψ : α → Ket d, me.states = MState.pure ∘ ψ) := by
+  constructor
+  · intro ⟨pe, hpe⟩
+    use pe.states
+    ext1 i
+    subst hpe
+    rfl
+  · intro ⟨ψ, hψ⟩
+    use ⟨ψ, me.distr⟩
+    simp only [toMEnsemble_mk]
+    congr
+    exact hψ.symm
+
+/-- The resulting mixed state after mixing the states in an ensemble with their
+respective probability weights. Note that, generically, a single mixed state has infinitely many
+ensembles that mixes into it. -/
+def mix (e : MEnsemble d α) : MState d := Distribution.expect_val e
+
+@[simp]
+theorem mix_of (e : MEnsemble d α) : (mix e).m = ∑ i, (e.distr i : ℝ) • (e.states i).m := by
+  apply AddSubgroup.val_finset_sum -- *laughs in defeq*
+
+/-- Two mixed-state ensembles indexed by `\alpha` and `\beta` are equivalent if `α ≃ β`. -/
+def congrMEnsemble (σ : α ≃ β) : MEnsemble d α ≃ MEnsemble d β := Distribution.congrRandVar σ
+
+/-- Two pure-state ensembles indexed by `\alpha` and `\beta` are equivalent if `α ≃ β`. -/
+def congrPEnsemble (σ : α ≃ β) : PEnsemble d α ≃ PEnsemble d β := Distribution.congrRandVar σ
+
+/-- Equivalence of mixed-state ensembles leaves the resulting mixed state invariant -/
+@[simp]
+theorem mix_congrMEnsemble_eq_mix (σ : α ≃ β) (e : MEnsemble d α) : mix (congrMEnsemble σ e) = mix e :=
+  Distribution.expect_val_congr_eq_expect_val σ e
+
+/-- Equivalence of pure-state ensembles leaves the resulting mixed state invariant -/
+@[simp]
+theorem mix_congrPEnsemble_eq_mix (σ : α ≃ β) (e : PEnsemble d α) : mix (toMEnsemble (congrPEnsemble σ e)) = mix (↑e : MEnsemble d α) := by
+  unfold toMEnsemble congrPEnsemble mix
+  rw [Distribution.map_congr_eq_congr_map MState.pure σ e]
+  exact Distribution.expect_val_congr_eq_expect_val σ (MState.pure <$> e)
+
+/-- The average of a function `f : MState d → T`, where `T` is of `Mixable U T` instance, on a mixed-state ensemble `e`
+is the expectation value of `f` acting on the states of `e`, with the corresponding probability weights from `e.distr`. -/
+def average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (e : MEnsemble d α) : T :=
+  Distribution.expect_val <| f <$> e
+
+/-- A version of `average` conveniently specialized for functions `f : MState d → ℝ≥0` returning nonnegative reals.
+Notably, the average is also a nonnegative real number. -/
+def average_NNReal {d : Type _} [Fintype d] [DecidableEq d] (f : MState d → NNReal) (e : MEnsemble d α) : NNReal :=
+  ⟨average (NNReal.toReal ∘ f) e,
+    Distribution.zero_le_expect_val e.distr (NNReal.toReal ∘ f ∘ e.states) (fun n => (f <| e.states n).2)⟩
+
+/-- The average of a function `f : Ket d → T`, where `T` is of `Mixable U T` instance, on a pure-state ensemble `e`
+is the expectation value of `f` acting on the states of `e`, with the corresponding probability weights from `e.distr`. -/
+def pure_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (e : PEnsemble d α) : T :=
+  Distribution.expect_val <| f <$> e
+
+/-- A version of `average` conveniently specialized for functions `f : Ket d → ℝ≥0` returning nonnegative reals.
+Notably, the average is also a nonnegative real number. -/
+def pure_average_NNReal {d : Type _} [Fintype d] (f : Ket d → NNReal) (e : PEnsemble d α) : NNReal :=
+  ⟨pure_average (NNReal.toReal ∘ f) e,
+    Distribution.zero_le_expect_val e.distr (NNReal.toReal ∘ f ∘ e.states) (fun n => (f <| e.states n).2)⟩
+
+/-- The average of `f : MState d → T` on a coerced pure-state ensemble `↑e : MEnsemble d α`
+is equal to averaging the restricted function over Kets `f ∘ pure : Ket d → T` on `e`. -/
+theorem average_of_pure_ensemble {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T]
+  (f : MState d → T) (e : PEnsemble d α) :
+  average f (toMEnsemble e) = pure_average (f ∘ pure) e := by
+  simp only [average, pure_average, toMEnsemble, comp_map]
+
+/-- A pure-state ensemble mixes into a pure state if and only if
+the only states in the ensemble with nonzero probability are equal to `ψ`  -/
+theorem mix_pEnsemble_pure_iff_pure {ψ : Ket d} {e : PEnsemble d α} :
+  mix (toMEnsemble e) = MState.pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = ψ := by
+  sorry
+
+/-- The average of `f : Ket d → T` on an ensemble that mixes to a pure state `ψ` is `f ψ` -/
+theorem mix_pEnsemble_pure_average {ψ : Ket d} {e : PEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (hmix : mix (toMEnsemble e) = MState.pure ψ) :
+  pure_average f e = f ψ := by
+  have hpure := mix_pEnsemble_pure_iff_pure.mp hmix
+  simp only [pure_average, Functor.map, Distribution.expect_val]
+  apply Mixable.to_U_inj
+  rw [PEnsemble.states] at hpure
+  simp only [Mixable.to_U_of_mkT, Function.comp_apply, smul_eq_mul, Mixable.mkT_instUniv]
+  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = ψ := fun i hi ↦ by
+    have h2 : e.distr i = 0 → (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) = 0 := fun h0 ↦ by
+      simp only [h0, Prob.coe_zero, zero_smul]
+    exact (hpure i) ∘ h2.mt
+  classical rw [←Finset.sum_filter_of_ne h1, Finset.sum_filter]
+  classical conv =>
+    enter [1, 2, a]
+    rw [←dite_eq_ite]
+    enter [2, hvar]
+    rw [hvar]
+  classical conv =>
+    enter [1, 2, a]
+    rw [dite_eq_ite]
+    rw [←ite_zero_smul]
+  have hpure' : ∀ i ∈ Finset.univ, (↑(e.distr i) : ℝ) ≠ 0 → e.var i = ψ := fun i hi hne0 ↦ by
+    apply hpure i
+    simpa using hne0
+  classical rw [←Finset.sum_smul, ←Finset.sum_filter, Finset.sum_filter_of_ne hpure', Distribution.normalized, one_smul]
+
+/-- A mixed-state ensemble mixes into a pure state if and only if
+the only states in the ensemble with nonzero probability are equal to `pure ψ`  -/
+theorem mix_mEnsemble_pure_iff_pure {ψ : Ket d} {e : MEnsemble d α} :
+  mix e = pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = MState.pure ψ := by
+  sorry
+
+/-- The average of `f : MState d → T` on an ensemble that mixes to a pure state `ψ` is `f (pure ψ)` -/
+theorem mix_mEnsemble_pure_average {ψ : Ket d} {e : MEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (hmix : mix e = pure ψ) :
+  average f e = f (pure ψ) := by
+  have hpure := mix_mEnsemble_pure_iff_pure.mp hmix
+  simp only [average, Functor.map, Distribution.expect_val]
+  apply Mixable.to_U_inj
+  rw [MEnsemble.states] at hpure
+  simp only [Mixable.to_U_of_mkT, Function.comp_apply, smul_eq_mul, Mixable.mkT_instUniv]
+  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = pure ψ := fun i hi ↦ by
+    have h2 : e.distr i = 0 → (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) = 0 := fun h0 ↦ by
+      simp only [h0, Prob.coe_zero, zero_smul]
+    exact (hpure i) ∘ h2.mt
+  classical rw [←Finset.sum_filter_of_ne h1, Finset.sum_filter]
+  classical conv =>
+    enter [1, 2, a]
+    rw [←dite_eq_ite]
+    enter [2, hvar]
+    rw [hvar]
+  classical conv =>
+    enter [1, 2, a]
+    rw [dite_eq_ite]
+    rw [←ite_zero_smul]
+  have hpure' : ∀ i ∈ Finset.univ, (↑(e.distr i) : ℝ) ≠ 0 → e.var i = pure ψ := fun i hi hne0 ↦ by
+    apply hpure i
+    simpa using hne0
+  classical rw [←Finset.sum_smul, ←Finset.sum_filter, Finset.sum_filter_of_ne hpure', Distribution.normalized, one_smul]
+
+/-- The trivial mixed-state ensemble of `ρ` consists of copies of `rho`, with the `i`-th one having
+probability 1. -/
+def trivial_mEnsemble (ρ : MState d) (i : α) : MEnsemble d α := ⟨fun _ ↦ ρ, Distribution.constant i⟩
+
+/-- The trivial mixed-state ensemble of `ρ` mixes to `ρ` -/
+theorem trivial_mEnsemble_mix (ρ : MState d) : ∀ i : α, mix (trivial_mEnsemble ρ i) = ρ := fun i ↦by
+  apply MState.ext_m
+  classical simp only [trivial_mEnsemble, Distribution.constant, mix_of, DFunLike.coe, apply_ite,
+    Prob.coe_one, Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
+    Finset.mem_univ, ↓reduceIte]
+
+/-- The average of `f : MState d → T` on a trivial ensemble of `ρ` is `f ρ`-/
+theorem trivial_mEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (ρ : MState d):
+  ∀ i : α, average f (trivial_mEnsemble ρ i) = f ρ := fun i ↦ by
+    simp only [average, Functor.map, Distribution.expect_val, trivial_mEnsemble]
+    apply Mixable.to_U_inj
+    classical simp [apply_ite]
+
+instance MEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (MEnsemble d α) where
+  default := trivial_mEnsemble default default
+
+/-- The trivial pure-state ensemble of `ψ` consists of copies of `ψ`, with the `i`-th one having
+probability 1. -/
+def trivial_pEnsemble (ψ : Ket d) (i : α) : PEnsemble d α := ⟨fun _ ↦ ψ, Distribution.constant i⟩
+
+/-- The trivial pure-state ensemble of `ψ` mixes to `ψ` -/
+theorem trivial_pEnsemble_mix (ψ : Ket d) : ∀ i : α, mix (toMEnsemble (trivial_pEnsemble ψ i)) = MState.pure ψ := fun i ↦ by
+  apply MState.ext_m
+  classical simp only [trivial_pEnsemble, Distribution.constant, toMEnsemble_mk, mix_of, DFunLike.coe,
+    apply_ite, Prob.coe_one, Prob.coe_zero, MEnsemble.states, Function.comp_apply, ite_smul,
+    one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+
+omit [DecidableEq d] in
+/-- The average of `f : Ket d → T` on a trivial ensemble of `ψ` is `f ψ`-/
+theorem trivial_pEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (ψ : Ket d) :
+  ∀ i : α, pure_average f (trivial_pEnsemble ψ i) = f ψ := fun i ↦ by
+    simp only [pure_average, Functor.map, Distribution.expect_val, trivial_pEnsemble]
+    apply Mixable.to_U_inj
+    classical simp [apply_ite]
+
+instance PEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (PEnsemble d α) where
+  default := trivial_pEnsemble default default
+
+/-- The spectral pure-state ensemble of `ρ`. The states are its eigenvectors, and the probabilities, eigenvalues. -/
+def spectral_ensemble (ρ : MState d) : PEnsemble d d :=
+  { var i :=
+    { vec := ρ.Hermitian.eigenvectorBasis i
+      normalized' := by
+        rw [←one_pow 2, ←ρ.Hermitian.eigenvectorBasis.orthonormal.1 i]
+        have hnonneg : 0 ≤ ∑ x : d, Complex.normSq (ρ.Hermitian.eigenvectorBasis i x) := by
+          simp_rw [Complex.normSq_eq_norm_sq]
+          positivity
+        simp only [← Complex.normSq_eq_norm_sq, EuclideanSpace.norm_eq, Real.sq_sqrt hnonneg]
+    }
+    distr := ρ.spectrum}
+
+/-- The spectral pure-state ensemble of `ρ` mixes to `ρ` -/
+theorem spectral_ensemble_mix : mix (↑(spectral_ensemble ρ) : MEnsemble d d) = ρ := by
+  ext i j
+  sorry
+
+end Ensemble
+---
+
+File: QuantumInfo/Finite/CPTPMap.lean
+---
+import QuantumInfo.Finite.CPTPMap.Bundled
+import QuantumInfo.Finite.CPTPMap.CPTP
+import QuantumInfo.Finite.CPTPMap.Dual
+import QuantumInfo.Finite.CPTPMap.MatrixMap
+import QuantumInfo.Finite.CPTPMap.Unbundled
+---
+
+File: QuantumInfo/Finite/CPTPMap/Bundled.lean
+---
+import QuantumInfo.Finite.CPTPMap.Unbundled
+import QuantumInfo.Finite.MState
+
+import Mathlib.Topology.Order.Hom.Basic
+
+/-! # Classes of Matrix Maps
+
+The bundled `MatrixMap`s: `HPMap`, `UnitalMap`, `TPMap`, `PMap`, and `CPMap`.
+These are defined over the bare minimum rings (`Semiring` or `RCLike`, respectively).
+
+The combinations `PTPMap` (positive trace-preserving), `CPTPMap`, and `CPUMap`
+(CP unital maps) take ℂ as the default class.
+
+The majority of quantum theory revolves around `CPTPMap`s, so those are explored more
+thoroughly in their file CPTP.lean.
+-/
+
+variable (dIn dOut R : Type*) (𝕜 : Type := ℂ)
+variable [Fintype dIn] [Fintype dOut]
+variable [Semiring R] [RCLike 𝕜]
+
+/-- Hermitian-preserving linear maps. -/
+structure HPMap extends MatrixMap dIn dOut 𝕜 where
+  HP : MatrixMap.IsHermitianPreserving toLinearMap
+
+/-- Unital linear maps. -/
+structure UnitalMap [DecidableEq dIn] [DecidableEq dOut] extends MatrixMap dIn dOut R where
+  unital : MatrixMap.Unital toLinearMap
+
+/-- Trace-preserving linear maps. -/
+structure TPMap extends MatrixMap dIn dOut R where
+  TP : MatrixMap.IsTracePreserving toLinearMap
+
+--Mark this as [simp] so that simp lemmas requiring `IsTracePreserving` can pick it up.
+--In theory this could be making "IsTracePreserving" a typeclass ... or more realistically,
+--defining a `TracePreservingClass` similar to `AddHomClass`
+attribute [simp] TPMap.TP
+
+/-- Positive linear maps. -/
+structure PMap extends HPMap dIn dOut 𝕜 where
+  pos : MatrixMap.IsPositive toLinearMap
+  HP := pos.IsHermitianPreserving
+
+/-- Completely positive linear maps. -/
+structure CPMap [DecidableEq dIn] extends PMap dIn dOut 𝕜 where
+  cp : MatrixMap.IsCompletelyPositive toLinearMap
+  pos := cp.IsPositive
+
+/-- Positive trace-preserving linear maps. These includes all channels, but aren't
+  necessarily *completely* positive, see `CPTPMap`. -/
+structure PTPMap extends PMap dIn dOut 𝕜, TPMap dIn dOut 𝕜
+
+attribute [simp] PTPMap.TP
+
+/-- Completely positive trace-preserving linear maps. This is the most common
+  meaning of "channel", often described as "the most general physically realizable
+  quantum operation". -/
+structure CPTPMap [DecidableEq dIn] extends PTPMap dIn dOut (𝕜 := 𝕜), CPMap dIn dOut 𝕜 where
+
+/-- Completely positive unital maps. These are important because they are the
+  dual to `CPTPMap`: they are the most general way to map *observables*. -/
+structure CPUMap [DecidableEq dIn] [DecidableEq dOut] extends CPMap dIn dOut 𝕜, UnitalMap dIn dOut 𝕜
+
+variable {dIn dOut R} {𝕜 : Type} [RCLike 𝕜]
+
+--Hermitian-presering maps: continuous linear maps on HermitianMats.
+namespace HPMap
+omit [Fintype dIn] [Fintype dOut]
+
+abbrev map (M : HPMap dIn dOut 𝕜) : MatrixMap dIn dOut 𝕜 := M.toLinearMap
+
+@[ext]
+theorem ext {Λ₁ Λ₂ : HPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
+  rwa [HPMap.mk.injEq]
+
+/-- Hermitian-preserving maps are functions from `HermitianMat`s to `HermitianMat`s. -/
+instance instFunLike : FunLike (HPMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  coe Λ ρ := ⟨Λ.map ρ.1, Λ.HP ρ.2⟩
+  coe_injective' _ _ h := by
+    sorry --Requires the fact the action on HermitianMat's determines action on all matrices
+
+set_option synthInstance.maxHeartbeats 40000 in
+instance instLinearMapClass : LinearMapClass (HPMap dIn dOut 𝕜) ℝ (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
+  map_smulₛₗ f c x := HermitianMat.ext <| by
+    simp [instFunLike]
+
+instance instContinuousMapClass : ContinuousMapClass (HPMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_continuous f :=
+    Continuous.subtype_mk (f.map.continuous_of_finiteDimensional.comp continuous_subtype_val) _
+
+end HPMap
+
+
+--Positive-preserving maps: continuous linear order-preserving maps on HermitianMats.
+namespace PMap
+
+@[ext]
+theorem ext {Λ₁ Λ₂ : PMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
+  rw [PMap.mk.injEq]
+  exact HPMap.ext h
+
+theorem injective_toHPMap : (PMap.toHPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
+  fun _ _ ↦ (mk.injEq _ _ _ _).mpr
+
+/-- Positive maps are functions from `HermitianMat`s to `HermitianMat`s. -/
+instance instFunLike : FunLike (PMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  coe := DFunLike.coe ∘ toHPMap
+  coe_injective' := DFunLike.coe_injective'.comp injective_toHPMap
+
+set_option synthInstance.maxHeartbeats 40000 in
+instance instLinearMapClass : LinearMapClass (PMap dIn dOut 𝕜) ℝ (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
+  map_smulₛₗ f c x := HermitianMat.ext <| by simp [instFunLike]
+
+instance instContinuousOrderHomClass : ContinuousOrderHomClass (PMap dIn dOut 𝕜)
+    (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_continuous f := ContinuousMapClass.map_continuous f.toHPMap
+  map_monotone f x y h := by
+    simpa using f.pos h
+
+/-- Positive-presering maps also preserve positivity on, specifically, Hermitian matrices. -/
+@[simp]
+theorem pos_Hermitian (M : PMap dIn dOut 𝕜) {x : HermitianMat dIn 𝕜} (h : 0 ≤ x) : 0 ≤ M x := by
+  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+
+end PMap
+
+
+namespace CPMap
+
+def of_kraus_CPMap {κ : Type*} [Fintype κ] [DecidableEq dIn] (M : κ → Matrix dOut dIn 𝕜) : CPMap dIn dOut 𝕜 where
+  toLinearMap := MatrixMap.of_kraus M M
+  cp := MatrixMap.IsCompletelyPositive.of_kraus_isCompletelyPositive M
+
+end CPMap
+
+--Positive trace-preserving maps:
+--  * Continuous linear order-preserving maps on HermitianMats.
+--  * Continuous maps on MStates.
+namespace PTPMap
+
+@[ext]
+theorem ext {Λ₁ Λ₂ : PTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
+  rw [PTPMap.mk.injEq]
+  exact PMap.ext h
+
+theorem injective_toPMap : (PTPMap.toPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
+  fun _ _ ↦ (mk.injEq _ _ _ _).mpr
+
+/-- Positive trace-preserving maps are functions from `HermitianMat`s to `HermitianMat`s. -/
+instance instHFunLike : FunLike (PTPMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  coe := DFunLike.coe ∘ toPMap
+  coe_injective' := DFunLike.coe_injective'.comp injective_toPMap
+
+set_option synthInstance.maxHeartbeats 40000 in
+instance instLinearMapClass : LinearMapClass (PTPMap dIn dOut 𝕜) ℝ (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_add f x y := by simp [instHFunLike]
+  map_smulₛₗ f c x := by simp [instHFunLike]
+
+instance instHContinuousOrderHomClass : ContinuousOrderHomClass (PTPMap dIn dOut 𝕜)
+    (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_continuous f := ContinuousMapClass.map_continuous f.toPMap
+  map_monotone f x y h := by
+    simpa using f.pos h
+
+/-- PTP maps also preserve positivity on Hermitian matrices. -/
+@[simp]
+theorem pos_Hermitian (M : PTPMap dIn dOut 𝕜) {x : HermitianMat dIn 𝕜} (h : 0 ≤ x) : 0 ≤ M x := by
+  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+
+/-- `PTPMap`s are functions from `MState`s to `MState`s. -/
+instance instMFunLike [DecidableEq dIn] [DecidableEq dOut] :
+    FunLike (PTPMap dIn dOut) (MState dIn) (MState dOut) where
+  coe Λ ρ := MState.mk
+    (Λ.toHPMap ρ.M) (HermitianMat.zero_le_iff.mpr (Λ.pos ρ.pos)) (by
+      rw [HermitianMat.trace_eq_one_iff, ← ρ.tr']
+      exact Λ.TP ρ)
+  coe_injective' _ _ h := by
+    sorry --Requires the fact the action on MStates determines action on all matrices
+
+instance instMContinuousMapClass [DecidableEq dIn] [DecidableEq dOut] :
+    ContinuousMapClass (PTPMap dIn dOut) (MState dIn) (MState dOut) where
+  map_continuous f := by
+    rw [continuous_induced_rng]
+    exact (map_continuous f.toHPMap).comp MState.Continuous_HermitianMat
+
+-- @[norm_cast]
+theorem val_apply_MState [DecidableEq dIn] (M : PTPMap dIn dOut) (ρ : MState dIn) :
+    (M ρ : HermitianMat dOut ℂ) = (instHFunLike.coe M) ρ := by
+  rfl
+
+--If we have a PTPMap, the input and output dimensions are always both nonempty (otherwise
+--we can't preserve trace) - or they're both empty. So `[Nonempty dIn]` will always suffice.
+-- This would be nice as an `instance` but that would leave `dIn` as a metavariable.
+theorem nonemptyOut (Λ : PTPMap dIn dOut) [hIn : Nonempty dIn] [DecidableEq dIn] : Nonempty dOut := by
+  by_contra h
+  simp only [not_nonempty_iff] at h
+  let M := (1 : Matrix dIn dIn ℂ)
+  have := calc (Finset.univ.card (α := dIn) : ℂ)
+    _ = M.trace := by simp [Matrix.trace, M]
+    _ = (Λ.map M).trace := (Λ.TP M).symm
+    _ = 0 := by simp only [Matrix.trace_eq_zero_of_isEmpty]
+  norm_num [Finset.univ_eq_empty_iff] at this
+
+end PTPMap
+
+namespace CPTPMap
+variable [DecidableEq dIn]
+
+/-- Two `CPTPMap`s are equal if their `MatrixMap`s are equal. -/
+@[ext]
+theorem ext {Λ₁ Λ₂ : CPTPMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
+  rw [CPTPMap.mk.injEq]
+  exact PTPMap.ext h
+
+theorem injective_toPTPMap : (CPTPMap.toPTPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective :=
+  fun _ _ ↦ (mk.injEq _ _ _ _).mpr
+
+-- /-- Positive trace-preserving maps are functions from `HermitianMat`s to `HermitianMat`s. -/
+-- instance instHFunLike : FunLike (CPTPMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+--   coe :=  DFunLike.coe ∘ toPTPMap
+--   coe_injective' := DFunLike.coe_injective'.comp injective_toPTPMap
+
+-- set_option synthInstance.maxHeartbeats 40000 in
+-- instance instHLinearMapClass : LinearMapClass (CPTPMap dIn dOut 𝕜) ℝ (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+--   map_add f x y := by simp [instHFunLike]
+--   map_smulₛₗ f c x := by simp [instHFunLike]
+
+-- instance instHContinuousOrderHomClass : ContinuousOrderHomClass (CPTPMap dIn dOut 𝕜)
+--     (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+--   map_continuous f := ContinuousMapClass.map_continuous f.toPMap
+--   map_monotone f x y h := by
+    -- simpa using f.pos h
+
+-- /-- PTP maps also preserve positivity on Hermitian matrices. -/
+-- @[simp]
+-- theorem pos_Hermitian (M : CPTPMap dIn dOut 𝕜) {x : HermitianMat dIn 𝕜} (h : 0 ≤ x) : 0 ≤ M x := by
+--   simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+
+/-- `CPTPMap`s are functions from `MState`s to `MState`s. -/
+instance instMFunLike [DecidableEq dOut] : FunLike (CPTPMap dIn dOut) (MState dIn) (MState dOut) where
+  coe := DFunLike.coe ∘ toPTPMap
+  coe_injective' := DFunLike.coe_injective'.comp injective_toPTPMap
+
+-- @[norm_cast]
+-- theorem val_apply_MState [DecidableEq dOut] (M : CPTPMap dIn dOut) (ρ : MState dIn) :
+--     (M ρ : HermitianMat dOut ℂ) = (instHFunLike.coe M) ρ := by
+--   rfl
+
+@[simp]
+theorem IsTracePreserving (Λ : CPTPMap dIn dOut 𝕜) : Λ.map.IsTracePreserving :=
+  Λ.TP
+
+def of_kraus_CPTPMap {κ : Type*} [Fintype κ] [DecidableEq dIn]
+  (M : κ → Matrix dOut dIn 𝕜)
+  (hTP : (∑ k, (M k).conjTranspose * (M k)) = 1) : CPTPMap dIn dOut 𝕜 where
+  toLinearMap := MatrixMap.of_kraus M M
+  cp := MatrixMap.IsCompletelyPositive.of_kraus_isCompletelyPositive M
+  TP := MatrixMap.IsTracePreserving.of_kraus_isTracePreserving M M hTP
+
+end CPTPMap
+
+namespace CPUMap
+variable [DecidableEq dIn] [DecidableEq dOut]
+
+@[ext]
+theorem ext {Λ₁ Λ₂ : CPUMap dIn dOut 𝕜} (h : Λ₁.map = Λ₂.map) : Λ₁ = Λ₂ := by
+  rw [CPUMap.mk.injEq, CPMap.mk.injEq]
+  exact PMap.ext h
+
+theorem injective_toPMap : (CPMap.toPMap ∘ CPUMap.toCPMap (dIn := dIn) (dOut := dOut) (𝕜 := 𝕜)).Injective := by
+  intro _ _ _
+  rwa [CPUMap.mk.injEq, CPMap.mk.injEq]
+
+/-- `CPUMap`s are functions from `HermitianMat`s to `HermitianMat`s. -/
+instance instFunLike : FunLike (CPUMap dIn dOut 𝕜) (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  coe Λ := Λ.toPMap
+  coe_injective' := (DFunLike.coe_injective' (F := PMap dIn dOut 𝕜)).comp injective_toPMap
+
+set_option synthInstance.maxHeartbeats 40000 in
+instance instLinearMapClass : LinearMapClass (CPUMap dIn dOut 𝕜) ℝ (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_add f x y := HermitianMat.ext <| LinearMap.map_add f.toLinearMap x y
+  map_smulₛₗ f c x := HermitianMat.ext <| by simp [instFunLike]
+
+instance instHContinuousOrderHomClass : ContinuousOrderHomClass (CPUMap dIn dOut 𝕜)
+    (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_continuous f := ContinuousMapClass.map_continuous f.toPMap
+  map_monotone f x y h := by
+    simpa using f.pos h
+
+instance instOneHomClass : OneHomClass (CPUMap dIn dOut 𝕜)
+    (HermitianMat dIn 𝕜) (HermitianMat dOut 𝕜) where
+  map_one f := HermitianMat.ext (f.unital)
+
+/-- CPTP maps also preserve positivity on Hermitian matrices. -/
+@[simp]
+theorem pos_Hermitian (M : CPUMap dIn dOut 𝕜) {x : HermitianMat dIn 𝕜} (h : 0 ≤ x) : 0 ≤ M x := by
+  simpa only [map_zero] using ContinuousOrderHomClass.map_monotone M h
+
+end CPUMap
+
+
+--Tests to make sure that our `simp`s and classe are all working like we want them too
+
+section test
+variable [DecidableEq dIn] [DecidableEq dOut]
+
+#guard_msgs in
+example (M : HPMap dIn dOut 𝕜) : (M (Real.pi • 1)) = Real.pi • M 1 := by simp
+
+#guard_msgs in
+example (M : PTPMap dIn dOut 𝕜) : (M (Real.pi • 1)) = Real.pi • M 1 := by simp
+
+#guard_msgs in
+example (M : CPTPMap dIn dOut 𝕜) (ρ : Matrix dIn dIn 𝕜) : (M.map ρ).trace = ρ.trace := by simp
+
+#guard_msgs in
+example (M : CPUMap dIn dOut ℂ) (T : HermitianMat dIn ℂ) : M (1 + 2 • T) = 1 + 2 • M T := by simp
+
+end test
+---
+
+File: QuantumInfo/Finite/CPTPMap/CPTP.lean
+---
+import QuantumInfo.Finite.CPTPMap.Bundled
+import QuantumInfo.Finite.Unitary
+
+/-! # Completely Positive Trace Preserving maps
+
+A `CPTPMap` is a `ℂ`-linear map between matrices (`MatrixMap` is an alias), bundled with the facts that it
+`IsCompletelyPositive` and `IsTracePreserving`. CPTP maps are typically regarded as the "most general quantum
+operation", as they map density matrices (`MState`s) to density matrices. The type `PTPMap`, for maps that are
+positive (but not necessarily completely positive) is also declared.
+
+A large portion of the theory is in terms of the Choi matrix (`MatrixMap.choi_matrix`), as the positive-definiteness
+of this matrix corresponds to being a CP map. This is [Choi's theorem on CP maps](https://en.wikipedia.org/wiki/Choi%27s_theorem_on_completely_positive_maps).
+
+This file also defines several important examples of, classes of, and operations on, CPTPMaps:
+ * `compose`: Composition of maps
+ * `id`: The identity map
+ * `replacement`: The replacement channel that always outputs the same state
+ * `prod`: Tensor product of two CPTP maps, with notation M₁ ⊗ M₂
+ * `piProd`: Tensor product of finitely many CPTP maps (Pi-type product)
+ * `of_unitary`: The CPTP map corresponding to a unitary opeation `U`
+ * `IsUnitary`: Predicate whether the map corresponds to any unitary
+ * `purify`: Purifying a channel into a unitary on a larger Hilbert space
+ * `complementary`: The complementary channel to its purification
+ * `IsEntanglementBreaking`, `IsDegradable`, `IsAntidegradable`: Entanglement breaking, degradable and antidegradable channels.
+ * `SWAP`, `assoc`, `assoc'`, `traceLeft`, `traceRight`: The CPTP maps corresponding to important operations on states. These correspond directly to `MState.SWAP`, `MState.assoc`, `MState.assoc'`, `MState.traceLeft`, and `MState.traceRight`.
+-/
+
+variable {dIn dOut dOut₂ : Type*} [Fintype dIn] [Fintype dOut] [Fintype dOut₂]
+
+namespace CPTPMap
+noncomputable section
+open scoped Matrix ComplexOrder
+
+variable [DecidableEq dIn]
+
+variable {dM : Type*} [Fintype dM] [DecidableEq dM]
+variable {dM₂ : Type*} [Fintype dM₂] [DecidableEq dM₂]
+variable (Λ : CPTPMap dIn dOut)
+
+/-- The Choi matrix of a CPTPMap. -/
+@[reducible]
+def choi := Λ.map.choi_matrix
+
+/-- Two CPTPMaps are equal if their Choi matrices are equal. -/
+theorem choi_ext {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : Λ₁.choi = Λ₂.choi) : Λ₁ = Λ₂ :=
+  sorry
+  -- PTP_ext (PTPMap.ext (MatrixMap.choi_matrix_inj h))
+
+/-- The Choi matrix of a channel is PSD. -/
+theorem choi_PSD_of_CPTP : Λ.map.choi_matrix.PosSemidef :=
+  Λ.map.choi_PSD_iff_CP_map.1 Λ.cp
+
+/-- The trace of a Choi matrix of a CPTP map is the cardinality of the input space. -/
+@[simp]
+theorem Tr_of_choi_of_CPTP : Λ.choi.trace =
+    (Finset.univ (α := dIn)).card :=
+  Λ.TP.trace_choi
+
+/-- Construct a CPTP map from a PSD Choi matrix with correct partial trace. -/
+def CPTP_of_choi_PSD_Tr {M : Matrix (dOut × dIn) (dOut × dIn) ℂ} (h₁ : M.PosSemidef)
+    (h₂ : M.traceLeft = 1) : CPTPMap dIn dOut where
+  toLinearMap := MatrixMap.of_choi_matrix M
+  cp := (MatrixMap.choi_PSD_iff_CP_map (MatrixMap.of_choi_matrix M)).2
+      ((MatrixMap.map_choi_inv M).symm ▸ h₁)
+  TP := (MatrixMap.of_choi_matrix M).IsTracePreserving_iff_trace_choi.2
+    ((MatrixMap.map_choi_inv M).symm ▸ h₂)
+
+@[simp]
+theorem choi_of_CPTP_of_choi (M : Matrix (dOut × dIn) (dOut × dIn) ℂ) {h₁} {h₂} :
+    (CPTP_of_choi_PSD_Tr (M := M) h₁ h₂).choi = M := by
+  simp only [choi, CPTP_of_choi_PSD_Tr]
+  rw [MatrixMap.map_choi_inv]
+
+theorem mat_coe_eq_apply_mat [DecidableEq dOut] (ρ : MState dIn) : (Λ ρ).m = Λ.map ρ.m :=
+  rfl
+
+@[ext]
+theorem funext [DecidableEq dOut] {Λ₁ Λ₂ : CPTPMap dIn dOut} (h : ∀ ρ, Λ₁ ρ = Λ₂ ρ) : Λ₁ = Λ₂ :=
+  DFunLike.ext _ _ h
+
+/-- The composition of CPTPMaps, as a CPTPMap. -/
+def compose (Λ₂ : CPTPMap dM dOut) (Λ₁ : CPTPMap dIn dM) : CPTPMap dIn dOut where
+  toLinearMap := Λ₂.map ∘ₗ Λ₁.map
+  cp := Λ₁.cp.comp Λ₂.cp
+  TP := Λ₁.TP.comp Λ₂.TP
+
+infixl:75 "∘ₘ" => CPTPMap.compose
+
+/-- Composition of CPTPMaps by `CPTPMap.compose` is compatible with the `instFunLike` action. -/
+@[simp]
+theorem compose_eq [DecidableEq dOut] {Λ₁ : CPTPMap dIn dM} {Λ₂ : CPTPMap dM dOut} : ∀ρ, (Λ₂ ∘ₘ Λ₁) ρ = Λ₂ (Λ₁ ρ) :=
+  fun _ ↦ rfl
+
+/-- Composition of CPTPMaps is associative. -/
+theorem compose_assoc [DecidableEq dOut] (Λ₃ : CPTPMap dM₂ dOut) (Λ₂ : CPTPMap dM dM₂)
+    (Λ₁ : CPTPMap dIn dM) : (Λ₃ ∘ₘ Λ₂) ∘ₘ Λ₁ = Λ₃ ∘ₘ (Λ₂ ∘ₘ Λ₁) := by
+  ext1 ρ
+  simp
+
+/-- CPTPMaps have a convex structure from their Choi matrices. -/
+instance instMixable : Mixable (Matrix (dOut × dIn) (dOut × dIn) ℂ) (CPTPMap dIn dOut) where
+  to_U := CPTPMap.choi
+  to_U_inj := choi_ext
+  mkT {u} h := ⟨CPTP_of_choi_PSD_Tr (M := u)
+    (Exists.recOn h fun t ht => ht ▸ t.choi_PSD_of_CPTP)
+    (Exists.recOn h fun t ht => (by
+      rw [← ht, ← MatrixMap.IsTracePreserving_iff_trace_choi]
+      exact t.TP)),
+    by apply choi_of_CPTP_of_choi⟩
+  convex := sorry
+
+/-- The identity channel, which leaves the input unchanged. -/
+def id : CPTPMap dIn dIn where
+  toLinearMap := .id
+  cp := .id
+  TP := .id
+
+/-- The map `CPTPMap.id` leaves any matrix unchanged. -/
+@[simp]
+theorem id_map : (id (dIn := dIn)).map = LinearMap.id := by
+  rfl
+
+/-- The map `CPTPMap.id` leaves the input state unchanged. -/
+@[simp]
+theorem id_MState (ρ : MState dIn) : CPTPMap.id (dIn := dIn) ρ = ρ := by
+  apply MState.ext_m
+  rw [mat_coe_eq_apply_mat]
+  simp
+
+/-- The map `CPTPMap.id` composed with any map is the same map. -/
+@[simp]
+theorem id_compose [DecidableEq dOut] (Λ : CPTPMap dIn dOut) : id ∘ₘ Λ = Λ := by
+  apply funext
+  simp
+
+/-- Any map composed with `CPTPMap.id` is the same map. -/
+@[simp]
+theorem compose_id (Λ : CPTPMap dIn dOut) : Λ ∘ₘ id = Λ := by
+  classical ext1
+  simp
+
+/-- There is a CPTP map that takes a system of any (nonzero) dimension and outputs the
+trivial Hilbert space, 1-dimensional, indexed by any `Unique` type. -/
+def destroy [Nonempty dIn] [Unique dOut] : CPTPMap dIn dOut :=
+  CPTP_of_choi_PSD_Tr Matrix.PosSemidef.one
+    (by ext i j;  simp [Matrix.traceLeft, Matrix.one_apply])
+
+/-- Two CPTP maps into the same one-dimensional output space must be equal -/
+theorem eq_if_output_unique [Unique dOut] (Λ₁ Λ₂ : CPTPMap dIn dOut) : Λ₁ = Λ₂ :=
+  funext fun _ ↦ (Unique.eq_default _).trans (Unique.eq_default _).symm
+
+/-- There is exactly one CPTPMap to a 1-dimensional space. -/
+instance instUnique [Nonempty dIn] [Unique dOut] : Unique (CPTPMap dIn dOut) where
+  default := destroy
+  uniq := fun _ ↦ eq_if_output_unique _ _
+
+/-- A state can be viewed as a CPTP map from the trivial Hilbert space (indexed by `Unit`)
+ that outputs exactly that state. -/
+def const_state [Unique dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap dIn dOut where
+  toLinearMap := (MatrixMap.of_choi_matrix (.of fun (i,_) (j,_) ↦ ρ.m i j))
+  cp := sorry
+  TP x := by
+    have h : ∑ i : dOut, ρ.m i i = 1 := ρ.tr'
+    simp [MatrixMap.of_choi_matrix, Matrix.trace, ← Finset.mul_sum, h]
+
+/-- The output of `const_state ρ` is always that `ρ`. -/
+@[simp]
+theorem const_state_apply [Unique dIn] [DecidableEq dOut] (ρ : MState dOut) (ρ₀ : MState dIn) :
+    const_state ρ ρ₀ = ρ := by
+  ext1
+  dsimp [const_state, MatrixMap.of_choi_matrix, instMFunLike, PTPMap.instMFunLike, HPMap.instFunLike,
+    HPMap.map]
+  simp only [Finset.univ_unique, Finset.sum_singleton]
+  rw [Unique.eq_default ρ₀]
+  -- convert one_mul _
+  --Should be a simp theorem
+  sorry
+
+/--The replacement channel that maps all inputs to a given state. -/
+def replacement [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) : CPTPMap dIn dOut :=
+  (const_state (dIn := Unit) ρ) ∘ₘ destroy
+
+/-- The output of `replacement ρ` is always that `ρ`. -/
+@[simp]
+theorem replacement_apply [Nonempty dIn] [DecidableEq dOut] (ρ : MState dOut) (ρ₀ : MState dIn) :
+    replacement ρ ρ₀ = ρ := by
+  simp only [replacement, compose_eq, const_state_apply]
+
+section prod
+open Kronecker
+
+variable {dI₁ dI₂ dO₁ dO₂ : Type*} [Fintype dI₁] [Fintype dI₂] [Fintype dO₁] [Fintype dO₂]
+variable [DecidableEq dI₁] [DecidableEq dI₂] [DecidableEq dO₁] [DecidableEq dO₂]
+
+set_option maxRecDepth 1000 in -- ??? what the heck is recursing
+/-- The tensor product of two CPTPMaps. -/
+def prod (Λ₁ : CPTPMap dI₁ dO₁) (Λ₂ : CPTPMap dI₂ dO₂) : CPTPMap (dI₁ × dI₂) (dO₁ × dO₂) where
+  toLinearMap := Λ₁.map.kron Λ₂.map
+  cp := Λ₁.cp.kron Λ₂.cp
+  TP := Λ₁.TP.kron Λ₂.TP
+
+infixl:70 "⊗ₖ" => CPTPMap.prod
+
+end prod
+
+section finprod
+
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀(i :ι), Fintype (dI i)] [∀(i :ι), DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀(i :ι), Fintype (dO i)] [∀(i :ι), DecidableEq (dO i)]
+
+/-- Finitely-indexed tensor products of CPTPMaps.  -/
+def piProd (Λi : (i:ι) → CPTPMap (dI i) (dO i)) : CPTPMap ((i:ι) → dI i) ((i:ι) → dO i) where
+  toLinearMap := MatrixMap.piKron (fun i ↦ (Λi i).map)
+  cp := MatrixMap.IsCompletelyPositive.piKron (fun i ↦ (Λi i).cp)
+  TP := sorry
+
+theorem fin_1_piProd
+  {dI : Fin 1 → Type v} [Fintype (dI 0)] [DecidableEq (dI 0)]
+  {dO : Fin 1 → Type w} [Fintype (dO 0)] [DecidableEq (dO 0)]
+  (Λi : (i : Fin 1) → CPTPMap (dI 0) (dO 0)) :
+    piProd Λi = sorry ∘ₘ ((Λi 1) ∘ₘ sorry) :=
+  sorry --TODO: permutations
+
+end finprod
+
+section trace
+variable {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂]
+
+/-- Partial tracing out the left, as a CPTP map. -/
+def traceLeft : CPTPMap (d₁ × d₂) d₂ where
+  toLinearMap := sorry --should be `Matrix.traceLeft` but that's not a linear map.
+  cp := sorry
+  TP := sorry
+
+/-- Partial tracing out the right, as a CPTP map. -/
+def traceRight : CPTPMap (d₁ × d₂) d₁ :=
+  sorry
+
+@[simp]
+theorem traceLeft_eq_MState_traceLeft (ρ : MState (d₁ × d₂)) :
+    traceLeft (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceLeft :=
+  sorry
+
+@[simp]
+theorem traceRight_eq_MState_traceRight (ρ : MState (d₁ × d₂)) :
+    traceRight (d₁ := d₁) (d₂ := d₂) ρ = ρ.traceRight :=
+  sorry
+
+end trace
+
+section equiv
+variable [DecidableEq dOut]
+
+/-- Given a equivalence (a bijection) between the types d₁ and d₂, that is, if they're
+ the same dimension, then there's a CPTP channel for this. This is what we need for
+ defining e.g. the SWAP channel, which is 'unitary' but takes heterogeneous input
+ and outputs types (d₁ × d₂) and (d₂ × d₁). -/
+def of_equiv (σ : dIn ≃ dOut) : CPTPMap dIn dOut where
+  toFun := Matrix.reindex σ σ
+  map_add' := by simp [Matrix.submatrix_add]
+  map_smul' := by simp [Matrix.submatrix_smul]
+  cp := sorry
+  TP x := by
+    symm
+    apply Fintype.sum_equiv σ
+    simp
+
+theorem equiv_inverse (σ : dIn ≃ dOut)  : (of_equiv σ) ∘ (of_equiv σ.symm) = id (dIn := dOut) :=
+  sorry
+
+variable {d₁ d₂ d₃ : Type*} [Fintype d₁] [Fintype d₂] [Fintype d₃]
+variable [DecidableEq d₁] [DecidableEq d₂] [DecidableEq d₃]
+
+--TODO: of_equiv (id) = id
+--(of_equiv σ).compose (of_equiv τ) = of_equiv (σ ∘ τ)
+
+/-- The SWAP operation, as a channel. -/
+def SWAP : CPTPMap (d₁ × d₂) (d₂ × d₁) :=
+  of_equiv (Equiv.prodComm d₁ d₂)
+
+/-- The associator, as a channel. -/
+def assoc : CPTPMap ((d₁ × d₂) × d₃) (d₁ × d₂ × d₃) :=
+  of_equiv (Equiv.prodAssoc d₁ d₂ d₃)
+
+/-- The inverse associator, as a channel. -/
+def assoc' : CPTPMap (d₁ × d₂ × d₃) ((d₁ × d₂) × d₃) :=
+  of_equiv (Equiv.prodAssoc d₁ d₂ d₃).symm
+
+@[simp]
+theorem SWAP_eq_MState_SWAP (ρ : MState (d₁ × d₂)) : SWAP (d₁ := d₁) (d₂ := d₂) ρ = ρ.SWAP :=
+  sorry
+
+@[simp]
+theorem assoc_eq_MState_assoc (ρ : MState ((d₁ × d₂) × d₃)) : assoc (d₁ := d₁) (d₂ := d₂) (d₃ := d₃) ρ = ρ.assoc :=
+  sorry
+
+@[simp]
+theorem assoc'_eq_MState_assoc' (ρ : MState (d₁ × d₂ × d₃)) : assoc' (d₁ := d₁) (d₂ := d₂) (d₃ := d₃) ρ = ρ.assoc' :=
+  sorry
+
+@[simp]
+theorem assoc_assoc' : (assoc (d₁ := d₁) (d₂ := d₂) (d₃ := d₃)) ∘ₘ assoc' = id := by
+  ext1 ρ
+  simp
+
+end equiv
+
+section unitary
+
+/-- Conjugating density matrices by a unitary as a channel. This is standard unitary evolution. -/
+def of_unitary (U : 𝐔[dIn]) : CPTPMap dIn dIn where
+  toFun ρ := U * ρ * star U
+  map_add' := by simp [mul_add, add_mul]
+  map_smul' := by simp
+  cp := sorry
+  TP := by simp [Matrix.trace_mul_cycle, MatrixMap.IsTracePreserving]
+
+/-- The unitary channel U conjugated by U. -/
+theorem of_unitary_eq_conj (U : 𝐔[dIn]) (ρ : MState dIn) :
+    (of_unitary U) ρ = ρ.U_conj U :=
+  rfl
+
+/-- A channel is unitary iff it is `of_unitary U`. -/
+def IsUnitary (Λ : CPTPMap dIn dIn) : Prop :=
+  ∃ U, Λ = of_unitary U
+
+/-- A channel is unitary iff it can be written as conjugation by a unitary. -/
+theorem IsUnitary_iff_U_conj (Λ : CPTPMap dIn dIn) : IsUnitary Λ ↔ ∃ U, ∀ ρ, Λ ρ = ρ.U_conj U := by
+  simp_rw [IsUnitary, ← of_unitary_eq_conj, CPTPMap.funext_iff]
+
+theorem IsUnitary_equiv (σ : dIn ≃ dIn) : IsUnitary (of_equiv σ) :=
+  sorry
+
+end unitary
+
+-- /-- A channel is *entanglement breaking* iff its product with the identity channel
+--   only outputs separable states. -/
+-- def IsEntanglementBreaking (Λ : CPTPMap dIn dOut) : Prop :=
+--   ∀ (dR : Type u_1) [Fintype dR] [DecidableEq dR],
+--   ∀ (ρ : MState (dR × dIn)), ((CPTPMap.id (dIn := dR) ⊗ₖ Λ) ρ).IsSeparable
+
+--TODO:
+--Theorem: entanglement breaking iff it holds for all channels, not just id.
+--Theorem: entanglement break iff it breaks a Bell pair (Wilde Exercise 4.6.2)
+--Theorem: entanglement break if c-q or q-c, e.g. measurements
+--Theorem: eb iff Kraus operators can be written as all unit rank (Wilde Theorem 4.6.1)
+
+section purify
+variable [DecidableEq dOut] [Inhabited dOut]
+
+/-- Every channel can be written as a unitary channel on a larger system. In general, if
+ the original channel was A→B, we may need to go as big as dilating the output system (the
+ environment) by a factor of A*B. One way of stating this would be that it forms an
+ isometry from A to (B×A×B). So that we can instead talk about the cleaner unitaries, we
+ say that this is a unitary on (A×B×B). The defining properties that this is a valid
+ purification comes are `purify_IsUnitary` and `purify_trace`. This means the environment
+ always has type `dIn × dOut`.
+
+ Furthermore, since we need a canonical "0" state on B in order to add with the input,
+ we require a typeclass instance [Inhabited dOut]. -/
+def purify (Λ : CPTPMap dIn dOut) : CPTPMap (dIn × dOut × dOut) (dIn × dOut × dOut) where
+  toLinearMap := sorry
+  cp := sorry
+  TP := sorry
+
+--TODO: Constructing this will probably need Kraus operators first.
+
+theorem purify_IsUnitary (Λ : CPTPMap dIn dOut) : Λ.purify.IsUnitary :=
+  sorry
+
+/-- With a channel Λ : A → B, a valid purification (A×B×B)→(A×B×B) is such that:
+ * Preparing the default ∣0⟩ state on two copies of B
+ * Appending these to the input
+ * Applying the purified unitary channel
+ * Tracing out the two left parts of the output
+is equivalent to the original channel. This theorem states that the channel output by `purify`
+has this property. -/
+theorem purify_trace (Λ : CPTPMap dIn dOut) : Λ = (
+    let zero_prep : CPTPMap Unit (dOut × dOut) := const_state (MState.pure (Ket.basis default))
+    let prep := (id ⊗ₖ zero_prep)
+    let append : CPTPMap dIn (dIn × Unit) := CPTPMap.of_equiv (Equiv.prodPUnit dIn).symm
+    CPTPMap.traceLeft ∘ₘ CPTPMap.traceLeft ∘ₘ Λ.purify ∘ₘ prep ∘ₘ append
+  ) :=
+  sorry
+
+--TODO Theorem: `purify` is unique up to unitary equivalence.
+
+--TODO: Best to rewrite the "zero_prep / prep / append" as one CPTPMap.append channel when we
+-- define that.
+
+/-- The complementary channel comes from tracing out the other half (the right half) of the purified channel `purify`. -/
+def complementary (Λ : CPTPMap dIn dOut) : CPTPMap dIn (dIn × dOut) :=
+  let zero_prep : CPTPMap Unit (dOut × dOut) := const_state (MState.pure (Ket.basis default))
+  let prep := (id ⊗ₖ zero_prep)
+  let append : CPTPMap dIn (dIn × Unit) := CPTPMap.of_equiv (Equiv.prodPUnit dIn).symm
+  CPTPMap.traceRight ∘ₘ CPTPMap.assoc' ∘ₘ Λ.purify ∘ₘ prep ∘ₘ append
+
+end purify
+
+section degradable
+variable [DecidableEq dOut] [Inhabited dOut] [DecidableEq dOut₂] [Inhabited dOut₂]
+
+/-- A channel is *degradable to* another, if the other can be written as a composition of
+  a _degrading_ channel D with the original channel. -/
+def IsDegradableTo (Λ : CPTPMap dIn dOut) (Λ₂ : CPTPMap dIn dOut₂) : Prop :=
+  ∃ (D : CPTPMap dOut (dOut₂)), D ∘ₘ Λ = Λ₂
+
+/-- A channel is *antidegradable to* another, if the other `IsDegradableTo` this one. -/
+@[reducible]
+def IsAntidegradableTo (Λ : CPTPMap dIn dOut) (Λ₂ : CPTPMap dIn dOut₂) : Prop :=
+  IsDegradableTo Λ₂ Λ
+
+/-- A channel is *degradable* if it `IsDegradableTo` its complementary channel. -/
+def IsDegradable (Λ : CPTPMap dIn dOut) : Prop :=
+  IsDegradableTo Λ Λ.complementary
+
+/-- A channel is *antidegradable* if it `IsAntidegradableTo` its complementary channel. -/
+@[reducible]
+def IsAntidegradable (Λ : CPTPMap dIn dOut) : Prop :=
+  IsAntidegradableTo Λ Λ.complementary
+
+--Theorem (Wilde Exercise 13.5.7): Entanglement breaking channels are antidegradable.
+end degradable
+
+/-- `CPTPMap`s inherit a topology from their choi matrices. -/
+instance instTop : TopologicalSpace (CPTPMap dIn dOut) :=
+  TopologicalSpace.induced (CPTPMap.choi) instTopologicalSpaceMatrix
+
+/-- The projection from `CPTPMap` to the Choi matrix is an embedding -/
+theorem choi_IsEmbedding : Topology.IsEmbedding (CPTPMap.choi (dIn := dIn) (dOut := dOut)) where
+  eq_induced := rfl
+  injective _ _ := choi_ext
+
+instance instT5MState : T3Space (CPTPMap dIn dOut) :=
+  Topology.IsEmbedding.t3Space choi_IsEmbedding
+
+end
+end CPTPMap
+---
+
+File: QuantumInfo/Finite/CPTPMap/Dual.lean
+---
+import QuantumInfo.Finite.CPTPMap.Bundled
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+
+/-! # Duals of matrix map
+
+Definitions and theorems about the dual of a matrix map. -/
+
+noncomputable section
+open ComplexOrder
+
+variable {dIn dOut : Type*} [Fintype dIn] [Fintype dOut] [DecidableEq dIn] [DecidableEq dOut]
+variable {R : Type*} [CommRing R]
+variable {𝕜 : Type*} [RCLike 𝕜]
+
+namespace MatrixMap
+
+variable {M : MatrixMap dIn dOut 𝕜}
+
+--This should be definable with LinearMap.adjoint, but that requires InnerProductSpace stuff
+--that is currently causing issues and pains (tried `open scoped Frobenius`).
+
+/-- The dual of a map between matrices, defined by `Tr[A M(B)] = Tr[(dual M)(A) B]`. Sometimes
+ called the adjoint of the map instead. -/
+@[irreducible]
+def dual (M : MatrixMap dIn dOut R) : MatrixMap dOut dIn R :=
+  let iso1 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dIn dIn).symm
+  let iso2 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dOut dOut)
+  iso1 ∘ₗ LinearMap.dualMap M ∘ₗ iso2
+
+/-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
+theorem Dual.trace_eq (M : MatrixMap dIn dOut R) (A : Matrix dIn dIn R) (B : Matrix dOut dOut R) :
+    (M A * B).trace = (A * M.dual B).trace := by
+  unfold dual
+  dsimp [Matrix.trace]
+  rw [LinearMap.dualMap_apply']
+  simp_rw [Matrix.mul_apply]
+  sorry
+
+--all properties below should provable just from `inner_eq`, since the definition of `dual` itself
+-- is pretty hair (and maybe could be improved...)
+
+/-- The dual of a `IsHermitianPreserving` map also `IsHermitianPreserving`. -/
+theorem IsHermitianPreserving.dual (h : M.IsHermitianPreserving) : M.dual.IsHermitianPreserving := by
+  sorry
+
+/-- The dual of a `IsPositive` map also `IsPositive`. -/
+theorem IsPositive.dual (h : M.IsPositive) : M.dual.IsPositive := by
+  intro x hx
+  use IsHermitianPreserving.dual h.IsHermitianPreserving hx.1
+  sorry
+
+/-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
+theorem dual_Unital (h : M.IsTracePreserving) : M.dual.Unital := by
+  sorry
+
+alias IsTracePreserving.dual := dual_Unital
+
+--The dual of a CompletelyPositive map is always CP, more generally it's k-positive
+-- see Lemma 3.1 of https://www.math.uwaterloo.ca/~krdavids/Preprints/CDPRpositivereal.pdf
+theorem IsCompletelyPositive.dual (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
+  sorry
+
+@[simp]
+theorem dual_dual : M.dual.dual = M := by
+  rw [dual, dual]
+  simp only [← LinearMap.dualMap_comp_dualMap]
+  have h₁ : (Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv.symm.toLinearMap ∘ₗ
+      ((Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv).toLinearMap.dualMap =
+      (Module.evalEquiv 𝕜 (Matrix dOut dOut 𝕜)).symm.toLinearMap := by
+    sorry
+  have h₂ : (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.symm.toLinearMap.dualMap ∘ₗ
+      (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.toLinearMap =
+      (Module.evalEquiv 𝕜 (Matrix dIn dIn 𝕜)).toLinearMap := by
+    ext x y
+    simp
+    generalize Matrix.stdBasis 𝕜 dIn dIn = L
+    sorry
+  rw [← Module.Dual.eval_comp_comp_evalEquiv_eq]
+  rw [← Module.evalEquiv_toLinearMap]
+  simp only [← LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
+    LinearMap.id_comp, h₁]
+  simp only [LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
+    LinearMap.comp_id, h₂]
+
+end MatrixMap
+
+namespace CPTPMap
+
+def dual (M : CPTPMap dIn dOut) : CPUMap dOut dIn where
+  toLinearMap := M.map.dual
+  unital := M.TP.dual
+  cp := .dual M.cp
+
+theorem dual_pos (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
+    0 ≤ M.dual T := by
+  exact M.dual.pos_Hermitian hT
+
+-- set_option pp.all true
+
+/-- The dual of a CPTP map preserves POVMs. Stated here just for two-element POVMs, that is, an
+operator `T` between 0 and 1. -/
+theorem dual.PTP_POVM (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T ∧ T ≤ 1) :
+    (0 ≤ M.dual T ∧ M.dual T ≤ 1) := by
+  rcases hT with ⟨hT₁, hT₂⟩
+  have hT_psd := HermitianMat.zero_le_iff.mp hT₁
+  use M.dual.pos_Hermitian hT₁
+  simpa using ContinuousOrderHomClass.map_monotone M.dual hT₂
+
+/-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
+theorem exp_val_Dual (ℰ : CPTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
+    (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.dual T) := by
+  simp only [MState.exp_val, HermitianMat.inner_eq_re_trace,
+    HermitianMat.val_eq_coe, RCLike.re_to_complex]
+  congr 1
+  apply MatrixMap.Dual.trace_eq
+
+end CPTPMap
+---
+
+File: QuantumInfo/Finite/CPTPMap/MatrixMap.lean
+---
+import Mathlib.LinearAlgebra.TensorProduct.Matrix
+import Mathlib.LinearAlgebra.PiTensorProduct
+import Mathlib.Data.Set.Card
+import Mathlib.Algebra.Module.LinearMap.Basic
+import QuantumInfo.ForMathlib
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.MState
+
+/-! # Linear maps of matrices
+
+This file works with `MatrixMap`s, that is, linear maps from square matrices to square matrices.
+Although this is just a shorthand for `Matrix A A R →ₗ[R] Matrix B B R`, there are several
+concepts that specifically make sense in this context.
+
+ * `toMatrix` is the rectangular "transfer matrix", where matrix multiplication commutes with map composition.
+ * `choi_matrix` is the square "Choi matrix", see `MatrixMap.choi_PSD_iff_CP_map` for example usage
+ * `kron` is the Kronecker product of matrix maps
+ * `IsTracePreserving` states the trace of the output is always equal to the trace of the input.
+
+We provide simp lemmas for relating these facts, prove basic facts e.g. composition and identity, and some facts
+about `IsTracePreserving` maps.
+-/
+
+/-- A `MatrixMap` is a linear map between squares matrices of size A to size B, over R. -/
+abbrev MatrixMap (A B R : Type*) [Semiring R] := Matrix A A R →ₗ[R] Matrix B B R
+
+variable {A B C D E F R : Type*} [Fintype A] [Semiring R] [DecidableEq A]
+
+namespace MatrixMap
+section matrix
+
+variable (A R) in
+/-- Alias of LinearMap.id, but specifically as a MatrixMap. -/
+@[reducible]
+def id : MatrixMap A A R := LinearMap.id
+
+/-- Choi matrix of a given linear matrix map. Note that this is defined even for things that
+  aren't CPTP, it's just rarely talked about in those contexts. This is the inverse of
+  `MatrixMap.of_choi_matrix`. Compare with `MatrixMap.toMatrix`, which gives the transfer matrix. -/
+def choi_matrix (M : MatrixMap A B R) : Matrix (B × A) (B × A) R :=
+  fun (j₁,i₁) (j₂,i₂) ↦ M (Matrix.single i₁ i₂ 1) j₁ j₂
+
+/-- Given the Choi matrix, generate the corresponding R-linear map between matrices as a
+MatrixMap. This is the inverse of `MatrixMap.choi_matrix`. -/
+def of_choi_matrix (M : Matrix (B × A) (B × A) R) : MatrixMap A B R where
+  toFun X := fun b₁ b₂ ↦ ∑ (a₁ : A), ∑ (a₂ : A), X a₁ a₂ * M (b₁, a₁) (b₂, a₂)
+  map_add' x y := by funext b₁ b₂; simp [add_mul, Finset.sum_add_distrib]
+  map_smul' r x := by
+    funext b₁ b₂
+    simp only [Matrix.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc]
+
+/-- Proves that `MatrixMap.of_choi_matrix` and `MatrixMap.choi_matrix` inverses. -/
+@[simp]
+theorem map_choi_inv (M : Matrix (B × A) (B × A) R) : choi_matrix (of_choi_matrix M) = M := by
+  ext ⟨i₁,i₂⟩ ⟨j₁,j₂⟩
+  simp [of_choi_matrix, choi_matrix, Matrix.single, ite_and]
+
+/-- Proves that `MatrixMap.choi_matrix` and `MatrixMap.of_choi_matrix` inverses. -/
+@[simp]
+theorem choi_map_inv (M : MatrixMap A B R) : of_choi_matrix (choi_matrix M) = M := by
+  sorry
+
+/-- The correspondence induced by `MatrixMap.of_choi_matrix` is injective. -/
+theorem choi_matrix_inj : Function.Injective (@choi_matrix A B R _ _) := by
+  intro x y h
+  simpa only [choi_map_inv] using congrArg of_choi_matrix h
+
+variable {R : Type*} [CommSemiring R]
+
+/-- The linear equivalence between MatrixMap's and transfer matrices on a larger space.
+Compare with `MatrixMap.choi_matrix`, which gives the Choi matrix instead of the transfer matrix. -/
+noncomputable def toMatrix [Fintype B] : MatrixMap A B R ≃ₗ[R] Matrix (B × B) (A × A) R :=
+  LinearMap.toMatrix (Matrix.stdBasis R A A) (Matrix.stdBasis R B B)
+
+/-- Multiplication of transfer matrices, `MatrixMap.toMatrix`, is equivalent to composition of maps. -/
+theorem toMatrix_comp [Fintype B] [Fintype C] [DecidableEq B] (M₁ : MatrixMap A B R) (M₂ : MatrixMap B C R) : toMatrix (M₂ ∘ₗ M₁) = (toMatrix M₂) * (toMatrix M₁) :=
+  LinearMap.toMatrix_comp _ _ _ M₂ M₁
+
+end matrix
+
+section kraus
+
+variable [SMulCommClass R R R] [Star R]
+variable {κ : Type*} [Fintype κ]
+
+/-- Construct a matrix map out of families of matrices M N : Σ → Matrix B A R
+indexed by κ via X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ -/
+def of_kraus (M N : κ → Matrix B A R) : MatrixMap A B R where
+  toFun X := ∑ k, M k * X * (N k).conjTranspose
+  map_add' x y := by simp only [Matrix.mul_add, Matrix.add_mul, Finset.sum_add_distrib]
+  map_smul' r x := by
+    simp only [RingHom.id_apply, Finset.smul_sum]
+    conv =>
+      enter [1, 2, k]
+      rw [Matrix.mul_smul, Matrix.smul_mul]
+
+def exists_kraus (Φ : MatrixMap A B R) : ∃ r : ℕ, ∃ (M N : Fin r → Matrix B A R), Φ = of_kraus M N :=
+  sorry
+
+end kraus
+
+section kron
+open Kronecker
+
+variable {A B C D R : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D]
+variable [DecidableEq A] [DecidableEq C]
+
+/-- The Kronecker product of MatrixMaps. Defined here using `TensorProduct.map M₁ M₂`, with appropriate
+reindexing operations and `LinearMap.toMatrix`/`Matrix.toLin`. Notation `⊗ₖₘ`. -/
+noncomputable def kron [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) : MatrixMap (A × C) (B × D) R :=
+  let h₁ := (LinearMap.toMatrix (Module.Basis.tensorProduct  (Matrix.stdBasis R A A) (Matrix.stdBasis R C C))
+      (Module.Basis.tensorProduct  (Matrix.stdBasis R B B) (Matrix.stdBasis R D D)))
+    (TensorProduct.map M₁ M₂);
+  let r₁ := Equiv.prodProdProdComm B B D D;
+  let r₂ := Equiv.prodProdProdComm A A C C;
+  let h₂ := Matrix.reindex r₁ r₂ h₁;
+  Matrix.toLin (Matrix.stdBasis R (A × C) (A × C)) (Matrix.stdBasis R (B × D) (B × D)) h₂
+
+scoped[MatrixMap] infixl:100 " ⊗ₖₘ " => MatrixMap.kron
+
+/-- The extensional definition of the Kronecker product `MatrixMap.kron`, in terms of the entries of its image. -/
+theorem kron_def [CommRing R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (M : Matrix (A × C) (A × C) R) : (M₁ ⊗ₖₘ M₂) M (b₁, d₁) (b₂, d₂) =
+  ∑ a₁, ∑ a₂, ∑ c₁, ∑ c₂, (M₁ (Matrix.single a₁ a₂ 1) b₁ b₂) * (M₂ (Matrix.single c₁ c₂ 1) d₁ d₂) * (M (a₁, c₁) (a₂, c₂)) := by
+  rw [kron, TensorProduct.toMatrix_map]
+  simp
+  rw [Matrix.toLin_apply]
+  simp [Equiv.prodProdProdComm, Matrix.kroneckerMap, Matrix.submatrix, LinearMap.toMatrix]
+  simp [Matrix.stdBasis_eq_single]
+  sorry
+
+section kron_lemmas
+variable [CommSemiring R]
+
+theorem add_kron (ML₁ ML₂ : MatrixMap A B R) (MR : MatrixMap C D R) : (ML₁ + ML₂) ⊗ₖₘ MR = ML₁ ⊗ₖₘ MR + ML₂ ⊗ₖₘ MR := by
+  simp [kron, TensorProduct.map_add_left, Matrix.submatrix_add]
+
+theorem kron_add (ML : MatrixMap A B R) (MR₁ MR₂ : MatrixMap C D R) : ML ⊗ₖₘ (MR₁ + MR₂) = ML ⊗ₖₘ MR₁ + ML ⊗ₖₘ  MR₂ := by
+  simp [kron, TensorProduct.map_add_right, Matrix.submatrix_add]
+
+theorem smul_kron (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : (r • ML) ⊗ₖₘ MR = r • (ML ⊗ₖₘ MR) := by
+  simp [kron, TensorProduct.map_smul_left, Matrix.submatrix_smul]
+
+theorem kron_smul (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : ML ⊗ₖₘ (r • MR) = r • (ML ⊗ₖₘ MR) := by
+  simp [kron, TensorProduct.map_smul_right, Matrix.submatrix_smul]
+
+@[simp]
+theorem zero_kron (MR : MatrixMap C D R) : (0 : MatrixMap A B R) ⊗ₖₘ MR = 0 := by
+  simp [kron]
+
+@[simp]
+theorem kron_zero (ML : MatrixMap A B R) : ML ⊗ₖₘ (0 : MatrixMap C D R) = 0 := by
+  simp [kron]
+
+variable [DecidableEq B] in
+theorem kron_id_id : (id A R ⊗ₖₘ id B R) = id (A × B) R := by
+  simp [kron]
+
+variable {Dl₁ Dl₂ Dl₃ Dr₁ Dr₂ Dr₃ : Type*}
+  [Fintype Dl₁] [Fintype Dl₂] [Fintype Dl₃] [Fintype Dr₁] [Fintype Dr₂] [Fintype Dr₃]
+  [DecidableEq Dl₁] [DecidableEq Dl₂] [DecidableEq Dr₁] [DecidableEq Dr₂] in
+/-- For maps L₁, L₂, R₁, and R₂, the product (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) -/
+theorem kron_comp_distrib (L₁ : MatrixMap Dl₁ Dl₂ R) (L₂ : MatrixMap Dl₂ Dl₃ R) (R₁ : MatrixMap Dr₁ Dr₂ R)
+    (R₂ : MatrixMap Dr₂ Dr₃ R) : (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) := by
+  simp [kron, TensorProduct.map_comp, ← Matrix.toLin_mul, Matrix.submatrix_mul_equiv, ← LinearMap.toMatrix_comp]
+
+end kron_lemmas
+
+-- /-- The canonical tensor product on linear maps between matrices, where a map from
+--   M[A,B] to M[C,D] is given by M[A×C,B×D]. This tensor product acts independently on
+--   Kronecker products and gives Kronecker products as outputs. -/
+-- def matrixMap_kron (M₁ : Matrix (A₁ × B₁) (C₁ × D₁) R) (M₂ : Matrix (A₂ × B₂) (C₂ × D₂) R) : Matrix ((A₁ × A₂) × (B₁ × B₂)) ((C₁ × C₂) × (D₁ × D₂)) R :=
+--   Matrix.of fun ((a₁, a₂), (b₁, b₂)) ((c₁, c₂), (d₁, d₂)) ↦
+--     (M₁ (a₁, b₁) (c₁, d₁)) * (M₂ (a₂, b₂) (c₂, d₂))
+
+/-- The operational definition of the Kronecker product `MatrixMap.kron`, that it maps a Kronecker product of
+inputs to the Kronecker product of outputs. It is the unique bilinear map doing so. -/
+theorem kron_map_of_kron_state [CommRing R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (MA : Matrix A A R) (MC : Matrix C C R) : (M₁ ⊗ₖₘ M₂) (MA ⊗ₖ MC) = (M₁ MA) ⊗ₖ (M₂ MC) := by
+  ext bd₁ bd₂
+  let (b₁, d₁) := bd₁
+  let (b₂, d₂) := bd₂
+  rw [kron_def]
+  simp only [Matrix.kroneckerMap_apply]
+  simp_rw [mul_assoc, ← Finset.mul_sum]
+  simp_rw [mul_comm (M₂ _ _ _), mul_assoc, ← Finset.mul_sum, ← mul_assoc]
+  simp_rw [← Finset.sum_mul]
+  congr
+  -- simp_rw [← Matrix.stdBasis_eq_stdBasisMatrix ]
+  -- unfold Matrix.stdBasisMatrix
+  -- simp_rw [← LinearMap.sum_apply]
+  -- simp
+  sorry
+  sorry
+
+theorem choi_matrix_state_rep {B : Type*} [Fintype B] [Nonempty A] (M : MatrixMap A B ℂ) :
+  M.choi_matrix = (↑(Fintype.card (α := A)) : ℂ) • (M ⊗ₖₘ (LinearMap.id : MatrixMap A A ℂ)) (MState.pure (Ket.MES A)).m := by
+  ext i j
+  simp [choi_matrix, kron_def M, Ket.MES, Ket.apply, Finset.mul_sum]
+  conv =>
+    rhs
+    conv =>
+      enter [2, x, 2, a_1]
+      conv =>
+        enter [2, a_2]
+        simp [apply_ite]
+      simp only [Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+      rw [← mul_inv, ← Complex.ofReal_mul, ← Real.sqrt_mul (Fintype.card A).cast_nonneg',
+        Real.sqrt_mul_self (Fintype.card A).cast_nonneg', mul_comm, mul_assoc]
+      simp
+      conv =>
+        right
+        rw [Matrix.single, Matrix.of_apply]
+        enter [1]
+        rw [and_comm]
+      simp [apply_ite, ite_and]
+    conv =>
+      enter [2, x]
+      simp [Finset.sum_ite]
+    simp [Finset.sum_ite]
+
+end kron
+
+section pi
+section basis
+
+--Missing from Mathlib
+
+variable {ι : Type*}
+variable {R : Type*} [CommSemiring R]
+variable {s : ι → Type*} [∀ i, AddCommMonoid (s i)] [∀ i, Module R (s i)]
+variable {L : ι → Type* }
+
+/-- Like `Basis.tensorProduct`, but for `PiTensorProduct` -/
+noncomputable def _root_.Module.Basis.piTensorProduct [∀i, Fintype (L i)]
+    (b : (i:ι) → Module.Basis (L i) R (s i)) :
+      Module.Basis ((i:ι) → L i) R (PiTensorProduct R s) :=
+  Finsupp.basisSingleOne.map sorry
+
+end basis
+
+variable {R : Type*} [CommSemiring R]
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
+
+/-- Finite Pi-type tensor product of MatrixMaps. Defined as `PiTensorProduct.tprod` of the underlying
+Linear maps. Notation `⨂ₜₘ[R] i, f i`, eventually. -/
+noncomputable def piKron (Λi : ∀ i, MatrixMap (dI i) (dO i) R) : MatrixMap (∀i, dI i) (∀i, dO i) R :=
+  let map₁ := PiTensorProduct.map Λi;
+  let map₂ := LinearMap.toMatrix
+    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dI i) (dI i)))
+    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dO i) (dO i))) map₁
+  let r₁ : ((i : ι) → dO i × dO i) ≃ ((i : ι) → dO i) × ((i : ι) → dO i) := Equiv.arrowProdEquivProdArrow _ dO dO
+  let r₂ : ((i : ι) → dI i × dI i) ≃ ((i : ι) → dI i) × ((i : ι) → dI i) := Equiv.arrowProdEquivProdArrow _ dI dI
+  let map₃ := Matrix.reindex r₁ r₂ map₂;
+  Matrix.toLin
+    (Matrix.stdBasis R ((i:ι) → dI i) ((i:ι) → dI i))
+    (Matrix.stdBasis R ((i:ι) → dO i) ((i:ι) → dO i)) map₃
+
+-- notation3:100 "⨂ₜₘ "(...)", "r:(scoped f => tprod R f) => r
+-- syntax (name := bigsum) "∑ " bigOpBinders ("with " term)? ", " term:67 : term
+
+end pi
+---
+
+File: QuantumInfo/Finite/CPTPMap/Unbundled.lean
+---
+import QuantumInfo.Finite.CPTPMap.MatrixMap
+
+/-! # Properties of Matrix Maps
+
+Building on `MatrixMap`s, this defines the properties: `IsTracePreserving`, `Unital`,
+`IsHermitianPreserving`, `IsPositive` and `IsCompletelyPositive`. They have basic facts
+such as closure under composition, addition, and scaling.
+
+These are the *unbundled* versions, which just state the relevant properties of a given `MatrixMap`.
+The bundled versions are `HPMap`, `UnitalMap`, `TPMap`, `PMap`, and `CPMap` respectively, given
+in Bundled.lean.
+-/
+
+namespace MatrixMap
+
+section tp
+variable [Fintype A] [DecidableEq A] [Fintype B] [Fintype C] [Semiring R]
+
+/-- A linear matrix map is *trace preserving* if trace of the output equals trace of the input. -/
+def IsTracePreserving (M : MatrixMap A B R) : Prop :=
+  ∀ (x : Matrix A A R), (M x).trace = x.trace
+
+/-- A map is trace preserving iff the partial trace of the Choi matrix is the identity. -/
+theorem IsTracePreserving_iff_trace_choi (M : MatrixMap A B R) : M.IsTracePreserving
+    ↔ M.choi_matrix.traceLeft = 1 := by
+  constructor
+  · intro h
+    ext a₁ a₂
+    replace h := h (Matrix.single a₁ a₂ 1)
+    simp_rw [Matrix.trace, Matrix.diag] at h
+    simp only [Matrix.traceLeft, choi_matrix, Matrix.of_apply, h]
+    simp only [Matrix.single, Matrix.of_apply, Finset.sum_boole, Matrix.one_apply]
+    have : (fun x => a₁ = x ∧ a₂ = x) = (fun x => a₁ = a₂ ∧ a₂ = x) := by
+      funext x
+      rw [eq_iff_iff, and_congr_left_iff]
+      rintro rfl
+      trivial
+    split_ifs with h
+    <;> simp [this, h, Finset.filter_eq]
+  · intro h X
+    replace h := fun (a₁ a₂ : A) ↦ congrFun₂ h a₁ a₂
+    simp [Matrix.traceLeft, Matrix.trace] at h ⊢
+    rw [← M.choi_map_inv, of_choi_matrix]
+    dsimp
+    rw [Finset.sum_comm_cycle, Finset.sum_comm_cycle]
+    simp_rw [← Finset.mul_sum, h, Matrix.one_apply]
+    simp
+
+namespace IsTracePreserving
+
+variable {A : Type*} [Fintype A] in
+/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original trace. -/
+@[simp]
+theorem apply_trace {M : MatrixMap A B R} (h : M.IsTracePreserving) (ρ : Matrix A A R)
+    : (M ρ).trace = ρ.trace :=
+  h ρ
+
+/-- The trace of a Choi matrix of a TP map is the cardinality of the input space. -/
+theorem trace_choi {M : MatrixMap A B R} (h : M.IsTracePreserving) :
+    M.choi_matrix.trace = (Finset.univ (α := A)).card := by
+  rw [← Matrix.traceLeft_trace, (IsTracePreserving_iff_trace_choi M).mp h,
+    Matrix.trace_one, Finset.card_univ]
+
+variable {A : Type*} [Fintype A] in
+/-- The composition of IsTracePreserving maps is also trace preserving. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
+    IsTracePreserving (M₂ ∘ₗ M₁) := by
+  intro x
+  simp [h₂ _, h₁ _]
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsTracePreserving. -/
+@[simp]
+theorem id : (id A R).IsTracePreserving := by
+  simp [IsTracePreserving, MatrixMap.id]
+
+variable {A R : Type*} [CommSemiring R] [Fintype A] in
+/-- Unit linear combinations of IsTracePreserving maps are IsTracePreserving. -/
+theorem unit_linear {M₁ M₂ : MatrixMap A B R} {x y : R}
+    (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) (hxy : x + y = 1) :
+    (x • M₁ + y • M₂).IsTracePreserving := by
+  rw [IsTracePreserving] at h₁ h₂ ⊢
+  simp [h₁, h₂, ← add_mul, hxy]
+
+variable {D R : Type*} [CommSemiring R] [DecidableEq C] [Fintype D] in
+/-- The kronecker product of IsTracePreserving maps is also trace preserving. -/
+theorem kron {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R} (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
+    (M₁ ⊗ₖₘ M₂).IsTracePreserving := by
+  sorry
+
+variable [CommSemiring S] [Star S] [SMulCommClass S S S] in
+/-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
+is trace-preserving if ∑ k : κ, (N k)ᴴ * (M k) = 1 -/
+theorem of_kraus_isTracePreserving {κ : Type*} [Fintype κ]
+  (M N : κ → Matrix B A S)
+  (hTP : (∑ k, (N k).conjTranspose * (M k)) = 1) :
+  (MatrixMap.of_kraus M N).IsTracePreserving := by
+  intro x
+  simp only [of_kraus, LinearMap.coe_mk, AddHom.coe_mk, Matrix.trace_sum]
+  conv =>
+    enter [1,2,i]
+    rw [Matrix.trace_mul_cycle (M i) x (N i).conjTranspose]
+  rw [←Matrix.trace_sum, ←Finset.sum_mul, hTP, one_mul]
+
+end IsTracePreserving
+end tp
+
+
+section unital
+
+variable [DecidableEq A] [DecidableEq B] [Semiring R]
+
+/-- A linear matrix map is *unital* if it preserves the identity. -/
+def Unital (M : MatrixMap A B R) : Prop :=
+  M 1 = 1
+
+namespace Unital
+
+variable {M : MatrixMap A B R}
+
+@[simp]
+theorem map_1 (h : M.Unital) : M 1 = 1 :=
+  h
+
+/-- The identity `MatrixMap` is `Unital`. -/
+@[simp]
+theorem id : (id A R).Unital := by
+  simp [Unital, MatrixMap.id]
+
+--TODO: Closed under composition, kronecker products, it's iff M.choi_matrix.traceLeft = 1...
+
+end Unital
+end unital
+
+variable {A B C R : Type*}
+
+open Kronecker
+open TensorProduct
+
+open ComplexOrder
+variable [RCLike R]
+
+/-- A linear matrix map is *Hermitian preserving* if it maps `IsHermitian` matrices to `IsHermitian`.-/
+def IsHermitianPreserving (M : MatrixMap A B R) : Prop :=
+  ∀{x}, x.IsHermitian → (M x).IsHermitian
+
+/-- A linear matrix map is *positive* if it maps `PosSemidef` matrices to `PosSemidef`.-/
+def IsPositive [Fintype A] [Fintype B] (M : MatrixMap A B R) : Prop :=
+  ∀{x}, x.PosSemidef → (M x).PosSemidef
+
+/-- A linear matrix map is *completely positive* if, for any integer n, the tensor product
+with `I(n)` is positive. -/
+def IsCompletelyPositive [Fintype A] [Fintype B] [DecidableEq A] (M : MatrixMap A B R) : Prop :=
+  ∀ (n : ℕ), (M ⊗ₖₘ (LinearMap.id : MatrixMap (Fin n) (Fin n) R)).IsPositive
+
+namespace IsHermitianPreserving
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsHermitianPreserving. -/
+theorem id : (id A R).IsPositive :=
+  _root_.id
+
+/-- The composition of IsHermitianPreserving maps is also Hermitian preserving. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R}
+    (h₁ : M₁.IsHermitianPreserving) (h₂ : M₂.IsHermitianPreserving) : IsHermitianPreserving (M₂ ∘ₗ M₁) :=
+  fun h ↦ h₂ (h₁ h)
+
+end IsHermitianPreserving
+
+namespace IsPositive
+variable [Fintype A] [Fintype B] [Fintype C]
+
+/- Every `MatrixMap` that `IsPositive` is also `IsHermitianPreserving`. -/
+theorem IsHermitianPreserving {M : MatrixMap A B R}
+    (hM : IsPositive M) : IsHermitianPreserving M := by
+--sketch: Positive maps are all Hermitian preserving, because positive matrices generate the full
+--set of Hermitian matrices (generate as a vector space). Concretely, every pair of elements
+-- (i,j) and (j,i) must be conjugate because we can look at the PSD matrices with 1's on (i,i),
+-- on (j,j), and on all 4 elements (i or j, i or j).
+  --This "generate the full set" is already proved in Mathlib as `span_selfAdjoint` so this
+  --should be quick
+  sorry
+
+/-- The composition of IsPositive maps is also positive. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsPositive)
+    (h₂ : M₂.IsPositive) : IsPositive (M₂ ∘ₗ M₁) :=
+  fun h ↦ h₂ (h₁ h)
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsPositive. -/
+@[simp]
+theorem id : (id A R).IsPositive :=
+  _root_.id
+
+/-- Sums of IsPositive maps are IsPositive. -/
+theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsPositive) (h₂ : M₂.IsPositive) :
+    (M₁ + M₂).IsPositive :=
+  fun x ↦ Matrix.PosSemidef.add (h₁ x) (h₂ x)
+
+/-- Nonnegative scalings of IsPositive maps are IsPositive. -/
+theorem smul {M : MatrixMap A B R} (hM : M.IsPositive) {x : R} (hx : 0 ≤ x) :
+    (x • M).IsPositive :=
+  fun hm ↦ (hM hm).smul hx
+
+end IsPositive
+
+namespace IsCompletelyPositive
+variable [Fintype A] [Fintype B] [Fintype C] [DecidableEq A]
+
+/-- Definition of a CP map, but with `Fintype T` in the definition instead of a `Fin n`. -/
+theorem of_Fintype  {M : MatrixMap A B R} (h : IsCompletelyPositive M)
+    (T : Type*) [Fintype T] [DecidableEq T] :
+    (M.kron (LinearMap.id : MatrixMap T T R)).IsPositive := by
+  sorry
+
+/- Every `MatrixMap` that `IsCompletelyPositive` also `IsPositiveMap`. -/
+theorem IsPositive [DecidableEq A] {M : MatrixMap A B R}
+    (hM : IsCompletelyPositive M) : IsPositive M := by
+  intro x hx
+  let x' : Matrix (A × Fin 1) (A × Fin 1) R := x ⊗ₖ 1
+  let eqB : (B × Fin 1) ≃ B :=
+    (Equiv.prodCongrRight (fun _ ↦ finOneEquiv)).trans (Equiv.prodPUnit B)
+  sorry
+
+/-- The composition of IsCompletelyPositive maps is also completely positive. -/
+theorem comp [DecidableEq B] {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsCompletelyPositive)
+    (h₂ : M₂.IsCompletelyPositive) : IsCompletelyPositive (M₂ ∘ₗ M₁) := by
+--sketch: (M₂ ∘ₗ M₁) ⊗ₖₘ id[n] = (M₂ ⊗ₖₘ id[n]) ∘ₗ (M₁ ⊗ₖₘ id[n]), which is a composition of positive maps.
+  intro n x hx
+  specialize h₁ n hx
+  specialize h₂ n h₁
+  conv in LinearMap.id =>
+    change LinearMap.id ∘ₗ LinearMap.id
+  rw [kron_comp_distrib]
+  simpa using h₂
+
+/-- The identity MatrixMap IsCompletelyPositive. -/
+@[simp]
+theorem id : (id A R).IsCompletelyPositive := by
+  intro n ρ h
+  rwa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id]
+
+/-- Sums of IsCompletelyPositive maps are IsCompletelyPositive. -/
+theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) :
+    (M₁ + M₂).IsCompletelyPositive :=
+  fun n _ h ↦ by
+  simpa only [add_kron] using Matrix.PosSemidef.add (h₁ n h) (h₂ n h)
+
+/-- Nonnegative scalings of `IsCompletelyPositive` maps are `IsCompletelyPositive`. -/
+theorem smul {M : MatrixMap A B R} (hM : M.IsCompletelyPositive) {x : R} (hx : 0 ≤ x) :
+    (x • M).IsCompletelyPositive :=
+  fun n ρ h ↦ by
+    rw [MatrixMap.smul_kron]
+    exact (hM n h).smul hx
+
+variable (A B) in
+/-- The zero map `IsCompletelyPositive`. -/
+theorem zero : (0 : MatrixMap A B R).IsCompletelyPositive :=
+  fun _ _ _ ↦ by simpa using Matrix.PosSemidef.zero
+
+variable [Fintype d] [DecidableEq d]
+/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely positive map. -/
+theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : MatrixMap.IsCompletelyPositive
+    (⟨⟨fun M => M ⊗ₖ C, h₁⟩, h₂⟩ : MatrixMap A (A × d) R) := by
+  sorry
+
+/-- Choi's theorem on completely positive maps: A map `IsCompletelyPositive` iff its Choi Matrix is PSD. -/
+theorem _root_.MatrixMap.choi_PSD_iff_CP_map [DecidableEq A] (M : MatrixMap A B ℂ) :
+    M.IsCompletelyPositive ↔ M.choi_matrix.PosSemidef := by
+  by_cases hA : Nonempty A
+  · constructor
+    · intro hcp
+      rw [choi_matrix_state_rep]
+      apply Matrix.PosSemidef.smul _ (ha := by positivity)
+      exact of_Fintype hcp A (MState.pure (Ket.MES A)).pos
+    · sorry
+  · simp at hA
+    have : M = 0 := Subsingleton.elim M 0
+    subst M
+    have hx (x : B × A → ℂ) : x = 0 := Subsingleton.elim x 0
+    simp [Matrix.PosSemidef, Matrix.IsHermitian, IsCompletelyPositive,
+      MatrixMap.IsPositive, hx]
+    ext
+    simp [choi_matrix] --TODO: `choi_matrix 0 = 0` as simp
+
+/-- The channel X ↦ ∑ k : κ, (M k) * X * (M k)ᴴ formed by Kraus operators M : κ → Matrix B A R
+is completely positive -/
+theorem of_kraus_isCompletelyPositive {κ : Type*} [Fintype κ] (M : κ → Matrix B A R) :
+  (MatrixMap.of_kraus M M).IsCompletelyPositive :=
+  sorry
+
+def exists_kraus (Φ : MatrixMap A B R) (hCP : Φ.IsCompletelyPositive) :
+  ∃ r : ℕ, ∃ (M : Fin r → Matrix B A R), Φ = of_kraus M M :=
+  sorry
+
+/-- The Kronecker product of IsCompletelyPositive maps is also completely positive. -/
+theorem kron [DecidableEq C] [Fintype D] {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R}
+    (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) : IsCompletelyPositive (M₁ ⊗ₖₘ M₂) := by
+--sketch: the Choi matrix of the Kron is the Kron of the Choi matrix, and Kron of PSD matrices is PSD.
+/-
+      intro n M hM
+      let M' : Matrix (dI₁ × (dI₂ × Fin n)) (dI₁ × (dI₂ × Fin n)) ℂ := sorry --reorder indices of M
+      have hM' : M'.PosSemidef := sorry --PSD preserved under reordering
+      let Λ₁M := ((Λ₁.map.kron LinearMap.id) M')
+      have hΛ₁M : Λ₁M.PosSemidef := Λ₁.completely_pos.def_Fintype (dI₂ × Fin n) hM'
+      let Λ₁M' : Matrix (dI₂ × (dO₁ × Fin n)) (dI₂ × (dO₁ × Fin n)) ℂ := sorry --reorder Λ₁M
+      have hΛ₁M' : Λ₁M'.PosSemidef := sorry --PSD preserved under reordering
+      let Λ₂Λ₁M := (Λ₂.map.kron LinearMap.id) Λ₁M'
+      have hΛ₂Λ₁M : Λ₂Λ₁M.PosSemidef := Λ₂.completely_pos.def_Fintype (dO₁ × Fin n) hΛ₁M'
+      --PSD preserved under reordering to get (((Λ₁.map.MatrixMap_Prod Λ₂.map).MatrixMap_Prod LinearMap.id) M)
+      sorry
+      -/
+  sorry
+
+section piKron
+
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
+
+/-- The `piKron` product of IsCompletelyPositive maps is also completely positive. -/
+theorem piKron {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).IsCompletelyPositive) :
+    IsCompletelyPositive (MatrixMap.piKron Λi) := by
+  sorry
+
+end piKron
+
+end IsCompletelyPositive
+
+end MatrixMap
+---
+
+File: QuantumInfo/Finite/Distance/TraceDistance.lean
+---
+import QuantumInfo.Finite.MState
+
+import QuantumInfo.ForMathlib
+
+noncomputable section
+
+open Classical
+open BigOperators
+open ComplexConjugate
+open Kronecker
+open scoped Matrix ComplexOrder
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+/--The trace distance between two quantum states: half the trace norm of the difference (ρ - σ). -/
+def TrDistance (ρ σ : MState d) : ℝ :=
+  (1/2:ℝ) * (ρ.m - σ.m).traceNorm
+
+namespace TrDistance
+
+variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
+
+theorem ge_zero : 0 ≤ TrDistance ρ σ := by
+  rw [TrDistance]
+  simp [Matrix.traceNorm_nonneg]
+
+theorem le_one : TrDistance ρ σ ≤ 1 :=
+  calc TrDistance ρ σ
+    _ = (1/2:ℝ) * (ρ.m - σ.m).traceNorm := by rfl
+    _ ≤ (1/2:ℝ) * (ρ.m.traceNorm + σ.m.traceNorm) := by
+      linarith [Matrix.traceNorm_triangleIneq' ρ.m σ.m]
+    _ = (1/2:ℝ) * (1 + 1) := by
+      rw [ρ.traceNorm_eq_1, σ.traceNorm_eq_1]
+    _ = 1 := by norm_num
+
+/-- The trace distance, as a `Prob` probability with value between 0 and 1. -/
+def prob : Prob :=
+  ⟨TrDistance ρ σ, ⟨ge_zero ρ σ, le_one ρ σ⟩⟩
+
+/-- The trace distance is a symmetric quantity. -/
+theorem symm : TrDistance ρ σ = TrDistance σ ρ := by
+  dsimp [TrDistance]
+  rw [← Matrix.traceNorm_eq_neg_self, neg_sub]
+
+/-- The trace distance is equal to half the 1-norm of the eigenvalues of their difference . -/
+theorem eq_abs_eigenvalues : TrDistance ρ σ = (1/2:ℝ) *
+    ∑ i, abs ((ρ.Hermitian.sub σ.Hermitian).eigenvalues i) := by
+  rw [TrDistance, Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues]
+
+-- Fuchs–van de Graaf inequalities
+-- Relation to classical TV distance
+---
+
+File: QuantumInfo/Finite/Distance/Fidelity.lean
+---
+import QuantumInfo.Finite.CPTPMap
+
+noncomputable section
+
+open BigOperators
+open ComplexConjugate
+open Kronecker
+open scoped Matrix ComplexOrder
+
+variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] (ρ σ : MState d)
+
+--We put all of the fidelity defs and theorems in the MState namespace so that they have the
+--nice . syntax, i.e. `ρ.fidelity σ = 1 ↔ ρ = σ`.
+namespace MState
+
+/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya coefficient. -/
+def fidelity (ρ σ : MState d) : ℝ :=
+  ((σ.M.conj ρ.pos.sqrt) ^ (1/2 : ℝ)).trace
+  -- let ρσρ := ρ.pos.sqrt * σ.m * ρ.pos.sqrt
+  -- let ρσρ_PosSemidef : ρσρ.PosSemidef := by
+  --   unfold ρσρ
+  --   nth_rewrite 2 [← ρ.pos.posSemidef_sqrt.isHermitian]
+  --   exact σ.pos.mul_mul_conjTranspose_same _
+  -- (ρσρ_PosSemidef.posSemidef_sqrt.1.rtrace)^2
+
+theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ :=
+  sorry
+  -- sq_nonneg _
+
+theorem fidelity_le_one : fidelity ρ σ ≤ 1 :=
+  sorry --submultiplicativity of trace and sqrt
+
+/-- The fidelity, as a `Prob` probability with value between 0 and 1. -/
+def fidelity_prob : Prob :=
+  ⟨fidelity ρ σ, ⟨fidelity_ge_zero ρ σ, fidelity_le_one ρ σ⟩⟩
+
+/-- A state has perfect fidelity with itself. -/
+theorem fidelity_self_eq_one : fidelity ρ ρ = 1 :=
+  sorry --Break and recombine sqrts
+
+/-- The fidelity is 1 if and only if the two states are the same. -/
+theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ :=
+  ⟨sorry,
+  fun h ↦ h ▸ fidelity_self_eq_one ρ
+  ⟩
+
+/-- The fidelity is a symmetric quantity. -/
+theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ :=
+  sorry --break into sqrts
+
+/-- The fidelity cannot decrease under the application of a channel. -/
+theorem fidelity_channel_nondecreasing [DecidableEq d₂] (Λ : CPTPMap d d₂) : fidelity (Λ ρ) (Λ σ) ≥ fidelity ρ σ :=
+  sorry
+
+--TODO: Real.arccos ∘ fidelity forms a metric (triangle inequality), the Fubini–Study metric.
+--Matches with classical (squared) Bhattacharyya coefficient
+--Invariance under unitaries
+--Uhlmann's theorem
+
+end MState
+---
+
+File: QuantumInfo/Finite/Entropy.lean
+---
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.CPTPMap
+import ClassicalInfo.Entropy
+
+/-!
+Quantum notions of information and entropy.
+-/
+
+noncomputable section
+
+variable {d d₁ d₂ d₃ : Type*}
+variable [Fintype d] [Fintype d₁] [Fintype d₂] [Fintype d₃]
+variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂] [DecidableEq d₃]
+variable {dA dB dC dA₁ dA₂ : Type*}
+variable [Fintype dA] [Fintype dB] [Fintype dC] [Fintype dA₁] [Fintype dA₂]
+variable [DecidableEq dA] [DecidableEq dB] [DecidableEq dC] [DecidableEq dA₁] [DecidableEq dA₂]
+
+/-- Von Neumann entropy of a mixed state. -/
+def Sᵥₙ (ρ : MState d) : ℝ :=
+  Hₛ (ρ.spectrum)
+
+/-- The Quantum Conditional Entropy S(ρᴬ|ρᴮ) is given by S(ρᴬᴮ) - S(ρᴮ). -/
+def qConditionalEnt (ρ : MState (dA × dB)) : ℝ :=
+  Sᵥₙ ρ - Sᵥₙ ρ.traceLeft
+
+/-- The Quantum Mutual Information I(A:B) is given by S(ρᴬ) + S(ρᴮ) - S(ρᴬᴮ). -/
+def qMutualInfo (ρ : MState (dA × dB)) : ℝ :=
+  Sᵥₙ ρ.traceLeft + Sᵥₙ ρ.traceRight - Sᵥₙ ρ
+
+/-- The Coherent Information of a state ρ pasing through a channel Λ is the negative conditional
+  entropy of the image under Λ of the purification of ρ. -/
+def coherentInfo (ρ : MState d₁) (Λ : CPTPMap d₁ d₂) : ℝ :=
+  let ρPure : MState (d₁ × d₁) := MState.pure ρ.purify
+  let ρImg : MState (d₂ × d₁) := Λ.prod (CPTPMap.id (dIn := d₁)) ρPure
+  (- qConditionalEnt ρImg)
+
+open Classical in
+/-- The quantum relative entropy S(ρ‖σ) = Tr[ρ (log ρ - log σ)]. -/
+def qRelativeEnt (ρ σ : MState d) : ENNReal :=
+  (if σ.M.ker ≤ ρ.M.ker then
+    some ⟨ρ.M.inner (HermitianMat.log ρ - HermitianMat.log σ),
+    /- Quantum relative entropy is nonnegative. This can be proved by an application of
+    Klein's inequality. -/
+    sorry⟩
+  else
+    ⊤)
+
+notation "𝐃(" ρ "‖" σ ")" => qRelativeEnt ρ σ
+
+/-- Quantum relative entropy as `Tr[ρ (log ρ - log σ)]` when supports are correct. -/
+theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
+    (𝐃(ρ‖σ) : EReal) = ρ.M.inner (HermitianMat.log ρ - HermitianMat.log σ) := by
+  simp only [qRelativeEnt, h]
+  congr
+
+/-- The quantum relative entropy is unchanged by `MState.relabel` -/
+@[simp]
+theorem qRelativeEnt_relabel (ρ σ : MState d) (e : d₂ ≃ d) :
+    𝐃(ρ.relabel e‖σ.relabel e) = 𝐃(ρ‖σ) := by
+  unfold qRelativeEnt
+  split_ifs with h₁ h₂ h₂
+  · congr 2
+    simp only [HermitianMat.inner, MState.relabel_m, RCLike.re_to_complex]
+    congr 1
+    --Push relabels through matrix log
+    --Use the fact that Matrix.trace (m.submatrix ⇑e ⇑e) = Matrix.trace m
+    sorry
+  rotate_right
+  · rfl
+  --The rest of this is about kernels of linear maps under equivs. Probably belongs elsewhere
+  all_goals
+    dsimp [MState.relabel] at h₁
+    sorry
+    -- simp only [Matrix.toLin'_submatrix] at h₁
+    -- have hbot : LinearMap.ker (LinearMap.funLeft ℂ ℂ ⇑e) = ⊥ := by
+    --   apply LinearMap.ker_eq_bot_of_inverse
+    --   rw [← LinearMap.funLeft_comp, Equiv.self_comp_symm]
+    --   rfl
+    -- rw [LinearMap.ker_comp_of_ker_eq_bot _ hbot, LinearMap.ker_comp] at h₁
+    -- rw [LinearMap.ker_comp_of_ker_eq_bot _ hbot, LinearMap.ker_comp] at h₁
+  -- case neg =>
+  --   apply h₂
+  --   have hsurj : Function.Surjective ⇑(LinearMap.funLeft ℂ ℂ ⇑e.symm) :=
+  --     LinearMap.funLeft_surjective_of_injective _ _ _ e.symm.injective
+  --   replace h₁ := Submodule.map_mono h₁ (f := LinearMap.funLeft ℂ ℂ ⇑e.symm)
+  --   rw [Submodule.map_comap_eq_of_surjective hsurj] at h₁
+  --   rw [Submodule.map_comap_eq_of_surjective hsurj] at h₁
+  --   exact h₁
+  -- case pos =>
+  --   exact h₁ (Submodule.comap_mono h₂)
+
+/-- "Formula for conversion from operator inequality to quantum relative entropy",
+-- Proposition S17 of https://arxiv.org/pdf/2401.01926v2 -/
+theorem qRelativeEnt_op_le {ρ σ : MState d} {α : ℝ} (hpos : 0 < α) (h : ρ.M ≤ α • σ.M) :
+  𝐃(ρ‖σ) ≤ ENNReal.ofReal (Real.log α) := by
+  sorry
+
+/-- The Quantum Conditional Mutual Information, I(A;C|B) = S(A|B) - S(A|BC). -/
+def qcmi (ρ : MState (dA × dB × dC)) : ℝ :=
+  qConditionalEnt ρ.assoc'.traceRight - qConditionalEnt ρ
+
+open ComplexOrder in
+open Classical in
+/-- The Sandwiched Renyi Relative Entropy, defined with ln (nits). Note that at `α = 1` this definition
+  switch to the standard Relative Entropy, for continuity. -/
+def SandwichedRelRentropy [Fintype d] (α : ℝ) (ρ σ : MState d) : ENNReal :=
+  if σ.M.ker ≤ ρ.M.ker
+  then (
+    if α = 1 then
+      𝐃(ρ‖σ)
+    else
+      .ofNNReal ⟨
+        ((ρ.M.conj (σ.M ^ ((1 - α)/(2 * α)) ).toMat) ^ α).trace.log / (α - 1)
+      , by
+        --Proof that this quantity is nonnegative
+        sorry
+          ⟩)
+  else ⊤
+
+notation "D̃_ " α "(" ρ "‖" σ ")" => SandwichedRelRentropy α ρ σ
+
+--QConditionalEnt chain rule
+
+--Quantum discord
+
+--Entanglement:
+-- * Entanglement entropy
+-- * Entanglement of formation
+-- * Relative entropy of entanglement
+-- * Squashed entanglement
+-- * Negativity (+ facts here: https://www.quantiki.org/wiki/strong-sub-additivity)
+-- * Distillable entanglement (One way, Two way, --> Coherent Information)
+-- * Entanglement cost (!= EoF, prove; asymptotically == EoF.)
+-- Bound entanglement (Prop)
+
+-- https://arxiv.org/pdf/quant-ph/0406162
+
+--https://en.wikipedia.org/wiki/Von_Neumann_entropy#Properties
+--  in particular https://www.quantiki.org/wiki/strong-sub-additivity
+
+--https://en.wikipedia.org/wiki/Quantum_relative_entropy#Relation_to_other_quantum_information_quantities
+
+--QMutualInfo is symmetric
+
+--TODO:
+-- * Classical conditional entropy is nonnegative
+-- * Not true of QConditionalS
+-- * These measures track their classical values
+
+section entropy
+
+@[gcongr]
+theorem qRelEntropy_heq_congr {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
+    𝐃(ρ₁‖σ₁) = 𝐃(ρ₂‖σ₂) := by
+  rw [heq_iff_exists_eq_cast] at hρ hσ
+  obtain ⟨_, rfl⟩ := hρ
+  obtain ⟨_, rfl⟩ := hσ
+  simp [← MState.relabel_cast _ hd]
+
+/-- Quantum relative entropy when σ has full rank -/
+theorem qRelativeEnt_rank {ρ σ : MState d} (h : σ.M.ker = ⊥) :
+    (𝐃(ρ‖σ) : EReal) = ρ.M.inner (HermitianMat.log ρ - HermitianMat.log σ) := by
+  apply qRelativeEnt_ker
+  simp only [h, bot_le]
+
+/-- The quantum relative entropy is additive when the inputs are product states -/
+@[simp]
+theorem qRelativeEnt_additive (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
+    𝐃(ρ₁ ⊗ ρ₂‖σ₁ ⊗ σ₂) = 𝐃(ρ₁‖σ₁) + 𝐃(ρ₂‖σ₂) := by
+  --handle the kernels of tensor products
+  --log of ⊗ is (log A ⊗ I) + (I ⊗ log B)
+  --rinner distributes over sub and add
+  --rinner of ⊗ is mul of rinner
+  sorry
+
+/-- Relative entropy is continuous (in each argument, actually, but we only need in the
+latter here). Will need the fact that all the cfc / eigenvalue stuff is continuous, which
+is going to make this a pain. -/
+@[fun_prop]
+theorem qRelativeEnt.Continuous (ρ : MState d) : Continuous fun σ => 𝐃(ρ‖σ) := by
+  sorry
+
+/-- Joint convexity of Quantum relative entropy. We can't state this with `ConvexOn` because that requires
+an `AddCommMonoid`, which `MState`s are not. Instead we state it with `Mixable`.
+
+TODO:
+ * Add the `Mixable` instance that infers from the `Coe` so that the right hand side can be written as
+`p [qRelativeEnt ρ₁ σ₁ ↔ qRelativeEnt ρ₂ σ₂]`
+ * Define (joint) convexity as its own thing - a `ConvexOn` for `Mixable` types.
+ * Maybe, more broadly, find a way to make `ConvexOn` work with the subset of `Matrix` that corresponds to `MState`.
+-/
+theorem qRelativeEnt_joint_convexity :
+  ∀ (ρ₁ ρ₂ σ₁ σ₂ : MState d), ∀ (p : Prob),
+    𝐃(p [ρ₁ ↔ ρ₂]‖p [σ₁ ↔ σ₂]) ≤ p * 𝐃(ρ₁‖σ₁) + (1 - p) * 𝐃(ρ₂‖σ₂) := by
+  sorry
+
+@[simp]
+theorem qRelEntropy_self {d : Type*} [Fintype d] [DecidableEq d] (ρ : MState d) :
+    𝐃(ρ‖ρ) = 0 := by
+  simp [qRelativeEnt]
+
+open ComplexOrder in
+@[aesop (rule_sets := [finiteness]) unsafe apply]
+theorem _root_.qRelativeEnt_ne_top {d : Type*} [Fintype d] [DecidableEq d] {ρ σ : MState d}
+    (hσ : σ.m.PosDef) : 𝐃(ρ‖σ) ≠ ⊤ := by
+  have : σ.M.ker = ⊥ := by sorry --TODO: PosDef -> HermitianMat.ker = ⊥
+  simp [qRelativeEnt, this]
+
+/-- von Neumman entropy is nonnegative. -/
+theorem Sᵥₙ_nonneg (ρ : MState d) : 0 ≤ Sᵥₙ ρ :=
+  Hₛ_nonneg _
+
+/-- von Neumman entropy is at most log d. -/
+theorem Sᵥₙ_le_log_d (ρ : MState d) : Sᵥₙ ρ ≤ Real.log (Finset.card Finset.univ (α := d)):=
+  Hₛ_le_log_d _
+
+/-- von Neumman entropy of pure states is zero. -/
+@[simp]
+theorem Sᵥₙ_of_pure_zero (ψ : Ket d) : Sᵥₙ (MState.pure ψ) = 0 := by
+  obtain ⟨i, hi⟩ := MState.spectrum_pure_eq_constant ψ
+  rw [Sᵥₙ, hi, Hₛ_constant_eq_zero]
+
+/-- von Neumann entropy is unchanged under SWAP. TODO: All unitaries-/
+@[simp]
+theorem Sᵥₙ_of_SWAP_eq (ρ : MState (d₁ × d₂)) : Sᵥₙ ρ.SWAP = Sᵥₙ ρ := by
+  sorry
+
+/-- von Neumann entropy is unchanged under assoc. -/
+@[simp]
+theorem Sᵥₙ_of_assoc_eq (ρ : MState ((d₁ × d₂) × d₃)) : Sᵥₙ ρ.assoc = Sᵥₙ ρ := by
+  sorry
+
+/-- von Neumann entropy is unchanged under assoc'. -/
+theorem Sᵥₙ_of_assoc'_eq (ρ : MState (d₁ × (d₂ × d₃))) : Sᵥₙ ρ.assoc' = Sᵥₙ ρ := by
+  sorry
+
+/-- von Neumman entropies of the left- and right- partial trace of pure states are equal. -/
+theorem Sᵥₙ_of_partial_eq (ψ : Ket (d₁ × d₂)) :
+    Sᵥₙ (MState.pure ψ).traceLeft = Sᵥₙ (MState.pure ψ).traceRight :=
+  sorry
+
+/-- Weak monotonicity of quantum conditional entropy. S(A|B) + S(A|C) ≥ 0 -/
+theorem Sᵥₙ_weak_monotonicity (ρ : MState (dA × dB × dC)) :
+    let ρAB := ρ.assoc'.traceRight
+    let ρAC := ρ.SWAP.assoc.traceLeft.SWAP
+    0 ≤ qConditionalEnt ρAB + qConditionalEnt ρAC :=
+  sorry
+
+/-- The Sandwiched Renyi Relative entropy is additive when the inputs are product states -/
+theorem SandwichedRelRentropy_additive (α) (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂) :
+    D̃_ α(ρ₁ ⊗ ρ₂‖σ₁ ⊗ σ₂) = D̃_ α(ρ₁‖σ₁) + D̃_ α(ρ₂‖σ₂) := by
+  dsimp [SandwichedRelRentropy]
+  sorry
+  -- split_ifs
+  -- · sorry
+  -- · sorry
+  -- · sorry
+
+@[simp]
+theorem sandwichedRelRentropy_relabel {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
+      {α : ℝ} (ρ σ : MState d) (e : d₂ ≃ d) :
+    D̃_ α(ρ.relabel e‖σ.relabel e) = D̃_ α(ρ‖σ) := by
+  sorry
+
+@[simp]
+theorem sandwichedRelRentropy_self {d : Type*} [Fintype d] [DecidableEq d] {α : ℝ} (ρ : MState d) :
+    D̃_ α(ρ‖ρ) = 0 := by
+  simp? [SandwichedRelRentropy, NNReal.eq_iff] says
+    simp only [SandwichedRelRentropy, le_refl, ↓reduceIte, qRelEntropy_self, ite_eq_left_iff,
+    ENNReal.coe_eq_zero, NNReal.eq_iff, NNReal.coe_mk, NNReal.coe_zero, div_eq_zero_iff,
+    Real.log_eq_zero]
+  intro hα
+  sorry
+
+open ComplexOrder in
+@[aesop (rule_sets := [finiteness]) unsafe apply]
+theorem sandwichedRelEntropy_ne_top {α : ℝ} {d : Type*} [Fintype d] [DecidableEq d] {ρ σ : MState d}
+    (hσ : σ.m.PosDef) : D̃_ α(ρ‖σ) ≠ ⊤ := by
+  have : σ.M.ker = ⊥ := by sorry --TODO: PosDef -> HermitianMat.ker = ⊥
+  simp [SandwichedRelRentropy, this]
+  finiteness
+
+@[fun_prop]
+theorem SandwichedRelRentropy.continuousOn {d : Type*} [Fintype d] [DecidableEq d] (ρ σ : MState d) :
+    ContinuousOn (fun α => D̃_ α(ρ‖σ)) (Set.Ioi 0) := by
+  --If this turns out too hard, we just need `ContinousAt f 1`.
+  --If that's still too hard, we really _just_ need that `(𝓝[≠] 1).tendsto f (f 1)`.
+  sorry
+
+/-- The Data Processing Inequality for the Sandwiched Renyi relative entropy.
+Proved in `https://arxiv.org/pdf/1306.5920`. Seems kind of involved. -/
+theorem sandwichedRenyiEntropy_DPI {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂]
+    {α : ℝ} (hα : 1 < α) (ρ σ : MState d) (Φ : CPTPMap d d₂) : D̃_ α(Φ ρ‖Φ σ) ≤ D̃_ α(ρ‖σ) := by
+  sorry
+
+/-- Quantum conditional entropy is symmetric for pure states. -/
+@[simp]
+theorem qConditionalEnt_of_pure_symm (ψ : Ket (d₁ × d₂)) :
+    qConditionalEnt (MState.pure ψ).SWAP = qConditionalEnt (MState.pure ψ) := by
+  simp [qConditionalEnt, Sᵥₙ_of_partial_eq]
+
+/-- Quantum mutual information is symmetric. -/
+@[simp]
+theorem qMutualInfo_symm (ρ : MState (d₁ × d₂)) :
+    qMutualInfo ρ.SWAP = qMutualInfo ρ := by
+  simp [qMutualInfo, add_comm]
+
+/-- I(A:B) = S(AB‖ρᴬ⊗ρᴮ) -/
+theorem qMutualInfo_as_qRelativeEnt (ρ : MState (dA × dB)) :
+    qMutualInfo ρ = (𝐃(ρ‖ρ.traceRight ⊗ ρ.traceLeft) : EReal) :=
+  sorry
+
+/-- "Ordinary" subadditivity of von Neumann entropy -/
+theorem Sᵥₙ_subadditivity (ρ : MState (d₁ × d₂)) :
+    Sᵥₙ ρ ≤ Sᵥₙ ρ.traceRight + Sᵥₙ ρ.traceLeft :=
+  sorry
+
+-- section triangle_tmp
+-- open Lean.Elab.Command
+-- aux_def wlog : ∀ (d₁ : Type _) {d₂ : Type _} [Fintype d₁] [Fintype d₂]
+--       (ρ : MState (d₁ × d₂)), Sᵥₙ (MState.traceRight ρ) - Sᵥₙ (MState.traceLeft ρ) ≤ Sᵥₙ ρ :=
+--     sorry
+-- end triangle_tmp
+
+/-- Araki-Lieb triangle inequality on von Neumann entropy -/
+theorem Sᵥₙ_triangle_subaddivity (ρ : MState (d₁ × d₂)) :
+    abs (Sᵥₙ ρ.traceRight - Sᵥₙ ρ.traceLeft) ≤ Sᵥₙ ρ :=
+  sorry
+
+/-- Strong subadditivity on a tripartite system -/
+theorem Sᵥₙ_strong_subadditivity (ρ₁₂₃ : MState (d₁ × d₂ × d₃)) :
+    let ρ₁₂ := ρ₁₂₃.assoc'.traceRight;
+    let ρ₂₃ := ρ₁₂₃.traceLeft;
+    let ρ₂ := ρ₁₂₃.traceLeft.traceRight;
+    Sᵥₙ ρ₁₂₃ + Sᵥₙ ρ₂ ≤ Sᵥₙ ρ₁₂ + Sᵥₙ ρ₂₃ :=
+  sorry
+
+/-- Strong subadditivity, stated in terms of conditional entropies.
+  Also called the data processing inequality. H(A|BC) ≤ H(A|B). -/
+theorem qConditionalEnt_strong_subadditivity (ρ₁₂₃ : MState (d₁ × d₂ × d₃)) :
+    qConditionalEnt ρ₁₂₃ ≤ qConditionalEnt (ρ₁₂₃.assoc'.traceRight) := by
+  have := Sᵥₙ_strong_subadditivity ρ₁₂₃
+  dsimp at this
+  simp only [qConditionalEnt, MState.traceRight_left_assoc']
+  linarith
+
+/-- Strong subadditivity, stated in terms of quantum mutual information.
+  I(A;BC) ≥ I(A;B). -/
+theorem qMutualInfo_strong_subadditivity (ρ₁₂₃ : MState (d₁ × d₂ × d₃)) :
+    qMutualInfo ρ₁₂₃ ≥ qMutualInfo (ρ₁₂₃.assoc'.traceRight) := by
+  have := Sᵥₙ_strong_subadditivity ρ₁₂₃
+  dsimp at this
+  simp only [qMutualInfo, MState.traceRight_left_assoc', MState.traceRight_right_assoc']
+  linarith
+
+/-- The quantum conditional mutual information `QCMI` is nonnegative. -/
+theorem qcmi_nonneg (ρ : MState (dA × dB × dC)) :
+    0 ≤ qcmi ρ := by
+  simp [qcmi, qConditionalEnt]
+  have := Sᵥₙ_strong_subadditivity ρ
+  linarith
+
+/-- The quantum conditional mutual information `QCMI ρABC` is at most 2 log dA. -/
+theorem qcmi_le_2_log_dim (ρ : MState (dA × dB × dC)) :
+    qcmi ρ ≤ 2 * Real.log (Fintype.card dA) := by
+  sorry
+
+/-- The quantum conditional mutual information `QCMI ρABC` is at most 2 log dC. -/
+theorem qcmi_le_2_log_dim' (ρ : MState (dA × dB × dC)) :
+    qcmi ρ ≤ 2 * Real.log (Fintype.card dC) := by
+  sorry
+
+-- /-- The chain rule for quantum conditional mutual information:
+-- `I(A₁A₂ : C | B) = I(A₁:C|B) + I(A₂:C|BA₁)`.
+-- -/
+-- theorem qcmi_chain_rule (ρ : MState ((dA₁ × dA₂) × dB × dC)) :
+--     let ρA₁BC := ρ.assoc.SWAP.assoc.traceLeft.SWAP;
+--     let ρA₂BA₁C : MState (dA₂ × (dA₁ × dB) × dC) :=
+--       ((CPTPMap.id ⊗ₖ CPTPMap.assoc').compose (CPTPMap.assoc.compose (CPTPMap.SWAP ⊗ₖ CPTPMap.id))) ρ;
+--     qcmi ρ = qcmi ρA₁BC + qcmi ρA₂BA₁C
+--      := by
+--   sorry
+
+end entropy
+---
+
+File: QuantumInfo/Finite/Capacity.lean
+---
+import Mathlib.Analysis.SpecialFunctions.Log.Base
+
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Distance
+
+
+/-! # Quantum Capacity
+
+This focuses on defining and proving theorems about the quantum capacity, the maximum asymptotic rate at which quantum information can be coherently transmitted. The precise definition is not consistent in the literature, see [Capacity_doc](./QuantumInfo/Finite/Capacity_doc.html) for a note on what has been used and how that was used to arrive at the following definition:
+
+ 1. A channel A `Emulates` another channel B if there are D and E such that D∘A∘E = B.
+ 2. A channel A `εApproximates` channel B (of the same dimensions) if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
+ 3. A channel A `AchievesRate` R:ℝ if for every ε>0, n copies of A emulates some channel B such that log2(dimout(B))/n ≥ R, and that B is εApproximately the identity.
+ 4. The `quantumCapacity` of the channel A is the supremum of the achievable rates, i.e. `sSup { R : ℝ | AchievesRate A R }`.
+
+The most basic facts:
+ * `emulates_self`: Every channel emulates itself.
+ * `emulates_trans`: If A emulates B and B emulates C, then A emulates C. (That is, emulation is an ordering.)
+ * `εApproximates A B ε` is equivalent to the existence of some δ (depending ε and dims(A)) so that |A-B| has diamond norm at most δ, and δ→0 as ε→0.
+ * `achievesRate_0`: Every channel achievesRate 0. So, the set of achievable rates is Nonempty.
+ * If a channel achievesRate R₁, it also every achievesRate R₂ every R₂ ≤ R₁, i.e. it is an interval extending left towards -∞. Achievable rates are `¬BddBelow`.
+ * `bddAbove_achievesRate`: A channel C : dimX → dimY cannot achievesRate R with `R > log2(min(dimX, dimY))`. Thus, the interval is `BddAbove`.
+
+The nice lemmas we would want:
+ * Capacity of a replacement channel is zero.
+ * Capacity of an identity channel is `log2(D)`.
+ * Capacity is superadditive under tensor products. (That is, at least additive. Showing that it isn't _exactly_ additive, unlike classical capacity which is additive, is a much harder task.)
+ * Capacity of a kth tensor power is exactly k times the capacity of the original channel.
+ * Capacity does not decrease under tensor sums.
+ * Capacity does not increase under composition.
+
+Then, we should show that our definition is equivalent to some above. Most, except (3), should be not too hard to prove.
+
+Then the LSD theorem establishes that the single-copy coherent information is a lower bound. This is stated in `coherentInfo_le_quantumCapacity`. The corollary, that the n-copy coherent information converges to the capacity, is `quantumCapacity_eq_piProd_coherentInfo`.
+
+# TODO
+
+The only notion of "capacity" here currently is "quantum capacity" in the usual sense. But there are several non-equal capacities relevant to quantum channels, see e.g. [Watrous's notes](https://cs.uwaterloo.ca/~watrous/TQI/TQI.8.pdf) for a list:
+ * Quantum capacity (`quantumCapacity`)
+ * Quantum 1-shot capacity
+ * Entanglement-assisted classical capacity
+ * Qss, the quantum side-channel capacity
+ * Holevo capacity, aka Holevo χ. The Holevo–Schumacher–Westmoreland theorem as a major theorem
+ * Entanglement-assisted Holevo capacity
+ * Entanglement-assisted quantum capacity
+ * One- and two-way distillable entanglement
+
+And other important theorems like superdense coding, nonadditivity, superactivation
+-/
+
+namespace CPTPMap
+
+variable {d₁ d₂ d₃ d₄ d₅ d₆ : Type*}
+variable [Fintype d₁] [Fintype d₂] [Fintype d₃] [Fintype d₄] [Fintype d₅] [Fintype d₆] [DecidableEq d₁] [DecidableEq d₂]
+
+variable [DecidableEq d₃] [DecidableEq d₄] in
+/--
+A channel Λ₁ `Emulates` another channel Λ₂ if there are D and E such that D∘Λ₁∘E = Λ₂.
+-/
+def Emulates (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) : Prop :=
+  ∃ (E : CPTPMap d₃ d₁) (D : CPTPMap d₂ d₄), D.compose (Λ₁.compose E) = Λ₂
+
+/--
+A channel A `εApproximates` channel B of the same dimensions if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
+-/
+def εApproximates (A B : CPTPMap d₁ d₂) (ε : ℝ) : Prop :=
+  ∀ (ρ : MState d₁), (A ρ).fidelity (B ρ) ≥ 1-ε
+
+variable [DecidableEq d₂] in
+/--
+A channel A `AchievesRate` R:ℝ if for every ε>0, some n copies of A emulates a channel B such that log2(dimout(B))/n ≥ R, and that B εApproximates the identity channel.
+-/
+def AchievesRate (A : CPTPMap d₁ d₂) (R : ℝ) : Prop :=
+  ∀ ε : ℝ, ε > 0 →
+    ∃ (n : ℕ) (dimB : ℕ) (B : CPTPMap (Fin dimB) (Fin dimB)),
+      (CPTPMap.piProd (fun (_ : Fin n) ↦ A)).Emulates B ∧
+      Real.logb 2 dimB ≥ R*n ∧
+      B.εApproximates CPTPMap.id ε
+
+variable [DecidableEq d₂] in
+noncomputable def quantumCapacity (A : CPTPMap d₁ d₂) : ℝ :=
+  sSup { R : ℝ | AchievesRate A R }
+
+section emulates
+variable [DecidableEq d₂] [DecidableEq d₃] [DecidableEq d₄] [DecidableEq d₅]
+
+set_option linter.unusedSectionVars false in
+/-- Every quantum channel emulates itself. -/
+theorem emulates_self (Λ : CPTPMap d₁ d₂) : Λ.Emulates Λ :=
+  ⟨CPTPMap.id, CPTPMap.id, by simp⟩
+
+set_option linter.unusedSectionVars false in
+/-- If a quantum channel A emulates B, and B emulates C, then A emulates C. -/
+theorem emulates_trans (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) (Λ₃ : CPTPMap d₅ d₆)
+  (h₁₂ : Λ₁.Emulates Λ₂) (h₂₃ : Λ₂.Emulates Λ₃) : Λ₁.Emulates Λ₃ := by
+  obtain ⟨E₁, D₁, hED₁⟩ := h₁₂
+  obtain ⟨E₂, D₂, hED₂⟩ := h₂₃
+  exact ⟨E₁.compose E₂, D₂.compose D₁, by classical simp [← hED₁, ← hED₂, compose_assoc]⟩
+
+end emulates
+
+section εApproximates
+
+/-- Every quantum channel perfectly approximates itself, that is, `εApproximates` with `ε = 0`. -/
+theorem εApproximates_self (Λ : CPTPMap d₁ d₂) : Λ.εApproximates Λ 0 :=
+  fun ρ ↦ ((Λ ρ).fidelity_self_eq_one.trans (sub_zero 1).symm).ge
+
+/-- If a quantum channel A approximates B with ε₀, it also approximates B with all larger ε₁. -/
+theorem εApproximates_monotone {A B : CPTPMap d₁ d₂} {ε₀ : ℝ} (h : A.εApproximates B ε₀)
+    {ε₁ : ℝ} (h₂ : ε₀ ≤ ε₁) : A.εApproximates B ε₁ :=
+  fun ρ ↦ (tsub_le_tsub_left h₂ 1).trans (h ρ)
+
+end εApproximates
+
+section AchievesRate
+variable [DecidableEq d₂]
+
+/-- Every quantum channel achieves a rate of zero. -/
+theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) : Λ.AchievesRate 0 := by
+  intro ε hε
+  let _ : Nonempty (Fin 1) := Fin.pos_iff_nonempty.mp Nat.one_pos
+  let _ : Nonempty (Fin 0 → d₂) := instNonemptyOfInhabited
+  use 0, 1, default
+  constructor
+  · exact ⟨default, default, Unique.eq_default _⟩
+  constructor
+  · norm_num
+  · rw [Unique.eq_default id]
+    exact εApproximates_monotone (εApproximates_self default) hε.le
+
+/-- The identity channel on D dimensional space achieves a rate of log2(D). -/
+theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (Fintype.card d₁)) := by
+  intro ε hε
+  use 1, Fintype.card d₁, id
+  constructor
+  · sorry--they are equivalent up to permutation
+  constructor
+  · norm_num
+  · exact εApproximates_monotone (εApproximates_self id) hε.le
+
+/-- A channel cannot achieve a rate greater than log2(D), where D is the input dimension. -/
+theorem not_achievesRate_gt_log_dim_in (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₁) < R): ¬Λ.AchievesRate R := by
+  sorry
+
+/-- A channel cannot achieve a rate greater than log2(D), where D is the output dimension. -/
+theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₂) < R): ¬Λ.AchievesRate R := by
+  sorry
+
+/-- The achievable rates are a bounded set. -/
+theorem bddAbove_achievesRate (Λ : CPTPMap d₁ d₂) : BddAbove {R | Λ.AchievesRate R} := by
+  use Real.logb 2 (Fintype.card d₁)
+  intro R h
+  contrapose h
+  exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h)
+
+end AchievesRate
+
+section capacity
+variable [DecidableEq d₂]
+
+/-- Quantum channel capacity is nonnegative. -/
+theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) : 0 ≤ Λ.quantumCapacity :=
+  le_csSup (bddAbove_achievesRate Λ) (achievesRate_0 Λ)
+
+/-- Quantum channel capacity is at most log2(D), where D is the input dimension. -/
+theorem quantumCapacity_ge_log_dim_in (Λ : CPTPMap d₁ d₂) : Λ.quantumCapacity ≤ Real.logb 2 (Fintype.card d₁) :=
+  Real.sSup_le (by
+    intro R h
+    contrapose h
+    exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h))
+  (by
+    by_cases h : Nonempty d₁
+    · apply Real.logb_nonneg one_lt_two (Nat.one_le_cast.mpr Fintype.card_pos)
+    · simp [not_nonempty_iff.mp h])
+
+/-- The LSD (Lloyd-Shor-Devetak) theorem: the quantum capacity is at least as large the single-copy coherent
+information. The "coherent information" is used in literature to refer to both a function of state and
+a channel (`coherentInfo`), or a function of just a channel. In the latter case, the state is implicitly
+maximized over. Here we use the former definition and state that the lower bound is true for all states. -/
+theorem coherentInfo_le_quantumCapacity (Λ : CPTPMap d₁ d₂) (ρ : MState d₁) : coherentInfo ρ Λ ≤ Λ.quantumCapacity := by
+  sorry
+
+/-- The quantum capacity is the limit of the coherent information of n-copy uses of the channel. -/
+theorem quantumCapacity_eq_piProd_coherentInfo (Λ : CPTPMap d₁ d₂) (ρ : MState d₁) : Λ.quantumCapacity =
+    sSup { r : ℝ | ∃ n ρ, r = coherentInfo ρ (CPTPMap.piProd (fun (_ : Fin n) ↦ Λ))} := by
+  sorry
+
+end capacity
+---
+
+[GLOBAL LEAN CONTEXT — always assumed at the top of the Lean file]  
+--Mathlib imports
+import QuantumInfo.ForMathlib
+
+--Code 
+import QuantumInfo.Finite.Channel.DegradableOrder
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Distance
+import QuantumInfo.Finite.Qubit.Basic
+import QuantumInfo.Finite.ResourceTheory.FreeState
+import QuantumInfo.Finite.ResourceTheory.SteinsLemma
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.Capacity
+import QuantumInfo.Finite.Ensemble
+import QuantumInfo.Finite.Entanglement
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.Finite.MState
+import QuantumInfo.Finite.Pinching
+import QuantumInfo.Finite.POVM
+import QuantumInfo.Finite.Unitary
+
+--Documentation without code
+import QuantumInfo.Finite.Capacity_doc
+
+set_option maxHeartbeats 0  
+set_option pp.numericTypes true  
+set_option pp.coercions true  
+set_option pp.letVarTypes true  
+set_option pp.structureInstanceTypes true  
+set_option pp.instanceTypes true  
+set_option pp.mvars.withType true  
+set_option pp.funBinderTypes true  
+set_option pp.piBinderTypes true  
+open scoped BigOperators  
+open Real Nat Topology Rat Filter  
+
+/-! # Quantum Information in Lean
+
+What follows is a top-level index to the major top-level definitions in this repository, in roughly their dependency order:
+ * `Bra` and `Ket` for pure quantum states
+ * `MState` for mixed quantum states
+ * `MState.«term𝐔[_]»`, a notation for unitary matrices, acting on quantum states
+ * `MEnsemble` and `PEnsemble`: Ensemble of mixed and pure states, respectively
+ * `(mixed_)convex_roof` : (Mixed) convex roof extension
+ * `CPTPMap` for quantum channels
+ * `Matrix.traceNorm`, the trace norm between matrices (mostly for `MState` distance)
+ * `MState.fidelity`, the fidelity between quantum states
+ * `Sᵥₙ`, `qConditionalEnt`, `qMutualInfo`, `coherentInfo`, etc. - different notions of entropy or information in quantum states
+ * `DegradablePreorder` the degradable order on quantum channels (technically a preorder)
+ * `CPTPMap.quantumCapacity`, the quantum capacity of a channel
+
+And a pointer to the main theorems (many of which are unproved):
+ * `MatrixMap.choi_PSD_iff_CP_map`, Choi's theorem on completely positive maps
+ * `Sᵥₙ_strong_subadditivity`, the strong subadditivity of von Neumann entropy
+ * `CPTPMap.coherentInfo_le_quantumCapacity`, the LSD theorem that the capacity of a channel is at least the coherent information
+
+-/
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: {new natural-language theorem here}  

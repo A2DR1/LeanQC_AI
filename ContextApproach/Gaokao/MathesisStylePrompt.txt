@@ -1,0 +1,1474 @@
+[ROLE]  
+You are an expert in formal mathematics and Lean 4.  
+Your task is to translate each natural-language [Question] into a Lean 4 theorem **statement** that compiles.  
+Do not attempt to prove it — always end with `:= by sorry`.  
+Do not repeat the global imports/options. Use the provided global context.  
+Keep each theorem self-contained and faithful to the natural-language text.  
+
+[GLOBAL LEAN CONTEXT — always assumed at the top of the Lean file]  
+import Mathlib  
+import Aesop  
+set_option maxHeartbeats 0  
+set_option pp.numericTypes true  
+set_option pp.coercions true  
+set_option pp.letVarTypes true  
+set_option pp.structureInstanceTypes true  
+set_option pp.instanceTypes true  
+set_option pp.mvars.withType true  
+set_option pp.funBinderTypes true  
+set_option pp.piBinderTypes true  
+open scoped BigOperators  
+open Real Nat Topology Rat Filter  
+
+[EXAMPLES — use these as references for style and formatting]  
+
+-- BEGIN_PAIR 0
+-- [Question]:
+-- Given \(f(x) = x + k \ln(1 + x)\), the tangent line \(l\) at the point \((t, f(t))\) (where \(t > 0\)) is considered. 
+Prove that the tangent line \(l\) does not pass through the origin \((0,0)\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given \(f(x) = x + k \ln(1 + x)\), the tangent line \(l\) at the point \((t, f(t))\) (where \(t > 0\)) is considered. 
+Prove that the tangent line \(l\) does not pass through the origin \((0,0)\).-/
+theorem gaokaoformal_g_0 
+(k : ℝ) 
+(f : ℝ → ℝ) 
+(hf : ∀ (x : ℝ), 1+x > 0 → f x = x + k * Real.log (1 + x)) 
+(t : ℝ) 
+(ht : t > 0)
+(l: ℝ → ℝ)
+(hl: ∀ (x:ℝ), l x = (deriv f t)*(x - t) + f t) :
+0 ≠ l 0:= by sorry
+-- END_PAIR 0 
+
+
+-- BEGIN_PAIR 1
+-- [Question]:
+-- Given the hyperbola \(C:x^{2}-y^{2}=m(m > 0)\), the point \(P_{1}(5,4)\) lies on \(C\), 
+and \(k\) is a constant with \(0 < k < 1\). 
+Construct the points \(P_{n}(n = 2,3,\cdots)\) sequentially as follows: 
+draw a line through \(P_{n - 1}\) with slope \(k\) intersecting the left branch of \(C\) at \(Q_{n - 1}\), 
+and let \(P_{n}\) be the reflection of \(Q_{n - 1}\) across the y-axis, 
+with coordinates \((x_{n},y_{n})\). 
+Prove that the sequence \(\{x_{n}-y_{n}\}\) is a geometric sequence with common ratio \(\frac{1 + k}{1 - k}\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the hyperbola \(C:x^{2}-y^{2}=m(m > 0)\), the point \(P_{1}(5,4)\) lies on \(C\), 
+and \(k\) is a constant with \(0 < k < 1\). 
+Construct the points \(P_{n}(n = 2,3,\cdots)\) sequentially as follows: 
+draw a line through \(P_{n - 1}\) with slope \(k\) intersecting the left branch of \(C\) at \(Q_{n - 1}\), 
+and let \(P_{n}\) be the reflection of \(Q_{n - 1}\) across the y-axis, 
+with coordinates \((x_{n},y_{n})\). 
+Prove that the sequence \(\{x_{n}-y_{n}\}\) is a geometric sequence with common ratio \(\frac{1 + k}{1 - k}\);-/
+theorem gaokaoformal_g_1 
+(C: Set (ℝ×ℝ))
+(m: ℝ)
+(hm: m>0)
+(hC: C = {(x,y):ℝ×ℝ | x^2 - y^2 = m})
+(k: ℝ)
+(hk: 0 < k ∧ k < 1)
+(P Q: ℕ+ → (ℝ×ℝ))
+(hP: P 1 = (5,4) ∧ P 1 ∈ C ∧ (∀ (n:ℕ+), (2 ≤ n) → (P n = (-(Q (n-1)).1, (Q (n-1)).2))))
+(hQ: ∀ (n:ℕ+), (Q n).1 < 0 ∧  ((P n).2 - (Q n).2) = k*((P n).1 - (Q n).1) ∧ (Q n) ∈ C) :
+∀ (n:ℕ+), ((P (n+1)).1 - (P (n+1)).2) = (1+k)/(1-k)*((P n).1 - (P n).2) := by sorry
+-- END_PAIR 1 
+
+
+-- BEGIN_PAIR 2
+-- [Question]:
+-- Given the hyperbola \(C:x^{2}-y^{2}=m(m > 0)\), the point \(P_{1}(5,4)\) lies on \(C\), and \(k\) is a constant with \(0 < k < 1\). 
+Points \(P_{n}(n = 2,3,\cdots)\) are constructed sequentially as follows: 
+through \(P_{n - 1}\), draw a line with slope \(k\) intersecting the left branch of \(C\) at \(Q_{n - 1}\), 
+and let \(P_{n}\) be the reflection of \(Q_{n - 1}\) across the \(y\)-axis, with coordinates \((x_{n},y_{n})\). 
+Let \(S_{n}\) denote the area of \(\triangle P_{n}P_{n + 1}P_{n + 2}\). 
+Prove that for any positive integer \(n\), \(S_{n}=S_{n + 1}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the hyperbola \(C:x^{2}-y^{2}=m(m > 0)\), the point \(P_{1}(5,4)\) lies on \(C\), and \(k\) is a constant with \(0 < k < 1\). 
+Points \(P_{n}(n = 2,3,\cdots)\) are constructed sequentially as follows: 
+through \(P_{n - 1}\), draw a line with slope \(k\) intersecting the left branch of \(C\) at \(Q_{n - 1}\), 
+and let \(P_{n}\) be the reflection of \(Q_{n - 1}\) across the \(y\)-axis, with coordinates \((x_{n},y_{n})\). 
+Let \(S_{n}\) denote the area of \(\triangle P_{n}P_{n + 1}P_{n + 2}\). 
+Prove that for any positive integer \(n\), \(S_{n}=S_{n + 1}\).-/
+theorem gaokaoformal_g_2
+(C: Set (ℝ×ℝ))
+(m: ℝ)
+(hm: m>0)
+(hC: C = {(x,y):ℝ×ℝ | x^2 - y^2 = m})
+(k: ℝ)
+(hk: 0 < k ∧ k < 1)
+(P Q: ℕ+ → (ℝ×ℝ))
+(hP: P 1 = (5,4) ∧ P 1 ∈ C ∧ (∀ (n:ℕ+), (2 ≤ n) → (P n = (-(Q (n-1)).1, (Q (n-1)).2))))
+(hQ: ∀ (n:ℕ+), (Q n).1 < 0 ∧  ((P n).2 - (Q n).2) = k*((P n).1 - (Q n).1) ∧ (Q n) ∈ C)
+(S: ℕ+ → ℝ)
+(hS : ∀ (n:ℕ+), S n = 1/2*|((P (n+1)).1 - (P n).1)*((P (n+2)).2 - (P n).2) - ((P (n+1)).2 - (P n).2)*((P (n+2)).1 - (P n).1)|) :
+∀ (n:ℕ+), S n = S (n + 1) := by sorry
+-- END_PAIR 2 
+
+
+-- BEGIN_PAIR 3
+-- [Question]:
+-- Given the function \(f(x) = \ln\frac{x}{2 - x} + ax + b(x - 1)^{3}\), 
+prove that the curve \(y = f(x)\) is a centrally symmetric graph.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the function \(f(x) = \ln\frac{x}{2 - x} + ax + b(x - 1)^{3}\), 
+prove that the curve \(y = f(x)\) is a centrally symmetric graph.-/
+theorem gaokaoformal_g_3 
+(a b : ℝ) 
+(f : ℝ → ℝ) 
+(domain: Set ℝ)
+(hdomain: domain = {x | x/(2-x) > 0 ∧ 2 - x ≠ 0})
+(hf : ∀ x : ℝ, (x ∈ domain) → f x = Real.log (x / (2 - x)) + a * x + b * (x - 1)^3) :
+∃ a' b' : ℝ, ∀ x : ℝ, (a'+x ∈ domain ∧ a'-x ∈ domain) → f (a'+x) - b' = b' - f (a'-x) := by sorry
+-- END_PAIR 3 
+
+
+-- BEGIN_PAIR 4
+-- [Question]:
+-- Let \(m\) be a positive integer, and let \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) be an arithmetic sequence with a non-zero common difference. 
+If two terms \(a_{i}\) and \(a_{j}\) (\(i < j\)) are removed from the sequence such that the remaining \(4m\) terms can be evenly divided into \(m\) groups, 
+and each group of 4 numbers forms an arithmetic sequence, then the sequence \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) is called an \((i,j)-\)separable sequence. 
+For \(m \geq 3\), prove that the sequence \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) is a \((2,13)-\)separable sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(m\) be a positive integer, and let \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) be an arithmetic sequence with a non-zero common difference. 
+If two terms \(a_{i}\) and \(a_{j}\) (\(i < j\)) are removed from the sequence such that the remaining \(4m\) terms can be evenly divided into \(m\) groups, 
+and each group of 4 numbers forms an arithmetic sequence, then the sequence \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) is called an \((i,j)-\)separable sequence. 
+For \(m \geq 3\), prove that the sequence \(a_{1}, a_{2}, \cdots, a_{4m + 2}\) is a \((2,13)-\)separable sequence.-/
+theorem gaokaoformal_g_4
+(m : ℕ)
+(hm : 1 ≤ m)
+(a : ℕ → ℝ)
+(ha: ∃ (d:ℝ), d ≠ 0 ∧ (∀ (n:ℕ), (n≥ 1 ∧ n≤ 4*m+1) → a (n+1) = a n + d))
+(sep: (ℕ×ℕ) → Prop)
+(h_sep: ∀ (i j:ℕ),
+    (i≥ 1 ∧ i<j ∧ j≤ 4*m+2)→ 
+    sep (i,j) = (∃ (f : ℕ → ℕ),
+        (∀ (h:ℕ), (h ≥ 1 ∧ h ≤ 4*m+2 ∧ h≠i ∧ h≠j) → (f h ≥ 1 ∧ f h ≤ m)) ∧ 
+        (∀ (g:ℕ),
+            let S := {h:ℕ | h ≥ 1 ∧ h ≤ 4*m+2 ∧ h≠ i∧ h≠ j ∧ f h = g};
+            (g ≥ 1 ∧ g ≤ m) → 
+            (Nat.card S = 4 ∧
+            (∃ (p: ℕ → S),
+                (∀ (k l:ℕ), (k ≥ 1 ∧ k ≤ 4 ∧ l ≥ 1 ∧ l ≤ 4 ∧ k ≠ l) → p k ≠ p l) ∧
+                (∃ (d':ℝ), ∀ (k:ℕ), (k≥ 1 ∧ k ≤ 3) → a (p (k+1)) = a (p k) + d')))))) :
+m ≥ 3 → sep (2,13) := by sorry
+
+-- END_PAIR 4 
+
+
+-- BEGIN_PAIR 5
+-- [Question]:
+-- Let \(m\) be a positive integer, and let \(a_{1},a_{2},\cdots,a_{4m + 2}\) be an arithmetic sequence with a non-zero common difference. 
+If after removing two terms \(a_{i}\) and \(a_{j}\) (\(i < j\)), the remaining \(4m\) terms can be evenly divided into \(m\) groups, 
+each consisting of 4 numbers that form an arithmetic sequence, then the sequence \(a_{1},a_{2},\cdots,a_{4m + 2}\) is called \((i,j)-\)separable. 
+Randomly selecting two numbers \(i\) and \(j\) (\(i < j\)) from \(1,2,\cdots,4m + 2\) at once, denote the probability that the sequence \(a_{1},a_{2},\cdots,a_{4m + 2}\) is \((i,j)-\)separable as \(P_{m}\). 
+Prove that \(P_{m}>\frac{1}{8}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(m\) be a positive integer, and let \(a_{1},a_{2},\cdots,a_{4m + 2}\) be an arithmetic sequence with a non-zero common difference. 
+If after removing two terms \(a_{i}\) and \(a_{j}\) (\(i < j\)), the remaining \(4m\) terms can be evenly divided into \(m\) groups, 
+each consisting of 4 numbers that form an arithmetic sequence, then the sequence \(a_{1},a_{2},\cdots,a_{4m + 2}\) is called \((i,j)-\)separable. 
+Randomly selecting two numbers \(i\) and \(j\) (\(i < j\)) from \(1,2,\cdots,4m + 2\) at once, denote the probability that the sequence \(a_{1},a_{2},\cdots,a_{4m + 2}\) is \((i,j)-\)separable as \(P_{m}\). 
+Prove that \(P_{m}>\frac{1}{8}\).-/
+theorem gaokaoformal_g_5
+(m : ℕ)
+(hm : 1 ≤ m)
+(a : ℕ → ℝ)
+(ha: ∃ (d:ℝ), d ≠ 0 ∧ (∀ (n:ℕ), (n≥ 1 ∧ n≤ 4*m+1) → a (n+1) = a n + d))
+(sep: (ℕ×ℕ) → Prop)
+(h_sep: ∀ (i j:ℕ),
+    (i≥ 1 ∧ i<j ∧ j≤ 4*m+2)→ 
+    sep (i,j) = (∃ (f : ℕ → ℕ),
+        (∀ (h:ℕ), (h ≥ 1 ∧ h ≤ 4*m+2 ∧ h≠i ∧ h≠j) → (f h ≥ 1 ∧ f h ≤ m)) ∧ 
+        (∀ (g:ℕ),
+            let S := {h:ℕ | h ≥ 1 ∧ h ≤ 4*m+2 ∧ h≠ i∧ h≠ j ∧ f h = g};
+            (g ≥ 1 ∧ g ≤ m) → 
+            (Nat.card S = 4 ∧
+            (∃ (p: ℕ → S),
+                (∀ (k l:ℕ), (k ≥ 1 ∧ k ≤ 4 ∧ l ≥ 1 ∧ l ≤ 4 ∧ k ≠ l) → p k ≠ p l) ∧
+                (∃ (d':ℝ), ∀ (k:ℕ), (k≥ 1 ∧ k ≤ 3) → a (p (k+1)) = a (p k) + d'))))))
+(A B: Set (ℕ×ℕ))
+(hA: A = {(i,j) | 1 ≤ i ∧ i < j ∧ j ≤ 4*m+2})
+(hB: B = {(i,j) | 1 ≤ i ∧ i < j ∧ j ≤ 4*m+2 ∧ sep (i,j)}):
+B.ncard / A.ncard > 1/8 := by sorry
+-- END_PAIR 5 
+
+
+-- BEGIN_PAIR 6
+-- [Question]:
+-- For real numbers \(a\) and \(b\) satisfying \(a + b \geq 3\), prove that \(2a^{2} + 2b^{2} > a + b\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-For real numbers \(a\) and \(b\) satisfying \(a + b \geq 3\), prove that \(2a^{2} + 2b^{2} > a + b\).-/
+theorem gaokaoformal_g_6  (a b : ℝ)
+  (h₀ : a + b ≥ 3) :
+  2 * a^2 + 2 * b^2 > a + b  := by sorry
+-- END_PAIR 6 
+
+
+-- BEGIN_PAIR 7
+-- [Question]:
+-- Real numbers \(a\) and \(b\) satisfy \(a + b \geq 3\). Prove that \(\vert a - 2b^{2}\vert + \vert b - 2a^{2}\vert \geq 6\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Real numbers \(a\) and \(b\) satisfy \(a + b \geq 3\). Prove that \(\vert a - 2b^{2}\vert + \vert b - 2a^{2}\vert \geq 6\).-/
+theorem gaokaoformal_g_7  (a b : ℝ)
+  (h₀ : a + b ≥ 3) :
+  |a - 2 * b^2| + |b - 2 * a^2| ≥ 6  := by sorry
+-- END_PAIR 7 
+
+
+-- BEGIN_PAIR 8
+-- [Question]:
+-- Given an ellipse \(E:\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}} = 1(a > b > 0)\) with an eccentricity of \(\frac{\sqrt{5}}{3}\), 
+points \(A\) and \(C\) are the top and bottom vertices of \(E\) respectively, 
+and points \(B\) and \(D\) are the left and right vertices of \(E\) respectively, 
+with \(\vert AC\vert = 4\). 
+Let \(P\) be a moving point on \(E\) in the first quadrant. 
+The line \(PD\) intersects the line \(BC\) at point \(M\), 
+and the line \(PA\) intersects the line \(y = - 2\) at point \(N\). 
+Prove that \(MN\parallel CD\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given an ellipse \(E:\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}} = 1(a > b > 0)\) with an eccentricity of \(\frac{\sqrt{5}}{3}\), 
+points \(A\) and \(C\) are the top and bottom vertices of \(E\) respectively, 
+and points \(B\) and \(D\) are the left and right vertices of \(E\) respectively, 
+with \(\vert AC\vert = 4\). 
+Let \(P\) be a moving point on \(E\) in the first quadrant. 
+The line \(PD\) intersects the line \(BC\) at point \(M\), 
+and the line \(PA\) intersects the line \(y = - 2\) at point \(N\). 
+Prove that \(MN\parallel CD\).-/
+theorem gaokaoformal_g_8 
+(a b : ℝ) 
+(ha : a > b) 
+(hb : b > 0) 
+(eccentricity : Real.sqrt 5 / 3 = Real.sqrt (1 - (b / a)^2)) 
+(A : ℝ × ℝ := (0, b)) 
+(C : ℝ × ℝ := (0, -b)) 
+(B : ℝ × ℝ := (-a, 0)) 
+(D : ℝ × ℝ := (a, 0)) 
+(AC_distance : Real.sqrt ((A.1 - C.1)^2 + (A.2 - C.2)^2) = 4) 
+(P : ℝ × ℝ) 
+(hP : P.1^2 / a^2 + P.2^2 / b^2 = 1 ∧ P.1 > 0 ∧ P.2 > 0) 
+(M : ℝ × ℝ) 
+(hM : (M.2-P.2)*(M.1-D.1) = (M.2-D.2)*(M.1-P.1) ∧ (M.2-B.2)*(M.1-C.1) = (M.2-C.2)*(M.1-B.1)) 
+(N : ℝ × ℝ) 
+(hN : (N.2-P.2)*(N.1-A.1) = (N.2-A.2)*(N.1-P.1) ∧ N.2 = -2) : 
+(N.1 - M.1) * (D.2 - C.2) = (N.2 - M.2) * (D.1 - C.1) := by sorry
+-- END_PAIR 8 
+
+
+-- BEGIN_PAIR 9
+-- [Question]:
+-- Given two sequences \(\{ a_{n}\}\) and \(\{ b_{n}\}\) both of length \(m(m>2)\), 
+with \(a_{n},b_{n}\in\{ 1,2,\cdots,m\}\), 
+and their respective partial sums \(A_{n}\) and \(B_{n}\) for the first \(n\) terms, where \(A_{0}=B_{0}=0\). 
+Prove that there exist \(p,q,s,t\in\{ 0,1,2,\cdots,m\}\) such that \(p>q\), \(s>t\), 
+and \(A_{p}+B_{t}=A_{q}+B_{s}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given two sequences \(\{ a_{n}\}\) and \(\{ b_{n}\}\) both of length \(m(m>2)\), 
+with \(a_{n},b_{n}\in\{ 1,2,\cdots,m\}\), 
+and their respective partial sums \(A_{n}\) and \(B_{n}\) for the first \(n\) terms, where \(A_{0}=B_{0}=0\). 
+Prove that there exist \(p,q,s,t\in\{ 0,1,2,\cdots,m\}\) such that \(p>q\), \(s>t\), 
+and \(A_{p}+B_{t}=A_{q}+B_{s}\).-/
+theorem gaokaoformal_g_9 
+{m : ℕ} 
+(hm : m > 2) 
+(a b : ℕ → ℕ) 
+(ha : ∀ (n : ℕ), n ∈ Finset.Icc 1 m → a n ∈ Finset.Icc 1 m) 
+(hb : ∀ (n : ℕ), n ∈ Finset.Icc 1 m → b n ∈ Finset.Icc 1 m)
+(A B : ℕ → ℕ) 
+(hA: A 0 = 0 ∧ (∀ (n:ℕ), n∈ Finset.Icc 1 m → A n = ∑ i in Finset.Icc 1 n, a i))
+(hB: B 0 = 0 ∧ (∀ (n:ℕ), n∈ Finset.Icc 1 m → B n = ∑ i in Finset.Icc 1 n, b i)):
+∃ (p q s t : ℕ), 
+    p ∈ Finset.Icc 0 m ∧ 
+    q ∈ Finset.Icc 0 m ∧
+    s ∈ Finset.Icc 0 m ∧
+    t ∈ Finset.Icc 0 m ∧
+    p > q ∧
+    s > t ∧ 
+    A p + B t = A q + B s := by sorry
+-- END_PAIR 9 
+
+
+-- BEGIN_PAIR 10
+-- [Question]:
+-- Given an ellipse \(C:\frac{y^{2}}{a^{2}}+\frac{x^{2}}{b^{2}} = 1(a > b > 0)\) with an eccentricity of \(\frac{\sqrt{5}}{3}\), 
+and the point \(A(-2,0)\) lies on \(C\). 
+A line passing through the point \((-2,3)\) intersects \(C\) at points \(P\) and \(Q\). 
+The lines \(AP\) and \(AQ\) intersect the \(y\)-axis at points \(M\) and \(N\) respectively. 
+Prove that the midpoint of the segment \(MN\) is a fixed point.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given an ellipse \(C:\frac{y^{2}}{a^{2}}+\frac{x^{2}}{b^{2}} = 1(a > b > 0)\) with an eccentricity of \(\frac{\sqrt{5}}{3}\), 
+and the point \(A(-2,0)\) lies on \(C\). 
+A line passing through the point \((-2,3)\) intersects \(C\) at points \(P\) and \(Q\). 
+The lines \(AP\) and \(AQ\) intersect the \(y\)-axis at points \(M\) and \(N\) respectively. 
+Prove that the midpoint of the segment \(MN\) is a fixed point.-/
+theorem gaokaoformal_g_10 
+(a b : ℝ) 
+(ha : 0 < b) 
+(hb : b < a) 
+(C: Set (ℝ×ℝ))
+(hC: C = {(x,y) | y^2/a^2 + x^2/b^2 = 1})
+(heccentricity : Real.sqrt (5) / 3 = Real.sqrt (a^2 - b^2) / a) 
+(A : ℝ × ℝ) 
+(hA : A = (-2, 0) ∧ A ∈ C) :
+∃ (X:ℝ×ℝ), ∀ (c d:ℝ) (P Q M N: ℝ×ℝ),
+    (let L := {(x,y) | c*(x+2) + d*(y-3) = 0};
+    (c≠ 0 ∨ d ≠ 0) ∧ 
+    P≠ Q ∧
+    P ∈ C∩L ∧
+    Q ∈ C∩L ∧ 
+    let AP := {(x,y) | (y-A.2)*(x-P.1) = (y-P.2)*(x-A.1)};
+    let AQ := {(x,y) | (y-A.2)*(x-Q.1) = (y-Q.2)*(x-A.1)};
+    M ∈ AP ∧
+    N ∈ AQ ∧
+    M.1 = 0 ∧
+    N.1 = 0) →
+    (M+N)/2 = X := by sorry
+-- END_PAIR 10 
+
+
+-- BEGIN_PAIR 11
+-- [Question]:
+-- Given that \(\{a_n\}\) is an arithmetic sequence with \(a_2 + a_5 = 16\) and \(a_5 - a_3 = 4\). 
+Let \(\{b_n\}\) be a geometric sequence such that for any \(k \in N^{*}\), 
+if \(2^{k - 1} \leq n \leq 2^k - 1\), then \(b_k < a_n < b_{k + 1}\). 
+For \(k \geq 2\), prove that \(2^k - 1 < b_k < 2^k + 1\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(\{a_n\}\) is an arithmetic sequence with \(a_2 + a_5 = 16\) and \(a_5 - a_3 = 4\). 
+Let \(\{b_n\}\) be a geometric sequence such that for any \(k \in N^{*}\), 
+if \(2^{k - 1} \leq n \leq 2^k - 1\), then \(b_k < a_n < b_{k + 1}\). 
+For \(k \geq 2\), prove that \(2^k - 1 < b_k < 2^k + 1\).-/
+theorem gaokaoformal_g_11  
+(a b : ℕ → ℝ)
+(ha: ∃ (d:ℝ), ∀ (n:ℕ), n≥1 → a (n+1) = a n + d)
+(hb: b 1 ≠ 0 ∧ (∃ (r:ℝ), r ≠ 0 ∧ (∀ (n:ℕ), n≥1 → b (n+1) = r * b n)))
+(ha1: a 2 + a 5 = 16 ∧ a 5 - a 3 = 4)
+(hab: ∀ (k n:ℕ), (k ≥ 1 ∧ 2^(k-1) ≤ n ∧ n ≤ 2^k-1) → (b k < a n ∧ a n < b (k+1))) :
+∀ (k:ℕ), k≥2 → 2 ^ k - 1 < b k ∧ b k < 2 ^ k + 1 := by sorry
+-- END_PAIR 11 
+
+
+-- BEGIN_PAIR 12
+-- [Question]:
+-- Given the function \(f(x)=(\frac{1}{x}+\frac{1}{2})\ln(x + 1)\). Prove that when \(x>0\), \(f(x)>1\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the function \(f(x)=(\frac{1}{x}+\frac{1}{2})\ln(x + 1)\). Prove that when \(x>0\), \(f(x)>1\);-/
+theorem gaokaoformal_g_12 (x : ℝ) (hx : 0 < x) : 1 < (1 / x + 1 / 2) * Real.log (x + 1) := by sorry
+-- END_PAIR 12 
+
+
+-- BEGIN_PAIR 13
+-- [Question]:
+-- For all n ∈ ℕ+, 
+prove that \(\frac{5}{6}<\ln(n!)-\left(n+\frac{1}{2}\right)\ln(n)+n\leq1\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-For all n ∈ ℕ+, 
+prove that \(\frac{5}{6}<\ln(n!)-\left(n+\frac{1}{2}\right)\ln(n)+n\leq1\).-/
+theorem gaokaoformal_g_13 :
+∀ (n:ℕ+),
+    5/6 < Real.log (Nat.factorial n) - (n + 1/2)*Real.log n + n ∧ Real.log (Nat.factorial n) - (n + 1/2)*Real.log n + n ≤ 1 := by sorry
+-- END_PAIR 13 
+
+
+-- BEGIN_PAIR 14
+-- [Question]:
+-- Given the function \(f(x) = a(e^x + a) - x\). Prove that when \(a > 0\), \(f(x) > 2\ln a + \frac{3}{2}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the function \(f(x) = a(e^x + a) - x\). Prove that when \(a > 0\), \(f(x) > 2\ln a + \frac{3}{2}\).-/
+theorem gaokaoformal_g_14 
+(a : ℝ) 
+(f : ℝ→ ℝ)
+(ha : 0 < a) 
+(hf: ∀ (x:ℝ), f x = a*(Real.exp x + a) - x) : 
+∀ (x:ℝ), f x > 2*Real.log a + 3/2:= by sorry
+-- END_PAIR 14 
+
+
+-- BEGIN_PAIR 15
+-- [Question]:
+-- In the Cartesian coordinate system \(xOy\), 
+the distance from point \(P\) to the \(x\)-axis is equal to the distance from \(P\) to the point \((0,\frac{1}{2})\). 
+The trajectory of the moving point \(P\) is denoted as \(W\). 
+Given that three vertices of a rectangle lie on \(W\), 
+prove that the perimeter of the rectangle is greater than \(3\sqrt{3}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-In the Cartesian coordinate system \(xOy\), 
+the distance from point \(P\) to the \(x\)-axis is equal to the distance from \(P\) to the point \((0,\frac{1}{2})\). 
+The trajectory of the moving point \(P\) is denoted as \(W\). 
+Given that three vertices of a rectangle lie on \(W\), 
+prove that the perimeter of the rectangle is greater than \(3\sqrt{3}\).-/
+theorem gaokaoformal_g_15    
+(W: Set (ℝ×ℝ))
+(hW: W = {(x,y): ℝ×ℝ | |y| = Real.sqrt (x^2 + (y - 1/2)^2)})
+(P: ℝ×ℝ)
+(hP: P∈ W)
+(A B C D : ℝ × ℝ)
+(hABC : A ∈ W ∧ B ∈ W ∧ C ∈ W)
+(hABCD : A ≠ B ∧ A ≠ C ∧ A ≠ D ∧ B ≠ C ∧ B ≠ D ∧ C ≠ D)
+(hrec: (A.2 - B.2)*(B.1 - C.1) = (A.1 - B.1)*(B.2 - C.2) ∧ 
+    (B.2 - C.2)*(C.1 - D.1) = (B.1 - C.1)*(C.2 - D.2) ∧ 
+    (C.2 - D.2)*(D.1 - A.1) = (C.1 - D.1)*(D.2 - A.2) ∧ 
+    (D.2 - A.2)*(A.1 - B.1) = (D.1 - A.1)*(A.2 - B.2)):
+3 * Real.sqrt 3 < Real.sqrt ((A.1 - B.1)^2 + (A.2 - B.2)^2) + Real.sqrt ((B.1 - C.1)^2 + (B.2 - C.2)^2) + Real.sqrt ((C.1 - D.1)^2 + (C.2 - D.2)^2) + Real.sqrt ((D.1 - A.1)^2 + (D.2 - A.2)^2) := by sorry
+-- END_PAIR 15 
+
+
+-- BEGIN_PAIR 16
+-- [Question]:
+-- Let \(\{ a_{n}\}\) be an arithmetic sequence, and define \(b_{n}=\begin{cases}a_{n}-6, & \text{if } n \text{ is odd}\\2a_{n}, & \text{if } n \text{ is even}\end{cases}\). Let \(S_{n}\) and \(T_{n}\) denote the sums of the first \(n\) terms of the sequences \(\{ a_{n}\}\) and \(\{ b_{n}\}\), respectively. Given that \(S_{4}=32\) and \(T_{3}=16\), prove that for \(n > 5\), \(T_{n}>S_{n}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(\{ a_{n}\}\) be an arithmetic sequence, and define \(b_{n}=\begin{cases}a_{n}-6, & \text{if } n \text{ is odd}\\2a_{n}, & \text{if } n \text{ is even}\end{cases}\). Let \(S_{n}\) and \(T_{n}\) denote the sums of the first \(n\) terms of the sequences \(\{ a_{n}\}\) and \(\{ b_{n}\}\), respectively. Given that \(S_{4}=32\) and \(T_{3}=16\), prove that for \(n > 5\), \(T_{n}>S_{n}\).-/
+theorem gaokaoformal_g_16  
+(a b: ℕ → ℝ)
+(ha: ∃ (d:ℝ), ∀ (n:ℕ), n≥1 → a (n+1) = a n + d)
+(hb: ∀ (n:ℕ), n≥1 → (Odd n → b n = a n - 6) ∧ (Even n → b n = 2 * a n))
+(S T: ℕ → ℝ)
+(hS: ∀ (n:ℕ), n≥ 1→ S n = ∑ i in Finset.Icc 1 n, a i)
+(hT: ∀ (n:ℕ), n≥ 1→ T n = ∑ i in Finset.Icc 1 n, b i)
+(h: S 4 = 32 ∧ T 3 = 16) :
+∀ (n:ℕ), n>5 → T n > S n := by sorry
+-- END_PAIR 16 
+
+
+-- BEGIN_PAIR 17
+-- [Question]:
+-- Given a hyperbola \(C\) centered at the origin with the left focus at \((-2\sqrt{5},0)\) and eccentricity \(\sqrt{5}\). Denote the left and right vertices of \(C\) as \(A_{1}\) and \(A_{2}\), respectively. A line passing through the point \((-4,0)\) intersects the left branch of \(C\) at points \(M\) and \(N\), with \(M\) in the second quadrant. The lines \(MA_{1}\) and \(NA_{2}\) intersect at point \(P\). Prove that point \(P\) lies on a fixed line.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given a hyperbola \(C\) centered at the origin with the left focus at \((-2\sqrt{5},0)\) and eccentricity \(\sqrt{5}\). Denote the left and right vertices of \(C\) as \(A_{1}\) and \(A_{2}\), respectively. A line passing through the point \((-4,0)\) intersects the left branch of \(C\) at points \(M\) and \(N\), with \(M\) in the second quadrant. The lines \(MA_{1}\) and \(NA_{2}\) intersect at point \(P\). Prove that point \(P\) lies on a fixed line.-/
+theorem gaokaoformal_g_17 :
+∃ (a b c:ℝ),
+    (a≠ 0 ∨ b≠ 0) ∧
+    let ℓ := {(x,y): ℝ×ℝ| a*x+b*y=c};
+    ∀ (α β:ℝ) (A₁ A₂ M N P : ℝ × ℝ) (k: ℝ),
+        let C := {(x, y) : ℝ × ℝ | x^2 / α^2 - y^2 / β^2 = 1};
+        let L := {(x,y):ℝ×ℝ | y = k*(x+4)};
+        (- Real.sqrt (α^2 + β^2) = -2*(Real.sqrt 5) ∧
+        Real.sqrt (1+β^2/α^2) = Real.sqrt 5 ∧
+        A₁ = (-α,0) ∧
+        A₂ = (α,0) ∧
+        M∈ L ∧
+        N∈ L ∧
+        M.1 < 0 ∧ 
+        M.2 > 0 ∧
+        N.1 < 0 ∧
+        M≠ N ∧
+        (P.2 - N.2) * (P.1 - A₂.1) = (P.1 - N.1) * (P.2 - A₂.2) ∧
+        (P.2 - M.2) * (P.1 - A₁.1) = (P.1 - M.1) * (P.2 - A₁.2)) → 
+        P ∈ ℓ := by sorry
+-- END_PAIR 17 
+
+
+-- BEGIN_PAIR 18
+-- [Question]:
+-- Prove that when \(0 < x < 1\), \(x - x^{2} < \sin x < x\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Prove that when \(0 < x < 1\), \(x - x^{2} < \sin x < x\);-/
+theorem gaokaoformal_g_18 (x : ℝ) (hx : 0 < x ∧ x < 1) : x - x^2 < Real.sin x ∧ Real.sin x < x := by sorry
+-- END_PAIR 18 
+
+
+-- BEGIN_PAIR 19
+-- [Question]:
+-- Given the function \(f(x)=\text{e}^{x}\ln(1 + x)\), prove that for any \(s,t\in(0,+\infty)\), the inequality \(f(s + t)>f(s)+f(t)\) holds.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the function \(f(x)=\text{e}^{x}\ln(1 + x)\), prove that for any \(s,t\in(0,+\infty)\), the inequality \(f(s + t)>f(s)+f(t)\) holds.-/
+theorem gaokaoformal_g_19 
+(f : ℝ → ℝ) 
+(h : ∀ (x : ℝ), (1+x > 0) → f x = Real.exp x * Real.log (1 + x)) 
+(s t : ℝ)
+(hs : 0 < s) 
+(ht : 0 < t) : 
+f (s + t) > f s + f t := by sorry
+-- END_PAIR 19 
+
+
+-- BEGIN_PAIR 20
+-- [Question]:
+-- Given a finite integer sequence \(Q:a_{1},a_{2},\cdots,a_{k}\), and a positive integer \(m\), if for any \(n\in\{1,2,\cdots,m\}\), 
+there exists a subsequence \(a_{i},a_{i + 1},a_{i + 2},\cdots,a_{i + j}(j\geq0)\) in \(Q\) such that \(a_{i}+a_{i + 1}+a_{i + 2}+\cdots+a_{i + j}=n\), 
+then \(Q\) is called an \(m-\)continuously representable sequence. If \(Q:a_{1},a_{2},\cdots,a_{k}\) is an \(8-\)continuously representable sequence, 
+prove that the minimal value of \(k\) is \(4\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given a finite integer sequence \(Q:a_{1},a_{2},\cdots,a_{k}\), and a positive integer \(m\), if for any \(n\in\{1,2,\cdots,m\}\), 
+there exists a subsequence \(a_{i},a_{i + 1},a_{i + 2},\cdots,a_{i + j}(j\geq0)\) in \(Q\) such that \(a_{i}+a_{i + 1}+a_{i + 2}+\cdots+a_{i + j}=n\), 
+then \(Q\) is called an \(m-\)continuously representable sequence. If \(Q:a_{1},a_{2},\cdots,a_{k}\) is an \(8-\)continuously representable sequence, 
+prove that the minimal value of \(k\) is \(4\);-/
+theorem gaokaoformal_g_20 
+(k : ℕ)
+(a : ℕ → ℤ) 
+(m_contin: ℕ → Prop)
+(h_prop: ∀ (m:ℕ), (m≥1) → 
+    m_contin m = (∀ (n:ℕ), 
+        (n≥ 1 ∧ n≤ m) → 
+        ∃ (i j:ℕ), i≥1 ∧ i+j ≤ k ∧ ∑ l in Finset.Icc i (i+j), a l = n)):
+(m_contin 8 → k ≥ 4) ∧ (k = 4 → m_contin 8) := by sorry
+-- END_PAIR 20 
+
+
+-- BEGIN_PAIR 21
+-- [Question]:
+-- Given a finite integer sequence \(Q:a_{1},a_{2},\cdots,a_{k}\), for a positive integer \(m\), if for any \(n\in\{1,2,\cdots,m\}\), 
+there exists a subsequence \(a_{i},a_{i + 1},a_{i + 2},\cdots,a_{i + j}(j\geq0)\) in \(Q\) such that \(a_{i}+a_{i + 1}+a_{i + 2}+\cdots+a_{i + j}=n\), 
+then \(Q\) is called an \(m-\)continuously representable sequence. If \(Q:a_{1},a_{2},\cdots,a_{k}\) is a \(20-\)continuously representable sequence, 
+and \(a_{1}+a_{2}+\cdots+a_{k}<20\), prove that \(k\geq7\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+
+/-Given a finite integer sequence \(Q:a_{1},a_{2},\cdots,a_{k}\), for a positive integer \(m\), if for any \(n\in\{1,2,\cdots,m\}\), 
+there exists a subsequence \(a_{i},a_{i + 1},a_{i + 2},\cdots,a_{i + j}(j\geq0)\) in \(Q\) such that \(a_{i}+a_{i + 1}+a_{i + 2}+\cdots+a_{i + j}=n\), 
+then \(Q\) is called an \(m-\)continuously representable sequence. If \(Q:a_{1},a_{2},\cdots,a_{k}\) is a \(20-\)continuously representable sequence, 
+and \(a_{1}+a_{2}+\cdots+a_{k}<20\), prove that \(k\geq7\).-/
+theorem gaokaoformal_g_21
+(k : ℕ)
+(a : ℕ → ℤ) 
+(m_contin: ℕ → Prop)
+(h_prop: ∀ (m:ℕ), (m≥1) → 
+    m_contin m = (∀ (n:ℕ), 
+        (n≥ 1 ∧ n≤ m) → 
+        ∃ (i j:ℕ), i≥1 ∧ i+j ≤ k ∧ ∑ l in Finset.Icc i (i+j), a l = n)):
+(m_contin 20 ∧ ∑ i in Finset.Icc 1 k, a i < 20) → k ≥ 7:= by sorry
+-- END_PAIR 21 
+
+
+-- BEGIN_PAIR 22
+-- [Question]:
+-- Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\). Given that \(\frac{2S_{n}}{n}+n = 2a_{n}+1\), prove that \(\{ a_{n}\}\) is an arithmetic sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\). Given that \(\frac{2S_{n}}{n}+n = 2a_{n}+1\), prove that \(\{ a_{n}\}\) is an arithmetic sequence.-/
+theorem gaokaoformal_g_22 
+(a : ℕ → ℝ) 
+(S : ℕ → ℝ) 
+(hS : ∀ (n : ℕ), n ≥ 1 → S n = ∑ k in Finset.Icc 1 n, a k) 
+(h : ∀ (n : ℕ), n ≥ 1 → 2 * S n / (n : ℝ) + (n : ℝ) = 2 * a n + 1) : 
+∃ (d : ℝ), ∀ (n : ℕ), n ≥ 1 → a (n + 1) = a n + d := by sorry
+-- END_PAIR 22 
+
+
+-- BEGIN_PAIR 23
+-- [Question]:
+-- Given the function \(f(x)=\frac{\text{e}^{x}}{x}-\ln x + x - a\), prove that if \(f(x)\) has two zeros \(x_{1},x_{2}\), then \(x_{1}x_{2}<1\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the function \(f(x)=\frac{\text{e}^{x}}{x}-\ln x + x - a\), prove that if \(f(x)\) has two zeros \(x_{1},x_{2}\), then \(x_{1}x_{2}<1\).-/
+theorem gaokaoformal_g_23  
+(a : ℝ)
+(f : ℝ → ℝ → ℝ)
+(hf : ∀ (a x : ℝ), (x>0) →  f a x = (Real.exp x)/x - Real.log x + x - a)
+(x₁ x₂ : ℝ)
+(h₁ : f a x₁ = 0)
+(h₂ : f a x₂ = 0)
+(h₃ : x₁ ≠ x₂ ∧ x₁ > 0 ∧ x₂ > 0) :
+x₁ * x₂ < 1 := by sorry
+-- END_PAIR 23 
+
+
+-- BEGIN_PAIR 24
+-- [Question]:
+-- Given that \(a\), \(b\), and \(c\) are all positive numbers and \(a^{2}+b^{2}+4c^{2}=3\), prove that \(a + b + 2c \leq 3\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(a\), \(b\), and \(c\) are all positive numbers and \(a^{2}+b^{2}+4c^{2}=3\), prove that \(a + b + 2c \leq 3\);-/
+theorem gaokaoformal_g_24  (a b c : ℝ)
+  (h₀ : 0 < a)
+  (h₁ : 0 < b)
+  (h₂ : 0 < c)
+  (h₃ : a^2 + b^2 + 4 * c^2 = 3) :
+  a + b + 2 * c ≤ 3  := by sorry
+-- END_PAIR 24 
+
+
+-- BEGIN_PAIR 25
+-- [Question]:
+-- Given that \(a\), \(b\), \(c\) are all positive numbers, and \(a^{2}+b^{2}+4c^{2}=3\), prove that if \(b = 2c\), then \(\frac{1}{a}+\frac{1}{c}\geq3\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(a\), \(b\), \(c\) are all positive numbers, and \(a^{2}+b^{2}+4c^{2}=3\), prove that if \(b = 2c\), then \(\frac{1}{a}+\frac{1}{c}\geq3\).-/
+theorem gaokaoformal_g_25  (a b c : ℝ)
+  (h₀ : 0 < a)
+  (h₁ : 0 < b)
+  (h₂ : 0 < c)
+  (h₃ : a^2 + b^2 + 4 * c^2 = 3)
+  (h₄ : b = 2 * c) :
+  3 ≤ 1 / a + 1 / c  := by sorry
+-- END_PAIR 25 
+
+
+-- BEGIN_PAIR 26
+-- [Question]:
+-- In triangle \(ABC\), let the sides opposite angles \(A\), \(B\), \(C\) be \(a\), \(b\), \(c\) respectively. 
+Given that \(\sin C \sin(A - B) = \sin B \sin(C - A)\), prove that \(2a^{2} = b^{2} + c^{2}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-In triangle \(ABC\), let the sides opposite angles \(A\), \(B\), \(C\) be \(a\), \(b\), \(c\) respectively. 
+Given that \(\sin C \sin(A - B) = \sin B \sin(C - A)\), prove that \(2a^{2} = b^{2} + c^{2}\).-/
+theorem gaokaoformal_g_26
+(inner: ((ℝ×ℝ) × (ℝ×ℝ)) → ℝ)
+(hinner: ∀ (X Y:ℝ×ℝ), inner (X,Y) = X.1*Y.1 + X.2*Y.2)
+(dist: ((ℝ×ℝ) × (ℝ×ℝ)) → ℝ)
+(hdist: ∀ (X Y:ℝ×ℝ), dist (X,Y) = Real.sqrt (inner (X-Y,X-Y)) )
+(A B C: ℝ×ℝ)
+(a b c: ℝ)
+(habc: a = dist (B,C) ∧ b = dist (C,A) ∧ c = dist (A,B))
+(habc2: a > 0 ∧ b > 0 ∧ c > 0)
+(α β γ: ℝ)
+(hαβγ: b*c*Real.cos α = inner (B-A,C-A) ∧ c*a*Real.cos β = inner (C-B,A-B) ∧ a*b*Real.cos γ = inner (A-C,B-C))
+(hαβγ2: 0 < α ∧ 0 < β ∧ 0 < γ ∧ α+β+γ = Real.pi)
+(h: (Real.sin γ)*(Real.sin (α - β)) = (Real.sin β)*(Real.sin (γ - α))) :
+2*a^2 = b^2 + c^2 := by sorry
+-- END_PAIR 26 
+
+
+-- BEGIN_PAIR 27
+-- [Question]:
+-- Given an ellipse \(E\) centered at the origin with symmetry about the \(x\)-axis and \(y\)-axis, 
+passing through points \(A(0, -2)\) and \(B(\frac{3}{2}, -1)\). 
+Let a line through point \(P(1, -2)\) intersect \(E\) at points \(M\) and \(N\). 
+A line parallel to the \(x\)-axis passing through \(M\) intersects the line segment \(AB\) at point \(T\). 
+Point \(H\) satisfies \(\overrightarrow{MT} = \overrightarrow{TH}\). 
+Prove that the line \(HN\) passes through a fixed point.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given an ellipse \(E\) centered at the origin with symmetry about the \(x\)-axis and \(y\)-axis, 
+passing through points \(A(0, -2)\) and \(B(\frac{3}{2}, -1)\). 
+Let a line through point \(P(1, -2)\) intersect \(E\) at points \(M\) and \(N\). 
+A line parallel to the \(x\)-axis passing through \(M\) intersects the line segment \(AB\) at point \(T\). 
+Point \(H\) satisfies \(\overrightarrow{MT} = \overrightarrow{TH}\). 
+Prove that the line \(HN\) passes through a fixed point.-/
+theorem gaokaoformal_g_27
+(a b: ℝ)
+(hab: a > 0 ∧ b > 0)
+(E: Set (ℝ×ℝ))
+(hE: E = {(x,y):ℝ×ℝ | x^2/a^2 + y^2/b^2 = 1})
+(A B: ℝ×ℝ)
+(hAB: A = (0,-2) ∧ B = (3/2, -1) ∧ A ∈ E ∧ B ∈ E) :
+∃ (fixed: ℝ×ℝ),
+    ∀ (p q: ℝ),
+        (p ≠ 0 ∨ q ≠ 0) →
+        let line := {(x,y):ℝ×ℝ | p*(x-1) + q*(y+2) = 0};
+        ∀ (M N: ℝ×ℝ),
+            (M ∈ line ∩ E ∧ N ∈ line ∩ E ∧ M ≠ N) →
+            let line_p := {(x,y):ℝ×ℝ | y = M.2}
+            ∀ (T: ℝ×ℝ),
+                T ∈ line_p ∧ (∃ (t:ℝ), 0 ≤ t ∧ t ≤ 1 ∧ T.1 = t*A.1+(1-t)*B.1 ∧ T.2 = t*A.2+(1-t)*B.2) → 
+                ∀ (H:ℝ×ℝ),
+                    T - M = H - T →
+                    (fixed.2-H.2)*(fixed.1-N.1) = (fixed.1-H.1)*(fixed.2-N.2) := by sorry
+-- END_PAIR 27 
+
+
+-- BEGIN_PAIR 28
+-- [Question]:
+-- Given that \(a\), \(b\), and \(c\) are all positive numbers, and \(a^{\frac{3}{2}} + b^{\frac{3}{2}} + c^{\frac{3}{2}} = 1\), prove that \(abc \leq \frac{1}{9}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(a\), \(b\), and \(c\) are all positive numbers, and \(a^{\frac{3}{2}} + b^{\frac{3}{2}} + c^{\frac{3}{2}} = 1\), prove that \(abc \leq \frac{1}{9}\).-/
+theorem gaokaoformal_g_28  (a b c : ℝ)
+  (h₀ : 0 < a)
+  (h₁ : 0 < b)
+  (h₂ : 0 < c)
+  (h₃ : a^(3 / 2 : ℝ) + b^(3 / 2 : ℝ) + c^(3 / 2 : ℝ) = 1) :
+  a * b * c ≤ 1 / 9 := by sorry
+-- END_PAIR 28 
+
+
+-- BEGIN_PAIR 29
+-- [Question]:
+-- Given that \(a\), \(b\), and \(c\) are all positive numbers, and \(a^{\frac{3}{2}} + b^{\frac{3}{2}} + c^{\frac{3}{2}} = 1\), prove that \(\frac{a}{b + c} + \frac{b}{a + c} + \frac{c}{a + b} \leq \frac{1}{2\sqrt{abc}}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(a\), \(b\), and \(c\) are all positive numbers, and \(a^{\frac{3}{2}} + b^{\frac{3}{2}} + c^{\frac{3}{2}} = 1\), prove that \(\frac{a}{b + c} + \frac{b}{a + c} + \frac{c}{a + b} \leq \frac{1}{2\sqrt{abc}}\).-/
+theorem gaokaoformal_g_29  (a b c : ℝ)
+  (h₀ : 0 < a)
+  (h₁ : 0 < b)
+  (h₂ : 0 < c)
+  (h₃ : a^(3 / 2 : ℝ) + b^(3 / 2 : ℝ) + c^(3 / 2 : ℝ) = 1) :
+  a / (b + c) + b / (a + c) + c / (a + b) ≤ 1 / (2 * Real.sqrt (a * b * c))  := by sorry
+-- END_PAIR 29 
+
+
+-- BEGIN_PAIR 30
+-- [Question]:
+-- Let \(\{ a_{n}\}\) be an arithmetic sequence and \(\{ b_{n}\}\) be a geometric sequence, with \(a_{1}=b_{1}=a_{2}-b_{2}=a_{3}-b_{3}=1\). 
+Let \(S_{n}\) denote the sum of the first \(n\) terms of \(\{ a_{n}\}\). 
+Prove that \((S_{n + 1}+a_{n + 1})b_{n}=S_{n + 1}b_{n + 1}-S_{n}b_{n}\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(\{ a_{n}\}\) be an arithmetic sequence and \(\{ b_{n}\}\) be a geometric sequence, with \(a_{1}=b_{1}=a_{2}-b_{2}=a_{3}-b_{3}=1\). 
+Let \(S_{n}\) denote the sum of the first \(n\) terms of \(\{ a_{n}\}\). 
+Prove that \((S_{n + 1}+a_{n + 1})b_{n}=S_{n + 1}b_{n + 1}-S_{n}b_{n}\);-/
+theorem gaokaoformal_g_30  
+(a b : ℕ → ℝ)
+(h₀ : ∃ (d : ℝ), ∀ (n : ℕ), (1 ≤ n) → a (n + 1) = a n + d)
+(h₁ : b 1 ≠ 0 ∧ (∃ (r : ℝ), r ≠ 0 ∧ (∀ (n : ℕ), (1 ≤ n) → b (n + 1) = r * b n)))
+(h₂ : a 1 = 1)
+(h₃ : b 1 = 1)
+(h₄ : a 2 - b 2 = 1)
+(h₅ : a 3 - b 3 = 1)
+(S : ℕ → ℝ)
+(hS : ∀ (n : ℕ), (1 ≤ n) → S n = ∑ k in Finset.Icc 1 n, a k) :
+∀ (n : ℕ), (1 ≤ n) → (S (n + 1) + a (n + 1)) * b n = S (n + 1) * b (n + 1) - S n * b n := by sorry
+-- END_PAIR 30 
+
+
+-- BEGIN_PAIR 31
+-- [Question]:
+-- Given \(a, b \in \mathbf{R}\), the functions \(f(x) = \text{e}^{x} - a \sin x\) and \(g(x) = b \sqrt{x}\). If the curves \(y = f(x)\) and \(y = g(x)\) have a common point, prove that \(a^{2} + b^{2} > \text{e}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given \(a, b \in \mathbf{R}\), the functions \(f(x) = \text{e}^{x} - a \sin x\) and \(g(x) = b \sqrt{x}\). If the curves \(y = f(x)\) and \(y = g(x)\) have a common point, prove that \(a^{2} + b^{2} > \text{e}\).-/
+theorem gaokaoformal_g_31  (a b : ℝ)
+  (f g: ℝ → ℝ)
+  (hf: ∀ (x:ℝ), f x = Real.exp x - a * Real.sin x)
+  (hg: ∀ (x:ℝ), (x ≥ 0) → g x = b * Real.sqrt x)
+  (h : ∃ (x : ℝ), x ≥ 0 ∧ f x = g x) :
+  a^2 + b^2 > Real.exp 1 := by sorry
+-- END_PAIR 31 
+
+
+-- BEGIN_PAIR 32
+-- [Question]:
+-- Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\), given that \(a_{1}=1\) and \(\{\frac{S_{n}}{a_{n}}\}\) is an arithmetic sequence with a common difference of \(\frac{1}{3}\). Prove that \(\frac{1}{a_{1}}+\frac{1}{a_{2}}+\cdots+\frac{1}{a_{n}}<2\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\), given that \(a_{1}=1\) and \(\{\frac{S_{n}}{a_{n}}\}\) is an arithmetic sequence with a common difference of \(\frac{1}{3}\). Prove that \(\frac{1}{a_{1}}+\frac{1}{a_{2}}+\cdots+\frac{1}{a_{n}}<2\).-/
+theorem gaokaoformal_g_32 
+(a : ℕ → ℝ) (S : ℕ → ℝ) (d : ℝ) (n : ℕ) 
+(ha : a 1 = 1) 
+(hS : ∀ n:ℕ, 1≤ n → S n = ∑ k in Finset.Icc 1 n, a k) 
+(hd : ∀ n:ℕ, 1≤ n →  S (n + 1) / a (n + 1) = S n / a n + d) 
+(hd' : d = 1 / 3) : 
+(∑ k in Finset.Icc 1 n, 1 / a k) < 2 := by sorry
+-- END_PAIR 32 
+
+
+-- BEGIN_PAIR 33
+-- [Question]:
+-- Given the functions \(f(x) = \text{e}^{x} - x\) and \(g(x) = x - \ln x\). 
+Prove that there exists a horizontal line \(y = b\) intersecting either \(y = f(x)\) or \(y = g(x)\) at three distinct points in total, 
+and the x-coordinates of these points from left to right form an arithmetic sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the functions \(f(x) = \text{e}^{x} - x\) and \(g(x) = x - \ln x\). 
+Prove that there exists a horizontal line \(y = b\) intersecting either \(y = f(x)\) or \(y = g(x)\) at three distinct points in total, 
+and the x-coordinates of these points from left to right form an arithmetic sequence.-/
+theorem gaokaoformal_g_33 
+(f g: ℝ → ℝ)
+(hf: ∀ (x:ℝ), f x = Real.exp x - x)
+(hg: ∀ (x:ℝ), (x>0) → g x  = x - Real.log x): 
+∃ (b: ℝ)(x₁ x₂ x₃: ℝ), 
+    (f x₁ = b ∨ (x₁ > 0 ∧ g x₁ = b)) ∧ 
+    (f x₂ = b ∨ (x₂ > 0 ∧ g x₂ = b)) ∧ 
+    (f x₃ = b ∨ (x₃ > 0 ∧ g x₃ = b)) ∧ 
+    (x₁ < x₂) ∧ (x₂ < x₃) ∧ 
+    (∀ (x:ℝ), (f x = b ∨ (x>0 ∧ g x = b)) → (x = x₁ ∨ x = x₂ ∨ x = x₃)) ∧ 
+    (2* x₂ = x₁ + x₃) := by sorry
+-- END_PAIR 33 
+
+
+-- BEGIN_PAIR 34
+-- [Question]:
+-- Given that \(\{ a_{n}\}\) is an arithmetic sequence, 
+\(\{ b_{n}\}\) is a geometric sequence with common ratio \(2\), 
+and \(a_{2}-b_{2}=a_{3}-b_{3}=b_{4}-a_{4}\). 
+Prove that \(a_{1}=b_{1}\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(\{ a_{n}\}\) is an arithmetic sequence, 
+\(\{ b_{n}\}\) is a geometric sequence with common ratio \(2\), 
+and \(a_{2}-b_{2}=a_{3}-b_{3}=b_{4}-a_{4}\). 
+Prove that \(a_{1}=b_{1}\);-/
+theorem gaokaoformal_g_34  
+(a b : ℕ → ℝ)
+(h₀ : ∃ (d : ℝ), ∀ (n : ℕ), 1 ≤ n → a (n + 1) = a n + d)
+(h₁ : b 1 ≠ 0 ∧ ∀ (n : ℕ), 1 ≤ n → b (n + 1) = 2 * b n)
+(h₂ : a 2 - b 2 = a 3 - b 3)
+(h₃ : a 3 - b 3 = b 4 - a 4) :
+a 1 = b 1  := by sorry
+-- END_PAIR 34 
+
+
+-- BEGIN_PAIR 35
+-- [Question]:
+-- Given the hyperbola \(C:\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}} = 1(a > 0,b > 0)\) with right focus \(F(2,0)\) and asymptotes \(y=\pm\sqrt{3}x\). 
+A line through \(F\) intersects the two asymptotes of \(C\) at points \(A\) and \(B\) respectively. 
+Points \(P(x_{1},y_{1})\) and \(Q(x_{2},y_{2})\) lie on \(C\) with \(x_{1}>x_{2}>0\) and \(y_{1}>0\). 
+A line through \(P\) with slope \(-\sqrt{3}\) and a line through \(Q\) with slope \(\sqrt{3}\) intersect at point \(M\). 
+From the following three conditions, select two to prove the third:
+① \(M\) lies on \(AB\); 
+② \(PQ\parallel AB\); 
+③ \(\vert MA\vert=\vert MB\vert\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the hyperbola \(C:\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}} = 1(a > 0,b > 0)\) with right focus \(F(2,0)\) and asymptotes \(y=\pm\sqrt{3}x\). 
+A line through \(F\) intersects the two asymptotes of \(C\) at points \(A\) and \(B\) respectively. 
+Points \(P(x_{1},y_{1})\) and \(Q(x_{2},y_{2})\) lie on \(C\) with \(x_{1}>x_{2}>0\) and \(y_{1}>0\). 
+A line through \(P\) with slope \(-\sqrt{3}\) and a line through \(Q\) with slope \(\sqrt{3}\) intersect at point \(M\). 
+From the following three conditions, select two to prove the third:
+① \(M\) lies on \(AB\); 
+② \(PQ\parallel AB\); 
+③ \(\vert MA\vert=\vert MB\vert\).-/
+theorem gaokaoformal_g_35 
+(a b : ℝ) 
+(ha : a > 0) 
+(hb : b > 0) 
+(C : Set (ℝ × ℝ)) 
+(hC : C = {(x,y):ℝ×ℝ | x^2 / a^2 - y^2 / b^2 = 1}) 
+(F : ℝ × ℝ) 
+(hF : F = (2, 0) ∧ F.1 = Real.sqrt (a^2+b^2)) 
+(A B : ℝ×ℝ)
+(hA: A.2 = Real.sqrt 3 * A.1)
+(hB: B.2 = - Real.sqrt 3 * B.1)
+(hAB: (F.2 - A.2)*(F.1 - B.1) = (F.1 - A.1)*(F.2 - B.2) ∧ A≠ B)
+(P Q : ℝ×ℝ)
+(hPQ: P ∈ C ∧ Q ∈ C ∧ P.1 > Q.1 ∧ Q.1 > 0 ∧ P.2 > 0)
+(M : ℝ×ℝ)
+(hM: (M.2  -P.2) = -Real.sqrt 3 *(M.1 - P.1) ∧ (M.2  -Q.2) = Real.sqrt 3 *(M.1 - Q.1)) 
+(p₁ p₂ p₃ : Prop)
+(hp₁ : p₁ = ((M.2 - A.2) * (M.1 - B.1) = (M.1 - A.1) * (M.2 - B.2)))
+(hp₂ : p₂ = (∃ (t:ℝ), P.2 - Q.2 = t*(A.2 - B.2) ∧ P.1 - Q.1 = t*(A.1 - B.1)))
+(hp₃ : p₃ = ((M.2 - A.2)^2 + (M.1 - A.1)^2 = (M.2 - B.2)^2 + (M.1 - B.1)^2)):
+((p₁ ∧ p₂) → p₃) ∨ ((p₂ ∧ p₃) → p₁) ∨ ((p₃ ∧ p₁) → p₂):= by sorry
+-- END_PAIR 35 
+
+
+-- BEGIN_PAIR 36
+-- [Question]:
+-- For \(n \in \mathbf{N}^{*}\), prove that \(\frac{1}{\sqrt{1^{2}+1}} + \frac{1}{\sqrt{2^{2}+2}} + \cdots + \frac{1}{\sqrt{n^{2}+n}} > \ln(n + 1)\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-For \(n \in \mathbf{N}^{*}\), prove that \(\frac{1}{\sqrt{1^{2}+1}} + \frac{1}{\sqrt{2^{2}+2}} + \cdots + \frac{1}{\sqrt{n^{2}+n}} > \ln(n + 1)\).-/
+theorem gaokaoformal_g_37 
+(n : ℕ) 
+(hn : 0 < n) : 
+∑ i in Finset.Icc 1 n, (1 / Real.sqrt (i^2 + i : ℝ)) > Real.log (n + 1) := by sorry
+-- END_PAIR 36 
+
+
+-- BEGIN_PAIR 37
+-- [Question]:
+-- Let the function \(f(x)=\frac{\text{e}}{2x}+\ln x\) (where \(x > 0\)). Given \(a,b\in\mathbf{R}\), suppose three distinct points \((x_{1},f(x_{1}))\), \((x_{2},f(x_{2}))\), and \((x_{3},f(x_{3}))\) on the curve \(y = f(x)\) have tangent lines all passing through the point \((a,b)\). Prove that if \(a > \text{e}\), then \(0 < b - f(a) < \frac{1}{2}\left(\frac{a}{\text{e}} - 1\right)\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let the function \(f(x)=\frac{\text{e}}{2x}+\ln x\) (where \(x > 0\)). Given \(a,b\in\mathbf{R}\), suppose three distinct points \((x_{1},f(x_{1}))\), \((x_{2},f(x_{2}))\), and \((x_{3},f(x_{3}))\) on the curve \(y = f(x)\) have tangent lines all passing through the point \((a,b)\). Prove that if \(a > \text{e}\), then \(0 < b - f(a) < \frac{1}{2}\left(\frac{a}{\text{e}} - 1\right)\).-/
+theorem gaokaoformal_g_38  (f : ℝ → ℝ)
+  (hf : ∀ (x : ℝ), x > 0 → f x = Real.exp 1 / (2 * x) + Real.log x)
+  (a b : ℝ)
+  (x₁ x₂ x₃ : ℝ)
+  (h₁ : 0 < x₁ ∧ 0 < x₂ ∧ 0 < x₃)
+  (h₂ : x₁ ≠ x₂ ∧ x₂ ≠ x₃ ∧ x₃ ≠ x₁)
+  (h₃ : deriv f x₁ = (b - f x₁) / (a - x₁))
+  (h₄ : deriv f x₂ = (b - f x₂) / (a - x₂))
+  (h₅ : deriv f x₃ = (b - f x₃) / (a - x₃))
+  (h₆ : a > Real.exp 1) :
+  0 < b - f a ∧ b - f a < (a / Real.exp 1 - 1) / 2 := by sorry
+-- END_PAIR 37 
+
+
+-- BEGIN_PAIR 38
+-- [Question]:
+-- Let the function \(f(x) = \frac{\text{e}}{2x} + \ln x\) for \(x > 0\). 
+Given \(a, b \in \mathbf{R}\), suppose that the tangents to the curve \(y = f(x)\) at three distinct points \((x_{1}, f(x_{1}))\), 
+\((x_{2}, f(x_{2}))\), and \((x_{3}, f(x_{3}))\) all pass through the point \((a, b)\). 
+Prove that if \(0 < a < \text{e}\) and \(x_{1} < x_{2} < x_{3}\), 
+then \(\frac{2}{\text{e}} + \frac{\text{e} - a}{6\text{e}^{2}} < \frac{1}{x_{1}} + \frac{1}{x_{3}} < \frac{2}{a} - \frac{\text{e} - a}{6\text{e}^{2}}\). 
+(Note: \(\text{e} = 2.71828\cdots\) is the base of the natural logarithm.)
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let the function \(f(x) = \frac{\text{e}}{2x} + \ln x\) for \(x > 0\). 
+Given \(a, b \in \mathbf{R}\), suppose that the tangents to the curve \(y = f(x)\) at three distinct points \((x_{1}, f(x_{1}))\), 
+\((x_{2}, f(x_{2}))\), and \((x_{3}, f(x_{3}))\) all pass through the point \((a, b)\). 
+Prove that if \(0 < a < \text{e}\) and \(x_{1} < x_{2} < x_{3}\), 
+then \(\frac{2}{\text{e}} + \frac{\text{e} - a}{6\text{e}^{2}} < \frac{1}{x_{1}} + \frac{1}{x_{3}} < \frac{2}{a} - \frac{\text{e} - a}{6\text{e}^{2}}\). 
+(Note: \(\text{e} = 2.71828\cdots\) is the base of the natural logarithm.)-/
+theorem gaokaoformal_g_39  
+(f : ℝ → ℝ)
+(hf : ∀ (x : ℝ), x > 0 → f x = Real.exp 1 / (2 * x) + Real.log x)
+(a b : ℝ)
+(x₁ x₂ x₃ : ℝ)
+(hx: x₁ > 0 ∧ x₂ > 0 ∧ x₃ > 0 ∧ x₁ ≠ x₂ ∧ x₂ ≠ x₃ ∧ x₁ ≠ x₃)
+(habx : deriv f x₁ * (a - x₁) = b - f x₁ ∧ 
+deriv f x₂ * (a - x₂) = b - f x₂ ∧ 
+deriv f x₃ * (a - x₃) = b - f x₃):
+(0 < a ∧ a < Real.exp 1 ∧ x₁ < x₂ ∧ x₂ < x₃) →
+2/Real.exp 1 + (Real.exp 1 - a)/(6*(Real.exp 2)) < 1/x₁ + 1/x₃ ∧
+1/x₁ + 1/x₃ < 2/a - (Real.exp 1 - a)/(6*(Real.exp 2)) := by sorry
+-- END_PAIR 38 
+
+
+-- BEGIN_PAIR 39
+-- [Question]:
+-- Given a sequence \(\{ a_{n}\}\) with all terms positive, let \(S_{n}\) denote the sum of the first \(n\) terms of \(\{ a_{n}\}\). Select two conditions from the following ①, ②, and ③ to prove that the remaining one holds. ① The sequence \(\{ a_{n}\}\) is arithmetic; ② The sequence \(\{ \sqrt{S_{n}}\}\) is arithmetic; ③ \(a_{2}=3a_{1}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given a sequence \(\{ a_{n}\}\) with all terms positive, let \(S_{n}\) denote the sum of the first \(n\) terms of \(\{ a_{n}\}\). Select two conditions from the following ①, ②, and ③ to prove that the remaining one holds. ① The sequence \(\{ a_{n}\}\) is arithmetic; ② The sequence \(\{ \sqrt{S_{n}}\}\) is arithmetic; ③ \(a_{2}=3a_{1}\).-/
+theorem gaokaoformal_g_40  
+(a : ℕ → ℝ)
+(h₀ : ∀ (n : ℕ),  n > 0 → 0 < a n)
+(S : ℕ → ℝ)
+(hS : ∀ (n : ℕ),  n > 0 → S n = ∑ i in Finset.Icc 1 n, a i)
+(p₁ p₂ p₃ : Prop)
+(h₁ : p₁ = (∃ (d : ℝ), ∀ (n : ℕ), n > 0 → a (n + 1) = a n + d))
+(h₂ : p₂ = (∃ (d : ℝ), ∀ (n : ℕ), n > 0 → Real.sqrt (S (n + 1)) = Real.sqrt (S n) + d))
+(h₃ : p₃ = (a 2 = 3 * a 1)) :
+((p₁ ∧ p₂) → p₃) ∨ ((p₂ ∧ p₃) → p₁) ∨ ((p₃ ∧ p₁) → p₂):= by sorry
+-- END_PAIR 39 
+
+
+-- BEGIN_PAIR 40
+-- [Question]:
+-- Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\), and \(b_{n}\) denote the product of the first \(n\) terms of the sequence \(\{ S_{n}\}\). Given that \(\frac{2}{S_{n}} + \frac{1}{b_{n}} = 2\), prove that the sequence \(\{ b_{n}\}\) is an arithmetic sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\), and \(b_{n}\) denote the product of the first \(n\) terms of the sequence \(\{ S_{n}\}\). Given that \(\frac{2}{S_{n}} + \frac{1}{b_{n}} = 2\), prove that the sequence \(\{ b_{n}\}\) is an arithmetic sequence.-/
+theorem gaokaoformal_g_42  (a : ℕ → ℝ)
+  (S : ℕ → ℝ)
+  (b : ℕ → ℝ)
+  (hS : ∀ (n : ℕ), 1 ≤ n → S n = ∑ k in Finset.Icc 1 n, a k)
+  (hb : ∀ (n : ℕ), 1 ≤ n → b n = ∏ k in Finset.Icc 1 n, S k)
+  (h : ∀ (n : ℕ), 1 ≤ n → 2 / S n + 1 / b n = 2) :
+  ∃ (d : ℝ), ∀ (n : ℕ), 1 ≤ n → b (n + 1) = b n + d := by sorry
+-- END_PAIR 40 
+
+
+-- BEGIN_PAIR 41
+-- [Question]:
+-- Given that \(\{ a_{n}\}\) is an arithmetic sequence with a common difference of 2, 
+and the sum of its first 8 terms is 64. 
+\(\{ b_{n}\}\) is a geometric sequence with a common ratio greater than 0, 
+\(b_{1}=4\), and \(b_{3}-b_{2}=48\). 
+Define \(c_{n}=b_{2n}+\frac{1}{b_{n}}\) for \(n\in N^{*}\). 
+Prove that \(\{ c_{n}^{2}-c_{2n}\}\) is a geometric sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(\{ a_{n}\}\) is an arithmetic sequence with a common difference of 2, 
+and the sum of its first 8 terms is 64. 
+\(\{ b_{n}\}\) is a geometric sequence with a common ratio greater than 0, 
+\(b_{1}=4\), and \(b_{3}-b_{2}=48\). 
+Define \(c_{n}=b_{2n}+\frac{1}{b_{n}}\) for \(n\in N^{*}\). 
+Prove that \(\{ c_{n}^{2}-c_{2n}\}\) is a geometric sequence.-/
+theorem gaokaoformal_g_43  
+(a : ℕ → ℝ)
+(b : ℕ → ℝ)
+(c : ℕ → ℝ)
+(h₀ : ∀ n : ℕ, 1 ≤ n → a (n + 1) = a n + 2)
+(h₁ : ∑ i in Finset.Icc 1 8, a i = 64)
+(h₂ : ∃ r : ℝ, (r > 0 ∧ (∀ n : ℕ, 1 ≤ n → b (n + 1) = r * b n)))
+(h₃ : b 1 = 4)
+(h₄ : b 3 - b 2 = 48)
+(hc : ∀ n : ℕ, 1 ≤ n → c n = b (2 * n) + 1 / b n) :
+(c 1)^2 - c 2 ≠ 0 ∧ (∃ q : ℝ, q ≠ 0 ∧ (∀ n : ℕ, n ≥ 1 → (c (n+1))^2 - c (2 * (n+1)) = q * ((c n)^2 - c (2 * n)))) := by sorry
+-- END_PAIR 41 
+
+
+-- BEGIN_PAIR 42
+-- [Question]:
+-- Given that \(\{ a_{n}\}\) is an arithmetic sequence with a common difference of 2, and the sum of its first 8 terms is 64. \(\{ b_{n}\}\) is a geometric sequence with a common ratio greater than 0, \(b_{1}=4\), and \(b_{3}-b_{2}=48\). Define \(c_{n}=b_{2n}+\frac{1}{b_{n}}\) for \(n\in N^{*}\). Prove that \(\sum_{k = 1}^{n}\sqrt{\frac{a_{k}a_{k + 1}}{c_{k}^{2}-c_{2k}}}<2\sqrt{2}\) for \(n\in N^{*}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given that \(\{ a_{n}\}\) is an arithmetic sequence with a common difference of 2, and the sum of its first 8 terms is 64. \(\{ b_{n}\}\) is a geometric sequence with a common ratio greater than 0, \(b_{1}=4\), and \(b_{3}-b_{2}=48\). Define \(c_{n}=b_{2n}+\frac{1}{b_{n}}\) for \(n\in N^{*}\). Prove that \(\sum_{k = 1}^{n}\sqrt{\frac{a_{k}a_{k + 1}}{c_{k}^{2}-c_{2k}}}<2\sqrt{2}\) for \(n\in N^{*}\).-/
+theorem gaokaoformal_g_44  (a : ℕ → ℝ) (b : ℕ → ℝ) (c : ℕ → ℝ)
+  (h₀ : ∀ (n : ℕ), n ≥ 1 → a (n + 1) = a n + 2)
+  (h₁ : ∑ k in Finset.Icc 1 8, a k = 64)
+  (h₂ : ∃ (r : ℝ), (r > 0 ∧ (∀ (n : ℕ), n ≥ 1 → b (n + 1) = r * b n)))
+  (h₃ : b 1 = 4)
+  (h₄ : b 3 - b 2 = 48)
+  (h₅ : ∀ (n : ℕ), n≥ 1 → c n = b (2 * n) + 1 / b n) :
+  ∀ (n : ℕ), n≥1 → ∑ k in Finset.Icc 1 n, Real.sqrt ((a k * a (k + 1)) / ((c k)^2 - c (2 * k))) < 2 * Real.sqrt 2 := by sorry
+-- END_PAIR 42 
+
+
+-- BEGIN_PAIR 43
+-- [Question]:
+-- Given \(a > 0\), the function \(f(x) = ax - xe^{x}\) is to be proven to have a unique extremum point.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given \(a > 0\), the function \(f(x) = ax - xe^{x}\) is to be proven to have a unique extremum point.-/
+theorem gaokaoformal_g_45 
+(a : ℝ) 
+(ha : a > 0) 
+(f: ℝ → ℝ)
+(hf: ∀ (x:ℝ), f x = a*x - x*Real.exp x): 
+∃! (x : ℝ), (deriv f x = 0  ∧ deriv (deriv f) x ≠ 0):= by sorry
+-- END_PAIR 43 
+
+
+-- BEGIN_PAIR 44
+-- [Question]:
+-- Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\). Given that \(a_{n}>0\), \(a_{2}=3a_{1}\), and the sequence \(\{ \sqrt{S_{n}}\}\) is an arithmetic sequence, prove that \(\{ a_{n}\}\) is an arithmetic sequence.
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(S_{n}\) denote the sum of the first \(n\) terms of the sequence \(\{ a_{n}\}\). Given that \(a_{n}>0\), \(a_{2}=3a_{1}\), and the sequence \(\{ \sqrt{S_{n}}\}\) is an arithmetic sequence, prove that \(\{ a_{n}\}\) is an arithmetic sequence.-/
+theorem gaokaoformal_g_46 
+(a : ℕ → ℝ) (S : ℕ → ℝ) (d : ℝ) 
+(hS : ∀ n:ℕ, 1 ≤ n → S n = ∑ k in Finset.Icc 1 n, a k) 
+(ha : ∀ n:ℕ, 1 ≤ n → 0 < a n) 
+(h2 : a 2 = 3 * a 1) 
+(hS' : ∃ (d: ℝ), ∀ n:ℕ, Real.sqrt (S (n + 1)) = Real.sqrt (S n) + d) : 
+∃ d:ℝ, ∀ n:ℕ, a (n + 1) = a n + d := by sorry
+-- END_PAIR 44 
+
+
+-- BEGIN_PAIR 45
+-- [Question]:
+-- Let \(\{ a_{n}\}\) be a geometric sequence with the first term \(1\), and the sequence \(\{ b_{n}\}\) satisfies \(b_{n}=\frac{na_{n}}{3}\). 
+It is known that \(a_{1}\), \(3a_{2}\), \(9a_{3}\) form an arithmetic sequence. 
+Let \(S_{n}\) and \(T_{n}\) denote the sums of the first \(n\) terms of \(\{ a_{n}\}\) and \(\{ b_{n}\}\), respectively. 
+Prove that \(T_{n}<\frac{S_{n}}{2}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(\{ a_{n}\}\) be a geometric sequence with the first term \(1\), and the sequence \(\{ b_{n}\}\) satisfies \(b_{n}=\frac{na_{n}}{3}\). 
+It is known that \(a_{1}\), \(3a_{2}\), \(9a_{3}\) form an arithmetic sequence. 
+Let \(S_{n}\) and \(T_{n}\) denote the sums of the first \(n\) terms of \(\{ a_{n}\}\) and \(\{ b_{n}\}\), respectively. 
+Prove that \(T_{n}<\frac{S_{n}}{2}\).-/
+theorem gaokaoformal_g_47  
+(a b : ℕ → ℝ)
+(r d : ℝ)
+(h₀ : ∃ r: ℝ, r ≠ 0 ∧ (∀ (n : ℕ), 1 ≤ n → a (n + 1) = a n * r))
+(h₁ : a 1 = 1)
+(h₂ : a 1 + 9*a 3 = 2*(3*a 2))
+(h₃ : ∀ (n : ℕ), 1 ≤ n → b n = n * a n / 3)
+(S T : ℕ → ℝ)
+(h₄ : ∀ (n : ℕ), 1 ≤ n → S n = ∑ i in Finset.Icc 1 n, a i)
+(h₅ : ∀ (n : ℕ), 1 ≤ n → T n = ∑ i in Finset.Icc 1 n, b i) :
+∀ (n : ℕ), 1 ≤ n → T n < S n / 2 := by sorry
+-- END_PAIR 45 
+
+
+-- BEGIN_PAIR 46
+-- [Question]:
+-- Let \(\triangle ABC\) be a triangle with sides \(a\), \(b\), \(c\) opposite angles \(A\), \(B\), \(C\) respectively. 
+Given \(b^{2}=ac\) and a point \(D\) on side \(AC\) such that \(BD\sin\angle ABC = a\sin C\). 
+Prove that \(BD = b\);
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(\triangle ABC\) be a triangle with sides \(a\), \(b\), \(c\) opposite angles \(A\), \(B\), \(C\) respectively. 
+Given \(b^{2}=ac\) and a point \(D\) on side \(AC\) such that \(BD\sin\angle ABC = a\sin C\). 
+Prove that \(BD = b\);-/
+theorem gaokaoformal_g_48
+(inner: ((ℝ×ℝ) × (ℝ×ℝ)) → ℝ)
+(hinner: ∀ (X Y:ℝ×ℝ), inner (X,Y) = X.1*Y.1 + X.2*Y.2)
+(dist: ((ℝ×ℝ) × (ℝ×ℝ)) → ℝ)
+(hdist: ∀ (X Y:ℝ×ℝ), dist (X,Y) = Real.sqrt (inner (X-Y,X-Y)) )
+(A B C: ℝ×ℝ)
+(a b c: ℝ)
+(habc: a = dist (B,C) ∧ b = dist (C,A) ∧ c = dist (A,B))
+(habc2: a > 0 ∧ b > 0 ∧ c > 0)
+(α β γ: ℝ)
+(hαβγ: b*c*Real.cos α = inner (B-A,C-A) ∧ c*a*Real.cos β = inner (C-B,A-B) ∧ a*b*Real.cos γ = inner (A-C,B-C))
+(hαβγ2: 0 < α ∧ 0 < β ∧ 0 < γ ∧ α+β+γ = Real.pi)
+(h: b^2 = a*c)
+(D: ℝ×ℝ)
+(hD: (∃ (t:ℝ), 0 ≤ t ∧ t ≤ 1 ∧ D.1 = t*A.1+(1-t)*C.1 ∧ D.2 = t*A.2+(1-t)*C.2) ∧ (dist (B,D)) * Real.sin β = a* Real.sin γ):
+dist (B,D) = b := by sorry
+-- END_PAIR 46 
+
+
+-- BEGIN_PAIR 47
+-- [Question]:
+-- Let \(a\) and \(b\) be two distinct positive numbers such that \(b\ln a - a\ln b = a - b\), prove that \(2<\frac{1}{a}+\frac{1}{b}<e\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Let \(a\) and \(b\) be two distinct positive numbers such that \(b\ln a - a\ln b = a - b\), prove that \(2<\frac{1}{a}+\frac{1}{b}<e\).-/
+theorem gaokaoformal_g_49  
+(a b : ℝ)
+(h₀ : 0 < a)
+(h₁ : 0 < b)
+(h₂ : a ≠ b)
+(h₄ : b * Real.log a - a * Real.log b = a - b) :
+2 < 1 / a + 1 / b ∧ 1 / a + 1 / b < Real.exp 1 := by sorry
+-- END_PAIR 47 
+
+
+-- BEGIN_PAIR 48
+-- [Question]:
+-- Given the ellipse \(C\) with equation \(\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}} = 1(a > b > 0)\), the right focus \(F(\sqrt{2},0)\), and the eccentricity \(\frac{\sqrt{6}}{3}\). Let \(M\), \(N\) be two points on the ellipse \(C\), and the line \(MN\) is tangent to the curve \(x^{2}+y^{2}=b^{2}(x > 0)\). Prove that the points \(M\), \(N\), \(F\) are collinear if and only if \(\vert MN\vert=\sqrt{3}\).
+--
+-- [Lean 4]:
+/-- import Mathlib
+import Aesop
+
+set_option maxHeartbeats 0
+
+open BigOperators Real Nat Topology Rat
+
+/-Given the ellipse \(C\) with equation \(\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}} = 1(a > b > 0)\), the right focus \(F(\sqrt{2},0)\), and the eccentricity \(\frac{\sqrt{6}}{3}\). Let \(M\), \(N\) be two points on the ellipse \(C\), and the line \(MN\) is tangent to the curve \(x^{2}+y^{2}=b^{2}(x > 0)\). Prove that the points \(M\), \(N\), \(F\) are collinear if and only if \(\vert MN\vert=\sqrt{3}\).-/
+theorem gaokaoformal_g_50 
+(a b : ℝ) 
+(hab: a > b ∧ b > 0)
+(C : Set (ℝ × ℝ)) 
+(hC : C = {p : ℝ × ℝ | p.1^2 / a^2 + p.2^2 / b^2 = 1}) 
+(F : ℝ × ℝ) 
+(hF : F = (Real.sqrt 2, 0) ∧ F.1 = Real.sqrt (a^2 - b^2) )
+(he : Real.sqrt (1 - b^2 / a^2) = Real.sqrt 6 / 3)
+(M N : ℝ × ℝ) 
+(hM : M ∈ C) 
+(hN : N ∈ C) 
+(hMN : ∃! (p : ℝ×ℝ), p.1 > 0 ∧ p.1^2 + p.2^2 = b^2 ∧ (p.2 - M.2)*(p.1 - N.1) = (p.1 - M.1)*(p.2 - N.2)) : 
+(F.2 - M.2)*(F.1 - N.1) = (F.2 - N.2)*(F.1 - M.1) ↔ Real.sqrt ((M.1 - N.1)^2 + (M.2 - N.2)^2) = Real.sqrt 3 := by sorry
+-- END_PAIR 48 
+
+[NEW TASK]  
+Now, given a new [Question], translate it into a Lean 4 theorem statement following the **same style, formatting, and level of explicitness** as the examples above.  
+
+[Question]: A population of microorganisms can survive through continuous self-reproduction. 
+Let one such microorganism be the 0th generation, after one reproduction it becomes the 1st generation, 
+after another reproduction it becomes the 2nd generation, and so on. 
+The number of offspring each generation produces is independent and identically distributed. 
+Let \(X\) denote the number of offspring produced by one microorganism in the next generation, with \(P(X = i) = p_{i}\) (where \(i = 0,1,2,3\)). 
+Let \(p\) represent the probability of the microorganism population nearing extinction after multiple generations of reproduction. 
+\(p\) is the smallest positive real root of the equation in \(x\): \(p_{0} + p_{1}x + p_{2}x^{2} + p_{3}x^{3} = x\). 
+Prove that when \(E(X) \leq 1\), \(p = 1\), and when \(E(X) > 1\), \(p < 1\).
+--
