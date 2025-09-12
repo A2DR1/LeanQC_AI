@@ -1,0 +1,26 @@
+/-- A matrix `U` represents a valid quantum gate (i.e., it preserves the normalization of any
+quantum state it acts on) if and only if it is a unitary matrix. -/
+theorem preserves_ket_norm_iff_is_unitary {d : Type*} [Fintype d] [DecidableEq d] (U : Matrix d d ℂ) :
+  (∀ (ψ : Ket d), ∑ i, ‖(U *ᵥ (ψ : d → ℂ)) i‖ ^ 2 = 1) ↔ U.IsUnitary := by sorry
+
+/-- The time evolution of a closed quantum system is linear. This means that applying an evolution
+to a convex combination of states is the same as applying the evolution to each state and then
+taking the convex combination of the results. -/
+theorem cptp_map_preserves_mixtures {d₁ d₂ : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+  (Λ : CPTPMap d₁ d₂) (p : Prob) (ρ₁ ρ₂ : MState d₁) :
+  Λ (p [ρ₁ ↔ ρ₂]) = p [Λ ρ₁ ↔ Λ ρ₂] := by sorry
+
+/-- The probability of measuring a system in state `|ψ⟩` and obtaining the outcome corresponding
+to the state `|φ⟩` is given by the squared magnitude of their inner product, `|⟨φ|ψ⟩|²`.
+This is a specific case of Born's rule for projective measurements. -/
+theorem born_rule_pure_state_projection {d : Type*} [Fintype d] [DecidableEq d] (ψ φ : Ket d) :
+  (MState.pure ψ).exp_val (MState.pure φ) = Complex.normSq 〈φ‖ψ〉 := by sorry
+
+/-- The no-cloning theorem: If a unitary operation `U` exists that can clone any arbitrary
+quantum state `|ψ⟩` from a space `d` using a blank ancillary state `|b⟩`, then that space `d`
+must be trivial (i.e., one-dimensional). -/
+theorem cloning_is_only_possible_in_trivial_space {d : Type*} [Fintype d] [DecidableEq d]
+  (U : Matrix (d × d) (d × d) ℂ) (b : Ket d) (h_unitary : U.IsUnitary)
+  (h_clones : ∀ (ψ : Ket d), U *ᵥ (ψ ⊗ b) = ((ψ ⊗ ψ) : (d × d) → ℂ)) :
+  Fintype.card d ≤ 1 := by sorry
+
