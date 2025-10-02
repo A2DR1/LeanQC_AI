@@ -1,0 +1,1295 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+hS'_e | hS'_n
+    · simp [S'] at hS'_e
+      use ⟨yₙ, hyₙ⟩
+      rw [lt_ciInf_iff]; swap
+      · --BddBelow (Set.range fun x : S => f (↑x) yₙ)
+        convert (hfc₂ yₙ hyₙ).bddBelow hS₁
+        ext; simp
+      use b, hab
+      intro i
+      exact (hS'_e i i.2).le
+    let _ := hS'_n.to_subtype
+    have hS'₁ : IsCompact S' := by
+      apply hS₁.of_isClosed_subset ?_ hS'_sub
+      specialize hfc₂ yₙ
+      rw [lowerSemicontinuousOn_iff_isClosed_epigraph hS₁.isClosed] at hfc₂
+      have ha_closed : IsClosed {p : M × ℝ | p.2 = b} := by
+        convert isClosed_univ.prod (isClosed_singleton (x := b))
+        simp [Set.ext_iff]
+      suffices Continuous (fun (z : M) ↦ (z, b) : M → M × ℝ) by
+        convert ((hfc₂ hyₙ).inter ha_closed).preimage this
+        simp [S']
+      fun_prop
+    have hS'₂ : Convex ℝ S' := hfq₂ _ hyₙ _
+    have ha' : a < ⨅ x : S', ⨆ yi : t, f x yi := by
+      apply lt_of_lt_of_le hab (hb.le.trans ?_)
+      classical
+      trans (⨅ x : S', ⨆ yi : { x // x ∈ (Insert.insert yₙ t : Finset N)}, f ↑x ↑yi)
+      · apply ciInf_le_ciInf_of_subset (f := fun x ↦ ⨆ yi : { x // x ∈ (Insert.insert yₙ t : Finset N)}, f ↑x ↑yi)
+        · exact hS'_n
+        · --BddBelow ((fun x => ⨆ yi, f x ↑yi) '' S)
+          convert BddBelow.range_sup_of_image2 (T := S) (S := { x | x ∈ insert yₙ t }) (f := flip f)
+            (by apply h_bddA.mono; simp [flip]; grind) (by apply h_bddB.mono; simp [flip]; grind)
+          simp [Set.ext_iff, flip]
+        · exact hS'_sub
+      · gcongr with x
+        · --BddBelow (Set.range fun x : S' => ⨆ yi, f ↑x ↑yi)
+          exact BddBelow.range_sup_of_image2 (T := S') (S := { x | x ∈ insert yₙ t }) (f := flip f)
+            (by apply h_bddA.mono; simp [flip]; grind) (by apply h_bddB.mono; simp [flip]; grind)
+        rw [t.ciSup_insert htn]
+        simp only [sup_le_iff, le_refl, and_true]
+        conv at hb => enter [2, 1, x]; rw [t.ciSup_insert htn]
+        contrapose! hb
+        refine ciInf_le_of_le ?_ ⟨x.val, hS'_sub x.2⟩ ?_
+        · --BddBelow (Set.range fun x => max (f (↑x) yₙ) (⨆ a, f ↑x ↑a))
+          apply BddBelow.range_mono (h := fun x ↦ le_max_left _ _)
+          convert (hfc₂ yₙ hyₙ).bddBelow hS₁
+          ext; simp
+        · have := x.2.2
+          simp [this, hb.le.trans this]
+    specialize @ih S'
+      (hfc₂ · · |>.mono hS'_sub) hS'₁ hS'_n
+      (hfc₁ · <| hS'_sub ·) (hfq₂ · · |>.subset hS'_sub hS'₂)
+      (hfq₁ · <| hS'_sub ·) hS'₂
+      (h_bddA.mono <| Set.image2_subset_right hS'_sub)
+      (h_bddB.mono <| Set.image2_subset_right hS'_sub) ht ha'
+    clear ha'
+    obtain ⟨y₀', hy₀'⟩ := ih
+    refine (sion_exists_min_2 hfc₂ hS₁ hS₃ hfc₁ hfq₂ hfq₁
+      hT₂ y₀' yₙ y₀'.2 hyₙ a ?_)
+    by_cases hS'eq : S' = S
+    · rw [hS'eq] at hy₀'
+      apply hy₀'.trans_le
+      gcongr
+      · --BddBelow (Set.range fun x : S => f (↑x) y₀')
+        convert (hfc₂ y₀' y₀'.2).bddBelow hS₁
+        ext; simp
+      exact le_sup_left
+    have hS_diff_ne : (S \ S').Nonempty :=
+      Set.nonempty_of_ssubset (hS'_sub.ssubset_of_ne hS'eq)
+    apply Set.Nonempty.to_subtype at hS_diff_ne
+
+    have h_non_inter : Nonempty ↑(S ∩ S') := by
+      rwa [Set.inter_eq_self_of_subset_right hS'_sub]
+    rw [ciInf_eq_min_cInf_inter_diff (f := fun x ↦ max (f x y₀') (f x yₙ)) S S']; swap
+    · --BddAbove ((fun x => max (f x y₀') (f x yₙ)) '' S)
+      apply h_bddB.mono
+      rintro _ ⟨x, hx, rfl⟩
+      use x, hx
+      -- TODO: On a newer mathlib this line is just `grind`
+      rcases max_cases (f x ↑y₀') (f x yₙ) <;> grind
+    clear h_non_inter
+    rw [lt_inf_iff]
+    constructor
+    · rw [Set.inter_eq_self_of_subset_right hS'_sub]
+      apply hy₀'.trans_le
+      gcongr
+      · --BddBelow (Set.range fun x : S' => f (↑x) y₀')
+        apply h_bddB.mono
+        rintro _ ⟨x, rfl⟩
+        use x, hS'_sub x.2, y₀', y₀'.2
+      exact le_sup_left
+    · have hS'_compl : S \ S' = { z | z ∈ S ∧ b < f z yₙ } := by
+        ext
+        simp [S']
+      rw [hS'_compl] at hS_diff_ne ⊢
+      rw [Set.coe_setOf] at hS_diff_ne
+      refine hab.trans_le ?_
+      simp
+      apply le_ciInf
+      intro x
+      have := x.2.2.le
+      exact le_sup_of_le_right this
+
+include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ hT₃ in
+/-- **Sion's Minimax theorem**. Because of `ciSup` and `ciInf` junk values when f isn't
+bounded, we need to assume that it's bounded above and below. -/
+theorem sion_minimax
+  (h_bddA : BddAbove (Set.image2 f S T))
+  (h_bddB : BddBelow (Set.image2 f S T))
+    : ⨅ x : S, ⨆ y : T, f x y = ⨆ y : T, ⨅ x : S, f x y := by
+  have _ := hS₁.isClosed
+  have _ := hS₃.to_subtype
+  have _ := hT₃.to_subtype
+  have h_bdd_0 (i : T) : BddBelow (Set.range fun j : S ↦ f j i) := by
+    --This one actually doesn't require h_bddB, we can just prove it from compactness + semicontinuity
+    convert (hfc₂ i i.2).bddBelow hS₁
+    ext; simp
+  have h_bdd_1 (j : S) : BddAbove (Set.range fun (x : T) => f j x) :=
+    h_bddA.mono (T.range_restrict (f j) ▸ Set.image_subset_image2_right j.coe_prop)
+  have h_bdd_2 : BddAbove (Set.range fun y : T ↦ ⨅ x : S, f x y) :=
+    h_bddA.range_inf_of_image2 h_bddB
+  have h_bdd_3 : BddBelow (Set.range fun x : S ↦ ⨆ y : T, f x y) :=
+    BddBelow.range_sup_of_image2 (f := flip f) (by simpa) (by simpa)
+  apply le_antisymm; swap
+  · exact ciSup_ciInf_le_ciInf_ciSup _ h_bdd_1 h_bdd_0
+  by_contra! h
+  obtain ⟨a, ha₁, ha₂⟩ := exists_between h; clear h
+  obtain ⟨b, hb₁, hb₂⟩ := exists_between ha₂; clear ha₂
+  revert ha₁
+  rw [imp_false, not_lt]
+  have := hS₁.elim_finite_subfamily_closed (fun (y : T) ↦ { x | x ∈ S ∧ f x y ≤ b}) ?_ ?_
+  · rcases this with ⟨u, hu⟩
+    have hu' : u.Nonempty := by
+      grind [Finset.not_nonempty_iff_eq_empty, Set.iInter_univ,
+        Set.inter_univ, Set.not_nonempty_empty]
+    have hau : a < ⨅ x : S, ⨆ yi : u.map ⟨_, Subtype.val_injective⟩, f ↑x ↑yi := by
+      simp +contextual only [Set.iInter_coe_set, Set.ext_iff, Set.mem_inter_iff, Set.mem_iInter,
+        Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and, true_and, not_forall,
+        not_le] at hu
+      rw [lt_ciInf_iff]; swap
+      · --BddBelow (Set.range fun x => ⨆ yi : Finset.map ⋯, f ↑x ↑yi)
+        exact BddBelow.range_sup_of_image2 (T := S) (S := u.map ⟨_, Subtype.val_injective⟩)
+          (f := flip f) (by apply h_bddA.mono; simp [flip]; grind) (by apply h_bddB.mono; simp [flip]; grind)
+      use b, hb₁
+      intro i
+      specialize hu i i.2
+      rcases hu with ⟨c, hc₁, hc₂, hc₃⟩
+      refine le_ciSup_of_le ?_ ⟨c, by simpa using ⟨hc₁, hc₂⟩⟩ hc₃.le
+      --BddAbove (Set.range fun yi : Finset.map ⋯ => f ↑i ↑yi)
+      apply h_bddA.mono
+      simp [Set.range, Set.image2]; grind
+    obtain ⟨y₀, hy₀⟩ := sion_exists_min_fin hfc₂ hS₁ hS₃ hfc₁ hfq₂ hfq₁ hT₂ hS₂
+      h_bddA h_bddB (u.map ⟨_, Subtype.val_injective⟩) (by simpa) (by simp) a hau
+    exact hy₀.le.trans (le_ciSup h_bdd_2 y₀)
+  · intro i
+    specialize hfc₂ i i.2
+    rw [lowerSemicontinuousOn_iff_isClosed_preimage] at hfc₂
+    exact hfc₂ b
+  · convert Set.inter_empty _
+    by_contra hu
+    simp? [Set.iInter_eq_empty_iff] says simp only [
+      Set.iInter_coe_set, Set.iInter_eq_empty_iff, Set.mem_iInter, Set.mem_setOf_eq,
+      Classical.not_imp, not_and, not_le, not_forall, not_exists, not_lt] at hu
+    obtain ⟨x, hx⟩ := hu
+    apply hb₂.not_ge
+    apply (ciInf_le h_bdd_3 ⟨x, hx _ hT₃.some_mem |>.1⟩).trans _
+    apply ciSup_le (hx _ ·.2 |>.2)
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Misc.lean
+TYPE: Lean 4
+SIZE: 3323 characters
+================================================================================
+
+import Mathlib.Order.Notation
+import Mathlib.Tactic.Finiteness
+
+import Mathlib.LinearAlgebra.BilinearMap
+import Mathlib.Topology.MetricSpace.Defs
+import Mathlib.Topology.UniformSpace.Cauchy
+
+--Can this be rewritten more generally? For `finiteness` to work, I don't know how.
+@[aesop (rule_sets := [finiteness]) unsafe apply]
+theorem ite_eq_top {α : Type*} [Top α] (h : Prop) [Decidable h] {x y : α} (hx : x ≠ ⊤) (hy : y ≠ ⊤) :
+    (if h then x else y) ≠ ⊤ := by
+  split <;> assumption
+
+--PR'ed in #29229
+theorem Equiv.trans_cancel_left (α β γ : Type*) (e : α ≃ β) (f : β ≃ γ) (g : α ≃ γ) :
+    e.trans f = g ↔ f = e.symm.trans g := by
+  constructor <;> (rintro rfl; simp [← Equiv.trans_assoc])
+
+--PR'ed in #29229
+theorem Equiv.trans_cancel_right (α β γ : Type*) (e : α ≃ β) (f : β ≃ γ) (g : α ≃ γ) :
+    e.trans f = g ↔ e = g.trans f.symm := by
+  constructor <;> (rintro rfl; simp [Equiv.trans_assoc])
+
+--PR'ed in #29228
+theorem heq_iff_exists_eq_cast {α β : Sort u} (a : α) (b : β) :
+    a ≍ b ↔ ∃ (h : β = α), a = cast h b := by
+  use fun h ↦ ⟨type_eq_of_heq h.symm, eq_cast_iff_heq.mpr h⟩
+  rintro ⟨rfl, h⟩
+  rw [h, cast_eq]
+
+section subtype_val_iSup
+/-
+When
+https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/diamond.20in.20ConditionallyCompleteLattice/near/538053239
+is fixed, the declarations below should be changed to
+```
+theorem subtype_val_iSup {ι α : Type*} [ConditionallyCompleteLattice α] {s : Set α} {f : ι → α}
+    [Inhabited ↑s] [s.OrdConnected] (h : ∀ i, f i ∈ s) :
+    (⨆ i, (⟨f i, h i⟩ : ↑s)).val = ⨆ i, f i := by
+  sorry
+
+theorem subtype_val_iSup' {ι α : Type*} [ConditionallyCompleteLattice α] {s : Set α} {f : ι → α}
+    [Inhabited ↑s] [s.OrdConnected] (h : ∀ i, f i ∈ s) :
+    ⨆ i, (⟨f i, h i⟩ : ↑s) = ⟨⨆ i, f i, by sorry⟩ := by
+  rw [Subtype.eq_iff, subtype_val_iSup]
+```
+Sadly, though, there's a "diamond" and we need it with the other data (the one we specify more narrowly
+below).
+-/
+variable {ι α : Type*} [i : Nonempty ι] [ConditionallyCompleteLattice α]
+  {f : ι → α} {a b : α} [Fact (a ≤ b)]
+
+/- This isn't marked as `simp` because rewriting from a sup over a `CompleteLattice` into a
+`ConditionallyCompleteLattice` would, pretty often, be undesirable. -/
+theorem subtype_val_iSup (h : ∀ i, f i ∈ Set.Icc a b) :
+    (⨆ i, (⟨f i, h i⟩ : ↑(Set.Icc a b))).val = ⨆ i, f i := by
+  simp only [iSup, sSup, Set.range_eq_empty_iff, not_isEmpty_of_nonempty, reduceDIte]
+  congr 1; ext1
+  simp
+
+theorem subtype_val_iSup' (h : ∀ i, f i ∈ Set.Icc a b) :
+    ⨆ i, (⟨f i, h i⟩ : ↑(Set.Icc a b)) =
+      ⟨⨆ i, f i, ⟨(h i.some).1.trans (le_ciSup ⟨b, by intro; grind⟩ _), ciSup_le (h ·|>.2)⟩⟩ := by
+  rw [Subtype.eq_iff, subtype_val_iSup]
+
+/- This isn't marked as `simp` because rewriting from a sup over a `CompleteLattice` into a
+`ConditionallyCompleteLattice` would, pretty often, be undesirable. -/
+theorem subtype_val_iInf (h : ∀ i, f i ∈ Set.Icc a b) :
+    (⨅ i, (⟨f i, h i⟩ : ↑(Set.Icc a b))).val = ⨅ i, f i := by
+  simp only [iInf, sInf, Set.range_eq_empty_iff, not_isEmpty_of_nonempty, reduceDIte]
+  congr 1; ext1
+  simp
+
+theorem subtype_val_iInf' (h : ∀ i, f i ∈ Set.Icc a b) :
+    ⨅ i, (⟨f i, h i⟩ : ↑(Set.Icc a b)) =
+      ⟨⨅ i, f i, ⟨le_ciInf (h ·|>.1), (ciInf_le ⟨a, by intro; grind⟩ _).trans (h i.some).2⟩⟩ := by
+  rw [Subtype.eq_iff, subtype_val_iInf]
+
+end subtype_val_iSup
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Superadditive.lean
+TYPE: Lean 4
+SIZE: 1156 characters
+================================================================================
+
+import Mathlib.Analysis.Subadditive
+
+def Superadditive (u : ℕ → ℝ) : Prop :=
+  ∀ m n, u (m + n) ≥ u m + u n
+
+namespace Superadditive
+
+variable {u : ℕ → ℝ} (h : Superadditive u)
+
+include h in
+theorem to_Subadditive : Subadditive (-u ·) :=
+  (by dsimp; linarith [h · ·])
+
+noncomputable def lim (_h : Superadditive u) :=
+  sSup ((fun n : ℕ => u n / n) '' .Ici 1)
+
+/-- Fekete's lemma for superadditive sequences: a superadditive sequence which is
+  bounded above converges. -/
+theorem tendsto_lim (hbdd : BddAbove (Set.range fun n => u n / n)) :
+    Filter.Tendsto (fun n => u n / n) .atTop (nhds (h.lim)) := by
+  have := h.to_Subadditive.tendsto_lim (hbdd.recOn
+    (⟨-·, fun _ hx ↦ neg_le.mp <| ·
+    (hx.recOn (⟨·, by rw [← ·, neg_div', neg_neg]⟩))⟩)
+  )
+  convert this.neg using 1
+  · ext; rw [neg_div', neg_neg]
+  · simp only [lim, Subadditive.lim, Real.sInf_def, neg_neg, nhds_eq_nhds_iff,
+      ← Set.image_neg_eq_neg, Set.image_image, neg_div', neg_neg]
+
+end Superadditive
+
+
+namespace Subadditive
+
+variable {u : ℕ → ℝ} (h : Subadditive u)
+
+include h in
+theorem to_Superadditive : Superadditive (-u ·) :=
+  (by dsimp; linarith [h · ·])
+
+end Subadditive
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/ULift.lean
+TYPE: Lean 4
+SIZE: 2121 characters
+================================================================================
+
+import Mathlib
+
+open ComplexOrder
+
+universe u v
+
+instance ULift.instStar {𝕜 : Type u} [Star 𝕜] : Star (ULift.{v,u} 𝕜) where
+  star x := .up (star x.down)
+
+@[simp]
+theorem ULift.star_eq {𝕜 : Type u} [Star 𝕜] (x : ULift.{v,u} 𝕜) : star x = .up (star x.down) := by
+  rfl
+
+instance ULift.instInvolutiveStar {𝕜 : Type u} [InvolutiveStar 𝕜] : InvolutiveStar (ULift.{v,u} 𝕜) where
+  star_involutive x := by simp
+
+instance ULift.instStarMul {𝕜 : Type u} [Mul 𝕜] [StarMul 𝕜] : StarMul (ULift.{v,u} 𝕜) where
+  star_mul x y := by simp; rfl
+
+instance {𝕜 : Type u} [NonUnitalNonAssocSemiring 𝕜] [StarRing 𝕜] : StarRing (ULift.{v,u} 𝕜) where
+  star_add x y := by simp; rfl
+
+@[simp]
+theorem ULift.starRingEnd_down {𝕜 : Type u} (x : ULift.{v,u} 𝕜) [CommSemiring 𝕜] [StarRing 𝕜] :
+    ((starRingEnd (ULift.{v, u} 𝕜)) x).down = star x.down := by
+  rfl
+
+instance {𝕜 : Type u} [NormedField 𝕜] : NormedField (ULift.{v,u} 𝕜) where
+  dist_eq x y := NormedField.dist_eq x.down y.down
+  norm_mul a b := NormedField.norm_mul a.down b.down
+
+instance {𝕜 : Type u} [DenselyNormedField 𝕜] : DenselyNormedField (ULift.{v,u} 𝕜) where
+  lt_norm_lt x y := by simpa using DenselyNormedField.lt_norm_lt x y
+
+@[simp]
+theorem AddEquiv.ulift_apply {α : Type u} [Add α] (x : ULift.{v, u} α) :
+    AddEquiv.ulift.{u, v} x = x.down := by
+  rfl
+
+noncomputable instance {𝕜 : Type u} [RCLike 𝕜] : RCLike (ULift.{v,u} 𝕜) where
+  re := RCLike.re.comp AddEquiv.ulift.toAddMonoidHom
+  im := RCLike.im.comp AddEquiv.ulift.toAddMonoidHom
+  I := .up RCLike.I
+  I_re_ax := by simp
+  I_mul_I_ax := by
+    rcases RCLike.I_mul_I_ax (K := 𝕜) with h₁|h₂
+    · left
+      ext
+      convert h₁
+    · right
+      ext
+      convert h₂
+  re_add_im_ax z := by
+    convert congrArg ULift.up (RCLike.re_add_im_ax z.down)
+  ofReal_re_ax r := by simp
+  ofReal_im_ax := by simp
+  mul_re_ax z w := by simp
+  mul_im_ax := by simp
+  conj_re_ax x := by simp
+  conj_im_ax := by simp
+  conj_I_ax := by ext; simp
+  norm_sq_eq_def_ax x := by simpa using RCLike.norm_sq_eq_def_ax x.down
+  mul_im_I_ax := by simp
+  le_iff_re_im {z w} := by simpa using RCLike.le_iff_re_im (z := z.down) (w := w.down)
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Unitary.lean
+TYPE: Lean 4
+SIZE: 2591 characters
+================================================================================
+
+import Mathlib.LinearAlgebra.Matrix.Kronecker
+import Mathlib.LinearAlgebra.Matrix.PosDef
+
+open BigOperators
+open Classical
+
+namespace LinearMap
+section unitary
+
+variable {𝕜 : Type*} [RCLike 𝕜]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable [FiniteDimensional 𝕜 E]
+
+open Module.End
+
+@[simp]
+theorem unitary_star_apply_eq (U : unitary (E →ₗ[𝕜] E)) (v : E) :
+    (star U.val) (U.val v) = v := by
+  rw [← mul_apply, (unitary.mem_iff.mp U.prop).left, one_apply]
+
+@[simp]
+theorem unitary_apply_star_eq (U : unitary (E →ₗ[𝕜] E)) (v : E) :
+    U.val ((star U.val) v) = v := by
+  rw [← mul_apply, (unitary.mem_iff.mp U.prop).right, one_apply]
+
+/-- Conjugating a linear map by a unitary operator gives a map whose μ-eigenspace is
+  isomorphic (same dimension) as those of the original linear map. -/
+noncomputable def conj_unitary_eigenspace_equiv (T : E →ₗ[𝕜] E) (U : unitary (E →ₗ[𝕜] E)) (μ : 𝕜) :
+    eigenspace T μ ≃ₗ[𝕜] eigenspace (U.val * T * star (U.val)) μ := by
+  constructor
+  case toLinearMap =>
+    constructor
+    case toAddHom =>
+      constructor
+      case toFun =>
+        rintro ⟨v,hv⟩
+        use U.val v
+        rw [mem_eigenspace_iff] at hv ⊢
+        simp [mul_apply, hv]
+      case map_add' =>
+        intro x y
+        simp
+    intro m x
+    simp
+  case invFun =>
+    rintro ⟨v,hv⟩
+    use (star U.val) v
+    rw [mem_eigenspace_iff] at hv ⊢
+    simpa using congrArg ((star U.val) ·) hv
+  case left_inv =>
+    intro v
+    simp
+  case right_inv =>
+    intro v
+    simp
+
+
+end unitary
+namespace IsSymmetric
+
+open Module.End
+
+variable {𝕜 : Type*} [RCLike 𝕜]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+variable [FiniteDimensional 𝕜 E]
+variable {T : E →ₗ[𝕜] E}
+
+/-- A symmetric operator conjugated by a unitary is symmetric. -/
+theorem conj_unitary_IsSymmetric (U : unitary (E →ₗ[𝕜] E)) (hT : T.IsSymmetric) :
+    (U.val * T * star U.val).IsSymmetric := by
+  intro i j
+  rw [mul_assoc, mul_apply, ← LinearMap.adjoint_inner_right]
+  rw [mul_apply, mul_apply, mul_apply, ← LinearMap.adjoint_inner_left U.val]
+  exact hT (star U.val <| i) (star U.val j)
+
+variable {n : ℕ} (hn : Module.finrank 𝕜 E = n)
+
+/-- There is an equivalence between the eigenvalues of a finite dimensional symmetric operator,
+and the eigenvalues of that operator conjugated by a unitary. -/
+def conj_unitary_eigenvalue_equiv (U : unitary (E →ₗ[𝕜] E)) (hT : T.IsSymmetric) :
+    { σ : Equiv.Perm (Fin n) // (hT.conj_unitary_IsSymmetric U).eigenvalues hn = hT.eigenvalues hn ∘ σ } := by
+  sorry --use conj_unitary_eigenspace_equiv
+
+end IsSymmetric
+end LinearMap
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib.lean
+TYPE: Lean 4
+SIZE: 531 characters
+================================================================================
+
+import QuantumInfo.ForMathlib.ContinuousLinearMap
+import QuantumInfo.ForMathlib.ContinuousSup
+import QuantumInfo.ForMathlib.Filter
+import QuantumInfo.ForMathlib.HermitianMat
+import QuantumInfo.ForMathlib.Isometry
+import QuantumInfo.ForMathlib.LinearEquiv
+import QuantumInfo.ForMathlib.MatrixNorm.TraceNorm
+import QuantumInfo.ForMathlib.Matrix
+import QuantumInfo.ForMathlib.Minimax
+import QuantumInfo.ForMathlib.Misc
+import QuantumInfo.ForMathlib.Unitary
+
+/-! Collects the various "missing" Mathlib facts we have in this folder. -/
+
+
+================================================================================
+FILE: QuantumInfo/InfiniteDim/QState.lean
+TYPE: Lean 4
+SIZE: 2501 characters
+================================================================================
+
+-- import Mathlib
+-- -- import QuantumInfo.InfiniteDim.TraceClass
+
+-- variable (H : Type*)
+-- variable [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+
+-- namespace Quantum
+
+-- local notation "⟪" x ", " y "⟫" => @inner ℂ _ _ x y
+
+-- open InnerProduct
+
+-- /-- Ket in a Hilbert space H, defined as a vector of unit norm. -/
+-- structure Ket :=
+--   vec : H
+--   normalized : ‖vec‖=1
+
+-- /-- An operator on a Hilbert space H is a mixed state iff it's a PSD operator with trace 1.-/
+-- structure IsMixedState (op : H →L[ℂ] H) : Prop :=
+--   /-- The operator of a mixed state is Hermitian -/
+--   herm : IsSelfAdjoint op
+--   /-- The operator of a mixed state is Positive Semidefinite -/
+--   posSemiDef : ∀ (x : H), 0 ≤ ⟪x, op x⟫.re
+--   /-- The operator is traceclass. -/
+--   traceClass : IsTraceClass op
+--   /-- The trace of a mixed state is 1. -/
+--   traceOne : TraceClass.trace op = 1
+
+-- /-- Mixed state in a Hilbert space H, defined as a PSD operator with trace 1. -/
+-- structure MState :=
+--   /-- The underlying operator of a state -/
+--   op : H →L[ℂ] H
+--   /-- The operator is a valid mixed state. -/
+--   prop : IsMixedState H op
+
+-- /-- The stateSpace of a Hilbert space H is the set of all mixed states in H. -/
+-- def stateSpace : Set (H →L[ℂ] H) := { ρ | IsMixedState H ρ }
+
+-- set_option pp.analyze true
+
+-- theorem stateSpace_convex : Convex ℝ (stateSpace H) := by
+--   rw [convex_iff_pointwise_add_subset]
+--   intros x y xpos ypos xy1 z hz
+--   rw [stateSpace] at hz ⊢
+--   rw [Set.mem_setOf_eq]
+--   obtain ⟨x₁', hx₁', y₁', hy₁', hρ₁ρ₂⟩ := Set.mem_add.1 hz
+--   obtain ⟨ρ₁, hρ₁, dx₁'⟩ := Set.mem_smul_set.1 hx₁'
+--   obtain ⟨ρ₂, hρ₂, dy₁'⟩ := Set.mem_smul_set.1 hy₁'
+--   clear hz hx₁' hy₁'
+--   subst dx₁'
+--   subst dy₁'
+--   subst z
+--   rw [Set.mem_setOf_eq] at hρ₁ hρ₂
+--   constructor
+--   · have h₁ := hρ₁.1
+--     have h₂ := hρ₂.1
+--     apply IsSelfAdjoint.add
+--     <;> apply IsSelfAdjoint.smul (by rfl) ‹_›
+--   · intro v
+--     simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul',
+--       Pi.smul_apply, inner_add_right, Complex.add_re]
+--     change 0 ≤ (⟪v, (x:ℂ) • ρ₁ v⟫_ℂ).re + (⟪v, (y:ℂ) • ρ₂ v⟫_ℂ).re
+--     simp only [inner_smul_right, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
+--       zero_mul, sub_zero, ge_iff_le]
+--     have h₁ := hρ₁.2 v
+--     have h₂ := hρ₂.2 v
+--     positivity
+--   ·
+--   -- · obtain ⟨ι, _⟩ := hρ₁.3
+--   --   apply TraceClass.mk_of_exists
+--   --   sorry
+--     sorry
+--   · sorry
+
+
+================================================================================
+FILE: QuantumInfo/Regularized.lean
+TYPE: Lean 4
+SIZE: 3713 characters
+================================================================================
+
+import QuantumInfo.ForMathlib.Superadditive
+import Mathlib.Order.LiminfLimsup
+import Mathlib.Topology.Order.MonotoneConvergence
+
+/-! Definition of "Regularized quantities" as are common in information theory,
+from one-shot versions, and good properties coming from Fekete's lemma.
+-/
+
+variable {T : Type*} [ConditionallyCompleteLattice T]
+
+/-- An `InfRegularized` value is the lim sup of value at each natural number, but requires
+ a proof of lower- and upper-bounds to be defined. -/
+noncomputable def InfRegularized (fn : ℕ → T) {lb ub : T}
+    (_ : ∀ n, lb ≤ fn n) (_ : ∀ n, fn n ≤ ub) : T :=
+  Filter.atTop.liminf fn
+
+/-- A `SupRegularized` value is the lim sup of value at each natural number, but requires
+ a proof of lower- and upper-bounds to be defined. -/
+noncomputable def SupRegularized (fn : ℕ → T) {lb ub : T}
+    (_ : ∀ n, lb ≤ fn n) (_ : ∀ n, fn n ≤ ub) : T :=
+  Filter.atTop.limsup fn
+
+namespace InfRegularized
+
+variable {fn : ℕ → T} {_lb _ub : T} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
+
+/-- The `InfRegularized` value is also lower bounded. -/
+theorem lb : _lb ≤ InfRegularized fn hl hu := by
+  sorry
+
+/-- The `InfRegularized` value is also upper bounded. -/
+theorem ub : InfRegularized fn hl hu ≤ _ub := by
+  sorry
+
+/-- For `Antitone` functions, the `InfRegularized` is the supremum of values. -/
+theorem anti_inf (h : Antitone fn) :
+    InfRegularized fn hl hu = sInf (Set.range fn) := by
+  sorry
+
+/-- For `Antitone` functions, the `InfRegularized` is lower bounded by
+  any particular value. -/
+theorem anti_ub (h : Antitone fn) : ∀ n, InfRegularized fn hl hu ≤ fn n := by
+  sorry
+
+end InfRegularized
+
+namespace SupRegularized
+
+variable {fn : ℕ → T} {_lb _ub : T} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
+
+/-- The `SupRegularized` value is also lower bounded. -/
+theorem lb : _lb ≤ SupRegularized fn hl hu := by
+  sorry
+
+/-- The `SupRegularized` value is also upper bounded. -/
+theorem ub : SupRegularized fn hl hu ≤ _ub := by
+  sorry
+
+/-- For `Monotone` functions, the `SupRegularized` is the supremum of values. -/
+theorem mono_sup (h : Monotone fn) :
+    SupRegularized fn hl hu = sSup { fn n | n : ℕ} := by
+  sorry
+
+/-- For `Monotone` functions, the `SupRegularized` is lower bounded by
+  any particular value. -/
+theorem mono_lb (h : Monotone fn) : ∀ n, fn n ≤ SupRegularized fn hl hu := by
+  sorry
+
+end SupRegularized
+
+section real
+
+variable {fn : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
+
+theorem InfRegularized.to_SupRegularized : InfRegularized fn hl hu = -SupRegularized (-fn ·)
+    (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
+  sorry
+
+theorem SupRegularized.to_InfRegularized : SupRegularized fn hl hu = -InfRegularized (-fn ·)
+    (lb := -_ub) (ub := -_lb) (neg_le_neg_iff.mpr <| hu ·) (neg_le_neg_iff.mpr <| hl ·) := by
+  sorry
+
+/-- For `Antitone` functions, the value `Filter.Tendsto` the `InfRegularized` value. -/
+theorem InfRegularized.anti_tendsto (h : Antitone fn) :
+    Filter.Tendsto fn .atTop (nhds (InfRegularized fn hl hu)) := by
+  convert tendsto_atTop_ciInf h ⟨_lb, fun _ ⟨a,b⟩ ↦ b ▸ hl a⟩
+  rw [InfRegularized.anti_inf h, iInf.eq_1]
+
+
+variable {f₁ : ℕ → ℝ} {_lb _ub : ℝ} {hl : ∀ n, _lb ≤ fn n} {hu : ∀ n, fn n ≤ _ub}
+
+theorem InfRegularized.of_Subadditive (hf : Subadditive (fun n ↦ fn n * n))
+    :
+    hf.lim = InfRegularized fn hl hu := by
+  have h₁ := hf.tendsto_lim (by
+    use min 0 _lb
+    rw [mem_lowerBounds]
+    rintro x ⟨y,(rfl : _ / _ = _)⟩
+    rcases y with (_|n)
+    · simp
+    · rw [inf_le_iff]
+      convert Or.inr (hl (n+1))
+      field_simp
+  )
+  apply tendsto_nhds_unique h₁
+  have := InfRegularized.anti_tendsto (fn := fn) (hl := hl) (hu := hu) (sorry)
+  sorry
+
+
+================================================================================
+FILE: QuantumInfo.lean
+TYPE: Lean 4
+SIZE: 2189 characters
+================================================================================
+
+--Mathlib imports
+import QuantumInfo.ForMathlib
+
+--Code
+import QuantumInfo.Finite.Channel.DegradableOrder
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Distance
+import QuantumInfo.Finite.Qubit.Basic
+import QuantumInfo.Finite.ResourceTheory.FreeState
+-- import QuantumInfo.Finite.ResourceTheory.ResourceTheory --Commenting out for now -- pretty broken
+import QuantumInfo.Finite.ResourceTheory.SteinsLemma
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.Capacity
+import QuantumInfo.Finite.Ensemble
+import QuantumInfo.Finite.Entanglement
+import QuantumInfo.Finite.Entropy
+-- import QuantumInfo.Finite.Entropy.Defs --Experimental
+-- import QuantumInfo.Finite.Entropy.Renyi --Experimental
+import QuantumInfo.Finite.MState
+import QuantumInfo.Finite.Pinching
+import QuantumInfo.Finite.POVM
+import QuantumInfo.Finite.Unitary
+
+--Documentation without code
+import QuantumInfo.Finite.Capacity_doc
+
+/-! # Quantum Information in Lean
+
+What follows is a top-level index to the major top-level definitions in this repository, in roughly their dependency order:
+ * `Bra` and `Ket` for pure quantum states
+ * `MState` for mixed quantum states
+ * `MState.«term𝐔[_]»`, a notation for unitary matrices, acting on quantum states
+ * `MEnsemble` and `PEnsemble`: Ensemble of mixed and pure states, respectively
+ * `(mixed_)convex_roof` : (Mixed) convex roof extension
+ * `CPTPMap` for quantum channels
+ * `Matrix.traceNorm`, the trace norm between matrices (mostly for `MState` distance)
+ * `MState.fidelity`, the fidelity between quantum states
+ * `Sᵥₙ`, `qConditionalEnt`, `qMutualInfo`, `coherentInfo`, etc. - different notions of entropy or information in quantum states
+ * `DegradablePreorder` the degradable order on quantum channels (technically a preorder)
+ * `CPTPMap.quantumCapacity`, the quantum capacity of a channel
+
+And a pointer to the main theorems (many of which are unproved):
+ * `MatrixMap.choi_PSD_iff_CP_map`, Choi's theorem on completely positive maps
+ * `Sᵥₙ_strong_subadditivity`, the strong subadditivity of von Neumann entropy
+ * `CPTPMap.coherentInfo_le_quantumCapacity`, the LSD theorem that the capacity of a channel is at least the coherent information
+
+-/
+
+
+================================================================================
+FILE: README.md
+TYPE: Markdown
+SIZE: 2890 characters
+================================================================================
+
+# Quantum Information in Lean
+
+This repository aims to contain definitions and proofs of basic ideas in quantum information theory. Some major goals, in rough order of difficulty, would be:
+ * Defining most notions of "distance", "entropy", "information", "capacity" that occur in the literature.
+ * Showing that these reflect the classical notions where applicable
+   * For instance, that if you embed a clasical probability distribution as a quantum mixed state, then the _classical_ conditional entropy and the _quantum_ conditional entropy are the same number.
+ * Strong sub-additivity of von Neumann entropy
+ * Holevo's theorem
+ * The [LSD theorem](https://en.wikipedia.org/wiki/Quantum_capacity#Hashing_bound_for_Pauli_channels) on quantum capacity
+ * Non-additivity of quantum capacity
+
+All of this will be done only in the theory finite-dimensional Hilbert spaces. Reasons:
+* Most quantum information theory is done in this setting anyway. Not to say that the infinite-dimensional work isn't important, just that this is what more researchers spend their time thinking about.
+* Infinite-dimensional quantum theory can be [weirdly behaved](https://en.wikipedia.org/wiki/Connes_embedding_problem).
+* Dealing with infinite-dimensional quantum theory is just hard. You need e.g. trace-class operators, CTC functions, and people often can't even agree on the definitions. (For instance, does a mixed state necessarily have a finite spectrum? I've seen it both ways.)
+
+Most stuff is in the `QuantumInfo/Finite` folder. There was a _tiny_ bit of infinite-dimensional theory in the `QuantumInfo/InfiniteDim` folder, but it's mostly been cleared out.
+
+The docgen is available on [my website](https://ohaithe.re/Lean-QuantumInfo/QuantumInfo.html), hopefully I remember to keep it well synced.
+
+[comment]: # (Note to self, instructions for building docs: `rm -rf .lake/build/doc/QuantumInfo* .lake/build/doc/ClassicalInfo*; lake -R -Kenv=dev build ClassicalInfo:docs QuantumInfo:doc`. In order to view them, `cd .lake/build/doc; python3 -m http.server`.)
+
+Docmentation of the main definitions can be found at [DOC.md](./DOC.md). A majority of the work will be outlining the major definitions and theorems from Mark Wilde's _Quantum Information Theory_. A correspondence to the definitions and theorems (in the form of a todo-list) are in [TODO](./TODO.md)
+
+# Major Goal: Generalized Quantum Stein's Lemma
+
+At the moment, the major goal of this repository is completing a proof of the [Generalized Quantum Stein's Lemma](https://arxiv.org/abs/2408.02722v1), following the proof in that link. The first milestone will be to formalize all the arguments _in that paper_ (while relying on standard or "obvious" results), and then the second milestone will be filling in all those other results so that the whole theorem is sorry-free. The first milestone is, at the moment (Aug 2025), quite close.
+
+
+================================================================================
+FILE: StatMech/Hamiltonian.lean
+TYPE: Lean 4
+SIZE: 1691 characters
+================================================================================
+
+import Mathlib.Data.Fintype.Defs
+import Mathlib.Data.Real.Basic
+
+section ThermodynamicEnsemble
+
+/-- The Hamiltonian for a microcanonical ensemble, parameterized by any extrinsic parameters of data D.
+  Since it's an arbitrary type, 'T' would be nice, but we use 'D' for data to avoid confusion with temperature.
+  We define Hamiltonians as an energy function on a real manifold, whose dimension n possibly depends on the data D.
+  Energy is a WithTop ℝ, ⊤ is used to mean "excluded as a possibility in phase space".
+  This formalization does exclude the possibility of discrete degrees of freedom; it is not _completely_ general.
+  A better formalization could have an arbitrary measurable space.
+-/
+structure MicroHamiltonian (D : Type) where
+  --For extrinsic parameters D (e.g. the number of particles of different chemical species, the shape of the box),
+  --how many continuous degrees of freedom are there?
+  dim : D → Type
+  --We require that the number of degrees of freedom is finite.
+  [dim_fin : ∀ d, Fintype (dim d)]
+  --Given the configuration, what is its energy?
+  H : {d : D} → (dim d → ℝ) → WithTop ℝ
+
+/-- We add the dim_fin to the instance cache so that things like the measure can be synthesized -/
+instance microHamiltonianFintype (H : MicroHamiltonian D) (d : D) : Fintype (H.dim d) :=
+  H.dim_fin d
+
+/-- The standard microcanonical ensemble Hamiltonian, where the data is the particle number N and the volume V. -/
+abbrev NVEHamiltonian := MicroHamiltonian (ℕ × ℝ)
+
+/-- Helper to get the number in an N-V Hamiltonian -/
+def NVEHamiltonian.N : (ℕ × ℝ) → ℕ := Prod.fst
+
+/-- Helper to get the volume in an N-V Hamiltonian -/
+def NVEHamiltonian.V : (ℕ × ℝ) → ℝ := Prod.snd
+
+
+================================================================================
+FILE: StatMech/IdealGas.lean
+TYPE: Lean 4
+SIZE: 8497 characters
+================================================================================
+
+import StatMech.ThermoQuantities
+import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
+
+noncomputable section
+
+--! Specializing to an ideal gas of distinguishable particles.
+
+/-- The Hamiltonian for an ideal gas: particles live in a cube of volume V^(1/3), and each contributes an energy p^2/2.
+The per-particle mass is normalized to 1. -/
+def IdealGas : NVEHamiltonian where
+  --The dimension of the manifold is 6 times the number of particles: three for position, three for momentum.
+  dim := fun (n,_) ↦ Fin n × (Fin 3 ⊕ Fin 3)
+  --The energy is ∞ if any positions are outside the cube, otherwise it's the sum of the momenta squared over 2.
+  H := fun {d} config ↦
+    let (n,V) := d
+    let R := V^(1/3:ℝ) / 2 --half-sidelength of a cubical box
+    if ∀ (i : Fin n) (ax : Fin 3), |config (i,.inl ax)| <= R then
+      ∑ (i : Fin n) (ax : Fin 3), config (i,.inr ax)^2 / (2 : ℝ)
+    else
+      ⊤
+
+namespace IdealGas
+open MicroHamiltonian
+open NVEHamiltonian
+
+variable (n : ℕ) {V β T : ℝ}
+
+open MeasureTheory in
+/-- The partition function Z for an ideal gas. -/
+theorem PartitionZ_eq (hV : 0 < V) (hβ : 0 < β) :
+    IdealGas.PartitionZ (n,V) β = V^n * (2 * Real.pi / β)^(3 * n / 2 : ℝ) := by
+  rw [PartitionZ, IdealGas]
+  simp only [Finset.univ_product_univ, one_div, ite_eq_right_iff, WithTop.sum_eq_top,
+    Finset.mem_univ, WithTop.coe_ne_top, and_false, exists_false, imp_false, not_forall, not_le,
+    neg_mul]
+  have h₀ : ∀ (config:Fin n × (Fin 3 ⊕ Fin 3) → ℝ) proof,
+      ((if ∀ (i : Fin n) (ax : Fin 3), |config (i, Sum.inl ax)| ≤ V ^ (3 : ℝ)⁻¹ / 2 then
+                  ∑ x : Fin n × Fin 3, config (x.1, Sum.inr x.2) ^ 2 / (2 :ℝ)
+                else ⊤) : WithTop ℝ).untop proof = ∑ x : Fin n × Fin 3, config (x.1, Sum.inr x.2) ^ 2 / (2 :ℝ) := by
+    intro config proof
+    rw [WithTop.untop_eq_iff]
+    split_ifs with h
+    · simp
+    · simp [h] at proof
+  simp only [h₀, dite_eq_ite]; clear h₀
+
+  let eq_pm : MeasurableEquiv ((Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ)) (Fin n × (Fin 3 ⊕ Fin 3) → ℝ) :=
+    let e1 := (MeasurableEquiv.sumPiEquivProdPi (α := fun (_ : (Fin n × Fin 3) ⊕ (Fin n × Fin 3)) ↦ ℝ))
+    let e2 := (MeasurableEquiv.piCongrLeft _ (MeasurableEquiv.prodSumDistrib (Fin n) (Fin 3) (Fin 3))).symm
+    e1.symm.trans e2
+
+  have h_preserve : MeasurePreserving eq_pm := by
+    unfold eq_pm
+    -- fun_prop --this *should* be a fun_prop!
+    rw [MeasurableEquiv.coe_trans]
+    apply MeasureTheory.MeasurePreserving.comp (μb := by volume_tac)
+    · apply MeasurePreserving.symm
+      apply MeasureTheory.volume_measurePreserving_piCongrLeft
+    · apply MeasurePreserving.symm
+      apply measurePreserving_sumPiEquivProdPi
+  rw [← MeasurePreserving.integral_comp h_preserve eq_pm.measurableEmbedding]; clear h_preserve
+
+  rw [show volume = Measure.prod volume volume from rfl]
+
+  have h_eval_eq_pm : ∀ (x y i p_i), eq_pm (x, y) (i, Sum.inl p_i) = x (i, p_i) := by
+    intros; rfl
+  have h_eval_eq_pm' : ∀ (x y i m_i), eq_pm (x, y) (i, Sum.inr m_i) = y (i, m_i) := by
+    intros; rfl
+  simp_rw [h_eval_eq_pm, h_eval_eq_pm']
+  clear h_eval_eq_pm h_eval_eq_pm'
+
+  have h_measurable_box : Measurable fun (a : (Fin n × Fin 3 → ℝ))
+      => ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |a (x_1, x_2)| := by
+    simp_rw [← Classical.not_forall_not, not_not, not_lt, abs_le]
+    apply Measurable.not
+    apply Measurable.forall
+    intro i
+    apply Measurable.forall
+    intro j
+    refine Measurable.comp (measurableSet_setOf.mp measurableSet_Icc) (measurable_pi_apply (i, j))
+
+  have h_measurability : Measurable fun x : (Fin n × Fin 3 → ℝ) × (Fin n × Fin 3 → ℝ) =>
+      if ∃ x_1 x_2, V ^ (3⁻¹:ℝ) / 2 < |x.1 (x_1, x_2)| then 0
+      else Real.exp (-(β * ∑ x_1 : Fin n × Fin 3, x.2 (x_1.1, x_1.2) ^ 2 / 2)) := by
+    apply Measurable.ite
+    · simp_rw [measurableSet_setOf]
+      convert Measurable.comp h_measurable_box measurable_fst
+    · fun_prop
+    · fun_prop
+
+  rw [MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
+  rotate_left
+  · apply Filter.Eventually.of_forall
+    intros
+    positivity
+  · apply Measurable.aestronglyMeasurable
+    fun_prop
+  rw [MeasureTheory.lintegral_prod_of_measurable]
+
+  conv =>
+    enter [1, 1, 2, x, 2, y]
+    rw [← ite_not _ _ (0:ℝ), ← boole_mul _ (Real.exp _)]
+    rw [ENNReal.ofReal_mul (by split_ifs <;> positivity)]
+  dsimp
+  conv =>
+    enter [1, 1, 2, x]
+    rw [MeasureTheory.lintegral_const_mul' _ _ (by exact ENNReal.ofReal_ne_top)]
+
+  swap
+  · exact Measurable.comp (g := ENNReal.ofReal) ENNReal.measurable_ofReal h_measurability
+
+  rw [MeasureTheory.lintegral_mul_const, ENNReal.toReal_mul]
+  rw [← MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
+  rw [← MeasureTheory.integral_eq_lintegral_of_nonneg_ae]
+  rotate_left
+  · apply Filter.Eventually.of_forall
+    intros
+    positivity
+  · apply Measurable.aestronglyMeasurable
+    fun_prop
+  · apply Filter.Eventually.of_forall
+    intros
+    positivity
+  · apply Measurable.aestronglyMeasurable
+    apply Measurable.ite
+    · rw [measurableSet_setOf]
+      apply Measurable.not
+      exact h_measurable_box
+    · fun_prop
+    · fun_prop
+  · apply Measurable.comp ENNReal.measurable_ofReal
+    apply Measurable.ite
+    · rw [measurableSet_setOf]
+      apply Measurable.not
+      exact h_measurable_box
+    · fun_prop
+    · fun_prop
+
+  congr 1
+  · --Volume of the box
+    have h_integrand_prod : ∀ (a : Fin n × Fin 3 → ℝ),
+        (if ¬∃ x y, V ^ (3⁻¹ : ℝ) / 2 < |a (x, y)| then 1 else 0) =
+        (∏ xy, if |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0 : ℝ) := by
+      intro a
+      push_neg
+      simp_rw [← Prod.forall (p := fun xy ↦ |a xy| ≤ V ^ (3⁻¹ : ℝ) / 2)]
+      exact Fintype.prod_boole.symm
+    simp_rw [h_integrand_prod]; clear h_integrand_prod
+    rw [MeasureTheory.integral_fintype_prod_eq_prod (𝕜 := ℝ)
+      (f := fun _ r ↦ if |r| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0)]
+    rw [Finset.prod_const]
+    rw [Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
+    have h_integral_1d : (∫ (x : ℝ), if |x| ≤ V ^ (3⁻¹ : ℝ) / 2 then 1 else 0) = V ^ (3⁻¹ : ℝ) := by
+      have h_indicator := integral_indicator (f := fun _ ↦ (1:ℝ)) (μ := by volume_tac)
+        (measurableSet_Icc (a := -(V ^ (3⁻¹ : ℝ) / 2)) (b := (V ^ (3⁻¹ : ℝ) / 2)))
+      simp_rw [Set.indicator] at h_indicator
+      simp_rw [abs_le, ← Set.mem_Icc, h_indicator]
+      simp
+      positivity
+    rw [h_integral_1d]; clear h_integral_1d
+    rw [← Real.rpow_mul_natCast]
+    field_simp
+    exact hV.le
+  · --Gaussian integral
+    have h_gaussian :=
+      GaussianFourier.integral_rexp_neg_mul_sq_norm (V := PiLp 2 (fun (_ : Fin n × Fin 3) ↦ ℝ)) (half_pos hβ)
+    apply (Eq.trans ?_ h_gaussian).trans ?_
+    · have := (EuclideanSpace.volume_preserving_measurableEquiv (Fin n × Fin 3))
+      rw [← this.integral_comp (MeasurableEquiv.measurableEmbedding _)]
+      congr! 3 with x
+      simp_rw [div_eq_inv_mul, ← Finset.mul_sum, ← mul_assoc, neg_mul, mul_comm, PiLp.norm_sq_eq_of_L2]
+      congr! 3
+      simp only [Prod.mk.eta, Real.norm_eq_abs, sq_abs]
+      congr
+    · field_simp
+      ring_nf
+
+/-- The Helmholtz Free Energy A for an ideal gas. -/
+theorem HelmholtzA_eq (hV : 0 < V) (hT : 0 < T) : IdealGas.HelmholtzA (n,V) T =
+    -n * T * (Real.log V + (3/2) * Real.log (2 * Real.pi * T)) := by
+  rw [HelmholtzA, PartitionZT, PartitionZ_eq n hV (one_div_pos.mpr hT), Real.log_mul,
+    Real.log_pow, Real.log_rpow, one_div, div_inv_eq_mul]
+  ring_nf
+  all_goals positivity
+
+theorem ZIntegrable (hV : 0 < V) (hβ : 0 < β) : IdealGas.ZIntegrable (n,V) β := by
+  have hZpos : 0 < PartitionZ IdealGas (n, V) β := by
+    rw [PartitionZ_eq n hV hβ]
+    positivity
+  constructor
+  · apply MeasureTheory.Integrable.of_integral_ne_zero
+    rw [← PartitionZ]
+    exact hZpos.ne'
+  · exact hZpos.ne'
+
+/-- The ideal gas law: PV = nRT. In our unitsless system, R = 1.-/
+theorem IdealGasLaw (hV : 0 < V) (hT : 0 < T) :
+    let P := IdealGas.Pressure (n,V) T;
+    let R := 1;
+    P * V = n * R * T := by
+  dsimp [Pressure]
+  rw [← derivWithin_of_isOpen (s := Set.Ioi 0) isOpen_Ioi hV]
+  rw [derivWithin_congr (f := fun V' ↦ -n * T * (Real.log V' + (3/2) * Real.log (2 * Real.pi * T))) ?_ ?_]
+  rw [derivWithin_of_isOpen (s := Set.Ioi 0) isOpen_Ioi hV]
+  rw [deriv_mul (by fun_prop) (by fun_prop (disch := exact hV.ne'))]
+  field_simp
+  ring_nf
+  · exact fun _ hV' ↦ HelmholtzA_eq n hV' hT
+  · exact HelmholtzA_eq n hV hT
+
+-- Now proving e.g. Boyle's Law ("for an ideal gas with a fixed particle number, P and V are inversely proportional")
+-- is a trivial consequence of the ideal gas law.
+
+end IdealGas
+
+
+================================================================================
+FILE: StatMech/ThermoQuantities.lean
+TYPE: Lean 4
+SIZE: 6507 characters
+================================================================================
+
+import StatMech.Hamiltonian
+import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.MeasureTheory.Constructions.Pi
+import Mathlib.MeasureTheory.Integral.Bochner
+import Mathlib.MeasureTheory.Measure.Haar.OfBasis
+import Mathlib.Order.CompletePartialOrder
+
+noncomputable section
+namespace MicroHamiltonian
+
+variable {D : Type} (H : MicroHamiltonian D) (d : D)
+
+/-- The partition function corresponding to a given MicroHamiltonian. This is a function taking a thermodynamic β, not a temperature.
+It also depends on the data D defining the system extrinsincs.
+
+ * Ideally this would be an NNReal, but ∫ (NNReal) doesn't work right now, so it would just be a separate proof anyway
+-/
+def PartitionZ (β : ℝ) : ℝ :=
+  ∫ (config : H.dim d → ℝ),
+    let E := H.H config
+    if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
+
+/-- The partition function as a function of temperature T instead of β. -/
+def PartitionZT (T : ℝ) : ℝ :=
+  PartitionZ H d (1/T)
+
+/-- The Internal Energy, U or E, defined as -∂(ln Z)/∂β. Parameterized here with β. -/
+def InternalU (β : ℝ) : ℝ :=
+  -deriv (fun β' ↦ (PartitionZ H d β').log) β
+
+/-- The Helmholtz Free Energy, -T * ln Z. Also denoted F. Parameterized here with temperature T, not β. -/
+def HelmholtzA (T : ℝ) : ℝ :=
+  -T * (PartitionZT H d T).log
+
+/-- The entropy, defined as the -∂A/∂T. Function of T. -/
+def EntropyS (T : ℝ) : ℝ :=
+  -deriv (HelmholtzA H d) T
+
+/-- The entropy, defined as ln Z + β*U. Function of β. -/
+def EntropySβ (β : ℝ) : ℝ :=
+  (PartitionZ H d β).log + β * InternalU H d β
+
+/-- To be able to compute or define anything from a Hamiltonian, we need its partition function to be
+a computable integral. A Hamiltonian is ZIntegrable at β if PartitionZ is Lesbegue integrable and nonzero.
+-/
+def ZIntegrable (β : ℝ) : Prop :=
+  MeasureTheory.Integrable (fun (config : H.dim d → ℝ) ↦
+    let E := H.H config;
+    if h : E = ⊤ then 0 else Real.exp (-β * (E.untop h))
+  ) ∧ (H.PartitionZ d β ≠ 0)
+
+/--
+This Prop defines the most common case of ZIntegrable, that it is integrable at all finite temperatures
+(aka all positive β).
+-/
+def PositiveβIntegrable : Prop :=
+  ∀ β > 0, H.ZIntegrable d β
+
+variable {H d}
+
+/-
+Need the fact that the partition function Z is differentiable. Assume it's integrable.
+Letting μ⁻(H,E) be the measure of {x | H(x) ≤ E}, then for nonzero β,
+∫_0..∞ exp(-βE) (dμ⁻/dE) dE =
+∫ exp(-βH) dμ =
+∫ (1/β * ∫_H..∞ exp(-βE) dE) dμ =
+∫ (1/β * ∫_-∞..∞ exp(-βE) χ(E ≤ H) dE) dμ =
+1/β * ∫ (∫ exp(-βE) χ(E ≤ H) dμ) dE =
+1/β * ∫ exp(-βE) * μ⁻(H,E) dE
+
+so this will be differentiable if
+∫ exp(-βE) * μ⁻(H,E) dE
+is, aka if the Laplace transform is differentiable.
+See e.g. https://math.stackexchange.com/q/84382/127777
+For this we really want the fact that the Laplace transform is analytic wherever it's absolutely convergent,
+which is (as Wikipedia informs) an easy consequence of Fubini's theorem + Morera's theorem. However, Morera's
+theorem isn't in mathlib yet. So this is a sorry for now
+-/
+open scoped ContDiff in
+theorem DifferentiableAt_Z_if_ZIntegrable {β : ℝ} (h : H.ZIntegrable d β) : ContDiffAt ℝ ω (H.PartitionZ d) β :=
+  sorry
+
+/-- The two definitions of entropy, in terms of T or β, are equivalent. -/
+theorem entropy_A_eq_entropy_Z (T β : ℝ) (hβT : T * β = 1) (hi : H.ZIntegrable d β)
+    : EntropyS H d T = EntropySβ H d β := by
+  have hTnz : T ≠ 0 := left_ne_zero_of_mul_eq_one hβT
+  have hβnz : β ≠ 0 := right_ne_zero_of_mul_eq_one hβT
+  have hβT' := eq_one_div_of_mul_eq_one_right hβT
+  dsimp [EntropyS, EntropySβ, InternalU, PartitionZT]
+  unfold HelmholtzA
+  rw [deriv_mul, deriv_neg'', neg_mul, one_mul, neg_add_rev, neg_neg, mul_neg, add_comm]
+  congr 1
+  · rw [PartitionZT, hβT']
+  simp_rw [PartitionZT]
+  have hdc := deriv_comp (h := fun T ↦ T⁻¹) (h₂ := fun β => Real.log (H.PartitionZ d β)) T ?_ ?_
+  unfold Function.comp at hdc
+  simp only [hdc, one_div, deriv_inv', mul_neg, neg_inj, hβT']
+  field_simp
+  ring_nf
+  --Show the differentiability side-goals
+  · eta_reduce
+    rw [← one_div, ← hβT']
+    have h₁ := hi.2
+    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt (OrderTop.le_top 1)
+    fun_prop (disch := assumption)
+  · fun_prop (disch := assumption)
+  · fun_prop
+  · simp_rw [PartitionZT]
+    rw [hβT'] at hi
+    have := hi.2
+    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt (OrderTop.le_top 1)
+    fun_prop (disch := assumption)
+
+/--
+The "definition of temperature from entropy":
+1/T = (∂S/∂U), when the derivative is at constant extrinsic d (typically N/V).
+Here we use β instead of 1/T on the left, and express the right actually as (∂S/∂β)/(∂U/∂β),
+as all our things are ultimately parameterized by β.
+-/
+theorem β_eq_deriv_S_U {β : ℝ} (hi : H.ZIntegrable d β) : β = (deriv (H.EntropySβ d) β) / deriv (H.InternalU d) β := by
+  unfold EntropySβ
+  unfold InternalU
+
+  --Show the differentiability side-goals
+  have : DifferentiableAt ℝ (fun β => Real.log (H.PartitionZ d β)) β := by
+    have := hi.2
+    have := (DifferentiableAt_Z_if_ZIntegrable hi).differentiableAt (OrderTop.le_top 1)
+    fun_prop (disch := assumption)
+  have : DifferentiableAt ℝ (deriv fun β => Real.log (H.PartitionZ d β)) β := by
+    have this := (DifferentiableAt_Z_if_ZIntegrable hi).log hi.2
+    replace this :=
+      (this.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (OrderTop.le_top _)
+    unfold deriv
+    fun_prop
+
+  --Main goal
+  simp only [mul_neg, deriv.neg']
+  rw [deriv_add]
+  simp only [deriv.neg', differentiableAt_id']
+  rw [deriv_mul]
+  simp only [deriv_id'', one_mul, neg_add_rev, add_neg_cancel_comm_assoc, neg_div_neg_eq]
+  have : deriv (deriv fun β => Real.log (H.PartitionZ d β)) β ≠ 0 := ?_
+  exact (mul_div_cancel_right₀ β this).symm
+  --Discharge those side-goals
+  · sorry
+  · fun_prop (disch := assumption)
+  · fun_prop (disch := assumption)
+  · fun_prop (disch := assumption)
+  · fun_prop (disch := assumption)
+
+open scoped ContDiff in
+example (x : ℝ) (f : ℝ → ℝ) (hf : ContDiffAt ℝ ω f x) : DifferentiableAt ℝ (deriv f) x := by
+  have := (hf.fderiv_right (m := ⊤) (OrderTop.le_top _)).differentiableAt (OrderTop.le_top _)
+  unfold deriv
+  fun_prop
+
+end MicroHamiltonian
+
+--! Specializing to a system of particles in space
+
+namespace NVEHamiltonian
+open MicroHamiltonian
+
+variable (H : NVEHamiltonian) (d : ℕ × ℝ)
+
+/-- Pressure, as a function of T. Defined as the conjugate variable to volume. -/
+def Pressure (T : ℝ) : ℝ :=
+  let (n, V) := d;
+  -deriv (fun V' ↦ HelmholtzA H (n, V') T) V
+
+end NVEHamiltonian
+
+
+================================================================================
+FILE: StatMech.lean
+TYPE: Lean 4
+SIZE: 86 characters
+================================================================================
+
+import StatMech.Hamiltonian
+import StatMech.IdealGas
+import StatMech.ThermoQuantities
+
+
+================================================================================
+FILE: TODO.md
+TYPE: Markdown
+SIZE: 9729 characters
+
+
+[Repository content continues in next chunk]

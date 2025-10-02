@@ -1,0 +1,1361 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+  rw [LinearMap.sum_apply, trace_sum]
+    dsimp
+    simp only [Matrix.trace_kronecker, Matrix.trace_mul_cycle (B := x),
+      Matrix.trace_single_eq_same, mul_one]
+    rw [← trace_sum, ← Finset.sum_mul]
+    congr
+    convert one_mul x
+    rw [show (1 : Matrix d d ℂ) = (1 : HermitianMat d ℂ).toMat by rfl, ← Λ.normalized]
+    push_cast
+    congr! with i _
+    exact HermitianMat.pow_half_mul (Λ.zero_le i)
+
+open Kronecker in
+theorem MeasurementMap_apply_matrix (Λ : POVM X d) (m : Matrix d d ℂ) :
+  Λ.MeasurementMap.map m =  ∑ x : X,
+    ((((Λ.mats x) ^ (1/2:ℝ)).toMat * m * ((Λ.mats x)^(1/2:ℝ)).toMat) ⊗ₖ Matrix.single x x 1) := by
+  dsimp [MeasurementMap, HPMap.map]
+  rw [LinearMap.sum_apply]
+  rfl
+
+open HermitianMat in
+theorem MeasurementMap_apply_hermitianMat (Λ : POVM X d) (m : HermitianMat d ℂ) :
+  Λ.MeasurementMap.toHPMap m = ∑ x : X,
+    --TODO: Something like `HermitianMat.single` to make this better
+    ((m.conj ((Λ.mats x)^(1/2:ℝ)).toMat : HermitianMat d ℂ) ⊗ₖ .diagonal (fun y ↦ ite (x = y) 1 0)) := by
+  ext1
+  convert Λ.MeasurementMap_apply_matrix m.toMat
+  simp [HermitianMat.conj]
+  congr!
+  ext i j
+  simp [HermitianMat.diagonal, Matrix.diagonal_apply, Matrix.single]
+  split_ifs <;> (try grind) <;> norm_num
+
+/-- A POVM leads to a distribution of outcomes on any given mixed state ρ. -/
+def Measure (Λ : POVM X d) (ρ : MState d) : Distribution X := .mk'
+    (f := fun x ↦ (Λ.mats x).inner ρ.M)
+    (h₁ := fun x ↦ HermitianMat.inner_ge_zero (Λ.zero_le x) ρ.zero_le)
+    (hN := by
+      simp [HermitianMat.inner_eq_re_trace, ← Complex.re_sum, ← trace_sum, ← Finset.sum_mul,
+      ← AddSubgroup.val_finset_sum, ← HermitianMat.val_eq_coe, Λ.normalized])
+
+/-- The quantum-classical `POVM.measurement_map`, gives a marginal on the right equal to `POVM.measure`.-/
+theorem traceLeft_measurementMap_eq_measure (Λ : POVM X d) (ρ : MState d) :
+    (Λ.MeasurementMap ρ).traceLeft = MState.ofClassical (Λ.Measure ρ) := by
+  open Kronecker in
+  ext i j
+  rcases ρ with ⟨⟨ρ, ρH⟩, hρ0, hρ1⟩
+  change (Matrix.traceLeft (Λ.MeasurementMap.map ρ)) i j = _
+  rw [MeasurementMap_apply_matrix]
+  --TODO: a lemma for Matrix.traceLeft (∑ x, _) = ∑ x, (Matrix.traceLeft _)
+  simp_rw [Matrix.traceLeft, Matrix.of_apply, Matrix.sum_apply]
+  rw [Finset.sum_comm]
+  simp only [kroneckerMap_apply, MState.coe_ofClassical]
+  simp only [single, of_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel,
+    Finset.sum_const_zero]
+  simp only [HermitianMat.diagonal, HermitianMat.mk_toMat, diagonal_apply]
+  symm; split
+  · subst j
+    simp only [Measure, Distribution.mk', Distribution.funlike_apply, and_self, Finset.sum_ite_eq',
+      Finset.mem_univ, ↓reduceIte]
+    change _ = Matrix.trace _
+    rw [Matrix.trace_mul_cycle, HermitianMat.pow_half_mul (Λ.zero_le i)]
+    exact HermitianMat.inner_eq_trace_rc _ _
+  · conv => enter [2, 2, x]; rw [if_neg (by grind)]
+    simp
+
+/-- The action of measuring a state with the POVM `Λ`, discarding the resulting state, and keeping
+the mixed state recording the outcome. This resulting state is purely diagonal, as given in
+`POVM.measureDiscard_apply`. -/
+noncomputable def MeasureDiscard (Λ : POVM X d) : CPTPMap d X :=
+  CPTPMap.traceLeft ∘ₘ Λ.MeasurementMap
+
+theorem measureDiscard_apply (Λ : POVM X d) (ρ : MState d) :
+    Λ.MeasureDiscard ρ = MState.ofClassical (Λ.Measure ρ) := by
+  simp [MeasureDiscard, traceLeft_measurementMap_eq_measure]
+
+end POVM
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Pinching.lean
+TYPE: Lean 4
+SIZE: 2701 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.MState
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.ForMathlib.HermitianMat.CFC
+
+/-! # Pinching channels
+A pinching channel decoheres in the eigenspaces of a given state.
+More precisely, given a state ρ, the pinching channel with respect to ρ is defined as
+  E(σ) = ∑ Pᵢ σ Pᵢ
+where the P_i are the projectors onto the i-th eigenspaces of ρ = ∑ᵢ pᵢ Pᵢ, with i ≠ j → pᵢ ≠ pⱼ.
+-/
+
+noncomputable section
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+def pinching_kraus (ρ : MState d) : spectrum ℝ ρ.m → HermitianMat d ℂ :=
+  fun x ↦ ρ.M.cfc (fun y ↦ if y = x then 1 else 0)
+
+instance finite_spectrum_inst (ρ : MState d) : Fintype (spectrum ℝ ρ.m) :=
+  Fintype.ofFinite (spectrum ℝ ρ.m)
+
+theorem pinching_sq_eq_self (ρ : MState d) : ∀ k, (pinching_kraus ρ k)^2 = (pinching_kraus ρ k) := fun k => by
+  ext1
+  push_cast
+  rw [pow_two, pinching_kraus, HermitianMat.cfc, ←cfc_mul
+  (hf := by simp only [continuousOn_iff_continuous_restrict, continuous_of_discreteTopology, implies_true])
+  (hg := by simp only [continuousOn_iff_continuous_restrict, continuous_of_discreteTopology, implies_true])]
+  simp only [← pow_two, ite_pow, one_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+    zero_pow]
+
+theorem pinching_sum (ρ : MState d) : ∑ k, pinching_kraus ρ k = 1 := by
+  ext i j
+  simp [pinching_kraus, HermitianMat.cfc]
+  have heq : Set.EqOn (fun x => ∑ i : spectrum ℝ ρ.m, if x = ↑i then (1 : ℝ) else 0) 1 (spectrum ℝ ρ.m) := by
+    unfold Set.EqOn; intro x hx
+    dsimp
+    rw [Finset.sum_set_coe (f := fun i => if x = i then 1 else 0) (s := spectrum ℝ ρ.m), Finset.sum_ite_eq_of_mem]
+    rw [Set.mem_toFinset]
+    exact hx
+  rw [←cfc_sum (hf := by simp only [continuousOn_iff_continuous_restrict, continuous_of_discreteTopology, implies_true]),
+  Finset.sum_fn, cfc_congr heq, cfc_one (R := ℝ) (ha := _)]
+  rw [IsSelfAdjoint, Matrix.star_eq_conjTranspose, ρ.Hermitian]
+
+def pinching_map (ρ : MState d) : CPTPMap d d ℂ :=
+  CPTPMap.of_kraus_CPTPMap (HermitianMat.toMat ∘ pinching_kraus ρ) (by
+  conv =>
+    enter [1, 2, k]
+    rw [Function.comp_apply, (pinching_kraus ρ k).H, ←pow_two]
+    norm_cast
+    rw [pinching_sq_eq_self ρ k]
+  norm_cast
+  rw [pinching_sum]
+  rfl
+  )
+
+/-- Exercise 2.8 of Hayashi's book "A group theoretic approach to Quantum Information".
+-- Used in (S59) -/
+theorem pinching_pythagoras (ρ σ : MState d) :  𝐃(ρ‖σ) = 𝐃(ρ‖pinching_map σ ρ) + 𝐃(pinching_map σ ρ‖σ) :=
+  sorry
+
+/-- Lemma 3.10 of Hayashi's book "Quantum Information Theory - Mathematical Foundations".
+-- Used in (S60) -/
+theorem pinching_bound (ρ σ : MState d) : ρ.M ≤ (↑(Fintype.card (spectrum ℝ σ.m)) : ℝ) • (pinching_map σ ρ).M :=
+  sorry
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Qubit/Basic.lean
+TYPE: Lean 4
+SIZE: 5829 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap
+
+/-!
+Quantum theory and operations specific to qubits.
+ - Standard named (single-qubit) gates: Z, X, Y, H, S, T
+ - Controlled versions of gates
+ - Completeness of the PPT test: a state is separable iff it is PPT.
+ - Fidelity for qubits: `F(ρ,σ) = 2√(ρ.det * σ.det)`.
+ - The singlet/triplet split.
+-/
+
+abbrev Qubit := Fin 2
+
+section Mathlib
+namespace Matrix
+
+variable {α : Type*} [NonUnitalNonAssocSemiring α] [StarRing α]
+
+variable {α β : Type*} [DecidableEq α] [Fintype α] [DecidableEq β] [Fintype β]
+
+@[simp]
+theorem neg_unitary_val (u : 𝐔[α]) : (-u).val = -u := by
+  rfl
+
+omit [DecidableEq α] [Fintype α] [DecidableEq β] [Fintype β] in
+open Kronecker in
+@[simp]
+theorem star_kron (a : Matrix α α ℂ) (b : Matrix β β ℂ) : star (a ⊗ₖ b) = (star a) ⊗ₖ (star b) := by
+  ext _ _
+  simp
+
+open Kronecker in
+theorem kron_unitary (a : 𝐔[α]) (b : 𝐔[β]) : a.val ⊗ₖ b.val ∈ 𝐔[α × β] := by
+  simp [Matrix.mem_unitaryGroup_iff, ← Matrix.mul_kronecker_mul]
+
+open Kronecker in
+def unitary_kron (a : 𝐔[α]) (b : 𝐔[β]) : 𝐔[α × β] :=
+  ⟨_, kron_unitary a b⟩
+
+scoped notation a:60 " ⊗ᵤ " b:60 => unitary_kron a b
+
+@[simp]
+theorem unitary_kron_apply (a : 𝐔[α]) (b : 𝐔[β]) (i₁ i₂ : α) (j₁ j₂ : β) :
+    (a ⊗ᵤ b) (i₁, j₁) (i₂, j₂) = (a i₁ i₂) * (b j₁ j₂) := by
+  rfl
+
+@[simp]
+theorem unitary_kron_one_one : (1 : 𝐔[α]) ⊗ᵤ (1 : 𝐔[β]) = (1 : 𝐔[α × β]) := by
+  simp [Matrix.unitary_kron]
+
+end Matrix
+end Mathlib
+
+open Lean.Parser.Tactic in
+open Lean in
+/--
+Proves goals equating small matrices by expanding out products and simpliying standard Real arithmetic.
+-/
+syntax (name := matrix_expand) "matrix_expand"
+  (" [" ((simpStar <|> simpErase <|> simpLemma),*,?) "]")?
+  (" with " rcasesPat+)? : tactic
+
+macro_rules
+  | `(tactic| matrix_expand $[[$rules,*]]? $[with $withArg*]?) => do
+    let id1 := (withArg.getD ⟨[]⟩).getD 0 (← `(rcasesPat| _))
+    let id2 := (withArg.getD ⟨[]⟩).getD 1 (← `(rcasesPat| _))
+    let rules' := rules.getD ⟨#[]⟩
+    `(tactic| (
+      ext i j
+      repeat rcases (i : Prod _ _) with ⟨i, $id1⟩
+      repeat rcases (j : Prod _ _) with ⟨j, $id2⟩
+      fin_cases i
+      <;> fin_cases j
+      <;> simp [Complex.ext_iff,
+        Matrix.mul_apply, Fintype.sum_prod_type, Matrix.one_apply, field,
+        $rules',* ]
+      <;> norm_num
+      <;> try field_simp
+      <;> try ring_nf
+      ))
+
+namespace Qubit
+open Real
+open Complex
+
+variable {k : Type*} [Fintype k] [DecidableEq k]
+
+/-- The Pauli Z gate on a qubit. -/
+def Z : 𝐔[Qubit] :=
+  ⟨!![1, 0; 0, -1], by constructor <;> matrix_expand⟩
+
+/-- The Pauli X gate on a qubit. -/
+def X : 𝐔[Qubit] :=
+  ⟨!![0, 1; 1, 0], by constructor <;> matrix_expand⟩
+
+/-- The Pauli Y gate on a qubit. -/
+def Y : 𝐔[Qubit] :=
+  ⟨!![0, -I; I, 0], by constructor <;> matrix_expand⟩
+
+/-- The H gate, a Hadamard gate, on a qubit. -/
+noncomputable def H : 𝐔[Qubit] :=
+  ⟨√(1/2) • (!![1, 1; 1, -1]), by constructor <;> matrix_expand⟩
+
+/-- The S gate, or Rz(π/2) rotation on a qubit. -/
+def S : 𝐔[Qubit] :=
+  ⟨!![1, 0; 0, I], by constructor <;> matrix_expand⟩
+
+/-- The T gate, or Rz(π/4) rotation on a qubit. -/
+noncomputable def T : 𝐔[Qubit] :=
+  ⟨!![1, 0; 0, (1 + I)/√2], by constructor <;> matrix_expand⟩
+
+@[simp]
+theorem Z_sq : Z * Z = 1 := by
+  matrix_expand [Z]
+
+@[simp]
+theorem X_sq : X * X = 1 := by
+  matrix_expand [X]
+
+@[simp]
+theorem Y_sq : Y * Y = 1 := by
+  matrix_expand [Y]
+
+@[simp]
+theorem H_sq : H * H = 1 := by
+  matrix_expand [H]
+
+@[simp]
+theorem S_sq : S * S = Z := by
+  matrix_expand [S, Z]
+
+@[simp]
+theorem T_sq : T * T = S := by
+  matrix_expand [T, S]
+
+/-- The anticommutator `{X,Y}` is zero. Marked simp as to put Pauli products in a canonical Y-X-Z order. -/
+@[simp]
+theorem X_Y_anticomm : X * Y = -Y * X := by
+  matrix_expand [X, Y]
+
+/-- The anticommutator `{Y,Z}` is zero. -/
+theorem Y_Z_anticomm : Z * Y = -Y * Z := by
+  matrix_expand [Z, Y]
+
+/-- The anticommutator `{Z,X}` is zero. -/
+theorem Z_X_anticomm : Z * X = -X * Z := by
+  matrix_expand [Z, X]
+
+@[simp]
+theorem H_mul_X_eq_Z_mul_H : H * X = Z * H := by
+  matrix_expand [H, X, Z]
+
+@[simp]
+theorem H_mul_Z_eq_X_mul_H : H * Z = X * H := by
+  matrix_expand [H, X, Z]
+
+@[simp]
+theorem S_Z_comm : Z * S = S * Z := by
+  simp [← S_sq, mul_assoc]
+
+@[simp]
+theorem T_Z_comm : Z * T = T * Z := by
+  simp [← S_sq, ← T_sq, mul_assoc]
+
+@[simp]
+theorem S_T_comm : S * T = T * S := by
+  simp [← T_sq, mul_assoc]
+
+/-- Given a unitary `U` on some Hilbert space `k`, we have the controllized version that acts on `Fin 2 ⊗ k`
+where `U` is conditionally applied if the first qubit is `1`. -/
+def controllize (g : 𝐔[k]) : 𝐔[Qubit × k] :=
+  ⟨Matrix.of fun (q₁,t₁) (q₂,t₂) ↦
+    if (q₁,q₂) = (0,0) then
+      (if t₁ = t₂ then 1 else 0)
+    else if (q₁,q₂) = (1,1) then
+      g t₁ t₂
+    else 0
+    , by
+      rw [Matrix.mem_unitaryGroup_iff]
+      matrix_expand [-Complex.ext_iff] with ti tj;
+      · congr 1
+        exact propext eq_comm
+      · exact congrFun₂ g.2.2 ti tj
+    ⟩
+
+scoped notation "C[" g "]" => controllize g
+
+variable (g : 𝐔[k]) (j₁ j₂ : k)
+
+@[simp]
+theorem controllize_apply_zero_zero : C[g] (0, j₁) (0, j₂) = (1 : 𝐔[k]) j₁ j₂ := by
+  rfl
+
+@[simp]
+theorem controllize_apply_zero_one : C[g] (0, j₁) (1, j₂) = 0 := by
+  rfl
+
+@[simp]
+theorem controllize_apply_one_zero : C[g] (1, j₁) (0, j₂) = 0 := by
+  rfl
+
+@[simp]
+theorem controllize_apply_one_one : C[g] (1, j₁) (1, j₂) = g j₁ j₂ := by
+  rfl
+
+@[simp]
+theorem controllize_mul (g₁ g₂ : 𝐔[k]) : C[g₁] * C[g₂] = C[g₁ * g₂] := by
+  matrix_expand
+
+@[simp]
+theorem controllize_one : C[(1 : 𝐔[k])] = 1 := by
+  matrix_expand
+
+@[simp]
+theorem controllize_mul_inv : C[g] * C[g⁻¹] = 1 := by
+  simp
+
+open scoped Matrix in
+@[simp]
+theorem X_controllize_X : (X ⊗ᵤ 1) * C[g] * (X ⊗ᵤ 1) = (1 ⊗ᵤ g) * C[g⁻¹] := by
+  matrix_expand [X, -Complex.ext_iff] with ki kj;
+  suffices (1 : Matrix k k ℂ) ki kj = (g * g⁻¹) ki kj by
+    convert this
+  simp
+
+end Qubit
+
+
+================================================================================
+FILE: QuantumInfo/Finite/ResourceTheory/FreeState.lean
+TYPE: Lean 4
+SIZE: 20090 characters
+================================================================================
+
+import Mathlib.Algebra.Module.Submodule.Lattice
+import Mathlib.Analysis.Subadditive
+import Mathlib.CategoryTheory.Functor.FullyFaithful
+import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+import Mathlib.Data.EReal.Basic
+import Mathlib.Tactic
+
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Entropy
+
+open scoped Topology
+
+/-- A `ResourcePretheory` is a family of Hilbert spaces closed under tensor products, with an instance of
+`Fintype` and `DecidableEq` for each. It forms a pre-structure then on which to discuss resource
+theories. For instance, to talk about "two-party scenarios", we could write `ResourcePretheory (ℕ × ℕ)`,
+with `H (a,b) := (Fin a) × (Fin b)`.
+
+The `Semigroup ι` structure means we have a way to take products of our labels of Hilbert spaces
+in a way that is associative (with actual equality). The `prodEquiv` lets us reinterpret between
+a product-labelled Hilbert spaces, and an actual pair of Hilbert spaces.
+-/
+class ResourcePretheory (ι : Type*) extends Semigroup ι where
+  /-- The indexing of each Hilbert space -/
+  H : ι → Type*
+  /-- Each space is finite -/
+  [FinH : ∀ i, Fintype (H i)]
+  /-- Each object has decidable equality -/
+  [DecEqH : ∀ i, DecidableEq (H i)]
+  /-- Each space is nonempty (dimension at least 1) -/
+  [NonemptyH : ∀ i, Nonempty (H i)]
+  /-- The product structure induces an isomorphism of Hilbert spaces -/
+  prodEquiv i j : H (i * j) ≃ (H i) × (H j)
+  --Possible we want some fact like the associativity of `prod` or the existence of an identity space,
+  -- which would then imply MonoidalCategory structure later (instead of just Category). For now we
+  -- take the (logically equivalent, in the appropriate model) assumption that the associator is
+  -- actually an equality. This is captured in the `Semigroup ι` assumption. If we wanted to turn
+  -- this into something more flexible, we would replace that with `Mul ι` (dropping `mul_assoc`)
+  -- and get an appropriate associator `Equiv` here.
+  hAssoc i j k :
+    ((prodEquiv (i * j) k).trans <|
+      ((prodEquiv i j).prodCongr (Equiv.refl (H k))).trans <|
+      (Equiv.prodAssoc _ _ _).trans <|
+      ((Equiv.refl (H i)).prodCongr ((prodEquiv j k).symm)).trans
+      (prodEquiv i (j * k)).symm
+    )
+     = Equiv.cast (congrArg H <| mul_assoc i j k)
+
+attribute [instance] ResourcePretheory.FinH
+attribute [instance] ResourcePretheory.DecEqH
+attribute [instance] ResourcePretheory.NonemptyH
+
+namespace ResourcePretheory
+
+variable {ι : Type*} [ResourcePretheory ι] {i j k l : ι}
+
+/-- The `prod` operation of `ResourcePretheory` gives the natural product operation on `MState`s
+that puts us in a new Hilbert space of the category. Accessible by the notation `ρ₁ ⊗ᵣ ρ₂`. -/
+noncomputable def prodRelabel (ρ₁ : MState (H i)) (ρ₂ : MState (H j)) : MState (H (i * j)) :=
+  (ρ₁ ⊗ ρ₂).relabel (prodEquiv i j)
+
+scoped infixl:65 "⊗ᵣ" => prodRelabel
+
+theorem prodRelabel_assoc (ρ₁ : MState (H i)) (ρ₂ : MState (H j)) (ρ₃ : MState (H k)) :
+    ρ₁ ⊗ᵣ ρ₂ ⊗ᵣ ρ₃ ≍ ρ₁ ⊗ᵣ (ρ₂ ⊗ᵣ ρ₃) := by
+  simp [prodRelabel, MState.relabel_kron]
+  have h_equiv := hAssoc i j k
+  rw [← Equiv.trans_assoc, Equiv.trans_cancel_right] at h_equiv
+  have h_cong := congrArg (MState.relabel ((ρ₁⊗ρ₂)⊗ρ₃)) h_equiv
+  rw [← eq_cast_iff_heq]; swap
+  · rw [mul_assoc]
+  convert h_cong; clear h_equiv h_cong
+  rw [← MState.relabel_cast]; swap
+  · rw [mul_assoc]
+  rw [MState.kron_relabel, MState.prod_assoc]
+  rw [MState.relabel_comp, MState.relabel_comp, MState.relabel_comp]
+  rfl
+
+/-- A `MState.relabel` can be distributed across a `prodRelabel`, if you have proofs that the factors
+correspond correctly. -/
+theorem prodRelabel_relabel_cast_prod
+    (ρ₁ : MState (H i)) (ρ₂ : MState (H j))
+    (h : H (k * l) = H (i * j)) (hik : k = i) (hlj : l = j) :
+    (ρ₁ ⊗ᵣ ρ₂).relabel (Equiv.cast h) =
+    (ρ₁.relabel (Equiv.cast (congrArg H hik))) ⊗ᵣ (ρ₂.relabel (Equiv.cast (congrArg H hlj))) := by
+  subst hik
+  subst hlj
+  rfl
+
+/-- The `prod` operation of `ResourcePretheory` gives the natural product operation on `CPTPMap`s. Accessible
+by the notation `M₁ ⊗ᵣ M₂`. -/
+noncomputable def prodCPTPMap (M₁ : CPTPMap (H i) (H j)) (M₂ : CPTPMap (H k) (H l)) :
+    CPTPMap (H (i * k)) (H (j * l)) :=
+  (CPTPMap.of_equiv (prodEquiv j l).symm).compose ((M₁ ⊗ₖ M₂).compose (CPTPMap.of_equiv (prodEquiv i k)))
+
+scoped notation M₁ "⊗ₖᵣ" M₂ => prodCPTPMap M₁ M₂
+
+open ComplexOrder in
+theorem PosDef.prod {ρ : MState (H i)} {σ : MState (H j)} (hρ : ρ.m.PosDef) (hσ : σ.m.PosDef)
+    : (ρ ⊗ᵣ σ).m.PosDef := by
+  have : (ρ ⊗ σ).m.PosDef := MState.PosDef.kron hρ hσ
+  rw [prodRelabel]
+  exact MState.PosDef.relabel this (prodEquiv i j)
+
+--BAD old attempt at PNat powers
+-- /-- Powers of spaces. Defined for `PNat` so that we don't have zeroth powers. -/
+-- noncomputable def spacePow (i : ι) (n : ℕ+) : ι :=
+--   n.natPred.rec i (fun _ j ↦ prod j i)
+
+-- scoped notation i "⊗^H[" n "]" => spacePow i n
+
+-- @[simp]
+-- theorem spacePow_one (i : ι) : i⊗^H[1] = i :=
+--   rfl
+
+-- theorem spacePow_succ (i : ι) (n : ℕ+) : i⊗^H[n + 1] = prod (i⊗^H[n]) i := by
+--   rcases n with ⟨_|n, hn⟩
+--   · contradiction
+--   · rfl
+
+-- /-- Powers of states. Defined for `PNat`, so that we don't have zeroth powers -/
+-- noncomputable def statePow {i : ι} (ρ : MState (H i)) (n : ℕ+) : MState (H (i⊗^H[n])) :=
+--   (n.natPred.rec ρ (fun _ σ ↦ σ ⊗ᵣ ρ) : MState (H (i⊗^H[n.natPred.succPNat])))
+
+-- scoped notation ρ "⊗^S[" n "]" => statePow ρ n
+
+-- @[simp]
+-- theorem statePow_one {i : ι} (ρ : MState (H i)) : ρ⊗^S[1] = ρ :=
+--   rfl
+
+-- theorem statePow_succ {i : ι} (ρ : MState (H i)) (n : ℕ+) : ρ⊗^S[n + 1] = ρ⊗^S[n] ⊗ᵣ ρ := by
+--   rcases n with ⟨_|n, hn⟩
+--   · contradiction
+--   · rfl
+
+@[simp]
+theorem qRelEntropy_prodRelabel (ρ₁ ρ₂ : MState (H i)) (σ₁ σ₂ : MState (H j)):
+    𝐃(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = 𝐃(ρ₁‖ρ₂) + 𝐃(σ₁‖σ₂) := by
+  simp [prodRelabel]
+
+@[simp]
+theorem sandwichedRelRentropy_prodRelabel {α : ℝ} (ρ₁ ρ₂ : MState (H i)) (σ₁ σ₂ : MState (H j)):
+    D̃_ α(ρ₁ ⊗ᵣ σ₁‖ρ₂ ⊗ᵣ σ₂) = D̃_ α(ρ₁‖ρ₂) + D̃_ α(σ₁‖σ₂) := by
+  simp [prodRelabel]
+
+end ResourcePretheory
+
+open ResourcePretheory
+
+/-- A ResourcePretheory is `Unital` if it has a Hilbert space of size 1, i.e. `ℂ`. -/
+class UnitalPretheory (ι : Type*) extends ResourcePretheory ι, MulOneClass ι, Unique (H 1) where
+  prod_default {i} (ρ : MState (H i)) :
+    (toResourcePretheory.prodRelabel ρ (Inhabited.default : MState (H 1))) ≍ ρ
+  default_prod {i} (ρ : MState (H i)) :
+    (toResourcePretheory.prodRelabel (Inhabited.default : MState (H 1)) ρ) ≍ ρ
+
+namespace UnitalPretheory
+
+variable {ι : Type*} [UnitalPretheory ι] {i j : ι}
+
+instance : Monoid ι where
+
+/-- Powers of spaces.
+
+We define it for `Nat` in a `UnitalPretheory`. In principal this could be done for any
+`ResourcePretheory` and be defined for `PNat` so that we don't have zeroth powers. In
+anticipation that we might some day want that, and that we might do everything with a
+non-equality associator, we keep this as its own definition and keep our own names for
+rewriting theorems where possible.-/
+noncomputable def spacePow (i : ι) (n : ℕ) : ι :=
+  i ^ n
+
+--This notation is less necessary now since we can just write `i ^ n` as long as it's
+--a monoid.
+scoped notation i "⊗^H[" n "]" => spacePow i n
+
+@[simp]
+theorem spacePow_zero (i : ι) : i ^ 0 = 1 := by
+  rfl
+
+@[simp]
+theorem spacePow_one (i : ι) : i ^ 1 = i := by
+  simp
+
+theorem spacePow_succ (i : ι) (n : ℕ) : i ^ (n + 1) = (i ^ n) * i := by
+  rfl
+
+theorem spacePow_add (m n : ℕ) :
+    i ^ (m + n) = (i ^ m) * (i ^ n) := by
+  induction n
+  · simp
+  · rename_i n ih
+    rw [spacePow_succ, ← mul_assoc, ← add_assoc, ← ih, spacePow_succ]
+
+theorem spacePow_mul (m n : ℕ) :
+    i ^ (m * n) = (i ^ m) ^ n :=
+  pow_mul i m n
+
+/-- Powers of states. Defined for `PNat`, so that we don't have zeroth powers -/
+noncomputable def statePow (ρ : MState (H i)) (n : ℕ) : MState (H (i ^ n)) :=
+  n.rec default (fun _ σ ↦ σ ⊗ᵣ ρ)
+
+scoped notation ρ "⊗^S[" n "]" => statePow ρ n
+
+@[simp]
+theorem statePow_zero (ρ : MState (H i)) : ρ⊗^S[0] = default :=
+  rfl
+
+@[simp]
+theorem statePow_one (ρ : MState (H i)) : ρ⊗^S[1] ≍ ρ := by
+  rw [← eq_cast_iff_heq]; swap
+  · rw [spacePow_one]
+  · rw [eq_cast_iff_heq, statePow]
+    exact default_prod ρ
+
+theorem statePow_succ (ρ : MState (H i)) (n : ℕ) : ρ⊗^S[n + 1] = ρ⊗^S[n] ⊗ᵣ ρ := by
+  rfl
+
+theorem statePow_add (ρ : MState (H i)) (m n : ℕ) : ρ⊗^S[m + n] ≍ ρ⊗^S[m] ⊗ᵣ ρ⊗^S[n] := by
+  rw [← eq_cast_iff_heq]; swap
+  · rw [spacePow_add]
+  rw [eq_cast_iff_heq]
+  induction n
+  · rw [add_zero, statePow_zero]
+    exact (prod_default _).symm
+  · rename_i n ih
+    rw [statePow_succ, ← add_assoc, statePow_succ]
+    refine HEq.trans ?_ (prodRelabel_assoc _ _ _)
+    congr
+    apply spacePow_add
+
+theorem statePow_add_relabel (ρ : MState (H i)) (m n : ℕ) :
+    ρ⊗^S[m + n] = (ρ⊗^S[m] ⊗ᵣ ρ⊗^S[n]).relabel (Equiv.cast (by congr; exact pow_add i m n)) := by
+  have h := statePow_add ρ m n
+  rw [heq_iff_exists_eq_cast] at h
+  obtain ⟨h, h₂⟩ := h
+  rw [h₂, MState.relabel_cast]
+
+theorem statePow_mul (ρ : MState (H i)) (m n : ℕ) : ρ⊗^S[m * n] ≍ (ρ⊗^S[m])⊗^S[n] := by
+  rw [← eq_cast_iff_heq]; swap
+  · rw [spacePow_mul]
+  rw [eq_cast_iff_heq]
+  induction n
+  · simp
+  · rename_i n ih
+    rw [statePow_succ, mul_add]
+    --This is TERRIBLE. There has to be a better way
+    trans ρ⊗^S[m * n] ⊗ᵣ ρ⊗^S[m * 1]
+    · apply statePow_add
+    · rw [← eq_cast_iff_heq] at ih; swap
+      · congr 2 <;> simp [pow_mul]
+      rw [← eq_cast_iff_heq]; swap
+      · congr 2 <;> simp [pow_mul]
+      rw [← MState.relabel_cast _ (by simp [pow_mul])]
+      rw [prodRelabel_relabel_cast_prod]
+      · congr
+        · rw [ih, MState.relabel_cast]
+        · rw [MState.relabel_cast]
+          rw [eq_cast_iff_heq]
+          · rw [mul_one]
+          · rw [mul_one]
+      · rw [pow_mul]
+
+theorem statePow_mul_relabel {i : ι} (ρ : MState (H i)) (m n : ℕ) :
+   ρ⊗^S[m * n] = (ρ⊗^S[m])⊗^S[n].relabel (Equiv.cast (congrArg H (pow_mul i m n))) := by
+  have h := statePow_mul ρ m n
+  rw [heq_iff_exists_eq_cast] at h
+  obtain ⟨h, h₂⟩ := h
+  rw [h₂, MState.relabel_cast]
+
+open ComplexOrder in
+theorem PosDef.npow {ρ : MState (H i)} (hρ : ρ.m.PosDef) (n : ℕ)
+    : (ρ⊗^S[n]).m.PosDef := by
+  induction n
+  · rw [statePow_zero, spacePow_zero]
+    exact MState.posDef_of_unique default
+  · apply ResourcePretheory.PosDef.prod ‹_› hρ
+
+theorem statePow_rw {n m : ℕ} (h : n = m) (ρ : MState (H i)) :
+    ρ⊗^S[n] = (ρ⊗^S[m]).relabel (Equiv.cast (by congr)) := by
+  subst n
+  simp
+
+@[simp]
+theorem qRelEntropy_statePow (ρ σ : MState (H i)) (n : ℕ) :
+    𝐃(ρ⊗^S[n] ‖ σ ⊗^S[n]) = n * 𝐃(ρ‖σ) := by
+  induction n
+  · simp
+  · rename_i n ih
+    rw [statePow_succ, statePow_succ, qRelEntropy_prodRelabel]
+    simp [ih, add_mul]
+
+--PULLOUT: MState.lean
+@[simp]
+theorem _root_.MState.default_M [Fintype d] [DecidableEq d] [Unique d] : (default : MState d).M = 1 := by
+  simp [MState.instInhabited, MState.uniform]
+  rfl
+
+--PULLOUT: HermitianMat/CFC.lean
+@[simp]
+theorem _root_.HermitianMat.one_rpow [Fintype d] [DecidableEq d] (r : ℝ) :
+    (1 : HermitianMat d ℂ) ^ r = 1 := by
+  rcases isEmpty_or_nonempty d
+  · apply Subsingleton.allEq
+  · nth_rw 2 [← HermitianMat.cfc_id (1 : HermitianMat d ℂ)]
+    exact HermitianMat.cfc_congr 1 (by simp)
+
+--PULLOUT: HermitianMat/Trace.lean
+@[simp]
+theorem _root_.HermitianMat.trace_one [Fintype d] [DecidableEq d] :
+    (1 : HermitianMat d ℂ).trace = (Fintype.card d) := by
+  simp [HermitianMat.trace_eq_re_trace]
+
+--PULLOUT: Entropy.lean
+@[simp]
+theorem _root_.sandwichedRelRentropy_of_unique [Fintype d] [DecidableEq d] [Unique d]
+  (ρ σ : MState d) (α : ℝ) :
+    D̃_α(ρ‖σ) = 0 := by
+  simp [Subsingleton.allEq ρ default, Subsingleton.allEq σ default, SandwichedRelRentropy]
+
+@[simp]
+theorem sandwichedRelRentropy_statePow {α : ℝ} (ρ σ : MState (H i)) (n : ℕ) :
+    D̃_ α(ρ⊗^S[n] ‖ σ⊗^S[n]) = n * D̃_ α(ρ‖σ) := by
+  induction n
+  · rw [statePow_zero, statePow_zero, spacePow_zero]
+    simp
+  · rename_i n ih
+    rw [statePow_succ, statePow_succ, sandwichedRelRentropy_prodRelabel]
+    simp [ih, add_mul]
+
+theorem sandwichedRelRentropy_heq_congr {α : ℝ}
+      {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂) (hρ : ρ₁ ≍ ρ₂) (hσ : σ₁ ≍ σ₂) :
+    D̃_ α(ρ₁‖σ₁) = D̃_ α(ρ₂‖σ₂) := by
+  rw [heq_iff_exists_eq_cast] at hρ hσ
+  obtain ⟨_, rfl⟩ := hρ
+  obtain ⟨_, rfl⟩ := hσ
+  simp [← MState.relabel_cast _ hd]
+
+@[gcongr]
+theorem sandwichedRelRentropy_congr {α : ℝ}
+      {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+      {ρ₁ σ₁ : MState d₁} {ρ₂ σ₂ : MState d₂} (hd : d₁ = d₂)
+        (hρ : ρ₁ = ρ₂.relabel (Equiv.cast hd)) (hσ : σ₁ = σ₂.relabel (Equiv.cast hd)) :
+    D̃_ α(ρ₁‖σ₁) = D̃_ α(ρ₂‖σ₂) := by
+  subst ρ₁ σ₁
+  simp
+
+end UnitalPretheory
+
+/- FreeStateTheories: theories defining some sets of "free states" within a collection of Hilbert spaces. -/
+
+/-- A `FreeStateTheory` is a collection of mixed states (`MState`s) in a `ResourcePretheory` that obeys
+some necessary axioms:
+ * For each Hilbert space `H i`, the free states are a closed, convex set
+ * For each Hilbert space `H i`, there is a free state of full rank
+ * If `ρᵢ ∈ H i` and `ρⱼ ∈ H j` are free, then `ρᵢ ⊗ ρⱼ` is free in `H (prod i j)`.
+-/
+class FreeStateTheory (ι : Type*) extends ResourcePretheory ι where
+  /-- The set of states we're calling "free" -/
+  IsFree : Set (MState (toResourcePretheory.H i))
+  /-- The set F(H) of free states is closed -/
+  free_closed : IsClosed (@IsFree i)
+  /-- The set F(H) of free states is convex (more precisely, their matrices are) -/
+  free_convex : Convex ℝ (MState.M '' (@IsFree i))
+  /-- The set of free states is closed under tensor product -/
+  free_prod {ρ₁ : MState (H i)} {ρ₂ : MState (H j)} (h₁ : IsFree ρ₁) (h₂ : IsFree ρ₂) : IsFree (ρ₁ ⊗ᵣ ρ₂)
+  /-- The set F(H) of free states contains a full-rank state `ρfull`, equivalently `ρfull` is positive definite. -/
+  free_fullRank (i : ι) : open ComplexOrder in ∃ (ρ : MState (H i)), ρ.m.PosDef ∧ IsFree ρ
+
+namespace FreeStateTheory
+
+variable {ι : Type*} [FreeStateTheory ι] {i : ι}
+
+noncomputable instance Inhabited_IsFree : Inhabited (IsFree (i := i)) :=
+  ⟨⟨(free_fullRank i).choose, (free_fullRank i).choose_spec.right⟩⟩
+
+theorem IsFree.of_unique [Unique (H i)] (ρ : MState (H i)) : ρ ∈ IsFree := by
+  obtain ⟨σ, h₁, h₂⟩ := free_fullRank i
+  convert h₂
+  apply Subsingleton.allEq
+
+/--The set of free states is compact because it's a closed subset of a compact space. -/
+theorem IsCompact_IsFree : IsCompact (IsFree (i := i)) :=
+  .of_isClosed_subset isCompact_univ free_closed (Set.subset_univ _)
+
+--Also this needs to be generalized to other convex sets. I think it should work for any
+--(well-behaved?) Mixable instance, it certainly works for any `Convex` set (of which `IsFree`
+-- is one, the only relevant property here is `free_convex`.
+theorem IsFree.mix {ι : Type*} [FreeStateTheory ι] {i : ι} {σ₁ σ₂ : MState (H i)}
+    (hσ₁ : IsFree σ₁) (hσ₂ : IsFree σ₂) (p : Prob) : IsFree (p [σ₁ ↔ σ₂]) := by
+  obtain ⟨m, hm₁, hm₂⟩ := free_convex (i := i) ⟨σ₁, hσ₁, rfl⟩ ⟨σ₂, hσ₂, rfl⟩ p.zero_le (1 - p).zero_le (by simp)
+  simp [Mixable.mix, Mixable.mix_ab, MState.instMixable]
+  simp at hm₂
+  convert ← hm₁
+
+end FreeStateTheory
+
+open UnitalPretheory
+open FreeStateTheory
+
+class UnitalFreeStateTheory (ι : Type*) extends FreeStateTheory ι, UnitalPretheory ι
+
+namespace UnitalFreeStateTheory
+
+--Things like asymptotically free operations, measures of non-freeness, etc. that can be stated
+--entirely in terms of the free states (without referring to operations) go here.
+
+variable {ι : Type*} [UnitalFreeStateTheory ι] {i : ι}
+
+theorem _root_.FreeStateTheory.IsFree.npow {i : ι} {ρ : MState (H i)}
+    (hρ : IsFree ρ) (n : ℕ) : IsFree (ρ⊗^S[n]) := by
+  induction n
+  · rw [statePow_zero, spacePow_zero]
+    apply IsFree.of_unique
+  · rw [statePow_succ]
+    exact FreeStateTheory.free_prod ‹_› hρ
+
+@[simp]
+theorem relabel_cast_isFree {i j : ι} (ρ : MState (H i)) (h : j = i) {h' : H j = H i}:
+    ρ.relabel (Equiv.cast h') ∈ IsFree ↔ ρ ∈ IsFree := by
+  subst h
+  simp
+
+open NNReal
+
+/-- In a `FreeStateTheory`, we have free states of full rank, therefore the minimum relative entropy
+of any state `ρ` to a free state is finite. -/
+@[aesop (rule_sets := [finiteness]) safe]
+lemma relativeEntResource_ne_top (ρ : MState (H i)) : ⨅ σ ∈ IsFree, 𝐃(ρ‖σ) ≠ ⊤ := by
+  let ⟨w,h⟩ := free_fullRank i
+  apply ne_top_of_le_ne_top _ (iInf_le _ w)
+  simp only [ne_eq, iInf_eq_top, Classical.not_imp]
+  constructor
+  · exact h.2
+  · refine ne_of_apply_ne ENNReal.toEReal (qRelativeEnt_ker (ρ := ρ) (?_) ▸ EReal.coe_ne_top _)
+    convert @bot_le _ _ (Submodule.instOrderBot) _
+    exact h.1.toLin_ker_eq_bot
+  /-
+  simp only [ne_eq, iInf_eq_top, not_forall]
+  obtain ⟨σ, hσ₁, hσ₂⟩ := FreeStateTheory.free_fullRank i
+  use σ, hσ₂
+  rw [qRelativeEnt]
+  split_ifs with h
+  · simp --should be `finiteness`, TODO debug
+  contrapose! h
+  convert bot_le
+  exact hσ₁.toLin_ker_eq_bot
+  -/
+
+noncomputable def RelativeEntResource : MState (H i) → ℝ≥0 :=
+    fun ρ ↦ (⨅ σ ∈ IsFree, 𝐃(ρ‖σ)).untop (relativeEntResource_ne_top ρ)
+
+scoped notation "𝑅ᵣ" => RelativeEntResource
+
+theorem exists_isFree_relativeEntResource (ρ : MState (H i)) :
+    ∃ σ ∈ IsFree, 𝐃(ρ‖σ) = 𝑅ᵣ ρ := by
+  obtain ⟨σ, hσ₁, hσ₂⟩ := IsCompact_IsFree.exists_isMinOn_lowerSemicontinuousOn
+    (s := IsFree (i := i)) (f := fun σ ↦ 𝐃(ρ‖σ))
+    Set.Nonempty.of_subtype (by fun_prop)
+  use σ, hσ₁
+  rw [RelativeEntResource, ← hσ₂.iInf_eq hσ₁, ENNReal.ofNNReal, WithTop.coe_untop, iInf_subtype']
+
+theorem RelativeEntResource.Subadditive (ρ : MState (H i)) : Subadditive fun n ↦ 𝑅ᵣ (ρ⊗^S[n]) := by
+  intro m n
+  obtain ⟨σ₂, hσ₂f, hσ₂d⟩ := exists_isFree_relativeEntResource (ρ⊗^S[m])
+  obtain ⟨σ₃, hσ₃f, hσ₃d⟩ := exists_isFree_relativeEntResource (ρ⊗^S[n])
+  simp only [RelativeEntResource, ← NNReal.coe_add, coe_le_coe]
+  rw [← ENNReal.coe_le_coe]
+  simp [RelativeEntResource, ENNReal.ofNNReal] at hσ₂d hσ₃d ⊢
+  rw [← hσ₂d, ← hσ₃d]
+  clear hσ₂d hσ₃d
+  have ht₁ : i ^ (m + n) = i ^ m * i ^ n :=
+    spacePow_add m n
+  have ht := congrArg H ht₁
+  refine le_trans (biInf_le (i := (σ₂ ⊗ᵣ σ₃).relabel (Equiv.cast ht)) _ ?_) ?_
+  · simpa [ht₁] using free_prod hσ₂f hσ₃f
+  · apply le_of_eq
+    rw [← qRelEntropy_prodRelabel]
+    gcongr
+    · apply statePow_add
+    · rw [← eq_cast_iff_heq]
+      apply MState.relabel_cast
+
+noncomputable def RegularizedRelativeEntResource (ρ : MState (H i)) : ℝ≥0 :=
+  ⟨(RelativeEntResource.Subadditive ρ).lim, by
+    rw [Subadditive.lim]
+    apply Real.sInf_nonneg
+    rintro x ⟨x, hx, rfl⟩
+    positivity⟩
+
+scoped notation "𝑅ᵣ∞" => RegularizedRelativeEntResource
+
+/-- Lemma 5 -/
+theorem RelativeEntResource.tendsto (ρ : MState (H i)) :
+    Filter.atTop.Tendsto (fun n ↦ 𝑅ᵣ (ρ⊗^S[n]) / n) (𝓝 (𝑅ᵣ∞ ρ)) := by
+  rw [← NNReal.tendsto_coe]
+  apply (RelativeEntResource.Subadditive ρ).tendsto_lim
+  use 0
+  rintro _ ⟨y, rfl⟩
+  positivity
+
+/-- Alternate version of Lemma 5 which states the convergence with the `ENNReal`
+expression for `RelativeEntResource`, as opposed its `untop`-ped `NNReal` value. -/
+theorem RelativeEntResource.tendsto_ennreal (ρ : MState (H i)) :
+    Filter.atTop.Tendsto (fun n ↦ (⨅ σ ∈ IsFree, 𝐃(ρ⊗^S[n]‖σ)) / ↑n) (𝓝 (𝑅ᵣ∞ ρ)) := by
+  refine Filter.Tendsto.congr' ?_ (ENNReal.tendsto_coe.mpr <| RelativeEntResource.tendsto ρ)
+  rw [Filter.EventuallyEq, Filter.eventually_atTop]
+  use 1; intros
+  rw [RelativeEntResource, ENNReal.coe_div (by positivity), ENNReal.coe_natCast]
+  congr
+  apply WithTop.coe_untop
+
+noncomputable def GlobalRobustness {i : ι} : MState (H i) → ℝ≥0 :=
+  fun ρ ↦ sInf {s | ∃ σ, (⟨1 / (1+s), by bound⟩ [ρ ↔ σ]) ∈ IsFree}
+
+/-- A sequence of operations `f_n` is asymptotically nongenerating if `lim_{n→∞} RG(f_n(ρ_n)) = 0`, where
+RG is `GlobalRobustness` and `ρ_n` is any sequence of free states. Equivalently, we can take the `max` (
+over operations and states) on the left-hand side inside the limit.
+-/
+def IsAsymptoticallyNongenerating (dI dO : ι) (f : (n : ℕ) → CPTPMap (H (dI⊗^H[n])) (H (dO⊗^H[n]))) : Prop :=
+  ∀ (ρs : (n : ℕ) → MState (H (dI⊗^H[n]))), (∀ n, IsFree (ρs n)) →
+  Filter.atTop.Tendsto (fun n ↦ GlobalRobustness ((f n) (ρs n))) (𝓝 0)
+
+end UnitalFreeStateTheory
+
+
+================================================================================
+FILE: QuantumInfo/Finite/ResourceTheory/HypothesisTesting.lean
+TYPE: Lean 4
+SIZE: 22681 characters
+================================================================================
+
+import Mathlib.Algebra.Module.Submodule.Lattice
+import Mathlib.Analysis.Subadditive
+import Mathlib.CategoryTheory.Functor.FullyFaithful
+import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+import Mathlib.Data.EReal.Basic
+
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.Finite.POVM
+
+/-!
+Defines `OptimalHypothesisRate`, the optimal rate of distinguishing an `MState` ρ from a set of other
+mixed states `S`, with at most Type I error ε.
+
+That is to say: take a projective measurement (a `POVM`) with elements `{T, 1-T}`, where measuring `T`
+will mean we conclude our unknown state was ρ, and measuring `1-T` will mean we think the state was
+something in `S`. We only accept T's such that `Tr[(1-T)ρ] ≤ ε`, that is, we have at most an ε
+probability of incorrectly concluding it was ρ. The Type II error associated to this T is then
+`max_{σ ∈ S} Tr[T σ]`, that is, the (worst possible, over possible states) chance of incorrectly
+concluding our state was in `S`. Optimize over `T` to get the lowest possible Type II error rate,
+and the resulting error rate is `OptimalHypothesisRate ρ ε S`.
+
+We make this accessible through the notation `β_ ε(ρ‖S)`.
+
+See [The tangled state of quantum hypothesis testing](https://doi.org/10.1038/s41567-023-02289-9) by
+Mario Berta et al. for a broader overview.
+-/
+
+open NNReal
+open ComplexOrder
+open Topology
+open Prob
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+/-- The optimal hypothesis testing rate, for a tolerance ε: given a state ρ and a set of states S,
+the optimum distinguishing rate that allows a probability ε of errors. -/
+noncomputable def OptimalHypothesisRate (ρ : MState d) (ε : Prob) (S : Set (MState d)) : Prob :=
+  ⨅ T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1},
+    ⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩
+
+scoped[OptimalHypothesisRate] notation "β_" ε " (" ρ "‖" S ")" =>  OptimalHypothesisRate ρ ε S
+
+namespace OptimalHypothesisRate
+
+/-- The space of strategies `T` in `OptimalHypothesisRate` is inhabited, we always have some valid strategy. -/
+instance iInf_Inhabited (ρ : MState d) (ε : Prob) :
+    Inhabited { m // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } :=
+  ⟨1, by simp⟩
+
+instance (ρ : MState d) (ε : Prob) : Inhabited {m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1} :=
+  iInf_Inhabited ρ ε
+
+/-- The space of strategies `T` in `OptimalHypothesisRate` is compact. -/
+theorem iInf_IsCompact (ρ : MState d) (ε : Prob) : IsCompact { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
+  have hC₁ : IsCompact {m : HermitianMat d ℂ | 0 ≤ m ∧ m ≤ 1} :=
+    HermitianMat.unitInterval_IsCompact
+  have hC₂ : IsClosed {m | ρ.exp_val (1 - m) ≤ ε} := by
+    --This is a linear constraint and so has a closed image
+    change IsClosed ((fun m ↦ ρ.M.inner_BilinForm (1 - m)) ⁻¹' (Set.Iic ε))
+    refine IsClosed.preimage ?_ isClosed_Iic
+    fun_prop
+  exact hC₁.inter_left hC₂
+
+/-- The space of strategies `T` in `OptimalHypothesisRate` is convex. -/
+theorem iInf_IsConvex (ρ : MState d) (ε : Prob) : Convex ℝ { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 } := by
+  --We *could* get this from a more general fact that any linear subspace is convex,
+  --and the intersection of convex spaces is convex, and this is an intersection of
+  --three convex spaces. That would be more broken-down and lemmaified.
+  rintro x ⟨hx₁, hx₂, hx₃⟩ y ⟨hy₁, hy₂, hy₃⟩ a b ha hb hab
+  rw [← eq_sub_iff_add_eq'] at hab
+  subst b
+  refine And.intro ?_ (And.intro ?_ ?_)
+  · simp only [MState.exp_val, HermitianMat.inner_left_sub, HermitianMat.inner_one, MState.tr,
+      tsub_le_iff_right, HermitianMat.inner_left_distrib, HermitianMat.inner_smul] at hx₁ hy₁ ⊢
+    linear_combination a * hx₁ + (1 - a) * hy₁
+  · apply HermitianMat.convex_cone <;> assumption
+  · --Something's wrong with type class inference that's taking wayyy longer than it should.
+    --DFunLike.coe is being unfolded tonnnnss of times.
+    rw [← sub_nonneg] at hx₃ hy₃ ⊢
+    convert HermitianMat.convex_cone hx₃ hy₃ ha hb using 1
+    simp only [sub_smul, one_smul, smul_sub]
+    abel
+
+/-- When `S` is empty, the optimal hypothesis testing rate is zero. -/
+@[simp]
+theorem of_empty {ρ : MState d} (ε : Prob) : β_ ε(ρ‖∅) = 0 := by
+  simp [OptimalHypothesisRate]
+  rfl
+
+theorem le_sup_exp_val {ρ : MState d} (ε : Prob) {S : Set (MState d)}
+    (m : HermitianMat d ℂ) (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
+    β_ ε(ρ‖S) ≤ ⨆ σ ∈ S, ⟨_, σ.exp_val_prob hm⟩ := by
+  unfold OptimalHypothesisRate
+  apply iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ _
+  simp only [le_refl]
+
+theorem le_of_subset (ρ : MState d) (ε : Prob) {S1 S2 : Set (MState d)} (h : S1 ⊆ S2) :
+    β_ ε(ρ‖S1) ≤ β_ ε(ρ‖S2) :=
+  iInf_mono (fun _ ↦ iSup_le_iSup_of_subset h)
+
+theorem of_singleton {ρ σ : MState d} {ε : Prob} :
+    β_ ε(ρ‖{σ}) =
+      ⨅ T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1},
+        ⟨_, σ.exp_val_prob T.2.right⟩ := by
+  simp only [OptimalHypothesisRate, iSup_singleton]
+
+open scoped Prob in
+theorem negLog_le_singleton (ρ : MState d) (ε : Prob) (S : Set (MState d))
+    (σ : MState d) (h : σ ∈ S) : —log β_ ε(ρ‖S) ≤ —log β_ ε(ρ‖{σ}) := by
+  apply Prob.negLog_Antitone
+  apply le_of_subset
+  exact Set.singleton_subset_iff.mpr h
+
+theorem singleton_le_exp_val {ρ σ : MState d} {ε : Prob} (m : HermitianMat d ℂ)
+    (hExp : ρ.exp_val (1 - m) ≤ ε) (hm : 0 ≤ m ∧ m ≤ 1) :
+  β_ ε(ρ‖{σ}) ≤ ⟨_, σ.exp_val_prob hm⟩ := by
+  rw [of_singleton]
+  apply iInf_le_of_le ⟨m, ⟨hExp, hm⟩⟩ _
+  simp only [le_refl]
+
+/-- There exists an optimal T for the hypothesis testing, that is, it's a minimum
+and not just an infimum. This states we have `1 - ε ≤ ρ.exp_val T`, but we can always
+"worsen" T to make that bound tight, which is `exists_min`. -/
+theorem exists_min' (ρ : MState d) (ε : Prob) (S : Set (MState d)):
+    ∃ (T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1}),
+      (⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩ = β_ ε(ρ‖S))
+      ∧ 1 - ε ≤ ρ.exp_val T := by
+  have _ : Nonempty d := ρ.nonempty
+  rcases S.eq_empty_or_nonempty with rfl | hS
+  · simpa [-Subtype.exists] using ⟨rfl, ⟨1, by simp⟩, by simp⟩
+  rw [← Set.nonempty_coe_sort] at hS
+  obtain ⟨T, hT₁, hT₂⟩ := IsCompact.exists_isMinOn (α := Prob)
+    (isCompact_iff_isCompact_univ.mp (iInf_IsCompact ρ ε)) Set.univ_nonempty
+    (f := fun T ↦ ⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩)
+    (by
+      have h := HermitianMat.inner_BilinForm.continuous_iSup_fst
+        (Bornology.isBounded_induced.mp (Bornology.IsBounded.all S))
+      apply Continuous.continuousOn
+      simp_rw [← iSup_subtype'', subtype_val_iSup' (ι := S)]
+      refine Continuous.subtype_mk ?_ _
+      refine Continuous.comp (g := fun T ↦ ⨆ (i : S), i.val.exp_val T) ?_ continuous_subtype_val
+      convert h with T
+      rw [← sSup_image' (s := S) (f := fun i ↦ i.exp_val T)]
+      rw [← sSup_image' (s := (MState.M '' S)) (f := fun i ↦ i.inner_BilinForm T)]
+      simp [Set.image, MState.exp_val]
+    )
+  clear hT₁
+
+  use T
+  constructor
+  · simp only [isMinOn_univ_iff] at hT₂
+    rw [OptimalHypothesisRate]
+    --Why is the following three bundled together not a theorem? Is it, and I can't find it? TODO
+    apply le_antisymm
+    · exact le_iInf hT₂
+    · exact iInf_le_iff.mpr fun _ a ↦ a T
+  · simpa [MState.exp_val_sub, add_comm (ε : ℝ) _] using T.2.1
+
+--TODO: Maybe we should define these two instances.
+-- Then we can get rid of `Prob.sub_zero` and use the generic `tsub_zero`.
+-- #synth AddCommMonoid Prob
+-- #synth OrderedSub Prob
+
+/-- There exists an optimal T for the hypothesis testing, that is, it's a minimum and
+not just an infimum. This tightens the `T` from `exists_min'` to a `⟪ρ,T⟫ = 1 - ε` bound. -/
+theorem exists_min (ρ : MState d) (ε : Prob) (S : Set (MState d)):
+    ∃ (T : { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1}),
+      (⨆ σ ∈ S, ⟨_, σ.exp_val_prob T.prop.right⟩ = β_ ε(ρ‖S))
+      ∧ ρ.exp_val T = 1 - ε := by
+  obtain ⟨T, hT₁, hT₂⟩ := exists_min' ρ ε S
+
+  --Instead of just `use T`, we (may) have to reduce it so that it saturates the ⟪ρ,T⟫ = 1 - ε bound.
+  --We do this by multiplying it by a scalar less than 1 to get a `T'`. Since this operator is less
+  --than T, it's still optimal in terms of achieving `β_ ε(ρ‖S)`, but it can get the `1 - ε` bound instead.
+  set δ := ρ.exp_val ↑T - (1 - ε)-- with δ_def
+  by_cases hδ : δ = 0
+  · use T, hT₁
+    linarith
+  replace hδ : 0 < δ := by linarith +splitNe
+  have hδ_le : δ ≤ 1 := by
+    linarith [ρ.exp_val_le_one T.2.2.2, ε.2]
+
+  have hTr : 0 < ρ.exp_val T := by
+    linarith [ε.coe_le_one]
+
+  set T' : HermitianMat d ℂ :=
+    (1 - δ / ρ.exp_val T) • T with hT'_def
+  have hT'_le : T' ≤ T := by
+    rw [← one_smul ℝ T.val, hT'_def]
+    gcongr
+    · exact T.2.2.1
+    · simp; positivity
+  have hρT' : ρ.exp_val (1 - T') = ε := by
+    simp [T', MState.exp_val_sub, δ, field]
+
+  have hT' : ρ.exp_val (1 - T') ≤ ε ∧ 0 ≤ T' ∧ T' ≤ 1 := by
+    use hρT'.le
+    constructor
+    · simp [T']
+      refine smul_nonneg ?_ T.2.2.1
+      bound
+    · exact hT'_le.trans T.2.2.2
+  use ⟨T', hT'⟩
+
+  constructor
+  · rw [OptimalHypothesisRate] at hT₁ ⊢
+    apply le_antisymm
+    · apply le_iInf
+      intro i
+      refine le_trans ?_ (le_of_eq_of_le hT₁ ?_)
+      · gcongr
+      · exact iInf_le_iff.mpr fun _ a ↦ a i
+    · exact iInf_le_iff.mpr fun _ a ↦ a ⟨T', hT'⟩
+  · simp [MState.exp_val_sub, ← hρT']
+
+/-- When the allowed Type I error `ε` is less than 1 (so, we have some limit on our errors),
+and the kernel of the state `ρ` contains the kernel of some element in `S`, then the optimal
+hypothesis rate is positive - there is some lower bound on the type II errors we'll see. In
+other words, under these conditions, we cannot completely avoid type II errors. -/
+theorem pos_of_lt_one {ρ : MState d} (S : Set (MState d))
+  (hρ : ∃ σ ∈ S, σ.M.ker ≤ ρ.M.ker)
+  {ε : Prob} (hε : ε < 1) : 0 < β_ ε(ρ‖S) := by
+  obtain ⟨σ, hσ₁, hσ₂⟩ := hρ
+  --Assume the converse: that the infimum is zero. The set of such T's is inhabited
+  --and closed, so there is some T that attains the value zero. This T has zero
+  --inner product with σ (`σ.exp_val T = 0`), and yet (by definition of T's type) we
+  --also have that `ρ.exp_val (1 - T) ≤ ε < 1`. So `T` lives entirely in σ's kernel,
+  --which (by `h_supp`) is contained in ρ's kernel. So
+  --`ρ.exp_val (1 - T) = ρ.exp_val 1 - ρ.exp_val T = ρ.trace - 0 = 1`, a contradiction.
+  by_contra h
+  obtain ⟨⟨T, hT₁, hT₂, hT₃⟩, hT₄, hT₅⟩ := exists_min ρ ε S
+  rw [← bot_eq_zero'', not_bot_lt_iff] at h
+  rw [h, iSup_eq_bot, bot_eq_zero''] at hT₄
+  specialize hT₄ σ
+  simp only [iSup_pos hσ₁, Subtype.ext_iff, Set.Icc.coe_zero, MState.exp_val] at hT₄
+  rw [HermitianMat.inner_zero_iff σ.zero_le hT₂] at hT₄
+  replace hT₁ : ρ.exp_val (1 - T) ≠ 1 := (lt_of_le_of_lt hT₁ hε).ne
+  absurd hT₁
+  rw [ρ.exp_val_eq_one_iff ?_, sub_sub_cancel]
+  · grw [← hT₄]
+    rwa [HermitianMat.ker, HermitianMat.ker, ContinuousLinearMap.ker_le_ker_iff_range_le_range] at hσ₂
+    · simp
+    · simp
+  · exact sub_le_self 1 hT₂
+
+--Lemma 3 from Hayashi
+theorem Lemma3 {ρ : MState d} (ε : Prob) {S : Set (MState d)} (hS₁ : IsCompact S)
+    (hS₂ : Convex ℝ (MState.M '' S)) : ⨆ σ ∈ S, β_ ε(ρ‖{σ}) = β_ ε(ρ‖S) := by
+
+  --Work out the case where S is empty, so we can now assume it's nonempty
+  rcases S.eq_empty_or_nonempty with rfl|hnS
+  · simpa using bot_eq_zero''
+  --Upgrade this fact to an instance
+  have _ : Nonempty S := hnS.to_subtype
+
+  simp only [OptimalHypothesisRate, Set.mem_singleton_iff, iSup_iSup_eq_left]
+
+  --This parts needs the minimax theorem. Set up the relevant sets and hypotheses.
+  --The function `f` will be the `MState.exp_val` function, but bundled as a bilinear form.
+  let f : LinearMap.BilinForm ℝ (HermitianMat d ℂ) := HermitianMat.inner_BilinForm
+  let S' : Set (HermitianMat d ℂ) := MState.M '' S
+  let T' : Set (HermitianMat d ℂ) := { m | ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1 }
+
+  have hS'₁ : IsCompact S' := hS₁.image MState.Continuous_HermitianMat
+
+  have hT'₁ : IsCompact T' := iInf_IsCompact ρ ε
+
+  have hT'₂ : Convex ℝ T' := iInf_IsConvex ρ ε
+
+  have hS'₃ : S'.Nonempty := by simpa only [Set.image_nonempty, S']
+
+  have hT'₃ : T'.Nonempty := Set.Nonempty.of_subtype
+
+  ext1 --turn it from Prob equality into ℝ equality
+  convert minimax (M := HermitianMat d ℂ) f S' T' hS'₁ hT'₁ hS₂ hT'₂ hS'₃ hT'₃
+  --The remaining twiddling is about moving the casts inside the iInf's and iSup's.
+  --In a better world, this would be mostly handled by some clever simps or push_cast's.
+  · have hi := iSup_range' (ι := S) (fun x ↦ ⨅ (y : T'), (f x) ↑y) (·)
+    rw [← Set.image_eq_range] at hi
+    rw [← iSup_subtype'', Set.Icc.coe_iSup (zero_le_one), hi]
+    congr!
+    exact Set.Icc.coe_iInf zero_le_one
+  · rw [Set.Icc.coe_iInf (ι := T') zero_le_one]
+    congr! 2 with y
+    have hi := iSup_range' (ι := S) (fun x ↦ (f x) ↑y) (·)
+    rw [← Set.image_eq_range] at hi
+    rw [← iSup_subtype'', Set.Icc.coe_iSup zero_le_one, hi]
+    rfl
+
+--Maybe should be phrased in terms of `0 < ...` instead? Maybe belongs in another file? It's kiinnnd of specialized..
+theorem ker_diagonal_prob_eq_bot {q : Prob} (hq₁ : 0 < q) (hq₂ : q < 1) :
+    HermitianMat.ker (.diagonal (Distribution.coin q ·)) = ⊥ := by
+  apply Matrix.PosDef.toLin_ker_eq_bot
+  apply Matrix.PosDef.diagonal
+  intro i; fin_cases i
+  · simpa
+  · simpa [← Complex.ofReal_one, Complex.real_lt_real]
+
+variable {d₂ : Type*} [Fintype d₂] [DecidableEq d₂] in
+/-- Lemma S1 -/
+theorem optimalHypothesisRate_antitone (ρ σ : MState d) (ℰ : CPTPMap d d₂) (ε : Prob) :
+    β_ ε(ρ‖{σ}) ≤ β_ ε(ℰ ρ‖{ℰ σ}) := by
+  simp only [of_singleton]
+  obtain ⟨ℰdualSubtype, h⟩ :
+      ∃ e : ({ m : HermitianMat d₂ ℂ // (ℰ ρ).exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1} →
+      { m : HermitianMat d ℂ // ρ.exp_val (1 - m) ≤ ε ∧ 0 ≤ m ∧ m ≤ 1}),
+      ∀ x, e x = ℰ.hermDual x
+       := by
+    constructor; swap
+    · rintro ⟨m, hm₁, hm₂⟩
+      refine ⟨ℰ.toPTPMap.hermDual m, ?_, PTPMap.hermDual.PTP_POVM ℰ.toPTPMap hm₂⟩
+      have hℰd : (ℰ ρ).exp_val (1 - m) = ρ.exp_val (ℰ.hermDual (1 - m)) :=
+        ℰ.exp_val_hermDual ρ (1 - m)
+      simpa [hℰd] using hm₁
+    · rintro ⟨m, hm₁, hm₂⟩
+      rfl
+  convert le_iInf_comp _ ℰdualSubtype
+  rename_i T'
+  specialize h T'
+  rw [h]
+  exact ℰ.exp_val_hermDual σ T'
+
+open scoped HermitianMat in
+open scoped Prob in
+/-- This is from [Strong converse exponents for a quantum channel discrimination problem
+and quantum-feedback-assisted communication](https://doi.org/10.1007/s00220-016-2645-4), Lemma 5.
+
+It seems like this is actually true for all 0 < α (with appropriate modifications at α = 1), but we only need
+it for the case of 1 < α.
+-/
+theorem Ref81Lem5 (ρ σ : MState d) (ε : Prob) (hε : ε < 1) (α : ℝ) (hα : 1 < α) :
+    —log β_ ε(ρ‖{σ}) ≤ D̃_ α(ρ‖σ) + —log (1 - ε) *
+      (.ofNNReal ⟨α, zero_le_one.trans hα.le⟩) / (.ofNNReal ⟨α - 1, sub_nonneg_of_le hα.le⟩)
+    := by
+  generalize_proofs pf1 pf2
+  --If ρ isn't in the support of σ, the right hand side is just ⊤. (The left hand side is not, necessarily!)
+  by_cases h_supp : σ.M.ker ≤ ρ.M.ker
+  swap
+  · simp [SandwichedRelRentropy, h_supp]
+
+  --Now we know that ρ.support ≤ σ.support. This is the main case we actually care about.
+  --Proof from https://link.springer.com/article/10.1007/s00220-016-2645-4 reproduced below.
+  /-
+  Lemma 5. Let ρ, σ ∈ S (H) be such that supp ρ ⊆ supp σ . For any Q ∈ B(H) such
+    that 0 ≤ Q ≤ I , and any α > 1,
+    − log Tr[Qσ] ≤ D˜α (ρ‖σ) − α / (α−1) * log Tr[Qρ]. (3.7)
+    In particular, for any α > 1 and any ε ∈ (0, 1),
+    D^ε_H (ρ‖σ) ≤ D˜α (ρ‖σ) + α / (α−1) * log(1 / (1−ε)). (3.8)
+    Proof. Let p ≡ Tr {Qρ} and q ≡ Tr {Qσ}. By the monotonicity of the sandwiched
+    Rényi relative entropy for α > 1, we find that
+    D˜α (ρ‖σ) ≥ D˜α ((p, 1 − p) ‖ (q, 1 − q)) (3.9)
+      = 1 / (α−1) * log[p^α * q^(1−α) + (1−p)^α * (1−q)^(1−α) ] (3.10)
+      ≥ 1 / (α−1) * log[p^α * q^(1−α) ] (3.11)
+      = α / (α−1) * log p − log q, (3.12)
+    from which (3.7) follows. The statement in (3.8) follows by optimizing over all Q such
+    that Tr {Qρ} ≥ 1 − ε.
+  -/
+  -- The "monotonicity of the ..." part here refers to the data processing inequality, and
+  -- the (p, 1-p) and (q,1-q) refer to states which are qubits ("coins") of probability p and
+  -- q, respectively. The states ρ and σ can be "processed" into these coins by measuring the optimal T.
+
+  have h₂ : 0 < 1 - ε.val := by
+    change ε.val < 1 at hε
+    linarith
+
+  let p : Prob := 1 - ε
+  set q : Prob := β_ ε(ρ‖{σ})
+  let p2 : MState (Fin 2) := .ofClassical <| .coin p
+  let q2 : MState (Fin 2) := .ofClassical <| .coin q
+
+  --Show there's a lower bound on β_ε, that you can't do perfect discrimination
+  --It's possible that we actually don't want this here, that it should "follow"
+  --from the main proof.
+  have hq : 0 < q := pos_of_lt_one {σ} ⟨σ, rfl, h_supp⟩ hε
+
+  suffices —log q ≤ D̃_ α(p2‖q2) + —log (1 - ε) * (.ofNNReal ⟨α, pf1⟩) / (.ofNNReal ⟨α - 1, pf2⟩) by
+    refine this.trans (add_le_add_right ?_ _)
+    --Show that this is an instance of the Data Processing Inequality
+    obtain ⟨Φ, hΦ₁, hΦ₂⟩ : ∃ (Φ : CPTPMap d (Fin 2)), p2 = Φ ρ 

@@ -1,0 +1,1176 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+otherwise we can't "shrink"
+    --it by applying Lemma 7. Taking the full-rank state of dimension `H i` and taking all powers of it, works.
+    set σ₁ : (n : ℕ) → IsFree (i := i ^ n) := fun n ↦
+      ⟨(free_fullRank i).choose ⊗^S[n], IsFree.npow (free_fullRank i).choose_spec.2 n⟩ with hσ₁
+    have hσ₁_top : R2 ρ σ₁ ≠ ⊤ := by
+      rw [R2, ← Filter.liminf_nat_add _ 1]
+      simp [σ₁, mul_comm _ (qRelativeEnt _ _)]
+      conv =>
+        enter [1,1,1,n]
+        rw [ENNReal.mul_div_cancel_right (by positivity) (by finiteness)]
+      simp [qRelativeEnt_ne_top (free_fullRank i).choose_spec.1]
+    clear hσ₁
+    --Repeat the Lemma7 improvement process to drive the gap down
+    let σₖ : ℕ → (n : ℕ) → IsFree (i := i ^ n) := fun k ↦
+      (Lemma7_improver ρ hε hε')^[k] σ₁
+
+    --The gap between R_{1,ε} and R2 for `σₖ k` goes to 0 as `k → ∞`.
+    have hσₖ_gap : Filter.atTop.Tendsto (fun k ↦ R2 ρ (σₖ k) - R1 ρ ε) (𝓝 0) := by
+      suffices h : ∀ (k : ℕ), R2 ρ (σₖ k) - R1 ρ ε ≤ ↑(1 - ε')^k * (R2 ρ σ₁ - R1 ρ ε) by
+        refine tendsto_nhds_bot_mono' ?_ h
+        conv =>
+          enter [3, 1]
+          equals 0 * (R2 ρ σ₁ - R1 ρ ε) => simp
+        apply ENNReal.Tendsto.mul_const
+        · simp only [ENNReal.tendsto_pow_atTop_nhds_zero_iff]
+          --This should just be `simp` or `bound` at this point. TODO.
+          simp [Prob.toNNReal, ← NNReal.coe_lt_coe, hε'.1]
+        · right; exact ENNReal.sub_ne_top hσ₁_top
+      suffices h : ∀ (m k : ℕ), R2 ρ (σₖ (m + k)) - R1 ρ ε ≤ (1 - ε')^k * (R2 ρ (σₖ m) - R1 ρ ε) by
+        convert h 0; simp
+      intro m k; induction k generalizing m
+      · simp [σₖ]
+      rename_i k ih
+      have σₖ_succ (n) : σₖ (n + 1) = Lemma7_improver ρ hε hε' (σₖ n) :=
+        Function.iterate_succ_apply' ..
+      rw [← add_assoc, σₖ_succ, pow_succ]
+      grw [Lemma7_gap ρ hε hε' (σₖ (m + k)), ih m]
+      ring_nf
+      rfl
+
+    replace hσₖ_gap : Filter.atTop.liminf (fun k ↦ R2 ρ (σₖ k)) ≤ R1 ρ ε := by
+      rw [ENNReal.tendsto_sub_const_nhds_zero_iff] at hσₖ_gap
+      grw [Filter.liminf_le_limsup, hσₖ_gap]
+
+    rw [R1] at hσₖ_gap
+    grw [← hσₖ_gap]; clear hσₖ_gap
+
+    have hReg := RelativeEntResource.tendsto_ennreal ρ
+    replace hReg := hReg.liminf_eq
+    rw [← hReg]; clear hReg
+
+    unfold R2
+    /- The idea is now that: the LHS is the liminf over all n, of the minimum free σ of dimension n;
+      the RHS is the liminf over a particular subsequence, given by σₖ, which is free. But then
+      the math is complicated a bit by the fact that the RHS is a _double_ liminf. This is what H&Y
+      deal with by talking about the sequences `σ_{n_k, ∗} = σ_{n_k, k}` (below Eq (26)). We don't
+      actually construct such a subsequence here, we just unfold the bounds repeatedly.
+    -/
+    refine Filter.le_liminf_of_le (by isBoundedDefault) ?_
+    apply Filter.Eventually.of_forall fun _ ↦ ?_
+    refine Filter.liminf_le_liminf ?_
+    apply Filter.Eventually.of_forall fun _ ↦ ?_
+    gcongr
+    rw [iInf_subtype']
+    exact iInf_le _ _
+
+  · --the "strong converse" part
+    conv =>
+      enter [1, 1, n, 1, 1]
+      rw [← OptimalHypothesisRate.Lemma3 ε IsCompact_IsFree free_convex]
+
+    --Let σₘ be the state minimizing 𝐃(ρ⊗^m‖σₘ) over free states. This is guaranteed to exist since
+    -- (1) the divergence is continuous and (2) the set of free states is compact.
+    have σₘ_exists (m : ℕ) := IsCompact_IsFree.exists_isMinOn_lowerSemicontinuousOn
+      Set.Nonempty.of_subtype (f := fun σ ↦ 𝐃(ρ⊗^S[m]‖σ)) (by fun_prop)
+
+    have hσₘ1 (m) := (σₘ_exists m).choose_spec.left
+    have hσₘ2 (m) := (σₘ_exists m).choose_spec.right
+    generalize σₘ_def : (fun m ↦ (σₘ_exists m).choose) = σₘ
+    simp_rw [congrFun σₘ_def] at hσₘ1 hσₘ2
+    clear σₘ_def σₘ_exists
+
+    --Let σ₁ be the full-rank free state
+    have ⟨σ₁, hσ₁_pos, hσ₁_free⟩ := FreeStateTheory.free_fullRank i
+
+    --`h` is Eq (14)
+    have h (m : ℕ) (hm : m ≥ 1) := Lemma6 hm ρ σ₁ (σₘ m) hσ₁_pos hε.2
+
+    --Update `h` to Eq (15)
+    have h₂ (m : ℕ) : (fun n ↦ —log β_ ε(ρ⊗^S[n]‖IsFree) / n) ≤ᶠ[Filter.atTop]
+        (fun n ↦ —log β_ ε(ρ⊗^S[n]‖{(Lemma6_σn m σ₁ (σₘ m)) n}) / n) := by
+      rw [Filter.EventuallyLE]
+      apply Filter.Eventually.of_forall
+      intro n
+      gcongr
+      apply OptimalHypothesisRate.negLog_le_singleton
+      apply Lemma6_σn_IsFree hσ₁_free hσₘ1
+    replace h (m) (hm) := (Filter.limsup_le_limsup (h₂ m)).trans (h m hm)
+    clear h₂
+
+    --Update `h` to Eq (16)
+    conv at h =>
+      enter [m, hm, 2, 1]
+      exact (IsMinOn.iInf_eq (hσₘ1 m) (hσₘ2 m)).symm
+
+    apply tendsto_le_of_eventuallyLE tendsto_const_nhds (RelativeEntResource.tendsto_ennreal ρ)
+    rw [Filter.EventuallyLE, Filter.eventually_atTop]
+    use 1
+    convert h using 7
+    · exact OptimalHypothesisRate.Lemma3 ε IsCompact_IsFree free_convex
+    · symm
+      apply iInf_subtype''
+
+/-- Theorem 4, which is also called the Generalized quantum Stein's lemma in Hayashi & Yamasaki.
+What they state as an equality of limits, which don't exist per se in Mathlib, we state as the existence
+of a number (which happens to be `RegularizedRelativeEntResource`) to which both sides converge.
+-/
+theorem limit_hypotesting_eq_limit_rel_entropy (ρ : MState (H i)) (ε : Prob) (hε : 0 < ε ∧ ε < 1) :
+    ∃ d : ℝ≥0,
+      Filter.atTop.Tendsto (fun n ↦ —log β_ ε(ρ⊗^S[n]‖IsFree) / n) (𝓝 d)
+      ∧
+      Filter.atTop.Tendsto (fun n ↦ (⨅ σ ∈ IsFree, 𝐃(ρ⊗^S[n]‖σ)) / n) (𝓝 d)
+      := by
+  use 𝑅ᵣ∞ ρ -- Regularized relative entropy of resource (RegularizedRelativeEntResource) as an NNReal
+  constructor
+  · exact GeneralizedQSteinsLemma ρ hε -- Theorem 1 in Hayashi & Yamasaki
+  · exact RelativeEntResource.tendsto_ennreal ρ -- The regularized relative entropy of resource is not infinity
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Unitary.lean
+TYPE: Lean 4
+SIZE: 2002 characters
+================================================================================
+
+import QuantumInfo.Finite.MState
+
+/-! # Unitary operators on quantum state
+
+This file is intended for lemmas about unitary matrices (`Matrix.unitaryGroup`) and how they apply to
+`Bra`s, `Ket`s, and `MState` mixed states.
+
+This is imported by `CPTPMap` to define things like unitary channels, Kraus operators, and
+complementary channels, so this file itself does not discuss channels yet.-/
+
+noncomputable section
+
+notation "𝐔[" n "]" => Matrix.unitaryGroup n ℂ
+
+namespace HermitianMat
+
+variable {𝕜 : Type*} [RCLike 𝕜] {n : Type*} [Fintype n] [DecidableEq n]
+variable (A B : HermitianMat n 𝕜) (U : Matrix.unitaryGroup n 𝕜)
+
+@[simp]
+theorem trace_conj_unitary : (A.conj U.val).trace = A.trace := by
+  simp [Matrix.trace_mul_cycle, HermitianMat.conj, ← Matrix.star_eq_conjTranspose, HermitianMat.trace]
+
+@[simp]
+theorem le_conj_unitary : A.conj U.val ≤ B.conj U ↔ A ≤ B := by
+  rw [← sub_nonneg, ← sub_nonneg (b := A), ← sub_conj]
+  constructor
+  · intro h
+    simpa [HermitianMat.conj_conj] using HermitianMat.conj_le h (star U).val
+  · exact fun h ↦ HermitianMat.conj_le h U.val
+
+end HermitianMat
+
+namespace MState
+
+variable {d d₁ d₂ d₃ : Type*}
+variable [Fintype d] [Fintype d₁] [Fintype d₂] [Fintype d₃]
+variable [DecidableEq d]
+
+/-- Conjugate a state by a unitary matrix (applying the unitary as an evolution). -/
+def U_conj (ρ : MState d) (U : 𝐔[d]) : MState d where
+  M := ρ.M.conj U.val
+  tr := by simp
+  zero_le := HermitianMat.conj_le ρ.zero_le U.val
+
+/-- You might think this should only be true up to permutation, so that it would read like
+`∃ σ : Equiv.Perm d, (ρ.U_conj U).spectrum = ρ.spectrum.relabel σ`. But since eigenvalues
+of a matrix are always canonically sorted, this is actually an equality.
+-/
+@[simp]
+theorem U_conj_spectrum_eq (ρ : MState d) (U : 𝐔[d]) :
+    (ρ.U_conj U).spectrum = ρ.spectrum := by
+  have (M : HermitianMat d ℂ) (U : 𝐔[d]) : (M.conj U).H.eigenvalues = M.H.eigenvalues := by
+    --missing simp lemma
+    sorry
+  simp [MState.spectrum, U_conj, this]
+
+end MState
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/ContinuousLinearMap.lean
+TYPE: Lean 4
+SIZE: 2260 characters
+================================================================================
+
+--For the first three lemmas
+import Mathlib.Topology.Algebra.Module.LinearMap
+
+--For the third lemma
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Order.CompletePartialOrder
+
+namespace ContinuousLinearMap
+
+variable {R S : Type*} [Semiring R] [Semiring S] (σ : R →+* S) (M M₂ : Type*)
+variable [TopologicalSpace M] [AddCommMonoid M] [TopologicalSpace M₂] [AddCommMonoid M₂]
+variable [Module R M] [Module S M₂]
+
+--These two theorems might look a bit silly as aliases of `LinearMap.____`, but they don't `simp` on their
+@[simp]
+theorem range_zero [RingHomSurjective σ] : LinearMap.range (0 : M →SL[σ] M₂) = ⊥ :=
+  LinearMap.range_zero
+
+@[simp]
+theorem ker_zero : LinearMap.ker (0 : M →SL[σ] M₂) = ⊤ :=
+  LinearMap.ker_zero
+
+theorem ker_mk (f : M →ₛₗ[σ] M₂) (hf : Continuous f.toFun) :
+    LinearMap.ker (ContinuousLinearMap.mk f hf) = LinearMap.ker f := by
+  rfl
+
+end ContinuousLinearMap
+
+namespace ContinuousLinearMap
+
+variable {n 𝕜 : Type*} [Fintype n] [RCLike 𝕜]
+
+/-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/
+theorem support_eq_sup_eigenspace_nonzero (A : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n)
+    (hA : A.IsSymmetric) : LinearMap.range A = ⨆ μ ≠ 0, Module.End.eigenspace A μ := by
+  apply le_antisymm
+  · rintro x ⟨y, hy⟩
+    have h_decomp : y ∈ ⨆ (μ : 𝕜), Module.End.eigenspace A.toLinearMap μ := by
+      have h_orth := hA.orthogonalComplement_iSup_eigenspaces_eq_bot
+      rw [Submodule.orthogonal_eq_bot_iff] at h_orth
+      rw [h_orth]
+      exact Submodule.mem_top;
+    rw [Submodule.mem_iSup_iff_exists_finsupp] at h_decomp
+    rcases h_decomp with ⟨f, hf₁, hf₂⟩
+    have h_apply_A : A y = ∑ i ∈ f.support, A (f i) := by
+      rw [← hf₂, map_finsuppSum]
+      exact rfl
+    have h_eigen (i) : A (f i) = (i : 𝕜) • f i :=
+      Module.End.mem_eigenspace_iff.mp (hf₁ i)
+    rw [← hy, h_apply_A, Finset.sum_congr rfl (fun i _ ↦ h_eigen i)]
+    refine Submodule.sum_mem _ fun i _ ↦ ?_
+    by_cases hi0 : i = 0
+    · simp [hi0]
+    · apply Submodule.smul_mem
+      apply Submodule.mem_iSup_of_mem i
+      exact Submodule.mem_iSup_of_mem hi0 (hf₁ i)
+  · simp only [iSup_le_iff]
+    intro μ hμ x hx
+    use μ⁻¹ • x
+    simp_all
+
+end ContinuousLinearMap
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/ContinuousSup.lean
+TYPE: Lean 4
+SIZE: 13541 characters
+================================================================================
+
+import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.Normed.Module.FiniteDimension
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
+
+variable {α β γ : Type*} {S : Set β} {f : γ → β → α}
+variable [ConditionallyCompleteLinearOrder α] [TopologicalSpace α] [OrderTopology α]
+variable [TopologicalSpace γ]
+
+namespace IsCompact
+variable [TopologicalSpace β]
+
+theorem sSup_image_eq_sSup_image_closure {f : β → α}
+  (hS : IsCompact (closure S)) (hf : Continuous f) :
+    sSup (f '' S) = sSup (f '' closure S) := by
+  rcases S.eq_empty_or_nonempty with rfl | h; · simp
+  refine csSup_eq_of_forall_le_of_forall_lt_exists_gt (by simpa) ?_ ?_
+  · rintro a ⟨w, hw, rfl⟩
+    exact le_csSup (hS.image hf).bddAbove (Set.mem_image_of_mem f <| subset_closure hw)
+  · intro w hw
+    simp only [Set.mem_image, exists_exists_and_eq_and]
+    contrapose! hw
+    have h_image_closure : f '' closure S ⊆ closure (f '' S) :=
+      image_closure_subset_closure_image hf
+    have h_closure_image : closure (f '' S) ⊆ Set.Iic w :=
+      closure_minimal (Set.image_subset_iff.mpr hw) isClosed_Iic
+    exact csSup_le ((h.mono subset_closure).image f) fun y hy ↦
+      (h_image_closure.trans h_closure_image) hy
+
+theorem sInf_image_eq_sInf_image_closure {f : β → α} (hS : IsCompact (closure S)) (hf : Continuous f) :
+    sInf (f '' S) = sInf (f '' closure S) :=
+  sSup_image_eq_sSup_image_closure (α := αᵒᵈ) hS hf
+
+/-- A version of `IsCompact.continuous_sSup` with a slightly weaker hypothesis on the set `K`,
+that its closure is compact (but the set itself need not be). -/
+theorem closure_continuous_sSup (hS : IsCompact (closure S)) (hf : Continuous ↿f) :
+    Continuous fun x ↦ sSup (f x '' S) := by
+  simp_rw [fun x ↦ sSup_image_eq_sSup_image_closure hS (f := f x) (by fun_prop)]
+  exact hS.continuous_sSup hf
+
+/-- A version of `IsCompact.continuous_sInf` with a slightly weaker hypothesis on the set `K`,
+that its closure is compact (but the set itself need not be). -/
+theorem closure_continuous_sInf (hS : IsCompact (closure S)) (hf : Continuous ↿f) :
+    Continuous fun x ↦ sInf (f x '' S) :=
+  closure_continuous_sSup (α := αᵒᵈ) hS hf
+
+theorem continuous_iSup (hS : IsCompact (closure S)) (hf : Continuous ↿f) :
+    Continuous fun x ↦ ⨆ y : S, f x y := by
+  simp_rw [iSup, ← Set.image_eq_range]
+  exact hS.closure_continuous_sSup hf
+
+theorem continuous_iInf (hS : IsCompact (closure S)) (hf : Continuous ↿f) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  continuous_iSup (α := αᵒᵈ) hS hf
+
+end IsCompact
+
+namespace Bornology.IsBounded
+variable [PseudoMetricSpace β] [ProperSpace β]
+
+/-- Similar to `IsCompact.continuous_sSup`, but taking a bounded set in the bornology instead
+of a compact set. -/ --TODO: Can `ProperSpace` be relaxed to `CompleteSpace` here?
+theorem continuous_sSup (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
+    Continuous fun x ↦ sSup (f x '' S) :=
+  hS.isCompact_closure.closure_continuous_sSup hf
+
+/-- Similar to `IsCompact.continuous_sInf`, but taking a bounded set in the bornology instead
+of a compact set. -/
+theorem continuous_sInf (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
+    Continuous fun x ↦ sInf (f x '' S) :=
+  hS.isCompact_closure.closure_continuous_sInf hf
+
+theorem continuous_iSup (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
+    Continuous fun x ↦ ⨆ y : S, f x y := by
+  simp_rw [iSup, ← Set.image_eq_range]
+  exact hS.isCompact_closure.closure_continuous_sSup <| by fun_prop
+
+theorem continuous_iInf (hS : Bornology.IsBounded S) (hf : Continuous ↿f) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  continuous_iSup (α := αᵒᵈ) hS hf
+
+end Bornology.IsBounded
+
+namespace LinearMap
+
+/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the supremum in one
+argument is still `Continuous`, by `Bornology.IsBounded.continuous_iSup`. -/
+theorem continuous_iSup {E F 𝕜 : Type*}
+  [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [AddCommGroup E] [TopologicalSpace E] [Module 𝕜 E] [IsModuleTopology 𝕜 E]
+  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F] [IsModuleTopology 𝕜 F]
+  (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨆ y : S, f x y :=
+  hS.continuous_iSup <| by fun_prop
+
+/-- For bilinear maps in suitably well-behaved spaces with `IsModuleTopology`, taking the infimum in one
+argument is still `Continuous`, by `Bornology.IsBounded.continuous_iInf`. -/
+theorem continuous_iInf {E F 𝕜 : Type*}
+  [CommRing 𝕜] [TopologicalSpace 𝕜] [IsTopologicalRing 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [AddCommGroup E] [TopologicalSpace E] [Module 𝕜 E] [IsModuleTopology 𝕜 E]
+  [AddCommGroup F] [Module 𝕜 F] [PseudoMetricSpace F] [ProperSpace F] [Module.Finite 𝕜 F] [IsModuleTopology 𝕜 F]
+  (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  hS.continuous_iInf <| by fun_prop
+
+/-- A specialization of `LinearMap.continuous_iSup` to finite dimensional spaces, in place
+of requiring a (non-instance) `IsModuleTopology`. -/
+theorem continuous_iSup' {E F 𝕜 : Type*}
+  [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜] [CompleteSpace 𝕜]
+  [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E] [T2Space E]
+  [Module 𝕜 E] [ContinuousSMul 𝕜 E] [FiniteDimensional 𝕜 E]
+  [PseudoMetricSpace F] [ProperSpace F] [AddCommGroup F] [IsTopologicalAddGroup F] [T2Space F]
+  [Module 𝕜 F] [ContinuousSMul 𝕜 F] [FiniteDimensional 𝕜 F]
+  (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨆ y : S, f x y :=
+  let _ : IsModuleTopology 𝕜 E := isModuleTopologyOfFiniteDimensional (𝕜 := 𝕜) (E := E)
+  let _ : IsModuleTopology 𝕜 F := isModuleTopologyOfFiniteDimensional (𝕜 := 𝕜) (E := F)
+  f.continuous_iSup hS
+
+/-- A specialization of `LinearMap.continuous_iInf` to finite dimensional spaces, in place
+of requiring a (non-instance) `IsModuleTopology`. -/
+theorem continuous_iInf' {E F 𝕜 : Type*}
+  [NontriviallyNormedField 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜] [CompleteSpace 𝕜]
+  [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E] [T2Space E]
+  [Module 𝕜 E] [ContinuousSMul 𝕜 E] [FiniteDimensional 𝕜 E]
+  [PseudoMetricSpace F] [ProperSpace F] [AddCommGroup F] [IsTopologicalAddGroup F] [T2Space F]
+  [Module 𝕜 F] [ContinuousSMul 𝕜 F] [FiniteDimensional 𝕜 F]
+  (f : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) {S : Set F} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  let _ : IsModuleTopology 𝕜 E := isModuleTopologyOfFiniteDimensional (𝕜 := 𝕜) (E := E)
+  let _ : IsModuleTopology 𝕜 F := isModuleTopologyOfFiniteDimensional (𝕜 := 𝕜) (E := F)
+  f.continuous_iInf hS
+
+/-- Alias of `LinearMap.continuous_iSup' ` that takes `LinearMap.BilinForm`. -/
+theorem BilinForm.continuous_iSup {𝕜 E : Type*}
+  [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E] [ProperSpace E]
+  (f : LinearMap.BilinForm 𝕜 E) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨆ y : S, f x y :=
+  f.continuous_iSup' hS
+
+/-- Alias of `LinearMap.continuous_iInf' ` that takes `LinearMap.BilinForm`. -/
+theorem BilinForm.continuous_iInf {𝕜 E : Type*}
+  [RCLike 𝕜] [ConditionallyCompleteLinearOrder 𝕜] [OrderTopology 𝕜]
+  [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E] [ProperSpace E]
+  (f : LinearMap.BilinForm 𝕜 E) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  f.continuous_iInf' hS
+
+end LinearMap
+
+namespace ContinuousLinearMap
+
+variable  {𝕜 𝕜₂ : Type*} {E F G : Type*} [NontriviallyNormedField 𝕜] [Semiring 𝕜₂] {σ₁₂ : 𝕜₂ →+* 𝕜}
+ [SeminormedAddCommGroup E] [NormedSpace 𝕜 E] [ProperSpace E]
+ [AddCommMonoid F] [TopologicalSpace F] [Module 𝕜₂ F]
+ [SeminormedAddCommGroup G] [NormedSpace 𝕜 G][ConditionallyCompleteLinearOrder G] [OrderTopology G]
+
+/-- A specialization of `Bornology.IsBounded.continuous_iSup_bilinear` to `ContinuousLinearMap`. -/
+theorem continuous_iSup
+  (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨆ y : S, f x y :=
+  hS.continuous_iSup <| by fun_prop
+
+theorem continuous_iInf
+  (f : F →SL[σ₁₂] E →L[𝕜] G) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨅ y : S, f x y :=
+  hS.continuous_iInf (α := G) <| by fun_prop
+
+end ContinuousLinearMap
+
+--This is the theorem we actually needed downstream...
+theorem LinearMap.BilinForm.continuous_iSup_fst
+  {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨆ y : S, f y x := by
+  exact LinearMap.BilinForm.continuous_iSup f.flip hS
+  --Old "direct" proof:
+  -- -- Since $f$ is continuous, there exists $C > 0$ such that for all $y \in S$ and $x \in E$, $|f y x| \leq C \|y\| \|x\|$.
+  -- obtain ⟨C, hC1, hC2⟩ : ∃ C > 0, ∀ y ∈ S, ∀ x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by
+  --   -- Since $f$ is continuous, there exists $C > 0$ such that for all $y, x \in E$, $|f y x| \leq C \|y\| \|x\|$ by the boundedness of continuous bilinear maps on finite-dimensional spaces.
+  --   have h_cont : ∃ C > 0, ∀ y x : E, |f y x| ≤ C * ‖y‖ * ‖x‖ := by
+  --     have h_bounded : Continuous (fun p : E × E => f p.1 p.2) := by
+  --       have _ := isModuleTopologyOfFiniteDimensional (𝕜 := ℝ) (E := E)
+  --       fun_prop
+  --     obtain ⟨C, hC₀, hC⟩ : ∃ C > 0, ∀ y x : E, ‖y‖ ≤ 1 → ‖x‖ ≤ 1 → |f y x| ≤ C := by
+  --       have h_compact : IsCompact {p : E × E | ‖p.1‖ ≤ 1 ∧ ‖p.2‖ ≤ 1} := by
+  --         have h_closed_unit_ball : IsCompact {p : E | ‖p‖ ≤ 1} := by
+  --           convert ProperSpace.isCompact_closedBall (0 : E) 1
+  --           simp [Metric.closedBall, dist_eq_norm]
+  --         exact h_closed_unit_ball.prod h_closed_unit_ball;
+  --       obtain ⟨C, hC⟩ := h_compact.exists_bound_of_continuousOn h_bounded.continuousOn;
+  --       exact ⟨C ⊔ 1, zero_lt_one.trans_le (le_max_right _ _), fun y x hy hx ↦ (hC (y, x) ⟨hy, hx⟩ ).trans (le_max_left _ _)⟩;
+  --     refine ⟨C, hC₀, fun y x ↦ ?_⟩;
+  --     rcases eq_or_ne y 0 with rfl | hy; · simp
+  --     rcases eq_or_ne x 0 with rfl | hx; · simp
+  --     have := hC (‖y‖⁻¹ • y) (‖x‖⁻¹ • x) (by simp [hy, norm_smul]) (by simp [hx, norm_smul])
+  --     simp only [map_smul, LinearMap.smul_apply, smul_eq_mul] at this
+  --     rw [abs_le] at this ⊢
+  --     rw [← norm_ne_zero_iff] at hx hy
+  --     have : 0 < ‖y‖ * ‖x‖ := by positivity
+  --     have := inv_mul_cancel_left₀ hy ((f y) x)
+  --     have := inv_mul_cancel_left₀ hx ((f y) x)
+  --     have := mul_inv_cancel₀ hy
+  --     constructor <;> nlinarith
+  --   exact ⟨ h_cont.choose, h_cont.choose_spec.1, fun y hy x ↦ h_cont.choose_spec.2 y x ⟩;
+  -- -- Since $S$ is bounded, there exists $M > 0$ such that for all $y \in S$, $\|y\| \leq M$.
+  -- obtain ⟨M, hM1, hM2⟩ : ∃ M > 0, ∀ y ∈ S, ‖y‖ ≤ M :=
+  --   hS.exists_pos_norm_le
+  -- rw [Metric.continuous_iff]
+  -- intro b ε hε
+  -- refine ⟨ε / (C * M + 1), div_pos hε (by positivity), fun a ha ↦ ?_⟩
+  -- -- Using the triangle inequality and the continuity of $f$, we get:
+  -- have h_triangle (y) (hy : y ∈ S) : |f y a - f y b| ≤ C * M * ‖a - b‖ := by
+  --   rw [← map_sub]
+  --   apply (hC2 y hy ( a - b )).trans
+  --   refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+  --   exact mul_le_mul_of_nonneg_left (hM2 y hy) hC1.le
+  -- rcases S.eq_empty_or_nonempty with rfl | ⟨y, hy⟩; · simp [*]
+  -- simp [dist_eq_norm] at *
+  -- -- Applying the triangle inequality to the suprema, we get:
+  -- have h_sup_triangle : |(⨆ y : S, f y a) - (⨆ y : S, f y b)| ≤ C * M * ‖a - b‖ := by
+  --   rw [abs_sub_le_iff]
+  --   constructor
+  --   · -- Applying the inequality $f y a \leq f y b + C * M * ‖a - b‖$ to each term in the supremum, we get:
+  --     have h_le (y : S) : f y a ≤ f y b + C * M * ‖a - b‖ := by
+  --       linarith [abs_le.mp (h_triangle y y.2)]
+  --     rw [sub_le_iff_le_add, add_comm]
+  --     convert ciSup_le fun y => le_trans ( h_le y ) _;
+  --     · exact ⟨⟨ y, hy ⟩⟩
+  --     · refine add_le_add ?_ le_rfl
+  --       refine le_csSup ?_ (Set.mem_range_self _)
+  --       exact ⟨C * M * ‖b‖, Set.forall_mem_range.2 fun y => le_of_abs_le ((hC2 _ y.2 _).trans (by gcongr; exact hM2 _ y.2))⟩;
+  --   · rw [sub_le_iff_le_add']
+  --     -- Applying the triangle inequality to each term in the supremum, we get:
+  --     have h_sup_triangle (y) (hy : y ∈ S) : f y b ≤ f y a + C * M * ‖a - b‖ := by
+  --       linarith [abs_le.mp (h_triangle y hy)]
+  --     convert ciSup_le _
+  --     · exact ⟨⟨y, hy⟩⟩
+  --     · intro x
+  --       refine (h_sup_triangle x x.2).trans (add_le_add_right ?_ _)
+  --       exact le_ciSup (show BddAbove (Set.range fun y : S ↦ f y a) by
+  --         refine ⟨C * M * ‖a‖, Set.forall_mem_range.2 fun y ↦ ?_⟩
+  --         refine le_of_abs_le ((hC2 _ y.2 _).trans ?_)
+  --         refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+  --         exact mul_le_mul_of_nonneg_left (hM2 _ y.2) hC1.le
+  --       ) x;
+  -- apply h_sup_triangle.trans_lt
+  -- rw [lt_div_iff₀ (by positivity)] at ha
+  -- nlinarith [mul_pos hC1 hM1]
+
+theorem LinearMap.BilinForm.continuous_iInf_fst
+  {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  (f : LinearMap.BilinForm ℝ E) {S : Set E} (hS : Bornology.IsBounded S) :
+    Continuous fun x ↦ ⨅ y : S, f y x :=
+  LinearMap.BilinForm.continuous_iInf f.flip hS
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Filter.lean
+TYPE: Lean 4
+SIZE: 3077 characters
+================================================================================
+
+import Mathlib
+
+import Mathlib.Tactic.Bound
+
+open Topology
+
+--This is a stupid name for a stupid lemma
+theorem Filter.Tendsto_inv_nat_mul_div_real (m : ℕ)
+   : Filter.Tendsto (fun (x : ℕ) => ((↑x)⁻¹ * ↑(x / m) : ℝ)) Filter.atTop (𝓝 (1 / ↑m)) := by
+  --Thanks aristotle!
+  -- This simplifies to $\lim_{x \to \infty} \frac{\lfloor x / m \rfloor}{x} = \frac{1}{m}$ because the floor function grows asymptotically like $x / m$.
+  have h_floor : Filter.Tendsto (fun x : ℕ => (Nat.floor (x / m : ℝ) : ℝ) / x) Filter.atTop (nhds (1 / (m : ℝ))) := by
+    -- We'll use the fact that the floor function is bounded and apply the squeeze theorem.
+    have h_floor_bound : ∀ x : ℕ, x > 0 → (Nat.floor (x / m : ℝ) : ℝ) / x ≥ (1 / m - 1 / x) ∧ (Nat.floor (x / m : ℝ) : ℝ) / x ≤ 1 / m := by
+      cases eq_or_ne m 0
+      · rename_i h
+        intro x a
+        subst h
+        simp_all only [gt_iff_lt, CharP.cast_eq_zero, div_zero, Nat.floor_zero, zero_div, one_div, zero_sub, ge_iff_le,
+          Left.neg_nonpos_iff, inv_nonneg, Nat.cast_nonneg, le_refl, and_self]
+      · intro x a
+        simp_all only [ne_eq, gt_iff_lt, one_div, ge_iff_le, tsub_le_iff_right]
+        apply And.intro
+        · rw [ inv_eq_one_div, div_add', div_le_div_iff₀ ] <;> first | positivity | nlinarith [ Nat.lt_floor_add_one ( ( x : ℝ ) / m ), show ( x : ℝ ) ≥ 1 by exact Nat.one_le_cast.mpr a, mul_div_cancel₀ ( x : ℝ ) ( show ( m : ℝ ) ≠ 0 by positivity ), inv_mul_cancel₀ ( show ( x : ℝ ) ≠ 0 by positivity ) ] ;
+        · rw [ div_le_iff₀ ( by positivity ) ];
+          simpa [ div_eq_inv_mul ] using Nat.floor_le ( by positivity : 0 ≤ ( x : ℝ ) / m );
+    -- Apply the squeeze theorem to conclude the proof.
+    have h_squeeze : Filter.Tendsto (fun x : ℕ => (1 / m : ℝ) - 1 / x) Filter.atTop (nhds (1 / m)) := by
+      simpa using tendsto_const_nhds.sub ( _root_.tendsto_inverse_atTop_nhds_zero_nat );
+    exact tendsto_of_tendsto_of_tendsto_of_le_of_le' h_squeeze tendsto_const_nhds ( Filter.eventually_atTop.mpr ⟨ 1, fun x hx => h_floor_bound x hx |>.1 ⟩ ) ( Filter.eventually_atTop.mpr ⟨ 1, fun x hx => h_floor_bound x hx |>.2 ⟩ );
+  -- Apply the hypothesis `h_floor` to conclude the proof.
+  convert h_floor using 1;
+  -- By definition of floor function, we know that ⌊(x : ℝ) / m⌋₊ is the greatest integer less than or equal to (x : ℝ) / m.
+  funext x; simp [Nat.floor_div_natCast];
+  ring
+
+--Similar to `ENNReal.tendsto_toReal_iff` in `Mathlib/Topology/Instances/ENNReal/Lemmas`, but
+-- instead of requiring finiteness for all values, just eventually is needed.
+open Filter Topology ENNReal in
+theorem ENNReal.tendsto_toReal_iff_of_eventually_ne_top
+  {ι} {fi : Filter ι} {f : ι → ℝ≥0∞} (hf : ∀ᶠ i in fi, f i ≠ ∞) {x : ℝ≥0∞}
+    (hx : x ≠ ∞) : Tendsto (fun n => (f n).toReal) fi (𝓝 x.toReal) ↔ Tendsto f fi (𝓝 x) := by
+  have he₁ : f =ᶠ[fi] (fun n ↦ (f n).toNNReal) := by
+    rw [EventuallyEq]
+    peel hf with h
+    simp [h]
+  have he₂ : (fun n ↦ (f n).toReal) = (fun n ↦ ((f n).toNNReal : ℝ≥0∞).toReal) :=
+    rfl
+  rw [Filter.tendsto_congr' he₁, he₂]
+  exact tendsto_toReal_iff (by finiteness) hx
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/HermitianMat/Basic.lean
+TYPE: Lean 4
+SIZE: 8661 characters
+================================================================================
+
+import QuantumInfo.ForMathlib.Matrix
+import QuantumInfo.ForMathlib.IsMaximalSelfAdjoint
+import QuantumInfo.ForMathlib.ContinuousLinearMap
+
+import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog
+import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic
+import Mathlib.LinearAlgebra.Matrix.HermitianFunctionalCalculus
+import Mathlib.Analysis.Matrix
+
+/-- The type of Hermitian matrices, as a `Subtype`. Equivalent to a `Matrix n n α` bundled
+with the fact that `Matrix.IsHermitian`. -/
+abbrev HermitianMat (n : Type*) (α : Type*) [AddGroup α] [StarAddMonoid α] :=
+  (selfAdjoint (Matrix n n α) : Type (max u_1 u_2))
+
+namespace HermitianMat
+
+variable {α : Type*} {m n : Type*}
+
+section addgroup
+
+variable [AddGroup α] [StarAddMonoid α]
+
+theorem eq_IsHermitian : HermitianMat n α  = { m : Matrix n n α // m.IsHermitian} := by
+  rfl
+
+@[coe, reducible] def toMat : HermitianMat n α → Matrix n n α :=
+  Subtype.val
+
+instance : Coe (HermitianMat n α) (Matrix n n α) := ⟨toMat⟩
+
+@[simp]
+theorem val_eq_coe (A : HermitianMat n α) : A.val = A := by
+  rfl
+
+@[simp]
+theorem mk_toMat (x : Matrix n n α) (h) : HermitianMat.toMat (Subtype.mk x h) = x := by
+  rfl
+
+/-- Alias for HermitianMat.property or HermitianMat.2, this gets the fact that the value
+  is actually `IsHermitian`.-/
+theorem H (A : HermitianMat n α) : A.toMat.IsHermitian :=
+  A.2
+
+@[ext] protected theorem ext {A B : HermitianMat n α} : A.toMat = B.toMat → A = B :=
+  Subtype.eq
+
+instance instFun : FunLike (HermitianMat n α) n (n → α) where
+  coe M := (M : Matrix n n α)
+  coe_injective' _ _ h := HermitianMat.ext h
+
+instance instStar : Star (HermitianMat n α) :=
+  ⟨(·)⟩
+
+instance instTrivialStar : TrivialStar (HermitianMat n α) :=
+  ⟨(refl ·)⟩
+
+@[simp]
+theorem conjTranspose_toMat (A : HermitianMat n α) :
+    A.toMat.conjTranspose = A :=
+  A.H
+
+end addgroup
+section commring
+
+variable [CommRing α] [StarRing α] [DecidableEq n] [Fintype n]
+
+noncomputable instance instInv : Inv (HermitianMat n α) :=
+  ⟨fun x ↦ ⟨x⁻¹, Matrix.IsHermitian.inv x.H⟩⟩
+
+noncomputable instance instZPow : Pow (HermitianMat n α) ℤ :=
+  ⟨fun x z ↦ ⟨x^z, Matrix.IsHermitian.zpow x.H z⟩⟩
+
+/-
+--There is already a `One` instance when `n` is a `Fintype` (it comes through the fact that we have a
+-- (`Ring`) but in principle we shouldn't need that (only DecidableEq!). But, the fact that trying
+-- `simp` in `coe_one` below causes a defeq timeout is worrying. So, we keep this commented out, we'll
+-- use `Fintype` everywhere we want a `1`.
+variable {n : Type*} [DecidableEq n]
+
+instance : One (HermitianMat n α) :=
+  ⟨1, by
+    simp [selfAdjoint.mem_iff, ← Matrix.ext_iff, Matrix.one_apply, apply_ite (β := α), eq_comm]⟩
+
+@[simp]
+theorem coe_one : (1 : HermitianMat n α).toMat = 1 := by
+  rfl
+-/
+
+end commring
+section rclike
+
+variable [RCLike α]
+
+@[simp]
+theorem im_eq_zero (A : HermitianMat n α) (x : n) :
+    RCLike.im (A x x) = 0 := by
+  simpa [CharZero.eq_neg_self_iff] using congrArg (RCLike.im <| · x x) A.H.symm
+
+--Repeat it explicitly for ℂ so that simp can find it
+@[simp]
+theorem Complex_im_eq_zero (A : HermitianMat n ℂ) (x : n) :
+    (A x x).im = 0 :=
+  A.im_eq_zero x
+
+variable [Fintype n] [DecidableEq n]
+
+end rclike
+
+section conj
+
+variable [CommRing α] [StarRing α] [Fintype n]
+variable (A : HermitianMat n α)
+
+/-- The Hermitian matrix given by conjugating by a (possibly rectangular) Matrix. If we required `B` to be
+square, this would apply to any `Semigroup`+`StarMul` (as proved by `IsSelfAdjoint.conjugate`). But this lets
+us conjugate to other sizes too, as is done in e.g. Kraus operators. That is, it's a _heterogeneous_ conjguation.
+-/
+def conj {m} (B : Matrix m n α) : HermitianMat m α :=
+  ⟨B * A.toMat * B.conjTranspose, by
+  ext
+  simp only [Matrix.star_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.sum_mul,
+    star_sum, star_mul', star_star, show ∀ (a b : n), star (A.toMat b a) = A.toMat a b from congrFun₂ A.property]
+  rw [Finset.sum_comm]
+  congr! 2
+  ring⟩
+
+theorem conj_conj {m l} [Fintype m] (B : Matrix m n α) (C : Matrix l m α) :
+    (A.conj B).conj C = A.conj (C * B) := by
+  ext1
+  simp only [conj, mk_toMat, Matrix.conjTranspose_mul, Matrix.mul_assoc]
+
+variable (B : HermitianMat n α)
+
+theorem add_conj {m} (M : Matrix m n α) : (A + B).conj M = A.conj M + B.conj M := by
+  ext1
+  simp [conj, Matrix.mul_add, Matrix.add_mul]
+
+theorem sub_conj {m} (M : Matrix m n α) : (A - B).conj M = A.conj M - B.conj M := by
+  ext1
+  simp [conj, Matrix.mul_sub, Matrix.sub_mul]
+
+@[simp]
+theorem conj_one [DecidableEq n] : A.conj (1 : Matrix n n α) = A := by
+  simp [conj]
+
+end conj
+
+section eigenspace
+
+variable {𝕜} [RCLike 𝕜] [Fintype n] [DecidableEq n] (A : HermitianMat n 𝕜)
+
+instance [i : Nonempty n] : FaithfulSMul ℝ (HermitianMat n 𝕜) where
+  eq_of_smul_eq_smul h := by
+    simpa [RCLike.smul_re] using congr(RCLike.re ($(h 1).val i.some i.some))
+
+/-- The continuous linear map associated with a Hermitian matrix. -/
+def lin : EuclideanSpace 𝕜 n →L[𝕜] EuclideanSpace 𝕜 n where
+  toLinearMap := A.toMat.toEuclideanLin
+  cont := LinearMap.continuous_of_finiteDimensional _
+
+@[simp]
+theorem isSymmetric : A.lin.IsSymmetric :=
+  Matrix.isHermitian_iff_isSymmetric.mp A.H
+
+@[simp]
+theorem lin_zero : (0 : HermitianMat n 𝕜).lin = 0 := by
+  simp [lin]; rfl
+
+@[simp]
+theorem lin_one : (1 : HermitianMat n 𝕜).lin = 1 := by
+  simp [lin]; rfl
+
+noncomputable def eigenspace (μ : 𝕜) : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+  Module.End.eigenspace A.lin μ
+
+/-- The kernel of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
+`LinearMap.ker A.toMat.toEuclideanLin`. Equivalently, the zero-eigenspace. -/
+def ker : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+  LinearMap.ker A.lin
+
+/-- The kernel of a Hermitian matrix is its zero eigenspace. -/
+theorem ker_eq_eigenspace_zero : A.ker = A.eigenspace 0 := by
+  ext
+  simp [ker, eigenspace]
+
+@[simp]
+theorem ker_zero : (0 : HermitianMat n 𝕜).ker = ⊤ := by
+  simp [ker]
+
+@[simp]
+theorem ker_one : (1 : HermitianMat n 𝕜).ker = ⊥ := by
+  simp [ker]; rfl
+
+/-- The support of a Hermitian matrix `A` as a submodule of Euclidean space, defined by
+`LinearMap.range A.toMat.toEuclideanLin`. Equivalently, the sum of all nonzero eigenspaces. -/
+def support : Submodule 𝕜 (EuclideanSpace 𝕜 n) :=
+  LinearMap.range A.lin
+
+/-- The support of a Hermitian matrix is the sum of its nonzero eigenspaces. -/
+theorem support_eq_sup_eigenspace_nonzero : A.support = ⨆ μ ≠ 0, A.eigenspace μ := by
+  exact A.lin.support_eq_sup_eigenspace_nonzero A.isSymmetric
+
+@[simp]
+theorem support_zero : (0 : HermitianMat n 𝕜).support = ⊥ := by
+  simp [support]
+
+@[simp]
+theorem support_one : (1 : HermitianMat n 𝕜).support = ⊤ := by
+  simpa [support] using LinearMap.ker_eq_bot_iff_range_eq_top.mp rfl
+
+@[simp]
+theorem ker_orthogonal_eq_support : A.kerᗮ = A.support := by
+  rw [ker, support]
+  convert ContinuousLinearMap.orthogonal_ker A.lin
+  simp
+
+@[simp]
+theorem support_orthogonal_eq_range : A.supportᗮ = A.ker := by
+  rw [ker, support]
+  convert ContinuousLinearMap.orthogonal_range A.lin
+  simp
+
+end eigenspace
+
+section diagonal
+
+--TODO: Generalize this more types than ℝ/ℂ
+def diagonal [DecidableEq n] (f : n → ℝ) : HermitianMat n ℂ :=
+  ⟨Matrix.diagonal (f ·),
+    by simp [selfAdjoint.mem_iff, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose]⟩
+
+theorem diagonal_conj_diagonal [Fintype n] [DecidableEq n] (f g : n → ℝ) :
+    (diagonal f).conj (diagonal g) =
+    diagonal (fun i ↦ f i * (g i)^2) := by
+  simp [diagonal, conj]
+  intro
+  ring
+
+end diagonal
+
+section kronecker
+open Kronecker
+
+variable [CommRing α] [StarRing α]
+
+/-- The kronecker product of two HermitianMats, see `Matrix.kroneckerMap`. -/
+@[simps]
+def kronecker (A : HermitianMat m α) (B : HermitianMat n α) : HermitianMat (m × n) α where
+  val := A.toMat ⊗ₖ B.toMat
+  property := Matrix.kroneckerMap_IsHermitian A.H B.H
+
+@[inherit_doc HermitianMat.kronecker]
+scoped[HermitianMat] infixl:100 " ⊗ₖ " => HermitianMat.kronecker
+
+@[simp]
+theorem zero_kronecker (A : HermitianMat m α) : (0 : HermitianMat n α) ⊗ₖ A = 0 := by
+  ext1; simp
+
+@[simp]
+theorem kronecker_zero (A : HermitianMat m α) : A ⊗ₖ (0 : HermitianMat n α) = 0 := by
+  ext1; simp
+
+variable [DecidableEq m] [DecidableEq n] [Fintype m] [Fintype n] in
+@[simp]
+theorem kronecker_one_one : (1 : HermitianMat m α) ⊗ₖ (1 : HermitianMat n α) = 1 := by
+  ext1; simp
+
+variable (A B : HermitianMat m α) (C : HermitianMat n α) in
+theorem add_kronecker : (A + B) ⊗ₖ C = A ⊗ₖ C + B ⊗ₖ C := by
+  ext1; simp [Matrix.add_kronecker]
+
+variable (A : HermitianMat m α) (B C : HermitianMat n α) in
+theorem kronecker_add : A ⊗ₖ (B + C) = A ⊗ₖ B + A ⊗ₖ C := by
+  ext1; simp [Matrix.kronecker_add]
+
+end kronecker
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/HermitianMat/CFC.lean
+TYPE: Lean 4
+SIZE: 21393 characters
+================================================================================
+
+import QuantumInfo.ForMathlib.HermitianMat.Inner
+import QuantumInfo.ForMathlib.Isometry
+
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Continuity
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Basic
+import Mathlib.Analysis.CStarAlgebra.CStarMatrix
+import Mathlib.Algebra.Order.Group.Pointwise.CompleteLattice
+
+/-! Matrix operations on HermitianMats with the CFC -/
+
+--PULLOUT
+namespace Matrix
+
+open ComplexOrder in
+theorem IsHermitian.spectrum_subset_Ici_of_sub {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
+  {A x: Matrix d d 𝕜} (hA : A.IsHermitian) (hl : (x - A).PosSemidef) :
+    spectrum ℝ x ⊆ Set.Ici (⨅ i, hA.eigenvalues i) := by
+  --Thanks Aristotle
+  intro μ hμ
+  obtain ⟨v, hv₁, hv₂⟩ : ∃ v : d → 𝕜, v ≠ 0 ∧ x.mulVec v = μ • v := by
+    have h_singular : ∃ v : d → 𝕜, v ≠ 0 ∧ (μ • 1 - x).mulVec v = 0 := by
+      simp only [spectrum.mem_iff, Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero, ne_eq, Decidable.not_not] at hμ
+      convert Matrix.exists_mulVec_eq_zero_iff.mpr hμ;
+      simp [Algebra.smul_def]
+    refine h_singular.imp fun v h ↦ ⟨h.left, ?_⟩
+    simp_all [Matrix.sub_mulVec, sub_eq_iff_eq_add, funext_iff, Matrix.mulVec, dotProduct, Matrix.one_apply]
+  -- Since $x - A$ is positive semidefinite, for any eigenvalue $\lambda$ of $x$, we have $\lambda \geq \min(\text{eigenvalues of } A)$.
+  have h_lower_bound : ∀ (v : d → 𝕜), v ≠ 0 → (star v ⬝ᵥ (x.mulVec v)) ≥ (⨅ i, (hA.eigenvalues i)) * (star v ⬝ᵥ v) := by
+    intro v hv_nonzero
+    have h_eigenvalue : (star v ⬝ᵥ (A.mulVec v)) ≥ (⨅ i, (hA.eigenvalues i)) * (star v ⬝ᵥ v) := by
+      have h_expand : (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) := by
+        change (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i))
+        have h_decomp : A = ∑ i, (hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k)))) := by
+          convert Matrix.IsHermitian.spectral_theorem hA using 1;
+          ext i j
+          simp only [RCLike.star_def, Matrix.smul_of, Matrix.sum_apply, Matrix.of_apply,
+            Pi.smul_apply, Matrix.diagonal, Function.comp_apply, Matrix.mul_apply,
+            Matrix.IsHermitian.eigenvectorUnitary_apply, PiLp.ofLp_apply, mul_ite, mul_zero,
+            Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Matrix.star_apply];
+          simp [ mul_comm, mul_left_comm, Algebra.smul_def ]
+        -- Substitute the decomposition of $A$ into the expression $(star v ⬝ᵥ (A.mulVec v))$.
+        have h_subst : (star v ⬝ᵥ (A.mulVec v)) = ∑ i, (hA.eigenvalues i) * (star v ⬝ᵥ (Matrix.mulVec (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k)))) v)) := by
+          -- Substitute the decomposition of $A$ into the expression $(star v ⬝ᵥ (A.mulVec v))$ and use the linearity of matrix multiplication.
+          have h_subst : (star v ⬝ᵥ (A.mulVec v)) = (star v ⬝ᵥ ((∑ i, (hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k))))).mulVec v)) := by
+            rw [ ← h_decomp ];
+          -- By the linearity of matrix multiplication and the dot product, we can distribute the sum over the dot product.
+          have h_distribute : (star v ⬝ᵥ (∑ i, (hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k))))).mulVec v) = ∑ i, (star v ⬝ᵥ ((hA.eigenvalues i) • (Matrix.of (fun j k => (hA.eigenvectorBasis i j) * (star (hA.eigenvectorBasis i k))))).mulVec v) := by
+            -- By the linearity of matrix multiplication and the dot product, we can distribute the sum over the dot product. This follows from the fact that matrix multiplication is linear.
+            have h_distribute : ∀ (M N : Matrix d d 𝕜) (v : d → 𝕜), Star.star v ⬝ᵥ (M + N).mulVec v = Star.star v ⬝ᵥ M.mulVec v + Star.star v ⬝ᵥ N.mulVec v := by
+              simp [ Matrix.add_mulVec, dotProduct_add ];
+            -- By induction on the number of terms in the sum, we can apply the distributive property repeatedly.
+            have h_induction : ∀ (n : ℕ) (M : Fin n → Matrix d d 𝕜) (v : d → 𝕜), Star.star v ⬝ᵥ (∑ i, M i).mulVec v = ∑ i, Star.star v ⬝ᵥ (M i).mulVec v := by
+              intro n M v; induction' n with n ih <;> simp [ Fin.sum_univ_succ, * ] ;
+            convert h_induction ( Fintype.card d ) ( fun i => Matrix.of ( hA.eigenvalues ( Fintype.equivFin d |>.symm i ) • fun j k => hA.eigenvectorBasis ( Fintype.equivFin d |>.symm i ) j * starRingEnd 𝕜 ( hA.eigenvectorBasis ( Fintype.equivFin d |>.symm i ) k ) ) ) v using 1;
+            · rw [ ← Equiv.sum_comp ( Fintype.equivFin d ) ];
+              simp [ Fintype.equivFin ];
+            · rw [ ← Equiv.sum_comp ( Fintype.equivFin d ) ];
+              simp [ Fintype.equivFin ];
+          convert h_distribute using 1;
+          simp only [dotProduct, Pi.star_apply, RCLike.star_def, Matrix.mulVec, Matrix.of_apply,
+            Finset.mul_sum _ _ _, Matrix.smul_apply, Algebra.smul_mul_assoc,
+            Algebra.mul_smul_comm];
+          simp [ Algebra.smul_def ];
+        convert h_subst using 2;
+        simp only [dotProduct, Pi.star_apply, RCLike.star_def, mul_comm, mul_assoc, Matrix.mulVec,
+          Matrix.of_apply, mul_eq_mul_left_iff, map_eq_zero];
+        simp [ mul_comm, mul_left_comm, Finset.mul_sum _ _ _ ];
+      -- Since $\lambda_i \geq \inf(\text{eigenvalues of } A)$ for all $i$, we can bound each term in the sum.
+      have h_bound : ∀ i, (hA.eigenvalues i) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) ≥ (⨅ i, (hA.eigenvalues i)) * (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) := by
+        intro i
+        have h_eigenvalue_bound : (hA.eigenvalues i) ≥ (⨅ i, (hA.eigenvalues i)) :=
+          ciInf_le (Set.finite_range _).bddBelow _
+        -- Since the product of the inner products is real and non-negative, multiplying both sides of the inequality by this product preserves the inequality.
+        have h_nonneg : 0 ≤ (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) := by
+          -- Since the inner product is conjugate symmetric, we have star v ⬝ᵥ (hA.eigenvectorBasis i) = conjugate(star (hA.eigenvectorBasis i) ⬝ᵥ v).
+          have h_conj_symm : star v ⬝ᵥ (hA.eigenvectorBasis i) = star (star (hA.eigenvectorBasis i) ⬝ᵥ v) := by
+            simp [ dotProduct, mul_comm];
+          rw [ h_conj_symm ];
+          exact mul_star_self_nonneg (star (hA.eigenvectorBasis i) ⬝ᵥ v);
+        norm_num [ mul_assoc ];
+        exact mul_le_mul_of_nonneg_right ( mod_cast h_eigenvalue_bound ) h_nonneg;
+      -- Since $\sum_{i} (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) = star v ⬝ᵥ v$, we can factor out $(⨅ i, (hA.eigenvalues i))$ from the sum.
+      have h_sum : ∑ i, (star (hA.eigenvectorBasis i) ⬝ᵥ v) * (star v ⬝ᵥ (hA.eigenvectorBasis i)) = star v ⬝ᵥ v := by
+        have h_sum : ∑ i, (star (hA.eigenvectorBasis i) ⬝ᵥ v) • (hA.eigenvectorBasis i) = v := by
+          have := hA.eigenvectorBasis.sum_repr v;
+          convert this using 1;
+          simp only [dotProduct, Pi.star_apply, RCLike.star_def, mul_comm,
+            hA.eigenvectorBasis.repr_apply_apply, PiLp.inner_apply, RCLike.inner_apply];
+        -- Taking the inner product of both sides of h_sum with star v, we get the desired equality.
+        have h_inner : star v ⬝ᵥ (∑ i, (star (hA.eigenvectorBasis i) ⬝ᵥ v) • (hA.eigenvectorBasis i)) = star v ⬝ᵥ v := by
+          rw [h_sum];
+        convert h_inner using 1;
+        simp [ dotProduct, Finset.mul_sum _ _ _ ];
+        exact Finset.sum_comm.trans ( Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring );
+      rw [ h_expand ];
+      refine' le_trans _ ( Finset.sum_le_sum fun i _ => h_bound i );
+      simp only [ mul_assoc];
+      rw [ ← Finset.mul_sum _ _ _, h_sum ];
+    have := hl.2 v; simp_all [ Matrix.sub_mulVec ] ;
+    exact le_trans h_eigenvalue this;
+  change (⨅ i, hA.eigenvalues i) ≤ μ
+  have := h_lower_bound v hv₁
+  simp_all only [ne_eq, star, RCLike.star_def, Matrix.dotProduct_mulVec, ge_iff_le,
+    dotProduct_smul];
+  simp_all only [dotProduct, mul_comm, RCLike.mul_conj];
+  rw [ Algebra.smul_def ] at this;
+  -- Since the sum of the squares of the norms of v is positive, we can divide both sides of the inequality by it.
+  have h_sum_pos : 0 < ∑ x : d, (‖v x‖ : ℝ) ^ 2 := by
+    contrapose! hv₁;
+    simp_all only [funext_iff, Pi.zero_apply, not_forall, forall_exists_index, Matrix.mulVec, Pi.smul_apply]
+    intro i
+    rw [← norm_eq_zero]
+    simpa [ sq_nonneg ] using le_antisymm ( le_trans ( Finset.single_le_sum ( fun a _ => sq_nonneg ( ‖v a‖ ) ) ( Finset.mem_univ i ) ) hv₁ ) ( sq_nonneg ( ‖v i‖ ) )
+  norm_cast at this;
+  nlinarith
+
+open ComplexOrder in
+theorem IsHermitian.spectrum_subset_Iic_of_sub {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
+  {A x : Matrix d d 𝕜} (hA : A.IsHermitian) (hl : (A - x).PosSemidef) :
+    spectrum ℝ x ⊆ Set.Iic (⨆ i, hA.eigenvalues i) := by
+  have h := spectrum_subset_Ici_of_sub hA.neg (x := -x) ?_
+  · rcases isEmpty_or_nonempty d
+    · simp
+    rw [← spectrum.neg_eq] at h
+    intro μ hμ
+    specialize h (Set.neg_mem_neg.mpr hμ)
+    rw [← Set.mem_neg, Set.neg_Ici] at h
+    convert h
+    rw [iInf, iSup, ← spectrum_real_eq_range_eigenvalues, ← spectrum_real_eq_range_eigenvalues]
+    rw [← spectrum.neg_eq, csInf_neg ?_ (A.finite_real_spectrum.bddAbove), neg_neg]
+    exact IsSelfAdjoint.spectrum_nonempty hA
+  · convert hl using 1
+    abel
+
+open ComplexOrder in
+theorem IsHermitian.spectrum_subset_of_mem_Icc {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
+  {A B x : Matrix d d 𝕜} (hA : A.IsHermitian) (hB : B.IsHermitian)
+  (hl : (x - A).PosSemidef) (hr : (B - x).PosSemidef) :
+    spectrum ℝ x ⊆ Set.Icc (⨅ i, hA.eigenvalues i) (⨆ i, hB.eigenvalues i) := by
+  rw [← Set.Ici_inter_Iic]
+  exact Set.subset_inter (hA.spectrum_subset_Ici_of_sub hl) (hB.spectrum_subset_Iic_of_sub hr)
+
+end Matrix
+
+namespace HermitianMat
+
+noncomputable section CFC
+
+macro "herm_cont":term => `(term|
+  by simp only [continuousOn_iff_continuous_restrict, continuous_of_discreteTopology])
+
+variable {d d₂ 𝕜 : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
+
+@[simp]
+theorem conjTranspose_cfc (A : HermitianMat d 𝕜) (f : ℝ → ℝ) :
+    (cfc f A.toMat).conjTranspose = cfc f A.toMat := by
+  exact cfc_predicate f A.toMat
+
+noncomputable nonrec def cfc (A : HermitianMat d 𝕜) (f : ℝ → ℝ) : HermitianMat d 𝕜 :=
+  ⟨cfc f A.toMat, cfc_predicate _ _⟩
+
+variable (A : HermitianMat d 𝕜) (f : ℝ → ℝ) (g : ℝ → ℝ) (r : ℝ)
+
+@[simp]
+theorem cfc_toMat : (cfc A f).toMat = _root_.cfc f A.toMat := by
+  rfl
+
+/-- Reindexing a matrix commutes with applying the CFC. -/
+@[simp]
+theorem cfc_reindex (e : d ≃ d₂) : cfc (A.reindex e) f = (cfc A f).reindex e := by
+  rw [HermitianMat.ext_iff]
+  simp only [cfc_toMat, reindex_coe]
+  exact Matrix.cfc_reindex f e
+
+--Ensure we get this instance:
+/-- info: locallyCompact_of_proper -/
+#guard_msgs in
+#synth LocallyCompactSpace (HermitianMat d 𝕜)
+
+--PULLOUT to Inner.lean
+--Better name ...
+open RealInnerProductSpace in
+omit [DecidableEq d] in
+theorem inner_eq_trace_mul' (A B : HermitianMat d 𝕜) :
+    ⟪A, B⟫ = RCLike.re (Matrix.trace (A.toMat * B.toMat)) := by
+  exact inner_eq_re_trace A B
+
+@[simp]
+theorem norm_one : ‖(1 : HermitianMat d 𝕜)‖ = √(Fintype.card d : ℝ) := by
+  simp [norm_eq_sqrt_real_inner, inner_eq_trace_mul']
+
+variable {A} in
+theorem lt_smul_of_norm_lt {r : ℝ} (h : ‖A‖ ≤ r) : A ≤ r • 1 := by
+  rcases lt_or_ge r 0 with _ | hr
+  · have := norm_nonneg A
+    order
+  rcases isEmpty_or_nonempty d
+  · exact le_of_subsingleton
+  contrapose! h
+  -- open ComplexOrder in
+  -- rw [le_iff, Matrix.PosSemidef] at h
+  -- simp at h
+  -- specialize h (r • 1 - A).H
+  -- rcases h with ⟨x, hx⟩
+  -- simp at hx
+  sorry
+
+theorem ball_subset_Icc (r : ℝ) : Metric.ball A r ⊆ Set.Icc (A - r • 1) (A + r • 1) := by
+  intro x
+  simp only [Metric.mem_ball, dist_eq_norm, Set.mem_Icc, tsub_le_iff_right]
+  intro h
+  constructor
+  · rw [← norm_neg] at h
+    grw [← lt_smul_of_norm_lt h.le]
+    simp
+  · grw [← lt_smul_of_norm_lt h.le]
+    simp
+
+section frobenius
+--Okay. To get `Continuous.cfc` to play along, we need an `IsometricContinuousFunctionalCalculus`
+-- on `Matrix` (because we need a topology, sure). This in turn means we need a choice of norm on
+-- matrices. We'll use the Frobenius norm and scope it there.
+open Matrix.Norms.Frobenius
+
+--This seems annoying. Matrices aren't a CStarAlgebra when 𝕜 = ℝ, of course. But if we get super stuck,
+--we could just switch this to being only for ℂ (so that the relevant facts in Mathlib make this easy),
+--but this means also specializing a bunch of downtstream stuff.
+def _root_.Matrix.instIsometric : IsometricContinuousFunctionalCalculus ℝ (Matrix d d 𝕜) IsSelfAdjoint where
+  isometric a ha := by
+    intro f₁ f₂
+    sorry
+
+scoped[Matrix.Norms.Frobenius] attribute [instance] Matrix.instIsometric
+
+end frobenius
+
+theorem spectrum_subset_of_mem_Icc (A B : HermitianMat d 𝕜) :
+    ∃ a b, ∀ x, A ≤ x ∧ x ≤ B → spectrum ℝ x.toMat ⊆ Set.Icc a b := by
+  use ⨅ i, A.H.eigenvalues i, ⨆ i, B.H.eigenvalues i
+  rintro x ⟨hl, hr⟩
+  exact A.H.spectrum

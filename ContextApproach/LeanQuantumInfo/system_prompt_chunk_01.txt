@@ -1,0 +1,1203 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+LEAN-QUANTUMINFO REPOSITORY CONTENT
+Repository: https://github.com/Timeroot/Lean-QuantumInfo.git
+Generated on: Sat Sep 27 14:17:22 EDT 2025
+================================================================================
+
+
+================================================================================
+FILE: ClassicalInfo/Capacity.lean
+TYPE: Lean 4
+SIZE: 2362 characters
+================================================================================
+
+import ClassicalInfo.Entropy
+import Mathlib.Data.Finset.Fin
+import Mathlib.Data.Fintype.Fin
+
+--Classical capacity
+-- * Define "code"
+-- * Define (Shannon) capacity of a (iid, memoryless) channel
+-- * Prove Shannon's capacity theorems
+
+variable (A I O : Type*)
+
+/-- Here we define a *Code* by an encdoder and a decoder. The encoder is a function that takes
+ strings (`List`s) of any length over an alphabet `A`, and returns strings over `I`;
+ the decoder takes `O` and gives back strings over `A`. The idea is that a channel
+ would map from strings of `I` to `O`. Important special cases are where `I=O` (the channel doesn't
+ change the symbol set), and `FixedLengthCode` where the output lengths only depend on input lengths. -/
+structure Code where
+  encoder : List A → List I
+  decoder : List O → List A
+
+/-- A `FixedLengthCode` is a `Code` whose output lengths don't depend on the input content, only
+ the input length. -/
+structure FixedLengthCode extends Code A I O where
+  enc_length : ℕ → ℕ
+  enc_maps_length : ∀ as, (encoder as).length = enc_length (as.length)
+  dec_length : ℕ → ℕ
+  dec_maps_length : ∀ is, (decoder is).length = dec_length (is.length)
+
+/-- A `BlockCode` is a `FixedLengthCode` that (1) maps symbols in discrete blocks of fixed length,
+ (2) the encoded alphabet `I` has a canonical injection into `O`, and (3) has encoder and decoders
+ that are inverses of each other. This is well-suited to describing noise and erasure channels. If
+ the channel merely "corrupts" the data then this `O = I`; the erasure channel might for instance take
+ `O = I ⊕ Unit` or `Option I`.
+
+ We define the behavior of a block code to "fail" if the input is not a multiple of the block size,
+ by having it return an empty list. -/
+structure BlockCode (io : I → O) extends FixedLengthCode A I O where
+  block_in : ℕ
+  block_out : ℕ
+  block_enc : (Fin block_in → A) → (Fin block_out → I)
+  block_dec : (Fin block_out → O) → (Fin block_in → A)
+  block_enc_dec_inv : ∀ as, block_dec (io ∘ (block_enc as)) = as
+  enc_length na := if na % block_in != 0 then 0 else (na / block_in) * block_out
+  dec_length no := if no % block_out != 0 then 0 else (no / block_out) * block_in
+  encoder as := if as.length % block_in != 0 then [] else
+    sorry
+  decoder os := if os.length % block_out != 0 then [] else
+    sorry
+  enc_maps_length := sorry
+  dec_maps_length := sorry
+
+
+================================================================================
+FILE: ClassicalInfo/Channel.lean
+TYPE: Lean 4
+SIZE: 2221 characters
+================================================================================
+
+import ClassicalInfo.Distribution
+import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
+
+open BigOperators
+
+/- Channels, as in information theory.
+
+A `Channel` is as a function from `List`s over an input alphabet A to a distribution
+of lists over an output alphabet B. The most important case of interest here
+is the memoryless channel, which preserves lengths and acts on each symbol
+identically and independently.
+-/
+
+variable (I O : Type*) [Fintype O]
+
+/- Actually defining Channels this way gets messy fast because of the measure theory.
+
+/-- Although we could simply `def Channel := List A → List B`, defining it as
+a structure lets us extend this structure by adding additional properties while
+staying a `Channel`. -/
+structure Channel [MeasurableSpace O] where
+  map : List I → MeasureTheory.Measure (List O)
+  map_prob : ∀is, IsProbabilityMeasure (map is)
+
+namespace Channel
+
+variable (A B C D : Type*)
+variable (Cab : Channel A B) (Cbc : Channel B C) (Ccd : Channel C D)
+
+/-- Identity channel -/
+def id : Channel A A :=
+  ⟨_root_.id⟩
+
+/-- Composition of two channels -/
+def comp : Channel A C :=
+  ⟨Cbc.map ∘ Cab.map⟩
+
+/-- Product of two channels, acting on two product types in parallel. -/
+def product : Channel (A × C) (B × D) :=
+  ⟨Cab.map × Ccd.map⟩
+-/
+
+/-- Discrete Memoryless Channel. Each input symbol `I` has a corresponding
+ output distribution `Distribution O`, and this process is applied
+ independently on each symbol in the list. -/
+structure DMChannel where
+  symb_dist : I → Distribution O
+
+namespace DMChannel
+
+/-- Apply a discrete memoryless channel to an n-character string. -/
+def on_fin (C : DMChannel I O) {n : ℕ} (is : Fin n → I) : Distribution (Fin n → O) :=
+  ⟨fun os ↦ ∏ k, C.symb_dist (is k) (os k), by
+    -- change ∑ os in Fintype.piFinset fun x => (Finset.univ : Finset O), ∏ k : Fin n, ((C.symb_dist (is k)) (os k) : ℝ) = 1
+    -- have : ∀i, Finset.sum Finset.univ (C.symb_dist i) = 1 :=
+    --   fun i ↦ Distribution.prop <| C.symb_dist i
+    -- rw [Finset.sum_prod_piFinset]
+    -- simp [this]
+    sorry⟩
+
+/-- Apply a discrete memoryless channel to a list. -/
+def on_list (C : DMChannel I O) (is : List I) : Distribution (Fin (is.length) → O) :=
+  C.on_fin is.get
+
+end DMChannel
+
+
+================================================================================
+FILE: ClassicalInfo/Distribution.lean
+TYPE: Lean 4
+SIZE: 11960 characters
+================================================================================
+
+import ClassicalInfo.Prob
+
+import Mathlib.Analysis.Convex.Combination
+
+/-! # Distributions on finite sets
+
+We define the type `Distribution α` on a `Fintype α`. By restricting ourselves to distributoins on finite types,
+a lot of notation and casts are greatly simplified. This suffices for (most) finite-dimensional quantum theory.
+-/
+
+noncomputable section
+open NNReal
+open Classical
+open BigOperators
+
+/--
+We define our own (discrete) probability distribution notion here, instead
+of using `PMF` from Mathlib, because that uses ENNReals everywhere to maintain compatibility
+with `MeasureTheory.Measure`.
+
+The probabilities internal to a Distribution are NNReals. This lets us more easily
+write the statement that they sum to 1, since NNReals can be added. (Probabilities,
+on their own, cannot.) But the FunLike instance gives `Prob` out, which carry the
+information that they are all in the range [0,1].
+-/
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+
+namespace Distribution
+
+variable {α β : Type*} [Fintype α] [Fintype β]
+
+/-- Make a distribution, proving only that the values are nonnegative and that the
+sum is 1. The fact that the values are at most 1 is derived as a consequence. -/
+def mk' (f : α → ℝ) (h₁ : ∀i, 0 ≤ f i) (hN : ∑ i, f i = 1) : Distribution α :=
+  have h₃ : ∀x, f x ≤ 1 := by
+    intro x
+    simp [← hN, Fintype.sum_eq_sum_compl_add x]
+    exact Finset.sum_nonneg' h₁
+  ⟨ fun i ↦ ⟨f i, ⟨h₁ i, h₃ i⟩⟩, hN⟩
+
+instance instFunLikeProb : FunLike (Distribution α) α Prob where
+  coe p a := p.1 a
+  coe_injective' _ _ h :=
+    Subtype.ext <| funext fun v ↦ by
+      simpa only [Subtype.mk.injEq, coe_inj] using congrFun h v
+
+@[simp]
+theorem normalized (d : Distribution α) : Finset.sum Finset.univ (fun i ↦ (d i : ℝ)) = 1 :=
+  d.2
+
+abbrev prob (d : Distribution α) := (d : α → Prob)
+
+@[simp]
+theorem fun_eq_val (d : Distribution α) : d.val = d :=
+  rfl
+
+@[simp]
+theorem funlike_apply (d : α → Prob) (h : _) (x : α) :
+    DFunLike.coe (self := instFunLikeProb) ⟨d, h⟩ x = d x :=
+  rfl
+
+@[ext]
+theorem ext {p q : Distribution α} (h : ∀ x, p x = q x) : p = q :=
+  DFunLike.ext p q h
+
+/-- A distribution is a witness that d is nonempty. -/
+instance nonempty (d : Distribution α) : Nonempty α := by
+  by_contra h
+  simpa [not_nonempty_iff.mp h] using d.2
+
+/-- Make an constant distribution: supported on a single element. This is also called, variously, a
+ "One-point distribution", a "Degenerate distribution", a "Deterministic distribution", a
+ "Delta function", or a "Point mass distribution". -/
+def constant (x : α) : Distribution α :=
+  ⟨fun y ↦ if x = y then 1 else 0,
+    by simp [apply_ite]⟩
+
+theorem constant_def (x : α) : (constant x : α → Prob) = fun y ↦ if x = y then 1 else 0 := by
+  rfl
+
+@[simp]
+theorem constant_eq (x : α) : constant x y = if x = y then 1 else 0 := by
+  rfl
+
+@[simp]
+theorem constant_def' (x y : α) : (constant x : α → Prob) y = if x = y then 1 else 0 := by
+  rw [← Prob.eq_iff_nnreal]
+  change (Prob.toNNReal ∘ (constant x)) y = (if x = y then 1 else 0 : Prob)
+  rw [constant_def x]
+  split_ifs with h
+  <;> simp [h]
+
+/-- If a distribution has an element with probability 1, the distribution has a constant. -/
+theorem constant_of_exists_one {D : Distribution α} {x : α} (h : D x = 1) : D = Distribution.constant x := by
+  ext y
+  by_cases h₂ : x = y
+  · simp [h, ← h₂]
+  · simp only [constant_eq, h₂, ↓reduceIte, Prob.coe_zero]
+    by_contra h₃
+    replace h₃ : 0 < (D y : ℝ) := by
+      linarith (config := {splitNe := true}) only [h₃, @Prob.zero_le_coe (D y)]
+    have := D.normalized
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ x), h, Prob.coe_one] at this
+    rw [← Finset.add_sum_erase _ _ (a := y) (by simpa using (Ne.symm h₂))] at this
+    have : 0 ≤ ∑ x ∈ Finset.erase (Finset.erase Finset.univ x) y, (D x : ℝ) :=
+      Finset.sum_nonneg' (fun _ ↦ Prob.zero_le_coe)
+    linarith
+
+/-- Make an uniform distribution. -/
+def uniform [n : Nonempty α] : Distribution α :=
+  ⟨fun _ ↦ ⟨1 / (Finset.univ.card (α := α)), by
+    have : 0 < Finset.univ.card (α := α) :=
+      Finset.Nonempty.card_pos (Finset.univ_nonempty_iff.mpr n)
+    bound⟩, by simp⟩
+
+@[simp]
+theorem uniform_def [Nonempty α] (y : α) : ((uniform y) : ℝ) = 1 / (Finset.univ.card (α := α)) :=
+  rfl
+
+/-- Make a distribution on a product of two Fintypes. -/
+def prod (d1 : Distribution α) (d2 : Distribution β) : Distribution (Prod α β) :=
+  ⟨fun x ↦ (d1 x.1) * (d2 x.2), by
+    simp [← Finset.mul_sum, Fintype.sum_prod_type]⟩
+
+@[simp]
+theorem prod_def (x : α) (y : β) : prod d1 d2 ⟨x, y⟩ = (d1 x) * (d2 y) :=
+  rfl
+
+/-- Given a distribution on α, extend it to a distribution on `Sum α β` by giving it no support on `β`. -/
+def extend_right (d : Distribution α) : Distribution (α ⊕ β) :=
+  ⟨fun x ↦ Sum.casesOn x d.val (Function.const _ 0), by simp⟩
+
+/-- Given a distribution on α, extend it to a distribution on `Sum β α` by giving it no support on `β`. -/
+def extend_left (d : Distribution α) : Distribution (β ⊕ α) :=
+  ⟨fun x ↦ Sum.casesOn x (Function.const _ 0) d.val, by simp⟩
+
+/-- Make a convex mixture of two distributions on the same set. -/
+instance instMixable : Mixable (α → ℝ) (Distribution α) :=
+  Mixable.instSubtype (inferInstance) (fun _ _ hab hx hy ↦ by
+    simp [Mixable.mix_ab, Finset.sum_add_distrib, ← Finset.mul_sum, hab, hx, hy]
+  )
+
+/-- Given a distribution on type α and an equivalence to type β, get the corresponding
+distribution on type β. -/
+def relabel (d : Distribution α) (σ : β ≃ α) : Distribution β :=
+  ⟨fun b ↦ d (σ b),
+   by rw [Equiv.sum_comp σ (fun a ↦ (d a : ℝ))]; exact d.prop⟩
+
+-- The two properties below (and congrRandVar) follow from the fact that Distribution is a contravariant functor.
+-- However, mathlib does not seem to support that outside of the CategoryTheory namespace
+/-- Distributions on α and β are equivalent for equivalent types α ≃ β. -/
+def congr (σ : α ≃ β) : Distribution α ≃ Distribution β := by
+  constructor
+  case toFun => exact fun d ↦ relabel d σ.symm
+  case invFun => exact fun d ↦ relabel d σ
+  case left_inv =>
+    intro d
+    ext i
+    unfold relabel
+    simp only [← fun_eq_val, Equiv.symm_apply_apply, Subtype.coe_eta]
+  case right_inv =>
+    intro d
+    ext i
+    unfold relabel
+    simp only [← fun_eq_val, Equiv.apply_symm_apply, Subtype.coe_eta]
+
+@[simp]
+theorem congr_apply (σ : α ≃ β) (d : Distribution α) (j : β): (congr σ d) j = d (σ.symm j) := by
+  rfl
+
+/-- The inverse and congruence operations for distributions commute -/
+@[simp]
+theorem congr_symm_apply (σ : α ≃ β) : (Distribution.congr σ).symm = Distribution.congr σ.symm := by
+  rfl
+
+/-- The distribution on Fin 2 corresponding to a coin with probability p. Chance p of 1, 1-p of 0. -/
+def coin (p : Prob) : Distribution (Fin 2) :=
+  ⟨(if · = 0 then p else 1 - p), by simp⟩
+
+@[simp]
+theorem coin_val_zero (p : Prob) : coin p 0 = p := by
+  simp [coin]
+
+@[simp]
+theorem coin_val_one (p : Prob) : coin p 1 = 1 - p := by
+  simp [coin]
+
+/-- Every distribution on two variable is some coin. -/
+theorem fin_two_eq_coin (d : Distribution (Fin 2)) : d = coin (d 0) := by
+  ext i
+  fin_cases i
+  · simp [coin]
+  · simpa only [coin, Fin.mk_one, funlike_apply, one_ne_zero, ↓reduceIte,
+    Prob.coe_one_minus, Subtype.eq_iff, Prob.coe_one_minus, eq_sub_iff_add_eq, add_comm,
+        fun_eq_val, Fin.sum_univ_two] using d.property
+
+theorem coin_eq_iff (p : Prob) (f : Distribution (Fin 2)) :
+    Distribution.coin p = f ↔ p = f 0 := by
+  constructor
+  · rintro rfl
+    rfl
+  · rintro rfl
+    rw [← Distribution.fin_two_eq_coin f]
+
+section randvar
+
+/-- A `T`-valued random variable over `α` is a map `var : α → T` along
+with a probability distribution `distr : Distribution α`. -/
+structure RandVar (α : Type*) [Fintype α] (T : Type*) where
+  var : α → T
+  distr : Distribution α
+
+instance instFunctor : Functor (RandVar α) where map f e := ⟨f ∘ e.1, e.2⟩
+
+instance instLawfulFunctor : LawfulFunctor (RandVar α) where
+  map_const {α} {β} := by rfl
+  id_map _ := by rfl
+  comp_map _ _ _ := by rfl
+
+-- `U` is required to be a group just because mix below uses Convex.sum_mem,
+-- but it should be provable with just `AddCommMonoid U`
+variable {T U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T]
+
+/-- `Distribution.exp_val` is the expectation value of a random variable `X`. Under the hood,
+it is the "convex combination over a finite family" on the type `T`, afforded by the `Mixable` instance,
+with the probability distribution of `X` as weights. -/
+def expect_val (X : RandVar α T) : T := by
+  let u : U := ∑ i ∈ Finset.univ, (X.distr i : ℝ) • (inst.to_U (X.var i))
+  have ht : ∃ t : T, inst.to_U t = u := by
+    have h₀ : ∀ i ∈ Finset.univ, 0 ≤ ↑(X.distr i) := by simp
+    have h₁ : ∑ i ∈ Finset.univ, (X.distr i : ℝ) = 1 := by simp
+    have hz : ∀ i ∈ Finset.univ, inst.to_U (X.var i) ∈ Set.range inst.to_U := by simp [Finset.mem_univ]
+    exact Set.mem_range.mp (inst.convex.sum_mem h₀ h₁ hz)
+  exact (inst.mkT ht).1
+
+/-- The expectation value of a random variable over `α = Fin 2` is the same as `Mixable.mix`
+with probabiliy weight `X.distr 0` -/
+theorem expect_val_eq_mixable_mix (d : Distribution (Fin 2)) (x₁ x₂ : T) : expect_val ⟨![x₁, x₂], d⟩ = Mixable.mix (d 0) x₁ x₂ := by
+  apply Mixable.to_U_inj
+  simp only [Mixable.mix, expect_val, DFunLike.coe, Mixable.to_U_of_mkT]
+  calc
+    ∑ i : Fin (Nat.succ 0).succ, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) = ∑ i, (d i : ℝ) • Mixable.to_U (![x₁, x₂] i) := by
+      simp
+    _ = (d 0 : ℝ) • Mixable.to_U (![x₁, x₂] 0) + (d 1 : ℝ) • Mixable.to_U (![x₁, x₂] 1) := by
+      simp
+    _ = (d 0 : ℝ) • Mixable.to_U x₁ + (1 - d 0).val • Mixable.to_U x₂ := by
+      congr
+      simpa only [Subtype.eq_iff, Prob.coe_one_minus, eq_sub_iff_add_eq, add_comm,
+        fun_eq_val, Fin.sum_univ_two] using d.property
+
+/-- The expectation value of a random variable with constant probability distribution `constant x` is its value at `x` -/
+theorem expect_val_constant (x : α) (f : α → T) : expect_val ⟨f, (constant x)⟩ = f x := by
+  apply Mixable.to_U_inj
+  simp only [expect_val, constant, DFunLike.coe, Mixable.to_U_of_mkT, apply_ite, Prob.coe_one,
+    Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+
+/-- The expectation value of a nonnegative real random variable is also nonnegative -/
+theorem zero_le_expect_val (d : Distribution α) (f : α → ℝ) (hpos : 0 ≤ f) : 0 ≤ expect_val ⟨f, d⟩ := by
+  simp only [expect_val, Mixable.mkT, Mixable.to_U, id]
+  apply Fintype.sum_nonneg
+  intro x
+  specialize hpos x
+  exact mul_nonneg Prob.zero_le_coe hpos
+
+/-- `T`-valued random variables on `α` and `β` are equivalent if `α ≃ β` -/
+def congrRandVar (σ : α ≃ β) : RandVar α T ≃ RandVar β T := by
+  constructor
+  case toFun => exact fun X ↦ { var := X.var ∘ σ.symm, distr := Distribution.congr σ X.distr }
+  case invFun => exact fun X ↦ { var := X.var ∘ σ, distr := Distribution.congr σ.symm X.distr }
+  case left_inv =>
+    intro e
+    dsimp
+    congr
+    · simp [Function.comp_assoc]
+    · rw [← Distribution.congr_symm_apply, Equiv.symm_apply_apply]
+  case right_inv =>
+    intro e
+    dsimp
+    congr
+    · simp [Function.comp_assoc]
+    · rw [← Distribution.congr_symm_apply, Equiv.apply_symm_apply]
+
+/-- Given a `T`-valued random variable `X` over `α`, mapping over `T` commutes with the equivalence over `α` -/
+def map_congr_eq_congr_map {S : Type _} [Mixable U S] (f : T → S) (σ : α ≃ β) (X : RandVar α T) :
+  f <$> congrRandVar σ X = congrRandVar σ (f <$> X) := by rfl
+
+/-- The expectation value is invariant under equivalence of random variables -/
+@[simp]
+theorem expect_val_congr_eq_expect_val (σ : α ≃ β) (X : RandVar α T) : expect_val (congrRandVar σ X) = expect_val X := by
+  apply Mixable.to_U_inj
+  simp only [expect_val, congrRandVar, Equiv.coe_fn_mk, Function.comp_apply, Mixable.to_U_of_mkT,
+    congr_apply]
+  rw [Equiv.sum_comp σ.symm (fun i : α ↦ (X.distr i : ℝ) • Mixable.to_U (X.var i))]
+
+end randvar
+
+end Distribution
+
+
+================================================================================
+FILE: ClassicalInfo/Entropy.lean
+TYPE: Lean 4
+SIZE: 4550 characters
+================================================================================
+
+import ClassicalInfo.Distribution
+import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
+import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
+import ClassicalInfo.ForMathlib.Analysis.SpecialFunctions.Log.NegMulLog
+
+/-! # Shannon entropy
+
+Definitions and facts about the Shannon entropy function -x*ln(x), both on a single
+variable and on a distribution.
+
+There is significant overlap with `Real.negMulLog` and `Real.binEntropy` in Mathlib,
+and probably these files could be combined in some form. -/
+
+noncomputable section
+open NNReal
+
+variable {α : Type u} [Fintype α]
+
+/-- The one-event entropy function, H₁(p) = -p*ln(p). Uses nits. -/
+def H₁ : Prob → ℝ :=
+  fun x ↦ Real.negMulLog x
+
+/-- H₁ of 0 is zero.-/
+@[simp]
+def H₁_zero_eq_zero : H₁ 0 = 0 := by
+  simp [H₁]
+
+/-- H₁ of 1 is zero.-/
+@[simp]
+def H₁_one_eq_zero : H₁ 1 = 0 := by
+  simp [H₁]
+
+/-- Entropy is nonnegative. -/
+theorem H₁_nonneg (p : Prob) : 0 ≤ H₁ p := by
+  rw [H₁, Real.negMulLog, neg_mul, Left.nonneg_neg_iff]
+  exact Real.mul_log_nonpos p.zero_le_coe p.coe_le_one
+
+/-- Entropy is less than 1. -/
+theorem H₁_le_1 (p : Prob) : H₁ p < 1 := by
+  rw [H₁]
+  by_cases h : p = 0
+  · norm_num [h]
+  · have hp0 : 0 < p := lt_of_le_of_ne' p.zero_le h
+    have h₂ := Real.abs_log_mul_self_lt p hp0 p.coe_le_one
+    rw [mul_comm, ← abs_neg, ← neg_mul] at h₂
+    exact lt_of_abs_lt h₂
+
+/-- Entropy is at most 1/e. -/
+theorem H₁_le_exp_m1 (p : Prob) : H₁ p ≤ Real.exp (-1) :=
+  Real.negMulLog_le_rexp_neg_one p.zero_le_coe
+
+theorem H₁_concave : ∀ (x y : Prob), ∀ (p : Prob), p[H₁ x ↔ H₁ y] ≤ H₁ (p[x ↔ y]) := by
+  intros x y p
+  simp only [H₁, smul_eq_mul, Prob.coe_one_minus, Mixable.mix, Mixable.mix_ab, Mixable.mkT_instUniv,
+    Prob.mkT_mixable, Prob.to_U_mixable, Mixable.to_U_instUniv, Prob.to_U_mixable]
+  by_cases hxy : x = y
+  · subst hxy
+    ring_nf
+    exact le_refl _
+  by_cases hp : (p:ℝ) = 0
+  · norm_num [hp]
+  by_cases hp₁ : (p:ℝ) = 1
+  · norm_num [hp₁]
+  rw [← ne_eq] at hxy hp hp₁
+  have := Real.strictConcaveOn_negMulLog.2
+  replace := @this x ?_ y ?_ ?_ p (1 - p) ?_ ?_ (by linarith)
+  · simp only [smul_eq_mul] at this
+    apply le_of_lt
+    convert this
+  · simp only [Set.mem_Ici, Prob.zero_le_coe]
+  · simp only [Set.mem_Ici, Prob.zero_le_coe]
+  · simpa only [Prob.ne_iff]
+  · exact lt_of_le_of_ne p.zero_le_coe hp.symm
+  · linarith (config := {splitNe := true}) [p.coe_le_one]
+
+/-- The Shannon entropy of a discrete distribution, H(X) = ∑ H₁(p_x). -/
+def Hₛ (d : Distribution α) : ℝ :=
+  Finset.sum Finset.univ (fun x ↦ H₁ (d.prob x))
+
+/-- Shannon entropy of a distribution is nonnegative. -/
+theorem Hₛ_nonneg (d : Distribution α) : 0 ≤ Hₛ d :=
+  Finset.sum_nonneg' fun _ ↦ H₁_nonneg _
+
+/-- Shannon entropy of a distribution is at most ln d. -/
+theorem Hₛ_le_log_d (d : Distribution α) : Hₛ d ≤ Real.log (Fintype.card α) := by
+  --Thanks Aristotle
+  by_cases h : Fintype.card α = 0
+  · simp_all [Hₛ, Fintype.card_eq_zero_iff.mp h]
+  -- Since the sum of the probabilities is 1, we can apply Jensen's inequality for the convex function -x log x.
+  have h_jensen {p : α → ℝ} (hsum : ∑ i, p i = 1) (hp : ∀ i, 0 ≤ p i ∧ p i ≤ 1) :
+      -∑ i, p i * (p i).log ≤ Real.log (Fintype.card α) := by
+    have h_jensen : (∑ i, (Fintype.card α : ℝ)⁻¹ * p i) * (∑ i, (Fintype.card α : ℝ)⁻¹ * p i).log ≤
+          (∑ i, (Fintype.card α : ℝ)⁻¹ * (p i * (p i).log)) := by
+      have h_convex : ConvexOn ℝ (Set.Icc 0 1) (fun x ↦ x * Real.log x) :=
+        Real.convexOn_mul_log.subset Set.Icc_subset_Ici_self (convex_Icc 0 1)
+      convert h_convex.map_sum_le _ _ _ <;> aesop
+    simp_rw [← Finset.mul_sum, hsum, mul_one, Real.log_inv] at h_jensen
+    have : 0 < (Fintype.card α : ℝ)⁻¹ := by positivity
+    have := mul_inv_cancel₀ <| show (Fintype.card α : ℝ) ≠ 0 by positivity
+    nlinarith
+  simpa [Hₛ, H₁, Real.negMulLog] using h_jensen d.2 (by grind)
+
+/-- The shannon entropy of a constant variable is zero. -/
+@[simp]
+theorem Hₛ_constant_eq_zero {i : α} : Hₛ (Distribution.constant i) = 0 := by
+  simp [Hₛ, apply_ite]
+
+/-- Shannon entropy of a uniform distribution is ln d. -/
+theorem Hₛ_uniform [Nonempty α] :
+    Hₛ (Distribution.uniform (α := α)) = Real.log (Finset.univ.card (α := α)) := by
+  simp [Hₛ, Distribution.prob, H₁, Real.negMulLog]
+
+/-- Shannon entropy of two-event distribution. -/
+theorem Hₛ_coin (p : Prob) : Hₛ (Distribution.coin p) = Real.binEntropy p := by
+  simp [Hₛ, H₁, Distribution.coin, Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
+
+--TODO:
+-- * Shannon entropy is concave under mixing distributions.
+-- * Shannon entropy as an expectation value
+
+
+================================================================================
+FILE: ClassicalInfo/ForMathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean
+TYPE: Lean 4
+SIZE: 1251 characters
+================================================================================
+
+import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
+
+noncomputable section
+open NNReal
+
+namespace Real
+
+theorem negMulLog_strictMonoOn : StrictMonoOn Real.negMulLog (Set.Icc 0 (exp (-1))) := by
+  apply strictMonoOn_of_deriv_pos
+  · exact convex_Icc 0 (exp (-1))
+  · exact continuous_negMulLog.continuousOn
+  · intro x hx
+    rw [interior_Icc, Set.mem_Ioo] at hx
+    linarith only [log_exp (-1), log_lt_log hx.left hx.right, deriv_negMulLog hx.left.ne']
+
+theorem negMulLog_strictAntiOn : StrictAntiOn Real.negMulLog (Set.Ici (exp (-1))) := by
+  apply strictAntiOn_of_deriv_neg
+  · exact convex_Ici (exp (-1))
+  · exact continuous_negMulLog.continuousOn
+  · intro x hx
+    rw [interior_Ici' Set.nonempty_Iio, Set.mem_Ioi] at hx
+    have hx' : x ≠ 0 := by grind [exp_nonneg]
+    linarith [log_exp (-1), log_lt_log (exp_pos (-1)) hx, deriv_negMulLog hx']
+
+theorem negMulLog_le_rexp_neg_one {x : ℝ} (hx : 0 ≤ x) : negMulLog x ≤ exp (-1) := by
+  by_cases hp : x < exp (-1)
+  · grw [negMulLog_strictMonoOn.monotoneOn (by grind) (by grind) hp.le]
+    simp [negMulLog]
+  by_cases hp' : Real.exp (-1) < x
+  · grw [negMulLog_strictAntiOn.antitoneOn (by grind) (by grind) hp'.le]
+    simp [negMulLog]
+  · simp [show x = exp (-1) by order, negMulLog]
+
+end Real
+
+
+================================================================================
+FILE: ClassicalInfo/Prob.lean
+TYPE: Lean 4
+SIZE: 16741 characters
+================================================================================
+
+import Mathlib.Analysis.Convex.Mul
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
+import Mathlib.Data.NNReal.Basic
+import Mathlib.Data.EReal.Basic
+import Mathlib.Tactic.Finiteness
+import Mathlib.Topology.UnitInterval
+
+/-! # Probabilities
+
+This defines a type `Prob`, which is simply any real number in the interval O to 1. This then comes with
+additional statements such as its application to convex sets, and it makes useful type alias for
+functions that only make sense on probabilities.
+
+A significant application is in the `Mixable` typeclass, also in this file, which is a general notion
+of convex combination that applies to types as opposed to sets; elements are `Mixable.mix`ed using `Prob`s.
+-/
+
+noncomputable section
+open NNReal
+open Classical
+
+/-- `Prob` is a real number in the interval [0,1]. Similar to NNReal in many definitions, but this
+  allows other nice things more 'safely' such as convex combination. -/
+@[reducible]
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+
+namespace Prob
+
+instance : Coe Prob ℝ := ⟨Subtype.val⟩
+
+instance canLift : CanLift ℝ Prob Subtype.val fun r => 0 ≤ r ∧ r ≤ 1 :=
+  Subtype.canLift _
+
+instance instZero : Zero Prob :=
+  ⟨0, by simp⟩
+
+instance instOne : One Prob :=
+  ⟨1, by simp⟩
+
+instance instMul : Mul Prob :=
+  ⟨fun x y ↦ ⟨x.1 * y.1,
+    ⟨mul_nonneg x.2.1 y.2.1, mul_le_one₀ x.2.2 y.2.1 y.2.2⟩⟩⟩
+
+@[simp, norm_cast]
+theorem coe_zero : (0 : Prob).val = 0 :=
+  rfl
+
+@[simp, norm_cast]
+theorem coe_one : (1 : Prob).val = 1 :=
+  rfl
+
+@[simp, norm_cast]
+theorem coe_mul (x y : Prob) : (x * y).val = x.val * y.val :=
+  rfl
+
+@[simp, norm_cast]
+theorem coe_inf (x y : Prob) : (x ⊓ y).val = x.val ⊓ y.val :=
+  rfl
+
+@[simp, norm_cast]
+theorem coe_sup (x y : Prob) : (x ⊔ y).val = x.val ⊔ y.val :=
+  rfl
+
+instance instCommMonoidWithZero : CommMonoidWithZero Prob where
+  mul_assoc := by intros; ext; simp [mul_assoc]
+  one_mul := by intros; ext; simp
+  mul_one := by intros; ext; simp
+  mul_comm := by intros; ext; simp [mul_comm]
+  mul_zero := by intros; ext; simp
+  zero_mul := by intros; ext; simp
+
+instance instDenselyOrdered : DenselyOrdered Prob :=
+  show DenselyOrdered (Set.Icc 0 1) from Set.instDenselyOrdered
+
+instance instCompleteLinearOrder : CompleteLinearOrder Prob :=
+  instCompleteLinearOrderElemIccOfFactLe
+
+instance instInhabited : Inhabited Prob where
+  default := 0
+
+instance : LinearOrderedCommMonoidWithZero Prob where
+  mul_le_mul_left := by
+    intros a b h c
+    rw [← Subtype.coe_le_coe]
+    exact mul_le_mul_of_nonneg_left h c.2.1
+  zero_le_one := (0 : Prob).2.2
+
+@[simp]
+theorem zero_le_coe {p : Prob} : 0 ≤ (p : ℝ) :=
+  p.2.1
+
+@[simp]
+theorem coe_le_one {p : Prob} : (p : ℝ) ≤ 1 :=
+  p.2.2
+
+@[simp]
+theorem zero_le {p : Prob} : 0 ≤ p :=
+  zero_le_coe
+
+@[simp]
+theorem le_one {p : Prob} : p ≤ 1 :=
+  coe_le_one
+
+@[ext] protected theorem eq {n m : Prob} : (n : ℝ) = (m : ℝ) → n = m :=
+  Subtype.eq
+
+theorem ne_iff {x y : Prob} : (x : ℝ) ≠ (y : ℝ) ↔ x ≠ y :=
+  not_congr <| Prob.eq_iff.symm
+
+@[simp, norm_cast]
+theorem toReal_mul (x y : Prob) : (x * y : Prob) = (x : ℝ) * (y : ℝ) := by
+  simp only [coe_mul]
+
+/-- Coercion `Prob → ℝ≥0`. -/
+@[coe] def toNNReal : Prob → ℝ≥0 :=
+  fun p ↦ ⟨p.val, zero_le_coe⟩
+
+@[simp]
+theorem toNNReal_mk : toNNReal { val := x, property := hx} = { val := x, property := hx.1 } :=
+  rfl
+
+instance : Coe Prob ℝ≥0 := ⟨toNNReal⟩
+
+instance canLiftNN : CanLift ℝ≥0 Prob toNNReal fun r => r ≤ 1 :=
+  ⟨fun x hx ↦ ⟨⟨x, ⟨x.2, hx⟩⟩, rfl⟩⟩
+
+protected theorem eq_iff_nnreal (n m : Prob) : (n : ℝ≥0) = (m : ℝ≥0) ↔ n = m := by
+  obtain ⟨n,hn⟩ := n
+  obtain ⟨m,hn⟩ := m
+  simp only [toNNReal_mk, Subtype.mk.injEq, NNReal]
+
+@[simp, norm_cast]
+theorem toNNReal_zero : (0 : Prob) = (0 : ℝ≥0) :=
+  rfl
+
+@[simp, norm_cast]
+theorem toNNReal_one : (1 : Prob) = (1 : ℝ≥0) :=
+  rfl
+
+def NNReal.asProb (p : ℝ≥0) (hp : p ≤ 1) : Prob :=
+  ⟨p, ⟨p.2, hp⟩⟩
+
+def NNReal.asProb' (p : ℝ≥0) (hp : p.1 ≤ 1) : Prob :=
+  ⟨p, ⟨p.2, hp⟩⟩
+
+theorem zero_lt_coe {p : Prob} (hp : p ≠ 0) : (0 : ℝ) < p :=
+  lt_of_le_of_ne' p.zero_le (unitInterval.coe_ne_zero.mpr hp)
+
+/-- Subtract a probability from another. Truncates to zero, so this is often not great
+to work with, for the same reason that Nat subtraction is a pain. But, it lets you write
+`1 - p`, which is sufficiently useful on its own that this seems worth having. -/
+instance instSub : Sub Prob where
+  sub p q := ⟨(p - q) ⊔ (0 : ℝ), by
+    simpa using le_add_of_le_of_nonneg p.2.2 q.2.1
+  ⟩
+
+theorem coe_sub (p q : Prob) : (p - q : Prob)  = (p.val - q.val) ⊔ (0 : ℝ) := by
+  rfl
+
+@[simp, norm_cast]
+theorem coe_one_minus (p : Prob) : (1 - p : Prob) = 1 - (p : ℝ) := by
+  simp [coe_sub]
+
+theorem add_one_minus (p : Prob) : p.val + (1 - p).val = 1 := by
+  simp
+
+@[simp]
+theorem one_minus_inv (p : Prob) : 1 - (1 - p) = p := by
+  ext
+  simp
+
+instance : OrderTopology Prob :=
+  orderTopology_of_ordConnected (ht := Set.ordConnected_Icc)
+
+@[simp, norm_cast]
+theorem coe_iInf {ι : Type*} [Nonempty ι] (f : ι → Prob) : ↑(⨅ t, f t) = (⨅ t, f t : ℝ) := by
+  apply Monotone.map_ciInf_of_continuousAt
+  · fun_prop
+  · exact fun _ _ ↦ id
+  · exact OrderBot.bddBelow _
+
+instance : Nontrivial Prob where
+  exists_pair_ne := ⟨0, 1, by simp [← Prob.ne_iff]⟩
+
+@[simp]
+theorem top_eq_one : (⊤ : Prob) = 1 := by
+  rfl
+
+@[simp]
+theorem sub_zero (p : Prob) : p - 0 = p := by
+  ext1; simp [coe_sub]
+
+@[fun_prop]
+theorem toNNReal_Continuous : Continuous Prob.toNNReal := by
+  unfold Prob.toNNReal
+  fun_prop
+
+end Prob
+
+/-- A `Mixable T` typeclass instance gives a compact way of talking about the action of probabilities
+  for forming linear combinations in convex spaces. The notation `p [ x₁ ↔ x₂ ]` means to take a convex
+  combination, equal to `x₁` if `p=1` and to `x₂` if `p=0`.
+
+  Mixable is defined by an "underlying" data type `U` with addition and scalar multiplication, and a
+  bijection between the `T` and a convex set of `U`. For instance, in `Mixable (Distribution (Fin n))`,
+  `U` is `n`-element vectors (which form the probability simplex, degenerate in one dimension). For
+  `QuantumInfo.Finite.MState` density matrices in quantum mechanics, which are PSD matrices of trace 1,
+  `U` is the underlying matrix.
+
+  Why not just stick with existing notions of `Convex`? `Convex` requires that the type already forms an
+  `AddCommMonoid` and `Module ℝ`. But many types, such as `Distribution`, are not: there is no good notion of
+  "multiplying a probability distribution by 0.3" to get another distribution. We can coerce the distribution
+  into, say, a vector or a function, but then we are not doing arithmetic with distributions. Accordingly,
+  the expression `0.3 * distA + 0.7 * distB` cannot represent a distribution on its own. -/
+class Mixable (U : outParam (Type u)) (T : Type v) [AddCommMonoid U] [Module ℝ U] where
+  /-- Getter for the underlying data -/
+  to_U : T → U
+  /-- Proof that this getter is injective -/
+  to_U_inj : ∀ {T₁ T₂}, to_U T₁ = to_U T₂ → T₁ = T₂
+  /-- Proof that this image is convex -/
+  convex : Convex ℝ (Set.range to_U)
+  /-- Function to get a T from a proof that U is in the set. -/
+  mkT : {u : U} → (∃ t, to_U t = u) → { t : T // to_U t = u }
+
+namespace Mixable
+
+variable {T U : Type*} [AddCommMonoid U] [Module ℝ U]
+
+@[reducible]
+def mix_ab [inst : Mixable U T] {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : a + b = 1) (x₁ x₂ : T) : T :=
+  inst.mkT <| inst.convex
+    (x := to_U x₁) (exists_apply_eq_apply _ _)
+    (y := to_U x₂) (exists_apply_eq_apply _ _)
+    ha hb hab
+
+/-- `Mixable.mix` represents the notion of "convex combination" on the type `T`, afforded by the `Mixable`
+instance. It takes a `Prob`, that is, a `Real` between 0 and 1. For working directly with a Real, use `mix_ab`. -/
+def mix [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) : T :=
+  inst.mix_ab p.zero_le_coe (1 - p).zero_le_coe p.add_one_minus x₁ x₂
+
+@[simp]
+theorem to_U_of_mkT [inst : Mixable U T] (u : U) {h} : inst.to_U (mkT (u := u) h).1 = u :=
+  (mkT (u := u) h).2
+
+notation p "[" x₁:80 "↔" x₂ "]" => mix p x₁ x₂
+
+notation p "[" x₁:80 "↔" x₂ ":" M "]" => mix (inst := M) p x₁ x₂
+
+@[simp]
+theorem mix_zero [inst : Mixable U T] (x₁ x₂ : T) : (0 : Prob) [ x₁ ↔ x₂ : inst] = x₂ := by
+  apply inst.to_U_inj
+  simp [mix, mix_ab]
+
+/--When T is the whole space, and T is a suitable vector space over ℝ, we get a Mixable instance.-/
+instance instUniv [AddCommMonoid T] [Module ℝ T] : Mixable T T where
+  to_U := id
+  to_U_inj := id
+  convex := by
+    convert convex_univ
+    simp only [Set.range_id]
+  mkT := fun _ ↦ ⟨_, rfl⟩
+
+@[simp]
+theorem mkT_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} (h : ∃ t', to_U t' = t) : instUniv.mkT h = ⟨t, rfl⟩ :=
+  rfl
+
+@[simp]
+theorem to_U_instUniv [AddCommMonoid T] [Module ℝ T] {t : T} : instUniv.to_U t = t :=
+  rfl
+
+section pi
+
+theorem instPi.lem_1 {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)]
+    {u : (i : D) → U i} (h : ∃ (t : (i : D) → T i), (fun d => to_U (t d)) = u) (d : D) : ∃ (t : T d), to_U t = u d := by
+  obtain ⟨t, h⟩ := h
+  use t d
+  exact congrFun h d
+
+variable {D : Type*} {T U : D → Type*} [∀i, AddCommMonoid (U i)] [∀ i, Module ℝ (U i)] [inst : ∀i, Mixable (U i) (T i)] in
+/-- Mixable instance on Pi types. -/
+instance instPi : Mixable ((i:D) → U i) ((i:D) → T i) where
+  to_U x := fun d ↦ (inst d).to_U (x d)
+  to_U_inj h := funext fun d ↦ (inst d).to_U_inj (congrFun h d)
+  mkT := fun {u} h ↦ ⟨fun d ↦ (inst d).mkT (u := u d) (instPi.lem_1 h d),
+    by funext d; simp⟩
+  convex := by
+    simp [Convex, StarConvex]
+    intro f₁ f₂ a b ha hb hab
+    use fun d ↦ (inst d).mix_ab ha hb hab (f₁ d) (f₂ d)
+    funext d
+    simp only [to_U_of_mkT, Pi.add_apply, Pi.smul_apply]
+
+@[simp]
+theorem val_mkT_instPi (D : Type*) [inst : Mixable U T] {u : D → U} (h : ∃ t, to_U t = u) : (instPi.mkT h).val =
+    fun d ↦ (inst.mkT (instPi.lem_1 h d)).val :=
+  rfl
+
+@[simp]
+theorem to_U_instPi (D : Type*) [inst : Mixable U T] {t : D → T} : (instPi).to_U t = fun d ↦ inst.to_U (t d) :=
+  rfl
+
+end pi
+
+/-- Mixable instances on subtypes (of other mixable types), assuming that they
+ have the correct closure properties. -/
+def instSubtype {T : Type*} {P : T → Prop} (inst : Mixable U T)
+    (h : ∀{x y:T},
+      ∀⦃a b : ℝ⦄, (ha : 0 ≤ a) → (hb : 0 ≤ b) → (hab : a + b = 1) →
+      P x → P y → P (inst.mix_ab ha hb hab x y))
+    : Mixable U { t // P t} where
+  to_U x := inst.to_U (x.val)
+  to_U_inj h := Subtype.ext (inst.to_U_inj h)
+  mkT := fun {u} h ↦ ⟨by
+    have ⟨t,hu⟩ := inst.mkT (u := u) $ h.casesOn fun t h ↦ ⟨t, h⟩
+    use t
+    have ⟨t₁,ht₁⟩ := h
+    exact (inst.to_U_inj $ hu.trans ht₁.symm) ▸ t₁.prop,
+    by simp only [to_U_of_mkT]⟩
+  convex := by
+    have hi := inst.convex
+    simp [Convex, StarConvex] at hi ⊢
+    intro x hx y hy a b ha hb hab
+    let ⟨z, hz⟩ := hi x y ha hb hab
+    refine ⟨z, ⟨?_, hz⟩⟩
+    convert h ha hb hab hx hy
+    apply inst.to_U_inj
+    convert hz
+    simp only [to_U_of_mkT]
+
+end Mixable
+
+namespace Prob
+
+/-- Probabilities `Prob` themselves are convex. -/
+instance instMixable : Mixable ℝ Prob where
+  to_U := Subtype.val
+  to_U_inj := Prob.eq
+  mkT := fun h ↦ ⟨⟨_, Exists.casesOn h fun t ht => ht ▸ t.prop⟩, rfl⟩
+  convex := by
+    simp [Convex, StarConvex]
+    intro x hx0 hx1 y hy0 hy1 a b ha hb hab
+    constructor
+    · positivity
+    · nlinarith
+
+@[simp]
+theorem to_U_mixable [AddCommMonoid T] [SMul ℝ T] (t : Prob) : instMixable.to_U t = t.val :=
+  rfl
+
+@[simp]
+theorem mkT_mixable (u : ℝ) (h : ∃ t : Prob, Mixable.to_U t = u) : Mixable.mkT h =
+    ⟨⟨u,Exists.casesOn h fun t ht ↦ ht ▸ t.2⟩, rfl⟩ :=
+  rfl
+
+/-- `Prob.mix` is an alias of `Mixable.mix` so it can be accessed from a probability with
+dot notation, e.g. `p.mix x y`. -/
+abbrev mix [AddCommMonoid U] [Module ℝ U] [inst : Mixable U T] (p : Prob) (x₁ x₂ : T) := inst.mix p x₁ x₂
+
+section negLog
+open ENNReal
+
+/-- Map a probability [0,1] to [0,+∞] with -log p. Special case that 0 maps to +∞ (not 0, as Real.log
+does). This makes it `Antitone`.
+-/
+noncomputable def negLog : Prob → ENNReal :=
+  fun p ↦ if p = 0 then ∞ else .ofNNReal ⟨-Real.log p,
+    Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩
+
+--Note that this is an em-dash `—` and not a minus `-`, to make the notation work.
+scoped notation "—log " => negLog
+
+--TODO: Upgrade to `StrictAnti`. Even better: bundle negLog as `Prob ≃o ENNRealᵒᵈ`.
+theorem negLog_Antitone : Antitone negLog := by
+  intro x y h
+  dsimp [negLog]
+  split_ifs with h₁ h₂ h₂
+  · rfl
+  · subst y
+    exfalso
+    change x.1 ≤ 0 at h
+    have : ¬(x.1 = 0) := unitInterval.coe_ne_zero.mpr (by assumption)
+    have : 0 ≤ x.1 := zero_le
+    linarith +splitNe
+  · exact OrderTop.le_top _
+  · rw [ENNReal.coe_le_coe, ← NNReal.coe_le_coe, coe_mk, coe_mk, neg_le_neg_iff]
+    apply (Real.log_le_log_iff _ _).mpr h
+    <;> exact lt_of_le_of_ne zero_le (unitInterval.coe_ne_zero.mpr (by assumption)).symm
+
+@[simp]
+theorem negLog_zero : —log (0 : Prob) = ⊤ := by
+  simp [negLog]
+
+@[simp]
+theorem negLog_one : —log 1 = 0 := by
+  simp [negLog]
+
+@[simp]
+theorem negLog_eq_top_iff {p : Prob} : —log p = ⊤ ↔ p = 0 := by
+  simp [negLog]
+
+theorem negLog_pos_ENNReal {p : Prob} (hp : p ≠ 0) : —log p = .ofNNReal ⟨-Real.log p,
+    Left.nonneg_neg_iff.mpr (Real.log_nonpos p.2.1 p.2.2)⟩ := by
+  simp [negLog, hp]
+
+@[simp]
+theorem negLog_pos_Real {p : Prob} : (—log p).toReal = -Real.log p := by
+  rw [negLog]
+  split_ifs with hp
+  · simp [hp]
+  · simp
+
+theorem le_negLog_of_le_exp {p : Prob} {x : ℝ} (h : p ≤ Real.exp (-x)) : ENNReal.ofReal x ≤ —log p := by
+  by_cases hx : 0 ≤ x
+  · rw [negLog]
+    split_ifs with hp
+    · exact le_top
+    · replace hp : 0 < p := lt_of_le_of_ne' p.zero_le hp
+      rw [le_iff_lt_or_eq] at h
+      rcases h with h|h
+      · apply le_of_lt
+        replace h := Real.strictMonoOn_log hp (Real.exp_pos _) h
+        rw [Real.log_exp] at h
+        rw [← ENNReal.toReal_lt_toReal ofReal_ne_top coe_ne_top, toReal_ofReal hx]
+        simpa using lt_neg_of_lt_neg h
+      · apply le_of_eq
+        rw [← ENNReal.toReal_eq_toReal ofReal_ne_top coe_ne_top,
+          coe_toReal, coe_mk, h, Real.log_exp, neg_neg, toReal_ofReal hx]
+  · trans 0
+    · simp only [nonpos_iff_eq_zero, ofReal_eq_zero, le_of_not_ge hx]
+    · exact _root_.zero_le _
+
+@[aesop (rule_sets := [finiteness]) safe apply]
+theorem negLog_ne_top {p : Prob} (hp : 0 < p.val) : —log p ≠ ∞ := by
+  simpa [negLog] using ne_of_gt hp
+
+theorem negLog_eq_neg_ENNReal_log (p : Prob) : —log p = -ENNReal.log p := by
+  rw [negLog]
+  split_ifs with hp
+  · simp [hp]
+  · rw [log, if_neg, if_neg]
+    · norm_cast
+    · finiteness
+    · rw [Subtype.ext_iff] at hp
+      rw [toNNReal, ENNReal.coe_eq_zero]
+      exact NNReal.coe_ne_zero.mp hp
+
+theorem negLog_eq_ofReal_neg_log {p : Prob} (hp : 0 < p) :
+    ENNReal.ofReal (-Real.log p) = —log p := by
+  rcases p with ⟨p, p0, p1⟩
+  rw [negLog]
+  split_ifs with h
+  · simp_all
+  · exact ENNReal.ofReal_eq_coe_nnreal (neg_nonneg_of_nonpos (Real.log_nonpos p0 p1))
+
+@[simp]
+theorem zero_lt_negLog {p : Prob} : 0 < —log p ↔ p ≠ 1 := by
+  --This is messy enough it's probably a sign we're missing other simp lemmas
+  rw [negLog]
+  split_ifs with h
+  · simp [h]
+  constructor <;> intro h₂ <;> contrapose! h₂
+  · simp [h₂]
+  simp only [nonpos_iff_eq_zero, ENNReal.coe_eq_zero] at h₂
+  rw [Subtype.ext_iff] at h₂
+  simp only [NNReal.val_eq_coe, NNReal.coe_zero, neg_eq_zero, Real.log_eq_zero,
+    Set.Icc.coe_eq_zero, Set.Icc.coe_eq_one] at h₂
+  rcases h₂ with h₂|h₂|h₂
+  · contradiction
+  · assumption
+  · linarith [p.zero_le_coe]
+
+@[fun_prop]
+theorem Continuous_negLog : Continuous negLog := by
+  --Thanks Aristotle
+  have h_cont_at_zero : ContinuousAt —log 0 := by
+    unfold Prob.negLog
+    rw [ContinuousAt, if_pos rfl, ENNReal.tendsto_nhds_top_iff_nnreal]
+    intro x
+    rw [Metric.eventually_nhds_iff]
+    use Real.exp (-x), by positivity
+    rintro ⟨a, ha0, ha1⟩ ha'
+    rw [Subtype.dist_eq, Set.Icc.coe_zero, dist_zero_right, Real.norm_eq_abs] at ha'
+    split_ifs with h; · simp
+    rw [Subtype.mk_eq_mk, Set.Icc.coe_zero] at h
+    simp only [ENNReal.coe_lt_coe, ← NNReal.coe_lt_coe, NNReal.coe_mk]
+    replace ha' := Real.log_lt_log (by positivity) ((le_abs_self _).trans_lt ha')
+    simp only [Real.log_exp] at ha'
+    linarith
+  have h_cont_on_pos : ContinuousOn —log (Set.Ioi 0) := by
+    intro p hp
+    apply Filter.Tendsto.congr'
+    · filter_upwards [self_mem_nhdsWithin] with x hx using negLog_eq_ofReal_neg_log hx
+    · rw [← negLog_eq_ofReal_neg_log hp]
+      apply ENNReal.continuous_ofReal.continuousAt.tendsto.comp
+      exact (continuous_subtype_val.continuousWithinAt.tendsto.log hp.ne').neg
+  rw [continuous_iff_continuousAt]
+  rintro ⟨p, ⟨_, _⟩⟩
+  rcases lt_trichotomy p 0 with h | rfl | h
+  · order
+  · exact h_cont_at_zero
+  · exact h_cont_on_pos.continuousAt (Ioi_mem_nhds h)
+
+end negLog
+
+end Prob
+
+
+================================================================================
+FILE: ClassicalInfo.lean
+TYPE: Lean 4
+SIZE: 154 characters
+================================================================================
+
+-- import ClassicalInfo.Capacity
+-- import ClassicalInfo.Channel
+import ClassicalInfo.Distribution
+import ClassicalInfo.Entropy
+import ClassicalInfo.Prob
+
+
+================================================================================
+FILE: DOC.md
+TYPE: Markdown
+SIZE: 10734 characters
+
+
+[Repository content continues in next chunk]

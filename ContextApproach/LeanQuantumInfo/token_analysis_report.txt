@@ -1,0 +1,101 @@
+TOKEN ESTIMATION REPORT
+==================================================
+
+File: /Users/austinshen/Documents/Umich/Research/LeanQC_AI/ContextApproach/LeanQuantumInfo/lean_quantum_info_full_content.txt
+  Size: 642,982 bytes
+  Characters: 613,871
+  Words: 95,570
+  Lines: 14,729
+  Token Estimates:
+    word_count: 127,426 tokens
+    character_count: 153,467 tokens
+    gpt_style: 196,276 tokens
+    tiktoken_style: 199,152 tokens
+
+File: /Users/austinshen/Documents/Umich/Research/LeanQC_AI/ContextApproach/LeanQuantumInfo/lean_quantum_info_simple.txt
+  Size: 629,166 bytes
+  Characters: 600,055
+  Words: 95,193
+  Lines: 14,508
+  Token Estimates:
+    word_count: 126,924 tokens
+    character_count: 150,013 tokens
+    gpt_style: 188,974 tokens
+    tiktoken_style: 197,737 tokens
+
+File: /Users/austinshen/Documents/Umich/Research/LeanQC_AI/ContextApproach/LeanQuantumInfo/lean_quantum_info_compact.txt
+  Size: 9,410 bytes
+  Characters: 9,410
+  Words: 921
+  Lines: 357
+  Token Estimates:
+    word_count: 1,228 tokens
+    character_count: 2,352 tokens
+    gpt_style: 2,491 tokens
+    tiktoken_style: 2,182 tokens
+
+File: /Users/austinshen/Documents/Umich/Research/LeanQC_AI/ContextApproach/LeanQuantumInfo/lean_quantum_info_prompt.txt
+  Size: 10,092 bytes
+  Characters: 10,092
+  Words: 1,063
+  Lines: 500
+  Token Estimates:
+    word_count: 1,417 tokens
+    character_count: 2,523 tokens
+    gpt_style: 2,812 tokens
+    tiktoken_style: 2,401 tokens
+
+SUMMARY
+------------------------------
+Total files analyzed: 4
+Total characters: 1,233,428
+Total words: 192,747
+Average file size: 322,912 bytes
+
+Total Token Estimates:
+  word_count: 256,995 tokens
+  character_count: 308,355 tokens
+  gpt_style: 390,553 tokens
+  tiktoken_style: 401,472 tokens
+
+MODEL CONTEXT LIMITS (for reference):
+  GPT-3.5-turbo: 4,096 tokens
+    - word_count estimate: 6274.3% of context limit
+    - character_count estimate: 7528.2% of context limit
+    - gpt_style estimate: 9535.0% of context limit
+    - tiktoken_style estimate: 9801.6% of context limit
+  GPT-4: 8,192 tokens
+    - word_count estimate: 3137.1% of context limit
+    - character_count estimate: 3764.1% of context limit
+    - gpt_style estimate: 4767.5% of context limit
+    - tiktoken_style estimate: 4900.8% of context limit
+  GPT-4-turbo: 128,000 tokens
+    - word_count estimate: 200.8% of context limit
+    - character_count estimate: 240.9% of context limit
+    - gpt_style estimate: 305.1% of context limit
+    - tiktoken_style estimate: 313.6% of context limit
+  GPT-4o: 128,000 tokens
+    - word_count estimate: 200.8% of context limit
+    - character_count estimate: 240.9% of context limit
+    - gpt_style estimate: 305.1% of context limit
+    - tiktoken_style estimate: 313.6% of context limit
+  Claude-3-Sonnet: 200,000 tokens
+    - word_count estimate: 128.5% of context limit
+    - character_count estimate: 154.2% of context limit
+    - gpt_style estimate: 195.3% of context limit
+    - tiktoken_style estimate: 200.7% of context limit
+  Claude-3-Opus: 200,000 tokens
+    - word_count estimate: 128.5% of context limit
+    - character_count estimate: 154.2% of context limit
+    - gpt_style estimate: 195.3% of context limit
+    - tiktoken_style estimate: 200.7% of context limit
+  Gemini-1.5-Pro: 2,000,000 tokens
+    - word_count estimate: 12.8% of context limit
+    - character_count estimate: 15.4% of context limit
+    - gpt_style estimate: 19.5% of context limit
+    - tiktoken_style estimate: 20.1% of context limit
+  Gemini-1.5-Flash: 1,000,000 tokens
+    - word_count estimate: 25.7% of context limit
+    - character_count estimate: 30.8% of context limit
+    - gpt_style estimate: 39.1% of context limit
+    - tiktoken_style estimate: 40.1% of context limit

@@ -1,0 +1,500 @@
+LEAN-QUANTUMINFO REPOSITORY CONTENT
+Repository: https://github.com/Timeroot/Lean-QuantumInfo.git
+============================================================
+
+## File: ClassicalInfo/Capacity.lean (Lean 4)
+```
+FILE: ClassicalInfo/Capacity.lean
+TYPE: Lean 4
+SIZE: 2362 characters
+```
+
+## File: ClassicalInfo/Channel.lean (Lean 4)
+```
+FILE: ClassicalInfo/Channel.lean
+TYPE: Lean 4
+SIZE: 2221 characters
+```
+
+## File: ClassicalInfo/Distribution.lean (Lean 4)
+```
+FILE: ClassicalInfo/Distribution.lean
+TYPE: Lean 4
+SIZE: 11960 characters
+```
+
+## File: ClassicalInfo/Entropy.lean (Lean 4)
+```
+FILE: ClassicalInfo/Entropy.lean
+TYPE: Lean 4
+SIZE: 4550 characters
+```
+
+## File: ClassicalInfo/ForMathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean (Lean 4)
+```
+FILE: ClassicalInfo/ForMathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean
+TYPE: Lean 4
+SIZE: 1251 characters
+```
+
+## File: ClassicalInfo/Prob.lean (Lean 4)
+```
+FILE: ClassicalInfo/Prob.lean
+TYPE: Lean 4
+SIZE: 16741 characters
+```
+
+## File: ClassicalInfo.lean (Lean 4)
+```
+FILE: ClassicalInfo.lean
+TYPE: Lean 4
+SIZE: 154 characters
+```
+
+## File: DOC.md (Markdown)
+```
+FILE: DOC.md
+TYPE: Markdown
+SIZE: 10734 characters
+```
+
+## File: QuantumInfo/Finite/Braket.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Braket.lean
+TYPE: Lean 4
+SIZE: 13983 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap/Bundled.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap/Bundled.lean
+TYPE: Lean 4
+SIZE: 17138 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap/CPTP.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap/CPTP.lean
+TYPE: Lean 4
+SIZE: 17274 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap/Dual.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap/Dual.lean
+TYPE: Lean 4
+SIZE: 12081 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap/MatrixMap.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap/MatrixMap.lean
+TYPE: Lean 4
+SIZE: 11657 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap/Unbundled.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap/Unbundled.lean
+TYPE: Lean 4
+SIZE: 14081 characters
+```
+
+## File: QuantumInfo/Finite/CPTPMap.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/CPTPMap.lean
+TYPE: Lean 4
+SIZE: 208 characters
+```
+
+## File: QuantumInfo/Finite/Capacity.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Capacity.lean
+TYPE: Lean 4
+SIZE: 9233 characters
+```
+
+## File: QuantumInfo/Finite/Capacity_doc.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Capacity_doc.lean
+TYPE: Lean 4
+SIZE: 5164 characters
+```
+
+## File: QuantumInfo/Finite/Channel/DegradableOrder.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Channel/DegradableOrder.lean
+TYPE: Lean 4
+SIZE: 2064 characters
+```
+
+## File: QuantumInfo/Finite/Distance/Fidelity.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Distance/Fidelity.lean
+TYPE: Lean 4
+SIZE: 2038 characters
+```
+
+## File: QuantumInfo/Finite/Distance/TraceDistance.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Distance/TraceDistance.lean
+TYPE: Lean 4
+SIZE: 1602 characters
+```
+
+## File: QuantumInfo/Finite/Distance.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Distance.lean
+TYPE: Lean 4
+SIZE: 313 characters
+```
+
+## File: QuantumInfo/Finite/Ensemble.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Ensemble.lean
+TYPE: Lean 4
+SIZE: 12153 characters
+```
+
+## File: QuantumInfo/Finite/Entanglement.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Entanglement.lean
+TYPE: Lean 4
+SIZE: 10610 characters
+```
+
+## File: QuantumInfo/Finite/Entropy/Defs.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Entropy/Defs.lean
+TYPE: Lean 4
+SIZE: 9510 characters
+```
+
+## File: QuantumInfo/Finite/Entropy/Renyi.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Entropy/Renyi.lean
+TYPE: Lean 4
+SIZE: 1052 characters
+```
+
+## File: QuantumInfo/Finite/Entropy.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Entropy.lean
+TYPE: Lean 4
+SIZE: 18364 characters
+```
+
+## File: QuantumInfo/Finite/MState.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/MState.lean
+TYPE: Lean 4
+SIZE: 31166 characters
+```
+
+## File: QuantumInfo/Finite/POVM.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/POVM.lean
+TYPE: Lean 4
+SIZE: 6758 characters
+```
+
+## File: QuantumInfo/Finite/Pinching.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Pinching.lean
+TYPE: Lean 4
+SIZE: 2701 characters
+```
+
+## File: QuantumInfo/Finite/Qubit/Basic.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Qubit/Basic.lean
+TYPE: Lean 4
+SIZE: 5829 characters
+```
+
+## File: QuantumInfo/Finite/ResourceTheory/FreeState.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/ResourceTheory/FreeState.lean
+TYPE: Lean 4
+SIZE: 20090 characters
+```
+
+## File: QuantumInfo/Finite/ResourceTheory/HypothesisTesting.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/ResourceTheory/HypothesisTesting.lean
+TYPE: Lean 4
+SIZE: 22681 characters
+```
+
+## File: QuantumInfo/Finite/ResourceTheory/ResourceTheory.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/ResourceTheory/ResourceTheory.lean
+TYPE: Lean 4
+SIZE: 8075 characters
+```
+
+## File: QuantumInfo/Finite/ResourceTheory/SteinsLemma.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/ResourceTheory/SteinsLemma.lean
+TYPE: Lean 4
+SIZE: 41394 characters
+```
+
+## File: QuantumInfo/Finite/Unitary.lean (Lean 4)
+```
+FILE: QuantumInfo/Finite/Unitary.lean
+TYPE: Lean 4
+SIZE: 2002 characters
+```
+
+## File: QuantumInfo/ForMathlib/ContinuousLinearMap.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/ContinuousLinearMap.lean
+TYPE: Lean 4
+SIZE: 2260 characters
+```
+
+## File: QuantumInfo/ForMathlib/ContinuousSup.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/ContinuousSup.lean
+TYPE: Lean 4
+SIZE: 13541 characters
+```
+
+## File: QuantumInfo/ForMathlib/Filter.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Filter.lean
+TYPE: Lean 4
+SIZE: 3077 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Basic.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Basic.lean
+TYPE: Lean 4
+SIZE: 8661 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/CFC.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/CFC.lean
+TYPE: Lean 4
+SIZE: 21393 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Inner.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Inner.lean
+TYPE: Lean 4
+SIZE: 28791 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Log.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Log.lean
+TYPE: Lean 4
+SIZE: 1263 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Order.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Order.lean
+TYPE: Lean 4
+SIZE: 2222 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Proj.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Proj.lean
+TYPE: Lean 4
+SIZE: 8577 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Reindex.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Reindex.lean
+TYPE: Lean 4
+SIZE: 2787 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat/Trace.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat/Trace.lean
+TYPE: Lean 4
+SIZE: 5455 characters
+```
+
+## File: QuantumInfo/ForMathlib/HermitianMat.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/HermitianMat.lean
+TYPE: Lean 4
+SIZE: 389 characters
+```
+
+## File: QuantumInfo/ForMathlib/IsMaximalSelfAdjoint.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/IsMaximalSelfAdjoint.lean
+TYPE: Lean 4
+SIZE: 1599 characters
+```
+
+## File: QuantumInfo/ForMathlib/Isometry.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Isometry.lean
+TYPE: Lean 4
+SIZE: 13046 characters
+```
+
+## File: QuantumInfo/ForMathlib/Lieb.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Lieb.lean
+TYPE: Lean 4
+SIZE: 422 characters
+```
+
+## File: QuantumInfo/ForMathlib/LinearEquiv.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/LinearEquiv.lean
+TYPE: Lean 4
+SIZE: 2202 characters
+```
+
+## File: QuantumInfo/ForMathlib/Matrix.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Matrix.lean
+TYPE: Lean 4
+SIZE: 38907 characters
+```
+
+## File: QuantumInfo/ForMathlib/MatrixNorm/TraceNorm.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/MatrixNorm/TraceNorm.lean
+TYPE: Lean 4
+SIZE: 4325 characters
+```
+
+## File: QuantumInfo/ForMathlib/Minimax.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Minimax.lean
+TYPE: Lean 4
+SIZE: 849 characters
+```
+
+## File: QuantumInfo/ForMathlib/Minimax_work.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Minimax_work.lean
+TYPE: Lean 4
+SIZE: 34637 characters
+```
+
+## File: QuantumInfo/ForMathlib/Misc.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Misc.lean
+TYPE: Lean 4
+SIZE: 3323 characters
+```
+
+## File: QuantumInfo/ForMathlib/Superadditive.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Superadditive.lean
+TYPE: Lean 4
+SIZE: 1156 characters
+```
+
+## File: QuantumInfo/ForMathlib/ULift.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/ULift.lean
+TYPE: Lean 4
+SIZE: 2121 characters
+```
+
+## File: QuantumInfo/ForMathlib/Unitary.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib/Unitary.lean
+TYPE: Lean 4
+SIZE: 2591 characters
+```
+
+## File: QuantumInfo/ForMathlib.lean (Lean 4)
+```
+FILE: QuantumInfo/ForMathlib.lean
+TYPE: Lean 4
+SIZE: 531 characters
+```
+
+## File: QuantumInfo/InfiniteDim/QState.lean (Lean 4)
+```
+FILE: QuantumInfo/InfiniteDim/QState.lean
+TYPE: Lean 4
+SIZE: 2501 characters
+```
+
+## File: QuantumInfo/Regularized.lean (Lean 4)
+```
+FILE: QuantumInfo/Regularized.lean
+TYPE: Lean 4
+SIZE: 3713 characters
+```
+
+## File: QuantumInfo.lean (Lean 4)
+```
+FILE: QuantumInfo.lean
+TYPE: Lean 4
+SIZE: 2189 characters
+```
+
+## File: README.md (Markdown)
+```
+FILE: README.md
+TYPE: Markdown
+SIZE: 2890 characters
+```
+
+## File: StatMech/Hamiltonian.lean (Lean 4)
+```
+FILE: StatMech/Hamiltonian.lean
+TYPE: Lean 4
+SIZE: 1691 characters
+```
+
+## File: StatMech/IdealGas.lean (Lean 4)
+```
+FILE: StatMech/IdealGas.lean
+TYPE: Lean 4
+SIZE: 8497 characters
+```
+
+## File: StatMech/ThermoQuantities.lean (Lean 4)
+```
+FILE: StatMech/ThermoQuantities.lean
+TYPE: Lean 4
+SIZE: 6507 characters
+```
+
+## File: StatMech.lean (Lean 4)
+```
+FILE: StatMech.lean
+TYPE: Lean 4
+SIZE: 86 characters
+```
+
+## File: TODO.md (Markdown)
+```
+FILE: TODO.md
+TYPE: Markdown
+SIZE: 9729 characters
+```
+
+## File: lake-manifest.json (JSON)
+```
+FILE: lake-manifest.json
+TYPE: JSON
+SIZE: 4346 characters
+```
+
+## File: lakefile.lean (Lean 4)
+```
+FILE: lakefile.lean
+TYPE: Lean 4
+SIZE: 387 characters
+```

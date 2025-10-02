@@ -1,0 +1,49 @@
+ADVANCED TOKEN ANALYSIS REPORT
+==================================================
+File: lean_quantum_info_full_content.txt
+Path: /Users/austinshen/Documents/Umich/Research/LeanQC_AI/ContextApproach/LeanQuantumInfo/lean_quantum_info_full_content.txt
+
+FILE STATISTICS:
+  Size: 642,982 bytes
+  Characters: 613,871
+  Words: 95,570
+  Lines: 14,729
+  Non-empty lines: 12,258
+
+TOKEN ESTIMATES BY MODEL:
+  gpt-3.5-turbo       :  172,942 tokens (4222.2% of limit) ✗ TOO LARGE
+  gpt-4               :  172,942 tokens (2111.1% of limit) ✗ TOO LARGE
+  gpt-4-turbo         :  172,942 tokens (135.1% of limit) ✗ TOO LARGE
+  gpt-4o              :  172,942 tokens (135.1% of limit) ✗ TOO LARGE
+  claude-3-sonnet     :  175,095 tokens ( 87.5% of limit) ✓ FITS
+  claude-3-opus       :  175,095 tokens ( 87.5% of limit) ✓ FITS
+  gemini-1.5-pro      :  172,942 tokens (  8.6% of limit) ✓ FITS
+  gemini-1.5-flash    :  172,942 tokens ( 17.3% of limit) ✓ FITS
+
+CHUNKING RECOMMENDATIONS:
+  gpt-3.5-turbo: Needs chunking (172,942 tokens > 4,096 limit)
+    Recommended chunk size: 3,096 tokens
+  gpt-4: Needs chunking (172,942 tokens > 8,192 limit)
+    Recommended chunk size: 7,192 tokens
+  gpt-4-turbo: Needs chunking (172,942 tokens > 128,000 limit)
+    Recommended chunk size: 127,000 tokens
+  gpt-4o: Needs chunking (172,942 tokens > 128,000 limit)
+    Recommended chunk size: 127,000 tokens
+  claude-3-sonnet: No chunking needed
+  claude-3-opus: No chunking needed
+  gemini-1.5-pro: No chunking needed
+  gemini-1.5-flash: No chunking needed
+
+DETAILED CHUNKING STRATEGY FOR GPT-3.5-TURBO:
+  Total tokens: 172,942
+  Context limit: 4,096
+  Excess tokens: 168,846
+
+  Available strategies:
+    1. Split into chunks of ~263 lines each
+       Estimated chunks: 57
+       Lines per chunk: 263
+
+    2. Split into chunks of ~10,989 characters each
+       Estimated chunks: 56
+       Characters per chunk: 10,989

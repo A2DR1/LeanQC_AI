@@ -1,0 +1,1240 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+
+/-- A channel is *antidegradable to* another, if the other `IsDegradableTo` this one. -/
+@[reducible]
+def IsAntidegradableTo (Λ : CPTPMap dIn dOut) (Λ₂ : CPTPMap dIn dOut₂) : Prop :=
+  IsDegradableTo Λ₂ Λ
+
+/-- A channel is *degradable* if it `IsDegradableTo` its complementary channel. -/
+def IsDegradable (Λ : CPTPMap dIn dOut) : Prop :=
+  IsDegradableTo Λ Λ.complementary
+
+/-- A channel is *antidegradable* if it `IsAntidegradableTo` its complementary channel. -/
+@[reducible]
+def IsAntidegradable (Λ : CPTPMap dIn dOut) : Prop :=
+  IsAntidegradableTo Λ Λ.complementary
+
+--Theorem (Wilde Exercise 13.5.7): Entanglement breaking channels are antidegradable.
+end degradable
+
+/-- `CPTPMap`s inherit a topology from their choi matrices. -/
+instance instTop : TopologicalSpace (CPTPMap dIn dOut) :=
+  TopologicalSpace.induced (CPTPMap.choi) instTopologicalSpaceMatrix
+
+/-- The projection from `CPTPMap` to the Choi matrix is an embedding -/
+theorem choi_IsEmbedding : Topology.IsEmbedding (CPTPMap.choi (dIn := dIn) (dOut := dOut)) where
+  eq_induced := rfl
+  injective _ _ := choi_ext
+
+instance instT5MState : T3Space (CPTPMap dIn dOut) :=
+  Topology.IsEmbedding.t3Space choi_IsEmbedding
+
+end
+end CPTPMap
+
+
+================================================================================
+FILE: QuantumInfo/Finite/CPTPMap/Dual.lean
+TYPE: Lean 4
+SIZE: 12081 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap.Bundled
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+
+/-! # Duals of matrix map
+
+Definitions and theorems about the dual of a matrix map. -/
+
+noncomputable section
+open ComplexOrder
+
+variable {dIn dOut : Type*} [Fintype dIn] [Fintype dOut]
+variable {R : Type*} [CommRing R]
+variable {𝕜 : Type*} [RCLike 𝕜]
+
+--PULLOUT
+theorem HermitianMat.toMat_add (x y : HermitianMat d ℂ) : (x + y).toMat = x.toMat + y.toMat := by
+  rfl
+
+namespace MatrixMap
+
+variable [DecidableEq dIn] [DecidableEq dOut] {M : MatrixMap dIn dOut 𝕜}
+
+--This should be definable with LinearMap.adjoint, but that requires InnerProductSpace stuff
+--that is currently causing issues and pains (tried `open scoped Frobenius`).
+
+/-- The dual of a map between matrices, defined by `Tr[A M(B)] = Tr[(dual M)(A) B]`. Sometimes
+ called the adjoint of the map instead. -/
+@[irreducible]
+def dual (M : MatrixMap dIn dOut R) : MatrixMap dOut dIn R :=
+  let iso1 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dIn dIn).symm
+  let iso2 := (Module.Basis.toDualEquiv <| Matrix.stdBasis R dOut dOut)
+  iso1 ∘ₗ LinearMap.dualMap M ∘ₗ iso2
+
+/-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
+theorem Dual.trace_eq (M : MatrixMap dIn dOut R) (A : Matrix dIn dIn R) (B : Matrix dOut dOut R) :
+    (M A * B).trace = (A * M.dual B).trace := by
+  unfold dual
+  dsimp [Matrix.trace]
+  rw [LinearMap.dualMap_apply']
+  simp_rw [Matrix.mul_apply]
+  sorry
+
+--all properties below should provable just from `inner_eq`, since the definition of `dual` itself
+-- is pretty hair (and maybe could be improved...)
+
+/-- The dual of a `IsHermitianPreserving` map also `IsHermitianPreserving`. -/
+theorem IsHermitianPreserving.dual (h : M.IsHermitianPreserving) : M.dual.IsHermitianPreserving := by
+  sorry
+
+/-- The dual of a `IsPositive` map also `IsPositive`. -/
+theorem IsPositive.dual (h : M.IsPositive) : M.dual.IsPositive := by
+  intro x hx
+  use IsHermitianPreserving.dual h.IsHermitianPreserving hx.1
+  sorry
+
+/-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
+theorem dual_Unital (h : M.IsTracePreserving) : M.dual.Unital := by
+  sorry
+
+alias IsTracePreserving.dual := dual_Unital
+
+--The dual of a CompletelyPositive map is always CP, more generally it's k-positive
+-- see Lemma 3.1 of https://www.math.uwaterloo.ca/~krdavids/Preprints/CDPRpositivereal.pdf
+theorem IsCompletelyPositive.dual (h : M.IsCompletelyPositive) : M.dual.IsCompletelyPositive := by
+  sorry
+
+@[simp]
+theorem dual_dual : M.dual.dual = M := by
+  rw [dual, dual]
+  simp only [← LinearMap.dualMap_comp_dualMap]
+  have h₁ : (Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv.symm.toLinearMap ∘ₗ
+      ((Matrix.stdBasis 𝕜 dOut dOut).toDualEquiv).toLinearMap.dualMap =
+      (Module.evalEquiv 𝕜 (Matrix dOut dOut 𝕜)).symm.toLinearMap := by
+    sorry
+  have h₂ : (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.symm.toLinearMap.dualMap ∘ₗ
+      (Matrix.stdBasis 𝕜 dIn dIn).toDualEquiv.toLinearMap =
+      (Module.evalEquiv 𝕜 (Matrix dIn dIn 𝕜)).toLinearMap := by
+    ext x y
+    simp
+    generalize Matrix.stdBasis 𝕜 dIn dIn = L
+    sorry
+  rw [← Module.Dual.eval_comp_comp_evalEquiv_eq]
+  rw [← Module.evalEquiv_toLinearMap]
+  simp only [← LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
+    LinearMap.id_comp, h₁]
+  simp only [LinearMap.comp_assoc, LinearEquiv.comp_coe, LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap,
+    LinearMap.comp_id, h₂]
+
+end MatrixMap
+
+namespace CPTPMap
+
+variable [DecidableEq dIn] [DecidableEq dOut]
+
+def dual (M : CPTPMap dIn dOut) : CPUMap dOut dIn where
+  toLinearMap := M.map.dual
+  unital := M.TP.dual
+  cp := .dual M.cp
+
+theorem dual_pos (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
+    0 ≤ M.dual T := by
+  exact M.dual.pos_Hermitian hT
+
+/-- The dual of a CPTP map preserves POVMs. Stated here just for two-element POVMs, that is, an
+operator `T` between 0 and 1. -/
+theorem dual.PTP_POVM (M : CPTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T ∧ T ≤ 1) :
+    (0 ≤ M.dual T ∧ M.dual T ≤ 1) := by
+  rcases hT with ⟨hT₁, hT₂⟩
+  have hT_psd := HermitianMat.zero_le_iff.mp hT₁
+  use M.dual.pos_Hermitian hT₁
+  simpa using ContinuousOrderHomClass.map_monotone M.dual hT₂
+
+/-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
+theorem exp_val_Dual (ℰ : CPTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
+    (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.dual T) := by
+  simp only [MState.exp_val, HermitianMat.inner_eq_re_trace,
+    HermitianMat.val_eq_coe, RCLike.re_to_complex]
+  congr 1
+  apply MatrixMap.Dual.trace_eq
+
+end CPTPMap
+
+section hermDual
+
+--PULLOUT to Bundled.lean. Also use this to improve the definitions in POVM.lean.
+def HPMap.ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) : HPMap dIn dOut where
+  toFun x := f (realPart x) + Complex.I • f (imaginaryPart x)
+  map_add' x y := by
+    simp only [map_add, AddSubgroup.coe_add, smul_add]
+    abel
+  map_smul' c m := by
+    have h_expand : realPart (c • m) = c.re • realPart m - c.im • imaginaryPart m ∧
+      imaginaryPart (c • m) = c.re • imaginaryPart m + c.im • realPart m := by
+      simp only [Subtype.ext_iff, AddSubgroupClass.coe_sub, selfAdjoint.val_smul,
+        AddSubgroup.coe_add, realPart, selfAdjointPart_apply_coe, invOf_eq_inv, star_smul, RCLike.star_def,
+        smul_add, imaginaryPart, LinearMap.coe_comp, Function.comp_apply,
+        skewAdjoint.negISMul_apply_coe, skewAdjointPart_apply_coe,
+        ← Matrix.ext_iff, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Complex.real_smul,
+        Complex.ofReal_inv, Complex.ofReal_ofNat, Matrix.star_apply, RCLike.star_def,
+        Matrix.sub_apply, Complex.ext_iff, Complex.add_re, Complex.mul_re, Complex.inv_re,
+        Complex.normSq_ofNat, Complex.mul_im, Complex.conj_re, Complex.conj_im, Complex.ofReal_re,
+        Complex.sub_re, Complex.sub_im, Complex.add_im, Complex.neg_re, Complex.neg_im]
+      ring_nf
+      simp
+    ext
+    simp only [h_expand, map_sub, map_smul, AddSubgroupClass.coe_sub,
+      selfAdjoint.val_smul, map_add, AddSubgroup.coe_add, smul_add, Matrix.add_apply,
+      Matrix.sub_apply, Matrix.smul_apply, Complex.real_smul, smul_eq_mul, RingHom.id_apply,
+      Complex.ext_iff, Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.ofReal_re,
+      Complex.ofReal_im, Complex.I, Complex.mul_im, Complex.add_im, Complex.sub_im]
+    ring_nf
+    simp
+  HP h := by
+    apply Matrix.IsHermitian.add
+    · apply HermitianMat.H
+    · simp [IsSelfAdjoint.imaginaryPart h]
+
+--PULLOUT
+@[simp]
+theorem HPMap.linearMap_ofHermitianMat (f : HermitianMat dIn ℂ →ₗ[ℝ] HermitianMat dOut ℂ) :
+    LinearMapClass.linearMap (HPMap.ofHermitianMat f) = f := by
+  ext1 ⟨x, hx⟩
+  ext1
+  simp only [ofHermitianMat, LinearMap.coe_coe]
+  simp only [HPMap.instFunLike, HPMap.map, HermitianMat.val_eq_coe, HermitianMat.mk_toMat,
+    LinearMap.coe_mk, AddHom.coe_mk]
+  conv => enter [2, 1, 2, 1]; rw [← realPart_add_I_smul_imaginaryPart x]
+  suffices imaginaryPart x = 0 by simp [this]
+  simp [imaginaryPart, skewAdjoint.negISMul, show star x = x from hx]
+
+--PULLOUT
+@[simp]
+theorem HPMap.ofHermitianMat_linearMap (f : HPMap dIn dOut ℂ) :
+    ofHermitianMat (LinearMapClass.linearMap f) = f := by
+  ext : 2
+  simp only [map, ofHermitianMat, instFunLike, LinearMap.coe_coe, HermitianMat.val_eq_coe,
+    HermitianMat.mk_toMat, LinearMap.coe_mk, AddHom.coe_mk,
+    ← map_smul, ← map_add, realPart_add_I_smul_imaginaryPart]
+
+variable (f : HPMap dIn dOut) (A : HermitianMat dIn ℂ)
+
+--Can define one for HPMap's that has 'easier' definitional properties, uses the inner product structure,
+--doesn't go through Module.Basis the same way. Requires the equivalence between ℝ-linear maps of HermitianMats
+--and ℂ-linear maps of matrices.
+def HPMap.hermDual : HPMap dOut dIn :=
+  HPMap.ofHermitianMat (LinearMapClass.linearMap f).adjoint
+
+@[simp]
+theorem HPMap.hermDual_hermDual : f.hermDual.hermDual = f := by
+  simp [hermDual]
+
+open RealInnerProductSpace in
+/-- The defining property of a dual map: inner products are preserved on the opposite argument. -/
+theorem HPMap.inner_hermDual (B : HermitianMat dOut ℂ) :
+    ⟪f A, B⟫ = ⟪A, f.hermDual B⟫ := by
+  change ⟪(LinearMapClass.linearMap f) A, B⟫ = ⟪A, (LinearMapClass.linearMap f.hermDual) B⟫
+  rw [hermDual, ← LinearMap.adjoint_inner_right, HPMap.linearMap_ofHermitianMat]
+
+/-- Version of `HPMap.inner_hermDual` that uses HermitiaMat.inner directly. TODO cleanup -/
+theorem HPMap.inner_hermDual' (B : HermitianMat dOut ℂ) :
+    (f A).inner B = A.inner (f.hermDual B) :=
+  HPMap.inner_hermDual f A B
+
+open RealInnerProductSpace in
+theorem inner_negPart_nonpos [DecidableEq dIn] : ⟪A, A⁻⟫ ≤ 0 := by
+  sorry
+
+open RealInnerProductSpace in
+theorem inner_negPart_zero_iff [DecidableEq dIn] : ⟪A, A⁻⟫ = 0 ↔ 0 ≤ A := by
+  sorry
+
+open RealInnerProductSpace in
+theorem inner_negPart_neg_iff [DecidableEq dIn] : ⟪A, A⁻⟫ < 0 ↔ ¬0 ≤ A := by
+  simp [← inner_negPart_zero_iff, lt_iff_le_and_ne, inner_negPart_nonpos A]
+
+--PULLOUT
+open RealInnerProductSpace in
+theorem HermitianMat.zero_le_iff_inner_pos (A : HermitianMat dIn ℂ) :
+    0 ≤ A ↔ ∀ B, 0 ≤ B → 0 ≤ ⟪A, B⟫ := by
+  use fun h _ ↦ inner_ge_zero h
+  intro h
+  contrapose! h
+  classical
+  use A⁻, negPart_le_zero A
+  rwa [inner_negPart_neg_iff]
+
+/-- The dual of a `IsPositive` map also `IsPositive`. -/
+theorem MatrixMap.IsPositive.hermDual (h : MatrixMap.IsPositive f.map) : f.hermDual.map.IsPositive := by
+  unfold IsPositive at h ⊢
+  intro x hx
+  set xH : HermitianMat dOut ℂ := ⟨x, hx.left⟩ with hxH
+  have hx' : x = xH := rfl; clear_value xH; subst x; clear hxH
+  change Matrix.PosSemidef (f.hermDual xH).toMat
+  rw [← HermitianMat.zero_le_iff] at hx ⊢
+  rw [HermitianMat.zero_le_iff_inner_pos]
+  intro y hy
+  rw [HermitianMat.zero_le_iff] at hy
+  specialize h hy
+  change Matrix.PosSemidef (f y).toMat at h
+  rw [← HermitianMat.zero_le_iff] at h
+  rw [HPMap.inner_hermDual, HPMap.hermDual_hermDual]
+  apply HermitianMat.inner_ge_zero hx h
+
+/-- The dual of TracePreserving map is *not* trace-preserving, it's *unital*, that is, M*(I) = I. -/
+theorem HPMap.hermDual_Unital [DecidableEq dIn] [DecidableEq dOut] (h : MatrixMap.IsTracePreserving f.map) :
+    f.hermDual.map.Unital := by
+  suffices f.hermDual 1 = 1 by --todo: make this is an accessible 'constructor' for Unital
+    rw [HermitianMat.ext_iff] at this
+    exact this
+  open RealInnerProductSpace in
+  apply ext_inner_left ℝ
+  intro v
+  rw [← HPMap.inner_hermDual]
+  change HermitianMat.inner _ _ = HermitianMat.inner _ _
+  rw [HermitianMat.inner_one, HermitianMat.inner_one] --TODO change to Inner.inner
+  exact congr(Complex.re $(h v)) --TODO: HPMap with IsTracePreserving give the HermitianMat.trace version
+
+alias MatrixMap.IsTracePreserving.hermDual := HPMap.hermDual_Unital
+
+namespace PTPMap
+
+variable [DecidableEq dIn] [DecidableEq dOut]
+
+def hermDual (M : PTPMap dIn dOut) : PUMap dOut dIn where
+  toHPMap := M.toHPMap.hermDual
+  pos := by
+    apply MatrixMap.IsPositive.hermDual --TODO: fix the implictness on IsPositive's arguments
+    exact @M.pos
+  unital := M.TP.hermDual
+
+theorem hermDual_pos (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T) :
+    0 ≤ M.hermDual T := by
+  exact M.hermDual.pos_Hermitian hT
+
+/-- The dual of a PTP map preserves POVMs. Stated here just for two-element POVMs, that is, an
+operator `T` between 0 and 1. -/
+theorem hermDual.PTP_POVM (M : PTPMap dIn dOut) {T : HermitianMat dOut ℂ} (hT : 0 ≤ T ∧ T ≤ 1) :
+    (0 ≤ M.hermDual T ∧ M.hermDual T ≤ 1) := by
+  rcases hT with ⟨hT₁, hT₂⟩
+  have hT_psd := HermitianMat.zero_le_iff.mp hT₁
+  use M.hermDual.pos_Hermitian hT₁
+  simpa using ContinuousOrderHomClass.map_monotone M.hermDual hT₂
+
+/-- The defining property of a dual channel, as specialized to `MState.exp_val`. -/
+theorem exp_val_hermDual (ℰ : PTPMap dIn dOut) (ρ : MState dIn) (T : HermitianMat dOut ℂ) :
+    (ℰ ρ).exp_val T  = ρ.exp_val (ℰ.hermDual T) := by
+  simp only [MState.exp_val]
+  apply HPMap.inner_hermDual'
+
+end PTPMap
+
+end hermDual
+
+
+================================================================================
+FILE: QuantumInfo/Finite/CPTPMap/MatrixMap.lean
+TYPE: Lean 4
+SIZE: 11657 characters
+================================================================================
+
+import Mathlib.LinearAlgebra.TensorProduct.Matrix
+import Mathlib.LinearAlgebra.PiTensorProduct
+import Mathlib.Data.Set.Card
+import Mathlib.Algebra.Module.LinearMap.Basic
+import QuantumInfo.ForMathlib
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.MState
+
+/-! # Linear maps of matrices
+
+This file works with `MatrixMap`s, that is, linear maps from square matrices to square matrices.
+Although this is just a shorthand for `Matrix A A R →ₗ[R] Matrix B B R`, there are several
+concepts that specifically make sense in this context.
+
+ * `toMatrix` is the rectangular "transfer matrix", where matrix multiplication commutes with map composition.
+ * `choi_matrix` is the square "Choi matrix", see `MatrixMap.choi_PSD_iff_CP_map` for example usage
+ * `kron` is the Kronecker product of matrix maps
+ * `IsTracePreserving` states the trace of the output is always equal to the trace of the input.
+
+We provide simp lemmas for relating these facts, prove basic facts e.g. composition and identity, and some facts
+about `IsTracePreserving` maps.
+-/
+
+/-- A `MatrixMap` is a linear map between squares matrices of size A to size B, over R. -/
+abbrev MatrixMap (A B R : Type*) [Semiring R] := Matrix A A R →ₗ[R] Matrix B B R
+
+variable {A B C D E F R : Type*} [Fintype A] [Semiring R] [DecidableEq A]
+
+namespace MatrixMap
+section matrix
+
+variable (A R) in
+/-- Alias of LinearMap.id, but specifically as a MatrixMap. -/
+@[reducible]
+def id : MatrixMap A A R := LinearMap.id
+
+/-- Choi matrix of a given linear matrix map. Note that this is defined even for things that
+  aren't CPTP, it's just rarely talked about in those contexts. This is the inverse of
+  `MatrixMap.of_choi_matrix`. Compare with `MatrixMap.toMatrix`, which gives the transfer matrix. -/
+def choi_matrix (M : MatrixMap A B R) : Matrix (B × A) (B × A) R :=
+  fun (j₁,i₁) (j₂,i₂) ↦ M (Matrix.single i₁ i₂ 1) j₁ j₂
+
+/-- Given the Choi matrix, generate the corresponding R-linear map between matrices as a
+MatrixMap. This is the inverse of `MatrixMap.choi_matrix`. -/
+def of_choi_matrix (M : Matrix (B × A) (B × A) R) : MatrixMap A B R where
+  toFun X := fun b₁ b₂ ↦ ∑ (a₁ : A), ∑ (a₂ : A), X a₁ a₂ * M (b₁, a₁) (b₂, a₂)
+  map_add' x y := by funext b₁ b₂; simp [add_mul, Finset.sum_add_distrib]
+  map_smul' r x := by
+    funext b₁ b₂
+    simp only [Matrix.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc]
+
+/-- Proves that `MatrixMap.of_choi_matrix` and `MatrixMap.choi_matrix` inverses. -/
+@[simp]
+theorem map_choi_inv (M : Matrix (B × A) (B × A) R) : choi_matrix (of_choi_matrix M) = M := by
+  ext ⟨i₁,i₂⟩ ⟨j₁,j₂⟩
+  simp [of_choi_matrix, choi_matrix, Matrix.single, ite_and]
+
+/-- Proves that `MatrixMap.choi_matrix` and `MatrixMap.of_choi_matrix` inverses. -/
+@[simp]
+theorem choi_map_inv (M : MatrixMap A B R) : of_choi_matrix (choi_matrix M) = M := by
+  sorry
+
+/-- The correspondence induced by `MatrixMap.of_choi_matrix` is injective. -/
+theorem choi_matrix_inj : Function.Injective (@choi_matrix A B R _ _) := by
+  intro x y h
+  simpa only [choi_map_inv] using congrArg of_choi_matrix h
+
+variable {R : Type*} [CommSemiring R]
+
+/-- The linear equivalence between MatrixMap's and transfer matrices on a larger space.
+Compare with `MatrixMap.choi_matrix`, which gives the Choi matrix instead of the transfer matrix. -/
+noncomputable def toMatrix [Fintype B] : MatrixMap A B R ≃ₗ[R] Matrix (B × B) (A × A) R :=
+  LinearMap.toMatrix (Matrix.stdBasis R A A) (Matrix.stdBasis R B B)
+
+/-- Multiplication of transfer matrices, `MatrixMap.toMatrix`, is equivalent to composition of maps. -/
+theorem toMatrix_comp [Fintype B] [Fintype C] [DecidableEq B] (M₁ : MatrixMap A B R) (M₂ : MatrixMap B C R) : toMatrix (M₂ ∘ₗ M₁) = (toMatrix M₂) * (toMatrix M₁) :=
+  LinearMap.toMatrix_comp _ _ _ M₂ M₁
+
+end matrix
+
+section kraus
+
+variable [SMulCommClass R R R] [Star R]
+variable {κ : Type*} [Fintype κ]
+
+/-- Construct a matrix map out of families of matrices M N : Σ → Matrix B A R
+indexed by κ via X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ -/
+def of_kraus (M N : κ → Matrix B A R) : MatrixMap A B R :=
+  ∑ k : κ, {
+    toFun X := M k * X * (N k).conjTranspose
+    map_add' x y := by rw [Matrix.mul_add, Matrix.add_mul]
+    map_smul' r x := by rw [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul]
+  }
+
+def exists_kraus (Φ : MatrixMap A B R) : ∃ r : ℕ, ∃ (M N : Fin r → Matrix B A R), Φ = of_kraus M N :=
+  sorry
+
+end kraus
+
+section kron
+open Kronecker
+
+variable {A B C D R : Type*} [Fintype A] [Fintype B] [Fintype C] [Fintype D]
+variable [DecidableEq A] [DecidableEq C]
+
+/-- The Kronecker product of MatrixMaps. Defined here using `TensorProduct.map M₁ M₂`, with appropriate
+reindexing operations and `LinearMap.toMatrix`/`Matrix.toLin`. Notation `⊗ₖₘ`. -/
+noncomputable def kron [CommSemiring R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) : MatrixMap (A × C) (B × D) R :=
+  let h₁ := (LinearMap.toMatrix (Module.Basis.tensorProduct  (Matrix.stdBasis R A A) (Matrix.stdBasis R C C))
+      (Module.Basis.tensorProduct  (Matrix.stdBasis R B B) (Matrix.stdBasis R D D)))
+    (TensorProduct.map M₁ M₂);
+  let r₁ := Equiv.prodProdProdComm B B D D;
+  let r₂ := Equiv.prodProdProdComm A A C C;
+  let h₂ := Matrix.reindex r₁ r₂ h₁;
+  Matrix.toLin (Matrix.stdBasis R (A × C) (A × C)) (Matrix.stdBasis R (B × D) (B × D)) h₂
+
+scoped[MatrixMap] infixl:100 " ⊗ₖₘ " => MatrixMap.kron
+
+/-- The extensional definition of the Kronecker product `MatrixMap.kron`, in terms of the entries of its image. -/
+theorem kron_def [CommRing R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (M : Matrix (A × C) (A × C) R) : (M₁ ⊗ₖₘ M₂) M (b₁, d₁) (b₂, d₂) =
+  ∑ a₁, ∑ a₂, ∑ c₁, ∑ c₂, (M₁ (Matrix.single a₁ a₂ 1) b₁ b₂) * (M₂ (Matrix.single c₁ c₂ 1) d₁ d₂) * (M (a₁, c₁) (a₂, c₂)) := by
+  rw [kron, TensorProduct.toMatrix_map]
+  simp
+  rw [Matrix.toLin_apply]
+  simp [Equiv.prodProdProdComm, Matrix.kroneckerMap, Matrix.submatrix, LinearMap.toMatrix]
+  simp [Matrix.stdBasis_eq_single]
+  sorry
+
+section kron_lemmas
+variable [CommSemiring R]
+
+theorem add_kron (ML₁ ML₂ : MatrixMap A B R) (MR : MatrixMap C D R) : (ML₁ + ML₂) ⊗ₖₘ MR = ML₁ ⊗ₖₘ MR + ML₂ ⊗ₖₘ MR := by
+  simp [kron, TensorProduct.map_add_left, Matrix.submatrix_add]
+
+theorem kron_add (ML : MatrixMap A B R) (MR₁ MR₂ : MatrixMap C D R) : ML ⊗ₖₘ (MR₁ + MR₂) = ML ⊗ₖₘ MR₁ + ML ⊗ₖₘ  MR₂ := by
+  simp [kron, TensorProduct.map_add_right, Matrix.submatrix_add]
+
+theorem smul_kron (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : (r • ML) ⊗ₖₘ MR = r • (ML ⊗ₖₘ MR) := by
+  simp [kron, TensorProduct.map_smul_left, Matrix.submatrix_smul]
+
+theorem kron_smul (r : R) (ML : MatrixMap A B R) (MR : MatrixMap C D R) : ML ⊗ₖₘ (r • MR) = r • (ML ⊗ₖₘ MR) := by
+  simp [kron, TensorProduct.map_smul_right, Matrix.submatrix_smul]
+
+@[simp]
+theorem zero_kron (MR : MatrixMap C D R) : (0 : MatrixMap A B R) ⊗ₖₘ MR = 0 := by
+  simp [kron]
+
+@[simp]
+theorem kron_zero (ML : MatrixMap A B R) : ML ⊗ₖₘ (0 : MatrixMap C D R) = 0 := by
+  simp [kron]
+
+variable [DecidableEq B] in
+theorem kron_id_id : (id A R ⊗ₖₘ id B R) = id (A × B) R := by
+  simp [kron]
+
+variable {Dl₁ Dl₂ Dl₃ Dr₁ Dr₂ Dr₃ : Type*}
+  [Fintype Dl₁] [Fintype Dl₂] [Fintype Dl₃] [Fintype Dr₁] [Fintype Dr₂] [Fintype Dr₃]
+  [DecidableEq Dl₁] [DecidableEq Dl₂] [DecidableEq Dr₁] [DecidableEq Dr₂] in
+/-- For maps L₁, L₂, R₁, and R₂, the product (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) -/
+theorem kron_comp_distrib (L₁ : MatrixMap Dl₁ Dl₂ R) (L₂ : MatrixMap Dl₂ Dl₃ R) (R₁ : MatrixMap Dr₁ Dr₂ R)
+    (R₂ : MatrixMap Dr₂ Dr₃ R) : (L₂ ∘ₗ L₁) ⊗ₖₘ (R₂ ∘ₗ R₁) = (L₂ ⊗ₖₘ R₂) ∘ₗ (L₁ ⊗ₖₘ R₁) := by
+  simp [kron, TensorProduct.map_comp, ← Matrix.toLin_mul, Matrix.submatrix_mul_equiv, ← LinearMap.toMatrix_comp]
+
+end kron_lemmas
+
+-- /-- The canonical tensor product on linear maps between matrices, where a map from
+--   M[A,B] to M[C,D] is given by M[A×C,B×D]. This tensor product acts independently on
+--   Kronecker products and gives Kronecker products as outputs. -/
+-- def matrixMap_kron (M₁ : Matrix (A₁ × B₁) (C₁ × D₁) R) (M₂ : Matrix (A₂ × B₂) (C₂ × D₂) R) : Matrix ((A₁ × A₂) × (B₁ × B₂)) ((C₁ × C₂) × (D₁ × D₂)) R :=
+--   Matrix.of fun ((a₁, a₂), (b₁, b₂)) ((c₁, c₂), (d₁, d₂)) ↦
+--     (M₁ (a₁, b₁) (c₁, d₁)) * (M₂ (a₂, b₂) (c₂, d₂))
+
+/-- The operational definition of the Kronecker product `MatrixMap.kron`, that it maps a Kronecker product of
+inputs to the Kronecker product of outputs. It is the unique bilinear map doing so. -/
+theorem kron_map_of_kron_state [CommRing R] (M₁ : MatrixMap A B R) (M₂ : MatrixMap C D R) (MA : Matrix A A R) (MC : Matrix C C R) : (M₁ ⊗ₖₘ M₂) (MA ⊗ₖ MC) = (M₁ MA) ⊗ₖ (M₂ MC) := by
+  ext bd₁ bd₂
+  let (b₁, d₁) := bd₁
+  let (b₂, d₂) := bd₂
+  rw [kron_def]
+  simp only [Matrix.kroneckerMap_apply]
+  simp_rw [mul_assoc, ← Finset.mul_sum]
+  simp_rw [mul_comm (M₂ _ _ _), mul_assoc, ← Finset.mul_sum, ← mul_assoc]
+  simp_rw [← Finset.sum_mul]
+  congr
+  -- simp_rw [← Matrix.stdBasis_eq_stdBasisMatrix ]
+  -- unfold Matrix.stdBasisMatrix
+  -- simp_rw [← LinearMap.sum_apply]
+  -- simp
+  sorry
+  sorry
+
+theorem choi_matrix_state_rep {B : Type*} [Fintype B] [Nonempty A] (M : MatrixMap A B ℂ) :
+  M.choi_matrix = (↑(Fintype.card (α := A)) : ℂ) • (M ⊗ₖₘ (LinearMap.id : MatrixMap A A ℂ)) (MState.pure (Ket.MES A)).m := by
+  ext i j
+  simp [choi_matrix, kron_def M, Ket.MES, Ket.apply, Finset.mul_sum]
+  conv =>
+    rhs
+    conv =>
+      enter [2, x, 2, a_1]
+      conv =>
+        enter [2, a_2]
+        simp [apply_ite]
+      simp only [Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+      rw [← mul_inv, ← Complex.ofReal_mul, ← Real.sqrt_mul (Fintype.card A).cast_nonneg',
+        Real.sqrt_mul_self (Fintype.card A).cast_nonneg', mul_comm, mul_assoc]
+      simp
+      conv =>
+        right
+        rw [Matrix.single, Matrix.of_apply]
+        enter [1]
+        rw [and_comm]
+      simp [apply_ite, ite_and]
+    conv =>
+      enter [2, x]
+      simp [Finset.sum_ite]
+    simp [Finset.sum_ite]
+
+end kron
+
+section pi
+section basis
+
+--Missing from Mathlib
+
+variable {ι : Type*}
+variable {R : Type*} [CommSemiring R]
+variable {s : ι → Type*} [∀ i, AddCommMonoid (s i)] [∀ i, Module R (s i)]
+variable {L : ι → Type* }
+
+/-- Like `Basis.tensorProduct`, but for `PiTensorProduct` -/
+noncomputable def _root_.Module.Basis.piTensorProduct [∀i, Fintype (L i)]
+    (b : (i:ι) → Module.Basis (L i) R (s i)) :
+      Module.Basis ((i:ι) → L i) R (PiTensorProduct R s) :=
+  Finsupp.basisSingleOne.map sorry
+
+end basis
+
+variable {R : Type*} [CommSemiring R]
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
+
+/-- Finite Pi-type tensor product of MatrixMaps. Defined as `PiTensorProduct.tprod` of the underlying
+Linear maps. Notation `⨂ₜₘ[R] i, f i`, eventually. -/
+noncomputable def piKron (Λi : ∀ i, MatrixMap (dI i) (dO i) R) : MatrixMap (∀i, dI i) (∀i, dO i) R :=
+  let map₁ := PiTensorProduct.map Λi;
+  let map₂ := LinearMap.toMatrix
+    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dI i) (dI i)))
+    (Module.Basis.piTensorProduct (fun i ↦ Matrix.stdBasis R (dO i) (dO i))) map₁
+  let r₁ : ((i : ι) → dO i × dO i) ≃ ((i : ι) → dO i) × ((i : ι) → dO i) := Equiv.arrowProdEquivProdArrow _ dO dO
+  let r₂ : ((i : ι) → dI i × dI i) ≃ ((i : ι) → dI i) × ((i : ι) → dI i) := Equiv.arrowProdEquivProdArrow _ dI dI
+  let map₃ := Matrix.reindex r₁ r₂ map₂;
+  Matrix.toLin
+    (Matrix.stdBasis R ((i:ι) → dI i) ((i:ι) → dI i))
+    (Matrix.stdBasis R ((i:ι) → dO i) ((i:ι) → dO i)) map₃
+
+-- notation3:100 "⨂ₜₘ "(...)", "r:(scoped f => tprod R f) => r
+-- syntax (name := bigsum) "∑ " bigOpBinders ("with " term)? ", " term:67 : term
+
+end pi
+
+
+================================================================================
+FILE: QuantumInfo/Finite/CPTPMap/Unbundled.lean
+TYPE: Lean 4
+SIZE: 14081 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap.MatrixMap
+
+/-! # Properties of Matrix Maps
+
+Building on `MatrixMap`s, this defines the properties: `IsTracePreserving`, `Unital`,
+`IsHermitianPreserving`, `IsPositive` and `IsCompletelyPositive`. They have basic facts
+such as closure under composition, addition, and scaling.
+
+These are the *unbundled* versions, which just state the relevant properties of a given `MatrixMap`.
+The bundled versions are `HPMap`, `UnitalMap`, `TPMap`, `PMap`, and `CPMap` respectively, given
+in Bundled.lean.
+-/
+
+namespace MatrixMap
+
+section tp
+variable [Fintype A] [DecidableEq A] [Fintype B] [Fintype C] [Semiring R]
+
+/-- A linear matrix map is *trace preserving* if trace of the output equals trace of the input. -/
+def IsTracePreserving (M : MatrixMap A B R) : Prop :=
+  ∀ (x : Matrix A A R), (M x).trace = x.trace
+
+/-- A map is trace preserving iff the partial trace of the Choi matrix is the identity. -/
+theorem IsTracePreserving_iff_trace_choi (M : MatrixMap A B R) : M.IsTracePreserving
+    ↔ M.choi_matrix.traceLeft = 1 := by
+  constructor
+  · intro h
+    ext a₁ a₂
+    replace h := h (Matrix.single a₁ a₂ 1)
+    simp_rw [Matrix.trace, Matrix.diag] at h
+    simp only [Matrix.traceLeft, choi_matrix, Matrix.of_apply, h]
+    simp only [Matrix.single, Matrix.of_apply, Finset.sum_boole, Matrix.one_apply]
+    have : (fun x => a₁ = x ∧ a₂ = x) = (fun x => a₁ = a₂ ∧ a₂ = x) := by
+      funext x
+      rw [eq_iff_iff, and_congr_left_iff]
+      rintro rfl
+      trivial
+    split_ifs with h
+    <;> simp [this, h, Finset.filter_eq]
+  · intro h X
+    replace h := fun (a₁ a₂ : A) ↦ congrFun₂ h a₁ a₂
+    simp [Matrix.traceLeft, Matrix.trace] at h ⊢
+    rw [← M.choi_map_inv, of_choi_matrix]
+    dsimp
+    rw [Finset.sum_comm_cycle, Finset.sum_comm_cycle]
+    simp_rw [← Finset.mul_sum, h, Matrix.one_apply]
+    simp
+
+namespace IsTracePreserving
+
+variable {A : Type*} [Fintype A] in
+/-- Simp lemma: the trace of the image of a IsTracePreserving map is the same as the original trace. -/
+@[simp]
+theorem apply_trace {M : MatrixMap A B R} (h : M.IsTracePreserving) (ρ : Matrix A A R)
+    : (M ρ).trace = ρ.trace :=
+  h ρ
+
+/-- The trace of a Choi matrix of a TP map is the cardinality of the input space. -/
+theorem trace_choi {M : MatrixMap A B R} (h : M.IsTracePreserving) :
+    M.choi_matrix.trace = (Finset.univ (α := A)).card := by
+  rw [← Matrix.traceLeft_trace, (IsTracePreserving_iff_trace_choi M).mp h,
+    Matrix.trace_one, Finset.card_univ]
+
+variable {A : Type*} [Fintype A] in
+/-- The composition of IsTracePreserving maps is also trace preserving. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
+    IsTracePreserving (M₂ ∘ₗ M₁) := by
+  intro x
+  simp [h₂ _, h₁ _]
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsTracePreserving. -/
+@[simp]
+theorem id : (id A R).IsTracePreserving := by
+  simp [IsTracePreserving, MatrixMap.id]
+
+variable {A R : Type*} [CommSemiring R] [Fintype A] in
+/-- Unit linear combinations of IsTracePreserving maps are IsTracePreserving. -/
+theorem unit_linear {M₁ M₂ : MatrixMap A B R} {x y : R}
+    (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) (hxy : x + y = 1) :
+    (x • M₁ + y • M₂).IsTracePreserving := by
+  rw [IsTracePreserving] at h₁ h₂ ⊢
+  simp [h₁, h₂, ← add_mul, hxy]
+
+variable {D R : Type*} [CommSemiring R] [DecidableEq C] [Fintype D] in
+/-- The kronecker product of IsTracePreserving maps is also trace preserving. -/
+theorem kron {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R} (h₁ : M₁.IsTracePreserving) (h₂ : M₂.IsTracePreserving) :
+    (M₁ ⊗ₖₘ M₂).IsTracePreserving := by
+  unfold MatrixMap.kron
+  intro x
+  simp
+  sorry
+
+variable [CommSemiring S] [Star S] [SMulCommClass S S S] in
+/-- The channel X ↦ ∑ k : κ, (M k) * X * (N k)ᴴ formed by Kraus operators M, N : κ → Matrix B A R
+is trace-preserving if ∑ k : κ, (N k)ᴴ * (M k) = 1 -/
+theorem of_kraus_isTracePreserving {κ : Type*} [Fintype κ]
+  (M N : κ → Matrix B A S)
+  (hTP : (∑ k, (N k).conjTranspose * (M k)) = 1) :
+  (MatrixMap.of_kraus M N).IsTracePreserving := by
+  intro x
+  simp only [of_kraus, LinearMap.coeFn_sum, LinearMap.coe_mk, AddHom.coe_mk, Finset.sum_apply,
+    Matrix.trace_sum]
+  conv =>
+    enter [1,2,i]
+    rw [Matrix.trace_mul_cycle (M i) x (N i).conjTranspose]
+  rw [← Matrix.trace_sum, ← Finset.sum_mul, hTP, one_mul]
+
+end IsTracePreserving
+end tp
+
+
+section unital
+
+variable [DecidableEq A] [DecidableEq B] [Semiring R]
+
+/-- A linear matrix map is *unital* if it preserves the identity. -/
+def Unital (M : MatrixMap A B R) : Prop :=
+  M 1 = 1
+
+namespace Unital
+
+variable {M : MatrixMap A B R}
+
+@[simp]
+theorem map_1 (h : M.Unital) : M 1 = 1 :=
+  h
+
+/-- The identity `MatrixMap` is `Unital`. -/
+@[simp]
+theorem id : (id A R).Unital := by
+  simp [Unital, MatrixMap.id]
+
+--TODO: Closed under composition, kronecker products, it's iff M.choi_matrix.traceLeft = 1...
+
+end Unital
+end unital
+
+variable {A B C R : Type*}
+
+open Kronecker
+open TensorProduct
+
+open ComplexOrder
+variable [RCLike R]
+
+/-- A linear matrix map is *Hermitian preserving* if it maps `IsHermitian` matrices to `IsHermitian`.-/
+def IsHermitianPreserving (M : MatrixMap A B R) : Prop :=
+  ∀{x}, x.IsHermitian → (M x).IsHermitian
+
+/-- A linear matrix map is *positive* if it maps `PosSemidef` matrices to `PosSemidef`.-/
+def IsPositive [Fintype A] [Fintype B] (M : MatrixMap A B R) : Prop :=
+  ∀{x}, x.PosSemidef → (M x).PosSemidef
+
+/-- A linear matrix map is *completely positive* if, for any integer n, the tensor product
+with `I(n)` is positive. -/
+def IsCompletelyPositive [Fintype A] [Fintype B] [DecidableEq A] (M : MatrixMap A B R) : Prop :=
+  ∀ (n : ℕ), (M ⊗ₖₘ (LinearMap.id : MatrixMap (Fin n) (Fin n) R)).IsPositive
+
+namespace IsHermitianPreserving
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsHermitianPreserving. -/
+theorem id : (id A R).IsPositive :=
+  _root_.id
+
+/-- The composition of IsHermitianPreserving maps is also Hermitian preserving. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R}
+    (h₁ : M₁.IsHermitianPreserving) (h₂ : M₂.IsHermitianPreserving) : IsHermitianPreserving (M₂ ∘ₗ M₁) :=
+  fun h ↦ h₂ (h₁ h)
+
+end IsHermitianPreserving
+
+namespace IsPositive
+variable [Fintype A] [Fintype B] [Fintype C]
+
+/- Every `MatrixMap` that `IsPositive` is also `IsHermitianPreserving`. -/
+theorem IsHermitianPreserving {M : MatrixMap A B R}
+    (hM : IsPositive M) : IsHermitianPreserving M := by
+  intro x hx
+  let xH : HermitianMat _ _ := ⟨x, hx⟩
+  classical --because PosPart requires DecidableEq
+  have hMPos := hM (HermitianMat.zero_le_iff.mp xH.zero_le_posPart)
+  have hMNeg := hM (HermitianMat.zero_le_iff.mp xH.negPart_le_zero)
+  have hSub := hMPos.isHermitian.sub hMNeg.isHermitian
+  rw [← map_sub] at hSub
+  convert ← hSub
+  exact HermitianMat.ext_iff.1 (HermitianMat.posPart_add_negPart xH)
+
+/-- The composition of IsPositive maps is also positive. -/
+theorem comp {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsPositive)
+    (h₂ : M₂.IsPositive) : IsPositive (M₂ ∘ₗ M₁) :=
+  fun h ↦ h₂ (h₁ h)
+
+variable {A : Type*} [Fintype A] in
+/-- The identity MatrixMap IsPositive. -/
+@[simp]
+theorem id : (id A R).IsPositive :=
+  _root_.id
+
+/-- Sums of IsPositive maps are IsPositive. -/
+theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsPositive) (h₂ : M₂.IsPositive) :
+    (M₁ + M₂).IsPositive :=
+  fun x ↦ Matrix.PosSemidef.add (h₁ x) (h₂ x)
+
+/-- Nonnegative scalings of IsPositive maps are IsPositive. -/
+theorem smul {M : MatrixMap A B R} (hM : M.IsPositive) {x : R} (hx : 0 ≤ x) :
+    (x • M).IsPositive :=
+  fun hm ↦ (hM hm).smul hx
+
+end IsPositive
+
+namespace IsCompletelyPositive
+variable [Fintype A] [Fintype B] [Fintype C] [DecidableEq A]
+
+/-- Definition of a CP map, but with `Fintype T` in the definition instead of a `Fin n`. -/
+theorem of_Fintype  {M : MatrixMap A B R} (h : IsCompletelyPositive M)
+    (T : Type*) [Fintype T] [DecidableEq T] :
+    (M.kron (LinearMap.id : MatrixMap T T R)).IsPositive := by
+  sorry
+
+/- Every `MatrixMap` that `IsCompletelyPositive` also `IsPositiveMap`. -/
+theorem IsPositive [DecidableEq A] {M : MatrixMap A B R}
+    (hM : IsCompletelyPositive M) : IsPositive M := by
+  intro x hx
+  let x' : Matrix (A × Fin 1) (A × Fin 1) R := x ⊗ₖ 1
+  let eqA : (A × Fin 1) ≃ A :=
+    (Equiv.prodCongrRight (fun _ ↦ finOneEquiv)).trans (Equiv.prodPUnit A)
+  let eqB : (B × Fin 1) ≃ B :=
+    (Equiv.prodCongrRight (fun _ ↦ finOneEquiv)).trans (Equiv.prodPUnit B)
+  specialize @hM 1 (x.submatrix eqA eqA) (Matrix.PosSemidef.submatrix hx _)
+  replace hM := Matrix.PosSemidef.submatrix hM eqB.symm
+  convert hM
+  sorry
+
+/-- The composition of IsCompletelyPositive maps is also completely positive. -/
+theorem comp [DecidableEq B] {M₁ : MatrixMap A B R} {M₂ : MatrixMap B C R} (h₁ : M₁.IsCompletelyPositive)
+    (h₂ : M₂.IsCompletelyPositive) : IsCompletelyPositive (M₂ ∘ₗ M₁) := by
+  --sketch: (M₂ ∘ₗ M₁) ⊗ₖₘ id[n] = (M₂ ⊗ₖₘ id[n]) ∘ₗ (M₁ ⊗ₖₘ id[n]), which is a composition of positive maps.
+  intro n x hx
+  specialize h₁ n hx
+  specialize h₂ n h₁
+  conv in LinearMap.id =>
+    change LinearMap.id ∘ₗ LinearMap.id
+  rw [kron_comp_distrib]
+  simpa using h₂
+
+/-- The identity MatrixMap IsCompletelyPositive. -/
+@[simp]
+theorem id : (id A R).IsCompletelyPositive := by
+  intro n ρ h
+  rwa [show LinearMap.id = MatrixMap.id (Fin n) R from rfl, kron_id_id]
+
+/-- Sums of IsCompletelyPositive maps are IsCompletelyPositive. -/
+theorem add {M₁ M₂ : MatrixMap A B R} (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) :
+    (M₁ + M₂).IsCompletelyPositive :=
+  fun n _ h ↦ by
+  simpa only [add_kron] using Matrix.PosSemidef.add (h₁ n h) (h₂ n h)
+
+/-- Nonnegative scalings of `IsCompletelyPositive` maps are `IsCompletelyPositive`. -/
+theorem smul {M : MatrixMap A B R} (hM : M.IsCompletelyPositive) {x : R} (hx : 0 ≤ x) :
+    (x • M).IsCompletelyPositive :=
+  fun n ρ h ↦ by
+    rw [MatrixMap.smul_kron]
+    exact (hM n h).smul hx
+
+variable (A B) in
+/-- The zero map `IsCompletelyPositive`. -/
+theorem zero : (0 : MatrixMap A B R).IsCompletelyPositive :=
+  fun _ _ _ ↦ by simpa using Matrix.PosSemidef.zero
+
+/-- A finite sum of completely positive maps is completely positive. -/
+theorem finset_sum {ι : Type*} [Fintype ι] {m : ι → MatrixMap A B R} (hm : ∀ i, (m i).IsCompletelyPositive) :
+    (∑ i, m i).IsCompletelyPositive :=
+  Finset.sum_induction m _ (fun _ _ ↦ add) (.zero A B) (by simpa)
+
+variable [Fintype d] [DecidableEq d]
+/-- The map that takes M and returns M ⊗ₖ C, where C is positive semidefinite, is a completely positive map. -/
+theorem kron_kronecker_const {C : Matrix d d R} (h : C.PosSemidef) {h₁ h₂ : _} : MatrixMap.IsCompletelyPositive
+    (⟨⟨fun M => M ⊗ₖ C, h₁⟩, h₂⟩ : MatrixMap A (A × d) R) := by
+  sorry
+
+/-- Choi's theorem on completely positive maps: A map `IsCompletelyPositive` iff its Choi Matrix is PSD. -/
+theorem _root_.MatrixMap.choi_PSD_iff_CP_map [DecidableEq A] (M : MatrixMap A B ℂ) :
+    M.IsCompletelyPositive ↔ M.choi_matrix.PosSemidef := by
+  by_cases hA : Nonempty A
+  · constructor
+    · intro hcp
+      rw [choi_matrix_state_rep]
+      apply Matrix.PosSemidef.smul _ (ha := by positivity)
+      exact of_Fintype hcp A (MState.pure (Ket.MES A)).pos
+    · sorry
+  · simp at hA
+    have : M = 0 := Subsingleton.elim M 0
+    subst M
+    have hx (x : B × A → ℂ) : x = 0 := Subsingleton.elim x 0
+    simp [Matrix.PosSemidef, Matrix.IsHermitian, IsCompletelyPositive,
+      MatrixMap.IsPositive, hx]
+    ext
+    simp [choi_matrix] --TODO: `choi_matrix 0 = 0` as simp
+
+/-- The act of conjugating (not necessarily by a unitary, just by any matrix at all) is completely positive. -/
+theorem conj_isCompletelyPositive (M : Matrix B A R) :
+  IsCompletelyPositive {
+    toFun := fun (x : Matrix A A R) ↦ M * x * M.conjTranspose,
+    map_add' x y := by rw [Matrix.mul_add, Matrix.add_mul]
+    map_smul' r x := by rw [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul]
+  } := by
+  sorry
+
+/-- The channel X ↦ ∑ k : κ, (M k) * X * (M k)ᴴ formed by Kraus operators M : κ → Matrix B A R
+is completely positive -/
+theorem of_kraus_isCompletelyPositive {κ : Type*} [Fintype κ] (M : κ → Matrix B A R) :
+    (MatrixMap.of_kraus M M).IsCompletelyPositive := by
+  rw [of_kraus]
+  exact finset_sum (fun i ↦ conj_isCompletelyPositive (M i))
+
+def exists_kraus (Φ : MatrixMap A B R) (hCP : Φ.IsCompletelyPositive) :
+    ∃ r : ℕ, ∃ (M : Fin r → Matrix B A R), Φ = of_kraus M M :=
+  sorry
+
+/-- The Kronecker product of IsCompletelyPositive maps is also completely positive. -/
+theorem kron [DecidableEq C] [Fintype D] {M₁ : MatrixMap A B R} {M₂ : MatrixMap C D R}
+    (h₁ : M₁.IsCompletelyPositive) (h₂ : M₂.IsCompletelyPositive) : IsCompletelyPositive (M₁ ⊗ₖₘ M₂) := by
+--sketch: the Choi matrix of the Kron is the Kron of the Choi matrix, and Kron of PSD matrices is PSD.
+/-
+      intro n M hM
+      let M' : Matrix (dI₁ × (dI₂ × Fin n)) (dI₁ × (dI₂ × Fin n)) ℂ := sorry --reorder indices of M
+      have hM' : M'.PosSemidef := sorry --PSD preserved under reordering
+      let Λ₁M := ((Λ₁.map.kron LinearMap.id) M')
+      have hΛ₁M : Λ₁M.PosSemidef := Λ₁.completely_pos.def_Fintype (dI₂ × Fin n) hM'
+      let Λ₁M' : Matrix (dI₂ × (dO₁ × Fin n)) (dI₂ × (dO₁ × Fin n)) ℂ := sorry --reorder Λ₁M
+      have hΛ₁M' : Λ₁M'.PosSemidef := sorry --PSD preserved under reordering
+      let Λ₂Λ₁M := (Λ₂.map.kron LinearMap.id) Λ₁M'
+      have hΛ₂Λ₁M : Λ₂Λ₁M.PosSemidef := Λ₂.completely_pos.def_Fintype (dO₁ × Fin n) hΛ₁M'
+      --PSD preserved under reordering to get (((Λ₁.map.MatrixMap_Prod Λ₂.map).MatrixMap_Prod LinearMap.id) M)
+      sorry
+      -/
+  sorry
+
+section piKron
+
+variable {ι : Type u} [DecidableEq ι] [fι : Fintype ι]
+variable {dI : ι → Type v} [∀i, Fintype (dI i)] [∀i, DecidableEq (dI i)]
+variable {dO : ι → Type w} [∀i, Fintype (dO i)] [∀i, DecidableEq (dO i)]
+
+/-- The `piKron` product of IsCompletelyPositive maps is also completely positive. -/
+theorem piKron {Λi : ∀ i, MatrixMap (dI i) (dO i) R} (h₁ : ∀ i, (Λi i).IsCompletelyPositive) :
+    IsCompletelyPositive (MatrixMap.piKron Λi) := by
+  sorry
+
+end piKron
+
+end IsCompletelyPositive
+
+end MatrixMap
+
+
+================================================================================
+FILE: QuantumInfo/Finite/CPTPMap.lean
+TYPE: Lean 4
+SIZE: 208 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap.Bundled
+import QuantumInfo.Finite.CPTPMap.CPTP
+import QuantumInfo.Finite.CPTPMap.Dual
+import QuantumInfo.Finite.CPTPMap.MatrixMap
+import QuantumInfo.Finite.CPTPMap.Unbundled
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Capacity.lean
+TYPE: Lean 4
+SIZE: 9233 characters
+================================================================================
+
+import Mathlib.Analysis.SpecialFunctions.Log.Base
+
+import QuantumInfo.Finite.Entropy
+import QuantumInfo.Finite.CPTPMap
+import QuantumInfo.Finite.Distance
+
+
+/-! # Quantum Capacity
+
+This focuses on defining and proving theorems about the quantum capacity, the maximum asymptotic rate at which quantum information can be coherently transmitted. The precise definition is not consistent in the literature, see [Capacity_doc](./QuantumInfo/Finite/Capacity_doc.html) for a note on what has been used and how that was used to arrive at the following definition:
+
+ 1. A channel A `Emulates` another channel B if there are D and E such that D∘A∘E = B.
+ 2. A channel A `εApproximates` channel B (of the same dimensions) if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
+ 3. A channel A `AchievesRate` R:ℝ if for every ε>0, n copies of A emulates some channel B such that log2(dimout(B))/n ≥ R, and that B is εApproximately the identity.
+ 4. The `quantumCapacity` of the channel A is the supremum of the achievable rates, i.e. `sSup { R : ℝ | AchievesRate A R }`.
+
+The most basic facts:
+ * `emulates_self`: Every channel emulates itself.
+ * `emulates_trans`: If A emulates B and B emulates C, then A emulates C. (That is, emulation is an ordering.)
+ * `εApproximates A B ε` is equivalent to the existence of some δ (depending ε and dims(A)) so that |A-B| has diamond norm at most δ, and δ→0 as ε→0.
+ * `achievesRate_0`: Every channel achievesRate 0. So, the set of achievable rates is Nonempty.
+ * If a channel achievesRate R₁, it also every achievesRate R₂ every R₂ ≤ R₁, i.e. it is an interval extending left towards -∞. Achievable rates are `¬BddBelow`.
+ * `bddAbove_achievesRate`: A channel C : dimX → dimY cannot achievesRate R with `R > log2(min(dimX, dimY))`. Thus, the interval is `BddAbove`.
+
+The nice lemmas we would want:
+ * Capacity of a replacement channel is zero.
+ * Capacity of an identity channel is `log2(D)`.
+ * Capacity is superadditive under tensor products. (That is, at least additive. Showing that it isn't _exactly_ additive, unlike classical capacity which is additive, is a much harder task.)
+ * Capacity of a kth tensor power is exactly k times the capacity of the original channel.
+ * Capacity does not decrease under tensor sums.
+ * Capacity does not increase under composition.
+
+Then, we should show that our definition is equivalent to some above. Most, except (3), should be not too hard to prove.
+
+Then the LSD theorem establishes that the single-copy coherent information is a lower bound. This is stated in `coherentInfo_le_quantumCapacity`. The corollary, that the n-copy coherent information converges to the capacity, is `quantumCapacity_eq_piProd_coherentInfo`.
+
+# TODO
+
+The only notion of "capacity" here currently is "quantum capacity" in the usual sense. But there are several non-equal capacities relevant to quantum channels, see e.g. [Watrous's notes](https://cs.uwaterloo.ca/~watrous/TQI/TQI.8.pdf) for a list:
+ * Quantum capacity (`quantumCapacity`)
+ * Quantum 1-shot capacity
+ * Entanglement-assisted classical capacity
+ * Qss, the quantum side-channel capacity
+ * Holevo capacity, aka Holevo χ. The Holevo–Schumacher–Westmoreland theorem as a major theorem
+ * Entanglement-assisted Holevo capacity
+ * Entanglement-assisted quantum capacity
+ * One- and two-way distillable entanglement
+
+And other important theorems like superdense coding, nonadditivity, superactivation
+-/
+
+namespace CPTPMap
+
+variable {d₁ d₂ d₃ d₄ d₅ d₆ : Type*}
+variable [Fintype d₁] [Fintype d₂] [Fintype d₃] [Fintype d₄] [Fintype d₅] [Fintype d₆] [DecidableEq d₁] [DecidableEq d₂]
+
+variable [DecidableEq d₃] [DecidableEq d₄] in
+/--
+A channel Λ₁ `Emulates` another channel Λ₂ if there are D and E such that D∘Λ₁∘E = Λ₂.
+-/
+def Emulates (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) : Prop :=
+  ∃ (E : CPTPMap d₃ d₁) (D : CPTPMap d₂ d₄), D.compose (Λ₁.compose E) = Λ₂
+
+/--
+A channel A `εApproximates` channel B of the same dimensions if the for every state ρ, the fidelity F(A(ρ), B(ρ)) is at least 1-ε.
+-/
+def εApproximates (A B : CPTPMap d₁ d₂) (ε : ℝ) : Prop :=
+  ∀ (ρ : MState d₁), (A ρ).fidelity (B ρ) ≥ 1-ε
+
+variable [DecidableEq d₂] in
+/--
+A channel A `AchievesRate` R:ℝ if for every ε>0, some n copies of A emulates a channel B such that log2(dimout(B))/n ≥ R, and that B εApproximates the identity channel.
+-/
+def AchievesRate (A : CPTPMap d₁ d₂) (R : ℝ) : Prop :=
+  ∀ ε : ℝ, ε > 0 →
+    ∃ (n : ℕ) (dimB : ℕ) (B : CPTPMap (Fin dimB) (Fin dimB)),
+      (CPTPMap.piProd (fun (_ : Fin n) ↦ A)).Emulates B ∧
+      Real.logb 2 dimB ≥ R*n ∧
+      B.εApproximates CPTPMap.id ε
+
+variable [DecidableEq d₂] in
+noncomputable def quantumCapacity (A : CPTPMap d₁ d₂) : ℝ :=
+  sSup { R : ℝ | AchievesRate A R }
+
+section emulates
+variable [DecidableEq d₂] [DecidableEq d₃] [DecidableEq d₄] [DecidableEq d₅]
+
+set_option linter.unusedSectionVars false in
+/-- Every quantum channel emulates itself. -/
+theorem emulates_self (Λ : CPTPMap d₁ d₂) : Λ.Emulates Λ :=
+  ⟨CPTPMap.id, CPTPMap.id, by simp⟩
+
+set_option linter.unusedSectionVars false in
+/-- If a quantum channel A emulates B, and B emulates C, then A emulates C. -/
+theorem emulates_trans (Λ₁ : CPTPMap d₁ d₂) (Λ₂ : CPTPMap d₃ d₄) (Λ₃ : CPTPMap d₅ d₆)
+  (h₁₂ : Λ₁.Emulates Λ₂) (h₂₃ : Λ₂.Emulates Λ₃) : Λ₁.Emulates Λ₃ := by
+  obtain ⟨E₁, D₁, hED₁⟩ := h₁₂
+  obtain ⟨E₂, D₂, hED₂⟩ := h₂₃
+  exact ⟨E₁.compose E₂, D₂.compose D₁, by classical simp [← hED₁, ← hED₂, compose_assoc]⟩
+
+end emulates
+
+section εApproximates
+
+/-- Every quantum channel perfectly approximates itself, that is, `εApproximates` with `ε = 0`. -/
+theorem εApproximates_self (Λ : CPTPMap d₁ d₂) : Λ.εApproximates Λ 0 :=
+  fun ρ ↦ ((Λ ρ).fidelity_self_eq_one.trans (sub_zero 1).symm).ge
+
+/-- If a quantum channel A approximates B with ε₀, it also approximates B with all larger ε₁. -/
+theorem εApproximates_monotone {A B : CPTPMap d₁ d₂} {ε₀ : ℝ} (h : A.εApproximates B ε₀)
+    {ε₁ : ℝ} (h₂ : ε₀ ≤ ε₁) : A.εApproximates B ε₁ :=
+  fun ρ ↦ (tsub_le_tsub_left h₂ 1).trans (h ρ)
+
+end εApproximates
+
+section AchievesRate
+variable [DecidableEq d₂]
+
+/-- Every quantum channel achieves a rate of zero. -/
+theorem achievesRate_0 (Λ : CPTPMap d₁ d₂) : Λ.AchievesRate 0 := by
+  intro ε hε
+  let _ : Nonempty (Fin 1) := Fin.pos_iff_nonempty.mp Nat.one_pos
+  let _ : Nonempty (Fin 0 → d₂) := instNonemptyOfInhabited
+  use 0, 1, default
+  constructor
+  · exact ⟨default, default, Unique.eq_default _⟩
+  constructor
+  · norm_num
+  · rw [Unique.eq_default id]
+    exact εApproximates_monotone (εApproximates_self default) hε.le
+
+/-- The identity channel on D dimensional space achieves a rate of log2(D). -/
+theorem id_achievesRate_log_dim : (id (dIn := d₁)).AchievesRate (Real.logb 2 (Fintype.card d₁)) := by
+  intro ε hε
+  use 1, Fintype.card d₁, id
+  constructor
+  · sorry--they are equivalent up to permutation
+  constructor
+  · norm_num
+  · exact εApproximates_monotone (εApproximates_self id) hε.le
+
+/-- A channel cannot achieve a rate greater than log2(D), where D is the input dimension. -/
+theorem not_achievesRate_gt_log_dim_in (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₁) < R): ¬Λ.AchievesRate R := by
+  sorry
+
+/-- A channel cannot achieve a rate greater than log2(D), where D is the output dimension. -/
+theorem not_achievesRate_gt_log_dim_out (Λ : CPTPMap d₁ d₂) {R : ℝ} (hR : Real.logb 2 (Fintype.card d₂) < R): ¬Λ.AchievesRate R := by
+  sorry
+
+/-- The achievable rates are a bounded set. -/
+theorem bddAbove_achievesRate (Λ : CPTPMap d₁ d₂) : BddAbove {R | Λ.AchievesRate R} := by
+  use Real.logb 2 (Fintype.card d₁)
+  intro R h
+  contrapose h
+  exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h)
+
+end AchievesRate
+
+section capacity
+variable [DecidableEq d₂]
+
+/-- Quantum channel capacity is nonnegative. -/
+theorem zero_le_quantumCapacity (Λ : CPTPMap d₁ d₂) : 0 ≤ Λ.quantumCapacity :=
+  le_csSup (bddAbove_achievesRate Λ) (achievesRate_0 Λ)
+
+/-- Quantum channel capacity is at most log2(D), where D is the input dimension. -/
+theorem quantumCapacity_ge_log_dim_in (Λ : CPTPMap d₁ d₂) : Λ.quantumCapacity ≤ Real.logb 2 (Fintype.card d₁) :=
+  Real.sSup_le (by
+    intro R h
+    contrapose h
+    exact not_achievesRate_gt_log_dim_in Λ (lt_of_not_ge h))
+  (by
+    by_cases h : Nonempty d₁
+    · apply Real.logb_nonneg one_lt_two (Nat.one_le_cast.mpr Fintype.card_pos)
+    · simp [not_nonempty_iff.mp h])
+
+/-- The LSD (Lloyd-Shor-Devetak) theorem: the quantum capacity is at least as large the single-copy coherent
+information. The "coherent information" is used in literature to refer to both a function of state and
+a channel (`coherentInfo`), or a function of just a channel. In the latter case, the state is implicitly
+maximized over. Here we use the former definition and state that the lower bound is true for all states. -/
+theorem coherentInfo_le_quantumCapacity (Λ : CPTPMap d₁ d₂) (ρ : MState d₁) : coherentInfo ρ Λ ≤ Λ.quantumCapacity := by
+  sorry
+
+/-- The quantum capacity is the limit of the coherent information of n-copy uses of the channel. -/
+theorem quantumCapacity_eq_piProd_coherentInfo (Λ : CPTPMap d₁ d₂) (ρ : MState d₁) : Λ.quantumCapacity =
+    sSup { r : ℝ | ∃ n ρ, r = coherentInfo ρ (CPTPMap.piProd (fun (_ : Fin n) ↦ Λ))} := by
+  sorry
+
+end capacity
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Capacity_doc.lean
+TYPE: Lean 4
+SIZE: 5164 characters
+
+
+[Repository content continues in next chunk]

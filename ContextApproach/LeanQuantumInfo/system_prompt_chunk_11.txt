@@ -1,0 +1,1134 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+eded):
+-- #synth Inner ℝ (Matrix (Fin 5) (Fin 5) ℝ)
+
+-- end frobenius_inner_product
+
+section partial_trace
+
+variable [AddCommMonoid R] [Fintype d]
+
+def traceLeft (m : Matrix (d × d₁) (d × d₂) R) : Matrix d₁ d₂ R :=
+  Matrix.of fun i₁ j₁ ↦ ∑ i₂, m (i₂, i₁) (i₂, j₁)
+
+def traceRight (m : Matrix (d₁ × d) (d₂ × d) R) : Matrix d₁ d₂ R :=
+  Matrix.of fun i₂ j₂ ↦ ∑ i₁, m (i₂, i₁) (j₂, i₁)
+
+variable [Fintype d₁] [Fintype d₂] in
+@[simp]
+theorem traceLeft_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceLeft.trace = A.trace := by
+  convert (Fintype.sum_prod_type_right _).symm
+  rfl
+
+variable [Fintype d₁] [Fintype d₂] in
+@[simp]
+theorem traceRight_trace (A : Matrix (d₁ × d₂) (d₁ × d₂) R) : A.traceRight.trace = A.trace := by
+  convert (Fintype.sum_prod_type _).symm
+  rfl
+
+variable [StarAddMonoid R] in
+theorem IsHermitian.traceLeft {A : Matrix (d × d₁) (d × d₁) R} (hA : A.IsHermitian) : A.traceLeft.IsHermitian := by
+  ext
+  simp only [Matrix.traceLeft, conjTranspose_apply, of_apply, star_sum]
+  congr!
+  exact congrFun₂ hA _ _
+
+variable [StarAddMonoid R] in
+theorem IsHermitian.traceRight {A : Matrix (d₁ × d) (d₁ × d) R} (hA : A.IsHermitian) : A.traceRight.IsHermitian := by
+  ext
+  simp only [Matrix.traceRight, conjTranspose_apply, of_apply, star_sum]
+  congr!
+  exact congrFun₂ hA _ _
+
+open ComplexOrder
+
+variable {d₁ d₂ : Type*} {A : Matrix (d₁ × d₂) (d₁ × d₂) 𝕜}
+variable [Fintype d₂] [Fintype d₁]
+
+theorem PosSemidef.traceLeft [DecidableEq d₁] (hA : A.PosSemidef) : A.traceLeft.PosSemidef := by
+  constructor
+  · exact hA.1.traceLeft
+  · intro x
+    convert Finset.sum_nonneg' (s := .univ) (fun (i : d₁) ↦ hA.2 (fun (j,k) ↦ if i = j then x k else 0))
+    simp_rw [Matrix.traceLeft, dotProduct_mulVec]
+    simpa [dotProduct, vecMul_eq_sum, ite_apply, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul,
+      apply_ite] using Finset.sum_comm_cycle
+
+theorem PosSemidef.traceRight [DecidableEq d₂] (hA : A.PosSemidef) : A.traceRight.PosSemidef := by
+  constructor
+  · exact hA.1.traceRight
+  · intro x
+    convert Finset.sum_nonneg' (s := .univ) (fun (i : d₂) ↦ hA.2 (fun (j,k) ↦ if i = k then x j else 0))
+    simp_rw [Matrix.traceRight, dotProduct_mulVec]
+    simpa [dotProduct, vecMul_eq_sum, ite_apply, Fintype.sum_prod_type, Finset.mul_sum, Finset.sum_mul,
+      apply_ite] using Finset.sum_comm_cycle
+
+end partial_trace
+
+section posdef
+
+open ComplexOrder
+open Kronecker
+
+theorem PosDef.kron {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
+    {A : Matrix d₁ d₁ 𝕜} {B : Matrix d₂ d₂ 𝕜} (hA : A.PosDef) (hB : B.PosDef) : (A ⊗ₖ B).PosDef := by
+  rw [hA.left.spectral_theorem, hB.left.spectral_theorem]
+  rw [mul_kronecker_mul, mul_kronecker_mul]
+  rw [star_eq_conjTranspose, star_eq_conjTranspose]
+  rw [← kroneckerMap_conjTranspose]
+  rw [diagonal_kronecker_diagonal]
+  apply mul_mul_conjTranspose_same
+  · rw [posDef_diagonal_iff]
+    rintro ⟨i₁, i₂⟩
+    convert mul_pos (hA.eigenvalues_pos i₁) (hB.eigenvalues_pos i₂)
+    rw [RCLike.pos_iff]
+    simp
+  · apply Matrix.vecMul_injective_of_isUnit
+    rw [isUnit_iff_exists]
+    use (star hA.left.eigenvectorUnitary.val) ⊗ₖ (star hB.left.eigenvectorUnitary.val)
+    simp [← Matrix.mul_kronecker_mul]
+
+theorem PosDef.submatrix {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
+    {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) {e : d₂ → d₁} (he : Function.Injective e) : (M.submatrix e e).PosDef := by
+  use hM.left.submatrix e
+  intro x hx
+  let y : d₁ → 𝕜 := fun i ↦ ∑ j ∈ { j | e j = i}, x j
+  have hy : y ≠ 0 := by
+    contrapose! hx
+    simp only [funext_iff] at hx ⊢
+    intro i
+    simpa [y, he.eq_iff, Finset.sum_eq_single_of_mem] using hx (e i)
+  convert hM.right y hy
+  dsimp [Matrix.mulVec, dotProduct, y]
+  simp only [map_sum]
+  simp only [Finset.sum_mul, Finset.sum_filter, Finset.mul_sum]
+  simp [← Finset.mul_sum, Finset.sum_comm]
+
+theorem PosDef.reindex {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
+    {M : Matrix d₁ d₁ 𝕜} (hM : M.PosDef) (e : d₁ ≃ d₂) : (M.reindex e e).PosDef :=
+  hM.submatrix e.symm.injective
+
+@[simp]
+theorem PosDef.reindex_iff {d₁ d₂ 𝕜 : Type*} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂] [RCLike 𝕜]
+    {M : Matrix d₁ d₁ 𝕜} (e : d₁ ≃ d₂) : (M.reindex e e).PosDef ↔ M.PosDef := by
+  refine ⟨fun h ↦ ?_, fun h ↦ h.reindex e⟩
+  convert h.reindex e.symm
+  simp
+
+theorem PosSemidef.rsmul {n : Type*} [Fintype n] {M : Matrix n n ℂ} (hM : M.PosSemidef) {c : ℝ} (hc : 0 ≤ c) :
+    (c • M).PosSemidef := by
+  constructor
+  · exact hM.1.smul_real c
+  · peel hM.2
+    rw [smul_mulVec, dotProduct_smul]
+    positivity
+
+theorem PosDef.Convex {n : Type*} [Fintype n] : Convex ℝ (Matrix.PosDef (n := n) (R := ℂ)) := by
+  intro A hA B hB a b ha hb hab
+  rcases ha.eq_or_lt with (rfl | ha)
+  · simp_all
+  rcases hb.eq_or_lt with (rfl | hb)
+  · simp_all
+  exact (hA.smul ha).add (hB.smul hb)
+
+end posdef
+
+section eigenvalues
+
+open ComplexOrder
+
+variable {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
+
+theorem PosDef_iff_eigenvalues' (M : Matrix d d 𝕜) :
+    M.PosDef ↔ ∃ (h : M.IsHermitian), ∀ i, 0 < h.eigenvalues i :=
+  ⟨fun h ↦ ⟨h.left, h.left.posDef_iff_eigenvalues_pos.mp h⟩,
+    fun ⟨w, h⟩ ↦ w.posDef_iff_eigenvalues_pos.mpr h⟩
+
+--PR'ed: #27118
+theorem IsHermitian.charpoly_roots_eq_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) :
+    M.charpoly.roots = Multiset.map (RCLike.ofReal ∘ hM.eigenvalues) Finset.univ.val := by
+  -- Since M is Hermitian, its characteristic polynomial splits into linear factors over the reals.
+  have h_split : M.charpoly = Multiset.prod (Multiset.map (fun (e : ℝ) => Polynomial.X - Polynomial.C (RCLike.ofReal e)) (Multiset.map (fun (i : d) => hM.eigenvalues i) Finset.univ.val)) := by
+    -- Since M is Hermitian, it is diagonalizable, and its characteristic polynomial splits into linear factors over the reals.
+    have h_diag : ∃ P : Matrix d d 𝕜, P.det ≠ 0 ∧ ∃ D : Matrix d d 𝕜, D = Matrix.diagonal (fun i => RCLike.ofReal (hM.eigenvalues i)) ∧ M = P * D * P⁻¹ := by
+      have := hM.spectral_theorem;
+      refine' ⟨ hM.eigenvectorUnitary, _, _ ⟩
+      · -- Since the eigenvector unitary is a unitary matrix, its determinant is a unit, hence non-zero.
+        have h_det_unitary : IsUnit (Matrix.det (hM.eigenvectorUnitary : Matrix d d 𝕜)) := by
+          exact UnitaryGroup.det_isUnit hM.eigenvectorUnitary
+        exact h_det_unitary.ne_zero
+      · refine' ⟨ _, rfl, this.trans _ ⟩
+        rw [ Matrix.inv_eq_left_inv ]
+        congr!
+        bound
+    -- Since M is similar to D, their characteristic polynomials are the same.
+    have h_char_poly : M.charpoly = Matrix.charpoly (Matrix.diagonal (fun i => RCLike.ofReal (hM.eigenvalues i))) := by
+      rcases h_diag with ⟨P, left, ⟨D, left_1, rfl⟩⟩
+      rw [ ← left_1, Matrix.charpoly, Matrix.charpoly ];
+      simp +decide [ Matrix.charmatrix, Matrix.mul_assoc ];
+      -- Since $w$ is invertible, we can simplify the determinant.
+      have h_inv : (P.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) * (P⁻¹.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) = 1 := by
+        simp [ ← Matrix.map_mul, left ];
+      -- Since $w$ is invertible, we can simplify the determinant using the fact that the determinant of a product is the product of the determinants.
+      have h_det_prod : Matrix.det ((Matrix.diagonal (fun _ => Polynomial.X) - P.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜) * (D.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜) * P⁻¹.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)))) = Matrix.det ((P.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) * (Matrix.diagonal (fun _ => Polynomial.X) - D.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) * (P⁻¹.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜))) := by
+        simp only [ mul_sub, sub_mul, Matrix.mul_assoc ];
+        -- Since Matrix.diagonal (fun _ => Polynomial.X) is a scalar matrix, it commutes with any matrix.
+        have h_comm : Matrix.diagonal (fun _ => Polynomial.X) * P⁻¹.map Polynomial.C = P⁻¹.map Polynomial.C * Matrix.diagonal (fun _ => Polynomial.X) := by
+          ext i j; by_cases hi : i = j <;> simp [ hi ];
+        simp only [ h_comm ];
+        simp [ ← mul_assoc, h_inv ];
+      rw [ h_det_prod, Matrix.det_mul, Matrix.det_mul ];
+      -- Since the determinant of the product of two matrices is the product of their determinants, and the determinant of the identity matrix is 1, we have:
+      have h_det_identity : Matrix.det (P.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) * Matrix.det (P⁻¹.map (⇑Polynomial.C : 𝕜 → Polynomial 𝕜)) = 1 := by
+        rw [ ← Matrix.det_mul, h_inv, Matrix.det_one ];
+      rw [ mul_right_comm, h_det_identity, one_mul ];
+    rw [h_char_poly];
+    simp [ Matrix.charpoly, Matrix.det_diagonal ];
+  rw [ h_split, Polynomial.roots_multiset_prod ];
+  -- Case 1
+  · erw [ Multiset.bind_map ];
+    aesop;
+  -- Case 2
+  · -- Since the eigenvalues are real, and we're working over the complex numbers (since 𝕜 is a real closed field), the polynomial X - C(e) would be zero only if e is zero. But if e is zero, then the polynomial would be X, which isn't zero. So 0 can't be in the multiset.
+    simp [Polynomial.X_sub_C_ne_zero]
+
+--These two are disgusting atm. There's cleaner versions of them headed to Mathlib. See #29526 and follow-ups
+lemma _root_.Multiset.map_univ_eq_iff {α β : Type*} [Fintype α] [DecidableEq β] (f g : α → β) :
+    Multiset.map f Finset.univ.val = Multiset.map g Finset.univ.val ↔ ∃ (e : α ≃ α), f = g ∘ e := by
+  apply Iff.intro
+  · intro a
+    -- Since these two multisets are equal, their elements must be equal up to permutation.
+    have h_perm : ∃ e : α ≃ α, ∀ x, f x = g (e x) := by
+      have h_count_eq : ∀ y : β, Finset.card (Finset.filter (fun x => f x = y) Finset.univ) = Finset.card (Finset.filter (fun x => g x = y) Finset.univ) := by
+        intro y;
+        replace a := congr_arg ( fun m => m.count y ) a;
+        simp_all ( config := { decide := Bool.true } ) [ Multiset.count_map ];
+        simpa [ eq_comm, Finset.filter_congr ] using a;
+      have h_perm : ∀ y : β, ∃ e : { x : α // f x = y } ≃ { x : α // g x = y }, True := by
+        intro y
+        simp_all only [exists_const_iff, and_true]
+        exact ⟨ Fintype.equivOfCardEq <| by simpa [ Fintype.card_subtype ] using h_count_eq y ⟩;
+      choose e he using h_perm;
+      refine' ⟨ _, _ ⟩;
+      exact ( Equiv.sigmaFiberEquiv f ).symm.trans ( Equiv.sigmaCongrRight e ) |> Equiv.trans <| Equiv.sigmaFiberEquiv g;
+      intro x
+      specialize e ( f x )
+      rename_i e_1
+      simp_all only [implies_true, Equiv.trans_apply, Equiv.sigmaCongrRight_apply,
+        Equiv.sigmaFiberEquiv_symm_apply_fst, Equiv.sigmaFiberEquiv_apply]
+      exact Eq.symm ( e_1 ( f x ) ⟨ x, rfl ⟩ |>.2 );
+    exact ⟨ h_perm.choose, funext h_perm.choose_spec ⟩;
+  · intro a
+    obtain ⟨w, h⟩ := a
+    subst h
+    simp_all only [Function.comp_apply, Finset.univ]
+    -- Since $w$ is a bijection, the multiset of $w(x)$ for $x$ in the original multiset is just a permutation of the original multiset.
+    have h_perm : Multiset.map (fun x => w x) (Finset.val Fintype.elems) = Finset.val Fintype.elems := by
+      exact Multiset.map_univ_val_equiv w;
+    conv_rhs => rw [ ← h_perm ];
+    simp +zetaDelta at *
+
+theorem IsHermitian.cfc_eigenvalues {M : Matrix d d 𝕜} (hM : M.IsHermitian) (f : ℝ → ℝ) :
+    ∃ (e : d ≃ d), Matrix.IsHermitian.eigenvalues (cfc_predicate f M) = f ∘ hM.eigenvalues ∘ e := by
+  have h_eigenvalues : Multiset.map hM.eigenvalues Finset.univ.val = Multiset.map (fun i => hM.eigenvalues i) Finset.univ.val := by
+    rfl
+  generalize_proofs at *;
+  have h_eigenvalues_cfc : (IsHermitian.cfc hM f).charpoly.roots = Multiset.map (fun i => (f (hM.eigenvalues i) : 𝕜)) Finset.univ.val := by
+    rw [ Matrix.IsHermitian.cfc, Matrix.charpoly ];
+    -- Since $U$ is unitary, we have $U^* U = I$, and thus the characteristic polynomial of $U D U^*$ is the same as the characteristic polynomial of $D$.
+    have h_charpoly : Matrix.det ((hM.eigenvectorUnitary : Matrix d d 𝕜) * Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues) * Star.star (hM.eigenvectorUnitary : Matrix d d 𝕜)).charmatrix = Matrix.det (Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues)).charmatrix := by
+      -- Since $U$ is unitary, we have $U^* U = I$, and thus the characteristic polynomial of $U D U^*$ is the same as the characteristic polynomial of $D$ by the properties of determinants.
+      have h_char_poly : ∀ (t : 𝕜), Matrix.det (t • 1 - (hM.eigenvectorUnitary : Matrix d d 𝕜) * Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues) * star (hM.eigenvectorUnitary : Matrix d d 𝕜)) = Matrix.det (t • 1 - Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues)) := by
+        intro t;
+        -- Since $U$ is unitary, we have $U^* U = I$, and thus the determinant of $tI - UDU^*$ is the same as the determinant of $tI - D$.
+        have h_det : Matrix.det (t • 1 - (hM.eigenvectorUnitary : Matrix d d 𝕜) * Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues) * star (hM.eigenvectorUnitary : Matrix d d 𝕜)) = Matrix.det ((hM.eigenvectorUnitary : Matrix d d 𝕜) * (t • 1 - Matrix.diagonal (RCLike.ofReal ∘ f ∘ hM.eigenvalues)) * star (hM.eigenvectorUnitary : Matrix d d 𝕜)) := by
+          simp [ mul_sub, sub_mul, mul_assoc ];
+        rw [ h_det, Matrix.det_mul, Matrix.det_mul ];
+        rw [ mul_right_comm, ← Matrix.det_mul, mul_comm ];
+        norm_num +zetaDelta at *;
+      refine' Polynomial.funext fun t => _;
+      convert h_char_poly t using 1;
+      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+        simp [ Matrix.one_apply, Polynomial.eval_prod ];
+        congr! 3;
+        aesop;
+      · simp [ Matrix.det_apply', Polynomial.eval_finset_sum ];
+        simp [ Matrix.one_apply, Polynomial.eval_prod ];
+        exact Finset.sum_congr rfl fun _ _ => by congr; ext; aesop;
+    simp_all [ Matrix.charmatrix, Matrix.det_diagonal ];
+    rw [ Polynomial.roots_prod ];
+    · bound;
+    · exact Finset.prod_ne_zero_iff.mpr fun i _ => Polynomial.X_sub_C_ne_zero _;
+  have := IsHermitian.charpoly_roots_eq_eigenvalues (cfc_predicate f M);
+  rw [← Matrix.IsHermitian.cfc_eq] at h_eigenvalues_cfc
+  rw [ h_eigenvalues_cfc ] at this;
+  simp [ Function.comp ] at this;
+  rw [ Multiset.map_univ_eq_iff ] at this;
+  obtain ⟨ e, he ⟩ := this;
+  use e.symm
+  ext x
+  have := congr_fun he ( e.symm x );
+  simp_all only [Function.comp_apply, Equiv.apply_symm_apply, algebraMap.coe_inj]
+
+end eigenvalues
+
+section
+
+variable {α n : Type*} [RCLike α] [Fintype n] [DecidableEq n]
+
+@[simp]
+theorem toEuclideanLin_one : Matrix.toEuclideanLin (1 : Matrix n n α) = .id := by
+  ext1 x
+  simp [Matrix.toEuclideanLin]
+
+end
+
+section more_cfc
+
+open ComplexOrder
+
+variable {d 𝕜 : Type*} [Fintype d] [DecidableEq d] [RCLike 𝕜]
+
+@[simp]
+theorem cfc_diagonal (g : d → ℝ) (f : ℝ → ℝ) :
+    cfc f (Matrix.diagonal (fun x ↦ (g x : 𝕜))) = diagonal (RCLike.ofReal ∘ f ∘ g) := by
+  --Thanks Aristotle
+  have h_self_adjoint : _root_.IsSelfAdjoint (diagonal (fun x => (g x : 𝕜))) := by
+      change Matrix.conjTranspose _ = _
+      simp [Matrix.conjTranspose]
+  --TODO cfc_cont_tac
+  rw [cfc, dif_pos ⟨h_self_adjoint, continuousOn_iff_continuous_restrict.mpr <| by fun_prop⟩]
+  rw [cfcHom_eq_of_continuous_of_map_id]
+  rotate_left
+  · refine' { .. }
+    use fun f ↦ Matrix.diagonal fun x ↦ f ⟨g x, (by
+      simpa [algebraMap_eq_diagonal, diagonal_apply] using
+        congr_arg (· x x) ·.exists_left_inv.choose_spec
+      )⟩
+    · simp
+    · simp [diagonal, ← Matrix.ext_iff, mul_apply]
+      grind
+    · simp
+    · simp [diagonal, funext_iff]
+      grind [add_zero]
+    · simp [← ext_iff, diagonal]
+      exact fun r i j ↦ rfl
+    · simp [← ext_iff, diagonal]
+      grind [RCLike.conj_ofReal, map_zero]
+  · dsimp [diagonal]
+    continuity
+  · simp [diagonal]
+  · simp [diagonal]
+
+theorem PosSemidef.pos_of_mem_spectrum {A : Matrix d d 𝕜} (hA : A.PosSemidef) (r : ℝ) :
+    r ∈ spectrum ℝ A → 0 ≤ r := by
+  intro hr
+  rw [hA.left.spectrum_real_eq_range_eigenvalues] at hr
+  rcases hr with ⟨i, rfl⟩
+  exact hA.eigenvalues_nonneg i
+
+theorem PosSemidef.pow_add {A : Matrix d d 𝕜} (hA : A.PosSemidef) {x y : ℝ} (hxy : x + y ≠ 0) :
+    cfc (· ^ (x + y) : ℝ → ℝ) A = cfc (fun r ↦ r ^ x * r ^ y : ℝ → ℝ) A := by
+  refine cfc_congr fun r hr ↦ ?_
+  exact Real.rpow_add' (hA.pos_of_mem_spectrum r hr) hxy
+
+theorem PosSemidef.pow_mul {A : Matrix d d 𝕜} {x y : ℝ} (hA : A.PosSemidef) :
+    cfc (· ^ (x * y) : ℝ → ℝ) A = cfc (fun r ↦ (r ^ x) ^ y : ℝ → ℝ) A := by
+  refine cfc_congr fun r hr ↦ ?_
+  exact Real.rpow_mul (hA.pos_of_mem_spectrum r hr) x y
+
+end more_cfc
+
+section subm
+
+variable {α : Type*} [AddCommMonoid α]
+variable {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂]
+
+@[simp]
+theorem trace_submatrix
+  (A : Matrix d₁ d₁ α) (e : d₂ ≃ d₁) :
+    (A.submatrix e e).trace = A.trace := by
+  simpa [Matrix.trace] using e.sum_comp (fun x ↦ A x x)
+
+end subm
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/MatrixNorm/TraceNorm.lean
+TYPE: Lean 4
+SIZE: 4325 characters
+================================================================================
+
+import QuantumInfo.ForMathlib.Matrix
+
+open BigOperators
+open Classical
+
+namespace Matrix
+noncomputable section traceNorm
+
+open scoped ComplexOrder
+
+variable {m n R : Type*}
+variable [Fintype m] [Fintype n]
+variable [RCLike R]
+
+/-- The trace norm of a matrix: Tr[√(A† A)]. -/
+def traceNorm (A : Matrix m n R) : ℝ :=
+  RCLike.re A.posSemidef_conjTranspose_mul_self.sqrt.trace
+
+/-- The trace norm of the negative is equal to the trace norm. -/
+@[simp]
+theorem traceNorm_eq_neg_self (A : Matrix m n R) : traceNorm (-A) = traceNorm A := by
+  unfold traceNorm
+  congr! 3
+  rw [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg]
+  exact neg_neg _
+
+--More generally sum of abs of singular values.
+--Proposition 9.1.1 in Wilde
+theorem traceNorm_Hermitian_eq_sum_abs_eigenvalues {A : Matrix n n R} (hA : A.IsHermitian) :
+    A.traceNorm = ∑ i, abs (hA.eigenvalues i) :=
+  sorry --Diagonalize A
+
+/-- The trace norm is nonnegative. Property 9.1.1 in Wilde -/
+theorem traceNorm_nonneg (A : Matrix m n R) : 0 ≤ A.traceNorm :=
+  And.left $ RCLike.nonneg_iff.1
+    A.posSemidef_conjTranspose_mul_self.posSemidef_sqrt.trace_nonneg
+
+/-- The trace norm is zero only if the matrix is zero. -/
+theorem traceNorm_zero_iff (A : Matrix m n R) : A.traceNorm = 0 ↔ A = 0 := by
+  constructor
+  · intro h
+    have h₂ : ∀ i, A.posSemidef_conjTranspose_mul_self.posSemidef_sqrt.1.eigenvalues i = 0 :=
+      sorry --sum of nonnegative values to zero
+    have h₃ : A.posSemidef_conjTranspose_mul_self.sqrt = 0 :=
+      sorry --all eigenvalues are zero iff matrix is zero
+    have h₄ : Aᴴ * A = 0 :=
+      sorry --sqrt is zero iff matrix is zero
+    have h₅ : A = 0 :=
+      sorry --conj_mul_self is zero iff A is zero
+    exact h₅
+  · intro hA
+    subst hA
+    have : (0 : Matrix m n R)ᴴ * (0 : Matrix m n R) = 0 := by simp
+    rw [traceNorm, PosSemidef.sqrt_eq this _ Matrix.PosSemidef.zero]
+    simp
+
+/-- Trace norm is linear under scalar multiplication. Property 9.1.2 in Wilde -/
+theorem traceNorm_smul (A : Matrix m n R) (c : R) : (c • A).traceNorm = ‖c‖ * A.traceNorm := by
+  have h : (c • A)ᴴ * (c • A) = (‖c‖^2:R) • (Aᴴ * A) := by
+    rw [conjTranspose_smul, RCLike.star_def, mul_smul, smul_mul, smul_smul]
+    rw [RCLike.mul_conj c]
+  rw [traceNorm, PosSemidef.sqrt_eq' h]
+  have : RCLike.re (trace (‖c‖ • A.posSemidef_conjTranspose_mul_self.sqrt)) = ‖c‖ * traceNorm A := by
+    simp [RCLike.smul_re]
+    apply Or.inl
+    rfl
+  convert this
+  rw [RCLike.real_smul_eq_coe_smul (K := R) ‖c‖]
+  by_cases h : c = 0
+  · nth_rewrite 8 [h]
+    simp only [norm_zero, algebraMap.coe_zero, zero_smul]
+    rw [← PosSemidef.sqrt_0]
+    apply PosSemidef.sqrt_eq
+    simp [h]
+  · apply PosSemidef.sqrt_nonneg_smul _
+    rw [RCLike.pos_iff_exists_ofReal]
+    use ‖c‖
+    simp [h]
+
+/-- For square matrices, the trace norm is max Tr[U * A] over unitaries U.-/
+theorem traceNorm_eq_max_tr_U (A : Matrix n n R) : IsGreatest {x | ∃ (U : unitaryGroup n R), (U.1 * A).trace = x} A.traceNorm := by
+  sorry
+
+/-- the trace norm satisfies the triangle inequality (for square matrices). TODO: Prove in general. -/
+theorem traceNorm_triangleIneq (A B : Matrix n n R) : (A + B).traceNorm ≤ A.traceNorm + B.traceNorm := by
+  obtain ⟨Uab, h₁⟩ := (traceNorm_eq_max_tr_U (A + B)).left
+  rw [Matrix.mul_add, Matrix.trace_add] at h₁
+  obtain h₂ := (traceNorm_eq_max_tr_U A).right
+  obtain h₃ := (traceNorm_eq_max_tr_U B).right
+  simp only [upperBounds, Subtype.exists, exists_prop, Set.mem_setOf_eq, forall_exists_index,
+    and_imp, forall_apply_eq_imp_iff₂] at h₂ h₃
+  replace h₂ := h₂ Uab.1 Uab.2
+  replace h₃ := h₃ Uab.1 Uab.2
+  rw [← RCLike.ofReal_le_ofReal (K := R)]
+  simp only [RCLike.ofReal_add]
+  calc _
+    _ = _ + _ := h₁.symm
+    _ ≤ ↑(traceNorm A) + trace (↑Uab * B) := by simp only [add_le_add_iff_right]; exact h₂
+    _ ≤ _ := by simp only [add_le_add_iff_left]; exact h₃
+
+theorem traceNorm_triangleIneq' (A B : Matrix n n R) : (A - B).traceNorm ≤ A.traceNorm + B.traceNorm := by
+  rw [sub_eq_add_neg A B, ←traceNorm_eq_neg_self B]
+  exact traceNorm_triangleIneq A (-B)
+
+theorem PosSemidef.traceNorm_PSD_eq_trace {A : Matrix m m R} (hA : A.PosSemidef) : A.traceNorm = A.trace := by
+  have : Aᴴ * A = A^2 := by rw [hA.1, pow_two]
+  rw [traceNorm, Matrix.PosSemidef.sqrt_eq' this, Matrix.PosSemidef.sqrt_sq hA, hA.1.re_trace_eq_trace]
+
+end traceNorm
+
+end Matrix
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Minimax.lean
+TYPE: Lean 4
+SIZE: 849 characters
+================================================================================
+
+import Mathlib.Analysis.Convex.Basic
+import Mathlib.Data.Real.Archimedean
+import Mathlib.Topology.Algebra.Monoid.Defs
+import Mathlib.Topology.Algebra.MulAction
+import Mathlib.Topology.Defs.Filter
+import Mathlib.Topology.MetricSpace.Pseudo.Defs
+
+/-- The minimax theorem, at the level of generality we need. For convex, compact, nonempty sets `S`
+and `T`in a real topological vector space `M`, and a bilinear function `f` on M, we can exchange
+the order of minimizing and maximizing. -/
+theorem minimax {M : Type*} [AddCommMonoid M] [Module ℝ M] [TopologicalSpace M] [ContinuousAdd M] [ContinuousSMul ℝ M]
+  (f : LinearMap.BilinForm ℝ M) (S : Set M) (T : Set M) (hS₁ : IsCompact S) (hT₁ : IsCompact T)
+  (hS₂ : Convex ℝ S) (hT₂ : Convex ℝ T) (hS₃ : S.Nonempty) (hT₃ : T.Nonempty)
+    : ⨆ x : S, ⨅ y : T, f x y =  ⨅ y : T, ⨆ x : S, f x y := by
+  sorry
+
+
+================================================================================
+FILE: QuantumInfo/ForMathlib/Minimax_work.lean
+TYPE: Lean 4
+SIZE: 34637 characters
+================================================================================
+
+import Mathlib.Analysis.Convex.PathConnected
+import Mathlib.Analysis.Convex.Quasiconvex
+import Mathlib.Analysis.Convex.Topology
+import Mathlib.Analysis.Normed.Order.Lattice
+import Mathlib.Data.Fintype.Order
+import Mathlib.Topology.Semicontinuous
+import Mathlib.Analysis.SpecificLimits.Basic
+
+@[simp]
+theorem Set.image2_flip {α β γ : Type*} {f : α → β → γ} (s : Set α) (t : Set β) :
+    image2 (flip f) t s = image2 f s t := by
+  grind [image2, flip]
+
+section ciSup
+
+variable {ι α : Type*} [ConditionallyCompleteLattice α] {f g : ι → α} {a : α}
+
+/-- The **max-min theorem**. A version of `iSup_iInf_le_iInf_iSup` for conditionally complete lattices. -/
+theorem ciSup_ciInf_le_ciInf_ciSup {ι': Type*} [Nonempty ι]
+  (f : ι → ι' → α) (Ha : ∀ j, BddAbove (Set.range (f · j))) (Hb : ∀ i, BddBelow (Set.range (f i))) :
+    ⨆ i, ⨅ j, f i j ≤ ⨅ j, ⨆ i, f i j :=
+  ciSup_le fun i ↦ ciInf_mono (Hb i) fun j ↦ le_ciSup (Ha j) i
+
+theorem lt_ciInf_iff {α : Type*} {ι : Sort*} [Nonempty ι] [ConditionallyCompleteLattice α] {f : ι → α} {a : α}
+    (hf : BddBelow (Set.range f)) :
+    a < iInf f ↔ ∃ b, a < b ∧ ∀ (i : ι), b ≤ f i :=
+  ⟨(⟨iInf f, ·, (ciInf_le hf ·)⟩), fun ⟨_, hb₁, hb₂⟩ ↦ lt_of_lt_of_le hb₁ (le_ciInf hb₂)⟩
+
+theorem BddAbove.range_max (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.range g)) :
+    BddAbove (Set.range (max f g)) := by
+  rcases hf with ⟨a, ha⟩
+  rcases hg with ⟨b, hb⟩
+  use a ⊔ b
+  simp only [mem_upperBounds, Set.mem_range, forall_exists_index, forall_apply_eq_imp_iff, Pi.sup_apply] at ha hb ⊢
+  intro i
+  specialize ha i
+  specialize hb i
+  order
+
+theorem BddBelow.range_min (hf : BddBelow (Set.range f)) (hg : BddBelow (Set.range g)) :
+    BddBelow (Set.range (min f g)) :=
+  BddAbove.range_max (α := αᵒᵈ) hf hg
+
+variable [Nonempty ι]
+
+theorem ciSup_sup_eq (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.range g)) : ⨆ x, f x ⊔ g x = (⨆ x, f x) ⊔ ⨆ x, g x :=
+  le_antisymm (ciSup_le fun _ => sup_le_sup (le_ciSup hf _) <| le_ciSup hg _)
+    (sup_le (ciSup_mono (hf.range_max hg) fun _ => le_sup_left) <| ciSup_mono (hf.range_max hg) fun _ => le_sup_right)
+
+theorem ciInf_inf_eq (hf : BddBelow (Set.range f)) (hg : BddBelow (Set.range g)) : ⨅ x, f x ⊓ g x = (⨅ x, f x) ⊓ ⨅ x, g x :=
+  ciSup_sup_eq (α := αᵒᵈ) hf hg
+
+theorem sup_ciSup (hf : BddAbove (Set.range f)) : a ⊔ ⨆ x, f x = ⨆ x, a ⊔ f x := by
+  rw [ciSup_sup_eq (by simp) hf, ciSup_const]
+
+theorem inf_ciInf (hf : BddBelow (Set.range f)) : a ⊓ ⨅ x, f x = ⨅ x, a ⊓ f x :=
+  sup_ciSup (α := αᵒᵈ) hf
+
+theorem ciInf_sup_ciInf_le (hf : BddBelow (Set.range f)) (hg : BddBelow (Set.range g)) :
+    (⨅ i, f i) ⊔ ⨅ i, g i ≤ ⨅ i, f i ⊔ g i :=
+  le_ciInf (fun i ↦ sup_le_sup (ciInf_le hf i) (ciInf_le hg i))
+
+theorem le_ciSup_inf_ciSup (hf : BddAbove (Set.range f)) (hg : BddAbove (Set.range g)) :
+    ⨆ (i : ι), f i ⊓ g i ≤ (⨆ (i : ι), f i) ⊓ ⨆ (i : ι), g i :=
+  ciInf_sup_ciInf_le (α := αᵒᵈ) hf hg
+
+omit [Nonempty ι] in
+theorem ciInf_eq_min_cInf_inter_diff (S T : Set ι)
+  [Nonempty (S ∩ T : Set ι)] [Nonempty (S \ T : Set ι)] (hf : BddBelow (f '' S)) :
+    ⨅ i : S, f i = (⨅ i : (S ∩ T : Set ι), f i) ⊓ ⨅ i : (S \ T : Set ι), f i := by
+  refine' le_antisymm _ _;
+  · rw [le_inf_iff]
+    apply And.intro
+    · apply_rules [ ciInf_le, le_ciInf ];
+      simp only [Subtype.forall, Set.mem_inter_iff, and_imp]
+      exact fun a ha hb => ciInf_le ( show BddBelow ( Set.range fun i : S => f i ) by simpa [ Set.range ] using hf ) ⟨ a, ha ⟩;
+    · apply_rules [ ciInf_le, le_ciInf ];
+      simp only [Subtype.forall, Set.mem_diff, and_imp]
+      exact fun a ha hb => ciInf_le ( show BddBelow ( Set.range fun i : S => f i ) by simpa [ Set.range ] using hf ) ⟨ a, ha ⟩;
+  · have _ : Nonempty S := .map (fun (x : (S ∩ T : Set _)) ↦ ⟨x, x.2.1⟩) ‹_›
+    apply le_csInf (Set.range_nonempty _)
+    rintro i ⟨b, rfl⟩
+    by_cases hiT : b.1 ∈ T
+    · refine' le_trans ( inf_le_left ) _;
+      refine' csInf_le _ _;
+      · exact ⟨ hf.choose, Set.forall_mem_range.2 fun i => hf.choose_spec ⟨ i, i.2.1, rfl ⟩ ⟩;
+      · aesop
+    · refine' le_trans ( inf_le_right ) _;
+      refine' csInf_le _ _
+      · exact ⟨ hf.choose, Set.forall_mem_range.2 fun x => hf.choose_spec ⟨ x, by aesop ⟩ ⟩
+      · aesop
+
+end ciSup
+
+theorem QuasiconvexOn.subset
+  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [LE β] [SMul 𝕜 E]
+  {s : Set E} {f : E → β} (h : QuasiconvexOn 𝕜 s f) {t : Set E} (hts : t ⊆ s) (ht : Convex 𝕜 t) :
+    QuasiconvexOn 𝕜 t f := by
+  intro b
+  convert ht.inter (h b) using 1
+  simp +contextual [Set.ext_iff, @hts _]
+
+theorem QuasiconvexOn.mem_segment_le_max
+  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeSup β] [SMul 𝕜 E]
+  {s : Set E} {f : E → β} (h : QuasiconvexOn 𝕜 s f)
+  {x y z : E} (hx : x ∈ s) (hy : y ∈ s) (hz : z ∈ segment 𝕜 x y):
+    f z ≤ f x ⊔ f y :=
+  ((h (f x ⊔ f y)).segment_subset (by simpa) (by simpa) hz).right
+
+theorem QuasiconcaveOn.min_le_mem_segment
+  {𝕜 E β : Type*} [Semiring 𝕜] [PartialOrder 𝕜] [AddCommMonoid E] [SemilatticeInf β] [SMul 𝕜 E]
+  {s : Set E} {f : E → β} (h : QuasiconcaveOn 𝕜 s f)
+  {x y z : E} (hx : x ∈ s) (hy : y ∈ s) (hz : z ∈ segment 𝕜 x y):
+    f x ⊓ f y ≤ f z :=
+  ((h (f x ⊓ f y)).segment_subset (by simpa) (by simpa) hz).right
+
+theorem LowerSemicontinuousOn.bddBelow {α : Type*} [TopologicalSpace α] {S : Set α} {g : α → ℝ}
+    (hg : LowerSemicontinuousOn g S) (hS : IsCompact S) : BddBelow (g '' S) := by
+  rcases S.eq_empty_or_nonempty with rfl | hS₂
+  · simp
+  have h_neighborhood : ∀ x ∈ S, ∃ U ∈ nhds x, ∀ y ∈ U ∩ S, g y > g x - 1 := by
+    -- By definition of lower semicontinuity, for each x ∈ S, there exists a neighborhood U_x such that g(y) > g(x) - 1 for all y ∈ U_x ∩ S.
+    intros x hx
+    specialize hg x hx (g x - 1) (sub_one_lt (g x))
+    rw [eventually_nhdsWithin_iff] at hg
+    simp only [Set.mem_inter_iff, gt_iff_lt, and_imp]
+    exact ⟨_, hg, fun y hy hyS ↦ hy hyS⟩
+  choose! U hU using h_neighborhood
+  -- By the finite subcover property, there exists a finite subset t ⊆ S$ such that S ⊆ ⋃_{x ∈ t} U_x$.
+  obtain ⟨t, ht⟩ : ∃ t, (∀ x ∈ t, x ∈ S) ∧ S ⊆ ⋃ x ∈ t, U x :=
+    hS.elim_nhds_subcover U fun x hx ↦ hU x hx |>.1;
+  -- Let $m$ be the minimum value of $g$ on the finite set $t$.
+  obtain ⟨m, hm⟩ : ∃ m, ∀ x ∈ t, g x ≥ m := by
+    use Finset.min' (t.image g) ?_
+    · exact fun x hx ↦ Finset.min'_le _ _ (t.mem_image_of_mem g hx)
+    refine ⟨_, Finset.mem_image_of_mem g <| Classical.choose_spec <| Finset.nonempty_of_ne_empty ?_⟩
+    rintro rfl
+    simpa using ht.2 hS₂.some_mem
+  use m - 1
+  refine Set.forall_mem_image.mpr fun x hx ↦ ?_
+  rcases Set.mem_iUnion₂.mp (ht.2 hx) with ⟨y, hy, hy'⟩
+  linarith [hm y hy, hU y (ht.1 y hy) |>.2 x ⟨hy', hx⟩]
+
+theorem LowerSemicontinuousOn.max {α : Type*} [TopologicalSpace α] {S : Set α} {f g : α → ℝ}
+    (hf : LowerSemicontinuousOn f S) (hg : LowerSemicontinuousOn g S) :
+    LowerSemicontinuousOn (fun x ↦ max (f x) (g x)) S := by
+  convert lowerSemicontinuousOn_ciSup (s := S) (f := fun (i : Bool) x' ↦ if i then f x' else g x') ?_ ?_
+  · rw [ciSup_eq_of_forall_le_of_forall_lt_exists_gt] <;> aesop
+  · simp
+  · simp [hf, hg]
+
+variable {α : Type*} [TopologicalSpace α] {β : Type*} [Preorder β] {f g : α → β} {x : α}
+  {s t : Set α} {y z : β} {γ : Type*} [LinearOrder γ]
+
+theorem lowerSemicontinuousOn_iff_isClosed_preimage {f : α → γ} [IsClosed s] :
+    LowerSemicontinuousOn f s ↔ ∀ y, IsClosed (s ∩ f ⁻¹' Set.Iic y) := by
+  constructor
+  · intro a y
+    refine' isClosed_of_closure_subset fun x hx => _;
+    rw [ mem_closure_iff ] at hx;
+    contrapose! hx;
+    rcases em ( x ∈ s ) with hx' | hx'
+    · simp only [Set.mem_inter_iff, hx', Set.mem_preimage, Set.mem_Iic, true_and, not_le] at hx
+      have := a x hx';
+      rcases mem_nhdsWithin.1 ( this y hx ) with ⟨ o, ho, h ⟩;
+      exact ⟨ o, ho, h.1, Set.eq_empty_iff_forall_notMem.2 fun z hz => h.2 ⟨ hz.1, hz.2.1 ⟩ |> not_le_of_gt <| Set.mem_Iic.1 hz.2.2 ⟩;
+    · exact ⟨ sᶜ, IsClosed.isOpen_compl, hx', by aesop ⟩;
+  · intro a x hx y hy
+    have hx_not_in : x ∉ s ∩ f ⁻¹' Set.Iic y := by
+      simp [hy]
+    rw [ eventually_nhdsWithin_iff ]
+    filter_upwards [ IsOpen.mem_nhds ( isOpen_compl_iff.2 ( a y ) ) hx_not_in ] with z hz hzs
+    exact lt_of_not_ge fun h => hz ⟨hzs, h⟩
+
+theorem segment.isConnected {E : Type u_1} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul ℝ E] (a b : E) :
+    IsConnected (segment ℝ a b) := by
+  rw [← Path.range_segment a b]
+  exact isConnected_range (Path.segment a b).continuous
+
+theorem BddAbove.range_inf_of_image2 {M N α : Type*} {f : M → N → α} [ConditionallyCompleteLinearOrder α]
+  {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T)) :
+    BddAbove (Set.range fun y : T ↦ ⨅ x : S, f x y) := by
+  rcases isEmpty_or_nonempty T with hT | hT
+  · aesop
+  rcases S.eq_empty_or_nonempty with rfl | hS
+  · simp [Set.range, iInf]
+  rw [← Set.nonempty_coe_sort, nonempty_subtype] at hS
+  rcases hS with ⟨x, hx⟩
+  choose z hz using h_bddA
+  choose w hw using h_bddB
+  have h_inf_le_M : ∀ y ∈ T, ⨅ x : S, f x y ≤ z := by
+    intro y hy
+    apply (ciInf_le ⟨_, Set.forall_mem_range.2 (hw <| Set.mem_image2_of_mem ·.2 hy)⟩ ⟨x, hx⟩).trans
+    exact hz (Set.mem_image2_of_mem hx hy)
+  exact ⟨_, Set.forall_mem_range.2 (h_inf_le_M _ ·.2)⟩
+
+theorem BddBelow.range_sup_of_image2 {M N α : Type*} {f : M → N → α} [ConditionallyCompleteLinearOrder α]
+  {S : Set M} {T : Set N} (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T)) :
+      BddBelow (Set.range fun y : T ↦ ⨆ x : S, f x y) :=
+  BddAbove.range_inf_of_image2 (α := αᵒᵈ) h_bddB h_bddA
+
+theorem ciInf_le_ciInf_of_subset {α β : Type*} [ConditionallyCompleteLattice α]
+  {f : β → α} {s t : Set β} (hs : s.Nonempty) (hf : BddBelow (f '' t)) (hst : s ⊆ t) :
+    ⨅ x : t, f x ≤ ⨅ x : s, f x := by
+  have h_lower_bound : ∀ y ∈ s, ⨅ x : t, f x ≤ f y := by
+    intro y hy
+    obtain ⟨w_1, ⟨left_1, right_1⟩⟩ : f y ∈ f '' t := by
+      use y, hst hy
+    exact le_trans ( ciInf_le (by simpa [ Set.range ] using hf ) ⟨ w_1, left_1 ⟩ ) ( by simp[right_1] );
+  apply le_csInf
+  · exact ⟨_, ⟨⟨_, hs.choose_spec⟩, rfl⟩⟩;
+  · aesop
+
+theorem LowerSemicontinuousOn.dite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
+  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → p a → β}
+  (hf : LowerSemicontinuousOn (fun x : Subtype p ↦ f x.val x.prop) {x | x.val ∈ s})
+  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
+    LowerSemicontinuousOn (fun x ↦ dite (p x) (f x) (fun _ ↦ ⊤)) s := by
+  rcases h_relatively_closed with ⟨u, ⟨hu, hsu⟩⟩
+  simp only [Set.ext_iff, Set.mem_inter_iff, Set.mem_setOf_eq, and_congr_right_iff] at hsu
+  intro x hx y hy
+  dsimp at hy
+  split_ifs at hy with h
+  · specialize hf ⟨x, h⟩ hx y hy
+    rw [ eventually_nhdsWithin_iff ] at hf ⊢
+    rw [ nhds_subtype_eq_comap, Filter.eventually_comap ] at hf;
+    filter_upwards [hf]
+    simp only [Subtype.forall]
+    grind [lt_top_of_lt]
+  · filter_upwards [self_mem_nhdsWithin, mem_nhdsWithin_of_mem_nhds (hu.isOpen_compl.mem_nhds (show x ∉ u by grind))]
+    intros
+    simp_all only [Set.mem_compl_iff, ↓reduceDIte]
+
+theorem LowerSemicontinuousOn.comp_continuousOn {α β γ : Type*}
+  [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ} {t : Set β}
+  (hg : LowerSemicontinuousOn g t) (hf : ContinuousOn f s) (h : Set.MapsTo f s t) :
+    LowerSemicontinuousOn (g ∘ f) s := by
+  intro x hx y hy
+  have h_neighborhood : ∃ U ∈ nhds (f x), ∀ z ∈ U ∩ t, y < g z := by
+    have := hg ( f x ) ( h hx ) y hy
+    simp_all only [Function.comp_apply, Set.mem_inter_iff, and_imp]
+    rw [ eventually_nhdsWithin_iff ] at this
+    aesop
+  obtain ⟨U, hU_nhds, hU⟩ : ∃ U ∈ nhds (f x), ∀ z ∈ U ∩ t, y < g z := h_neighborhood
+  have h_final : ∀ᶠ x' in nhdsWithin x s, f x' ∈ U ∧ f x' ∈ t := by
+    filter_upwards [ hf x hx hU_nhds, self_mem_nhdsWithin ] with x' hx' hx'' using ⟨ hx', h hx'' ⟩;
+  exact h_final.mono fun x' hx' => hU _ hx'
+
+theorem UpperSemicontinuousOn.comp_continuousOn {α β γ : Type*}
+  [TopologicalSpace α] [TopologicalSpace β] [Preorder γ] {f : α → β} {s : Set α} {g : β → γ} {t : Set β}
+  (hg : UpperSemicontinuousOn g t) (hf : ContinuousOn f s) (h : Set.MapsTo f s t) :
+    UpperSemicontinuousOn (g ∘ f) s :=
+  LowerSemicontinuousOn.comp_continuousOn (γ := γᵒᵈ) hg hf h
+
+theorem LowerSemicontinuousOn.ite_top {α β : Type*} [TopologicalSpace α] [Preorder β] [OrderTop β]
+  {s : Set α} (p : α → Prop) [DecidablePred p] {f : (a : α) → β} (hf : LowerSemicontinuousOn f (s ∩ setOf p))
+  (h_relatively_closed : ∃ U : Set α, IsClosed U ∧ s ∩ U = s ∩ setOf p) :
+    LowerSemicontinuousOn (fun x ↦ ite (p x) (f x) ⊤) s :=
+  dite_top p (hf.comp_continuousOn (by fun_prop) (by intro; simp)) h_relatively_closed
+
+theorem LeftOrdContinuous.comp_lowerSemicontinuousOn_strong_assumptions {α γ δ : Type*}
+  [TopologicalSpace α] [LinearOrder γ] [LinearOrder δ] [TopologicalSpace δ] [OrderTopology δ]
+  [TopologicalSpace γ] [OrderTopology γ] [DenselyOrdered γ] [DenselyOrdered δ]
+  {s : Set α} {g : γ → δ} {f : α → γ} (hg : LeftOrdContinuous g) (hf : LowerSemicontinuousOn f s) (hg2 : Monotone g) :
+    LowerSemicontinuousOn (g ∘ f) s := by
+  intros x hx y hy
+  have hU : ∃ U ∈ nhds x, ∀ z ∈ U ∩ s, g (f z) > y := by
+    simp_all only [Set.mem_inter_iff, gt_iff_lt, and_imp]
+    obtain ⟨z, hz1, hz2⟩ : ∃ z, y < g z ∧ z < f x := by
+      obtain ⟨z, hz⟩ : ∃ z, z < f x ∧ y < g z := by
+        by_contra h_contra
+        simp only [not_exists, not_and, not_lt] at h_contra
+        have h_exists_z : ∃ z, z < f x ∧ g z > y := by
+          have h_lub : IsLUB (Set.Iio (f x)) (f x) := by
+            exact isLUB_Iio
+          have := hg h_lub;
+          have := this.exists_between hy
+          simp_all only [Set.mem_image, Set.mem_Iio, exists_exists_and_eq_and, gt_iff_lt]
+          grind
+        exact h_exists_z.choose_spec.2.not_ge ( h_contra _ h_exists_z.choose_spec.1 );
+      aesop
+    specialize hf x hx z hz2
+    rw [ eventually_nhdsWithin_iff ] at hf
+    exact ⟨_, hf, fun _ hx hx' ↦ hz1.trans_le (hg2 (hx hx').le)⟩
+  simp only [Set.mem_inter_iff, and_imp] at hU
+  obtain ⟨w, ⟨left, right⟩⟩ := hU
+  exact Filter.eventually_inf_principal.2 (Filter.mem_of_superset left right)
+
+theorem UpperSemicontinuousOn.frequently_lt_of_tendsto {α β γ : Type*} [TopologicalSpace β] [Preorder γ]
+  {f : β → γ} {T : Set β} (hf : UpperSemicontinuousOn f T) {c : γ} {zs : α → β} {z : β}
+  {l : Filter α} [l.NeBot] (hzs : l.Tendsto zs (nhds z)) (hx₂ : f z < c) (hzI : ∀ a, zs a ∈ T) (hzT : z ∈ T) :
+    ∀ᶠ a in l, f (zs a) < c := by
+  have h : ∀ᶠ n in l, zs n ∈ {y ∈ T | f y < c} := by
+    filter_upwards [hzs.eventually (eventually_nhdsWithin_iff.mp ((hf z hzT) c hx₂))] with n hn
+      using ⟨hzI n, hn (hzI n)⟩
+  simp_all
+
+theorem Finset.ciInf_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
+  (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
+    ⨅ (a : (insert x t : _)), f a = f x ⊓ ⨅ (a : t), f a := by
+  apply le_antisymm
+  · apply le_inf
+    · apply csInf_le <;> aesop
+    apply le_csInf
+    · exact ⟨_, ⟨⟨ht.choose, ht.choose_spec ⟩, rfl⟩⟩
+    rintro _ ⟨⟨a, ha⟩, rfl⟩
+    exact csInf_le (Finite.bddBelow_range _) ⟨⟨a, Finset.mem_insert_of_mem ha⟩, rfl⟩
+  · apply le_csInf
+    · exact ⟨_, ⟨⟨x, Finset.mem_insert_self _ _⟩, rfl⟩⟩
+    simp only [Set.mem_range, Subtype.exists, mem_insert, exists_prop, exists_eq_or_imp]
+    rintro b (rfl | ⟨_, ⟨_, rfl⟩⟩)
+    · exact inf_le_left
+    apply inf_le_right.trans
+    apply csInf_le (Set.finite_range _).bddBelow
+    aesop
+
+theorem Finset.ciSup_insert {α β : Type*} [DecidableEq α] [ConditionallyCompleteLattice β]
+  (t : Finset α) (ht : t.Nonempty) (x : α) (f : α → β) :
+    ⨆ (a : (insert x t : _)), f a = f x ⊔ ⨆ (a : t), f a :=
+  t.ciInf_insert (β := βᵒᵈ) ht x f
+
+section sion_minimax
+/-!
+Following https://projecteuclid.org/journals/kodai-mathematical-journal/volume-11/issue-1/Elementary-proof-for-Sions-minimax-theorem/10.2996/kmj/1138038812.full, with some corrections. There are two errors in Lemma 2 and the main theorem: an incorrect step that
+`(∀ x, a < f x) → (a < ⨅ x, f x)`. This is repaired by taking an extra `exists_between` to get `a < b < ⨅ ...`, concluding that
+`(∀ x, b < f x) → (b ≤ ⨅ x, f x)` and so `(a < ⨅ x, f x)`.
+-/
+
+variable  {M : Type*} [NormedAddCommGroup M]
+  {N : Type*}
+  {f : M → N → ℝ} {S : Set M} {T : Set N}
+  (hfc₂ : ∀ y, y ∈ T → LowerSemicontinuousOn (f · y) S)
+  (hS₁ : IsCompact S) (hS₃ : S.Nonempty) (hT₃ : T.Nonempty)
+
+include hfc₂ hS₁ hS₃ in
+private theorem sion_exists_min_lowerSemi (a : ℝ) (hc : ∀ y₀ : T, ⨅ (x : S), f (↑x) y₀ ≤ a) (z : N) (hzT : z ∈ T) :
+    ∃ x ∈ S, f x z ≤ a := by
+  let _ := hS₃.to_subtype
+  contrapose! hc
+  use ⟨z, hzT⟩
+  have h_lower_bound (x : S) : a < f x z := hc x x.2
+  apply lt_of_le_of_ne
+  · apply le_csInf (Set.range_nonempty _)
+    rintro _ ⟨x, rfl⟩
+    exact (h_lower_bound x).le
+  intro h
+  obtain ⟨x, hxz⟩ : ∃ x : S, f x z ≤ a := by
+    obtain ⟨xn, hxn⟩ : ∃ xn : ℕ → S, Filter.atTop.Tendsto (fun n => f (xn n) z) (nhds a) := by
+      have h_eps : ∀ ε > 0, ∃ x : S, f x z < a + ε := by
+        intro ε εpos
+        have hx : ⨅ x : S, f x z < a + ε := by linarith
+        simpa using exists_lt_of_csInf_lt (Set.range_nonempty _) hx
+      choose! xn hxn using h_eps
+      use fun n ↦ xn (1 / (n + 1))
+      rw [tendsto_iff_dist_tendsto_zero]
+      refine squeeze_zero (fun _ ↦ abs_nonneg _) (fun n ↦ ?_) tendsto_one_div_add_atTop_nhds_zero_nat
+      refine abs_le.mpr ⟨?_, ?_⟩ <;> linarith [h_lower_bound (xn (1 / (n + 1))), hxn (1 / (n + 1)) (by positivity)]
+    obtain ⟨x, subseq, hsubseq₁, hsubseq₂⟩ : ∃ x : S, ∃ subseq : ℕ → ℕ,
+        StrictMono subseq ∧ Filter.Tendsto (fun n => xn (subseq n)) Filter.atTop (nhds x) := by
+      simpa using (isCompact_iff_isCompact_univ.mp hS₁).isSeqCompact (x := xn) fun _ ↦ trivial
+    use x
+    refine le_of_forall_pos_le_add fun ε εpos ↦ ?_
+    rw [← tsub_le_iff_right]
+    apply le_of_tendsto_of_tendsto tendsto_const_nhds (hxn.comp hsubseq₁.tendsto_atTop)
+    apply Filter.eventually_atTop.mpr
+    rw [Metric.tendsto_atTop] at hsubseq₂
+    have ⟨δ, δpos, H⟩ : ∃ δ > 0, ∀ y ∈ S, dist y x < δ → f y z > f x z - ε := by
+      obtain ⟨δ, hδ⟩ := Metric.mem_nhdsWithin_iff.mp (((hfc₂ z hzT) x x.2) _ (sub_lt_self _ εpos))
+      exact ⟨δ, hδ.1, fun y hy hyx => hδ.2 ⟨hyx, hy⟩⟩
+    rcases hsubseq₂ δ δpos with ⟨N, hN⟩
+    exact ⟨N, fun n hn ↦ (H _ (xn (subseq n)).coe_prop (hN _ hn)).le⟩
+  specialize h_lower_bound x
+  order
+
+variable [Module ℝ M] [ContinuousAdd M] [ContinuousSMul ℝ M]
+variable [NormedAddCommGroup N] [Module ℝ N] [ContinuousAdd N] [ContinuousSMul ℝ N]
+variable
+  (hfc₁ : ∀ x, x ∈ S → UpperSemicontinuousOn (f x) T)
+  (hfq₂ : ∀ y, y ∈ T → QuasiconvexOn ℝ S (f · y))
+  (hfq₁ : ∀ x, x ∈ S → QuasiconcaveOn ℝ T (f x))
+  (hT₂ : Convex ℝ T) (hS₂ : Convex ℝ S)
+
+include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hT₂ hS₃ in
+private lemma sion_exists_min_2 (y₁ y₂ : N) (hy₁ : y₁ ∈ T) (hy₂ : y₂ ∈ T)
+    (a : ℝ) (ha : a < ⨅ x : S, (max (f x y₁) (f x y₂)))
+    : ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
+  by_contra! hc
+  have _ := isCompact_iff_compactSpace.mp hS₁
+  have _ := hS₁.isClosed
+  obtain ⟨β, hβ₁, hβ₂⟩ := exists_between ha
+  let C : N → Set M := fun z ↦ { x ∈ S | f x z ≤ a }
+  let C' : N → Set M := fun z ↦ { x ∈ S | f x z ≤ β }
+  let A := C' y₁
+  let B := C' y₂
+  have hC_subset_C' (z) : C z ⊆ C' z :=
+    fun x hx ↦ ⟨hx.1, hx.2.trans hβ₁.le⟩
+  have hC_nonempty (z) (hz : z ∈ segment ℝ y₁ y₂) : (C z).Nonempty := by
+    simp only [Set.Nonempty, Set.mem_setOf_eq, C]
+    exact sion_exists_min_lowerSemi hfc₂ hS₁ hS₃ a hc z (hT₂.segment_subset hy₁ hy₂ hz)
+  have hC_closed (z) (hz : z ∈ segment ℝ y₁ y₂) : IsClosed (C z) := by
+    specialize hfc₂ z (hT₂.segment_subset hy₁ hy₂ hz)
+    rw [lowerSemicontinuousOn_iff_isClosed_preimage] at hfc₂
+    exact hfc₂ a
+  have hC'_nonempty (z) (hz : z ∈ segment ℝ y₁ y₂) : (C' z).Nonempty :=
+    (hC_nonempty z hz).mono (hC_subset_C' z)
+  have hC'_closed (z) (hz : z ∈ segment ℝ y₁ y₂) : IsClosed (C' z) := by
+    specialize hfc₂ z (hT₂.segment_subset hy₁ hy₂ hz)
+    rw [lowerSemicontinuousOn_iff_isClosed_preimage] at hfc₂
+    exact hfc₂ β
+  have hA_nonempty : A.Nonempty := hC'_nonempty y₁ (left_mem_segment ℝ y₁ y₂)
+  have hA_closed : IsClosed A := hC'_closed y₁ (left_mem_segment ℝ y₁ y₂)
+  have hB_nonempty : B.Nonempty := hC'_nonempty y₂ (right_mem_segment ℝ y₁ y₂)
+  have hB_closed : IsClosed B := hC'_closed y₂ (right_mem_segment ℝ y₁ y₂)
+  have hAB : A ∩ B = ∅ := by
+    simp [A, B, C', Set.ext_iff]
+    intro x hx hβy₁ _
+    by_contra! hβy₂
+    have hβ := max_le hβy₁ hβy₂
+    revert hβ
+    rw [imp_false, not_le]
+    refine lt_of_lt_of_le hβ₂ ?_
+    have h := ((hfc₂ y₁ hy₁).max (hfc₂ y₂ hy₂)).bddBelow hS₁
+    rw [Set.image_eq_range] at h
+    exact ciInf_le h ⟨x, hx⟩
+  have hfxz (x) (hx : x ∈ S) (z) (hz : z ∈ segment ℝ y₁ y₂) : min (f x y₁) (f x y₂) ≤ f x z :=
+    (hfq₁ x hx).min_le_mem_segment hy₁ hy₂ hz
+  have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∪ B := by
+    --TODO: On newer Mathlib this is just `grind [inf_le_iff, le_trans]`
+    intro; simp [C', A, B]; grind [inf_le_iff, le_trans]
+  have hC'z (z) (hz : z ∈ segment ℝ y₁ y₂) : Convex ℝ (C' z) :=
+    hfq₂ z (hT₂.segment_subset hy₁ hy₂ hz) β
+  have hC'zAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C' z ⊆ A ∨ C' z ⊆ B := by
+    specialize hC_subset_C' z
+    specialize hC'z z hz
+    have hC' : IsPreconnected (C' z) :=
+      ((hC'z).isConnected ((hC_nonempty z hz).mono hC_subset_C')).isPreconnected
+    rw [isPreconnected_iff_subset_of_disjoint_closed] at hC'
+    exact hC' A B hA_closed hB_closed (hC'zAB z hz) (by simp [hAB])
+  have hCzAB (z) (hz : z ∈ segment ℝ y₁ y₂) : C z ⊆ A ∨ C z ⊆ B := by
+    specialize hC_subset_C' z
+    rcases hC'zAB z hz with h | h
+    · exact .inl (hC_subset_C'.trans h)
+    · exact .inr (hC_subset_C'.trans h)
+  have h_not_CzAB (z) (hz : z ∈ segment ℝ y₁ y₂) : ¬(C z ⊆ A ∧ C z ⊆ B) := by
+    rintro ⟨h₁, h₂⟩
+    specialize hC_nonempty z hz
+    replace h₁ := Set.mem_of_mem_of_subset hC_nonempty.some_mem h₁
+    replace h₂ := Set.mem_of_mem_of_subset hC_nonempty.some_mem h₂
+    simpa [hAB] using Set.mem_inter h₁ h₂
+  let I : Set N := { z | z ∈ segment ℝ y₁ y₂ ∧ C z ⊆ A}
+  let J : Set N := { z | z ∈ segment ℝ y₁ y₂ ∧ C z ⊆ B}
+  have hI₁ : I.Nonempty := by
+    use y₁
+    simp [I, A, hC_subset_C', left_mem_segment]
+  have hJ₁ : J.Nonempty := by
+    use y₂
+    simp [J, B, hC_subset_C', right_mem_segment]
+  rw [Set.nonempty_iff_ne_empty] at hI₁ hJ₁
+  have hIJ : I ∩ J = ∅ := by
+    simp [I, J, Set.ext_iff]
+    intro z hz hCzA _ hCzB
+    specialize hCzA (hC_nonempty z hz).some_mem
+    specialize hCzB (hC_nonempty z hz).some_mem
+    rw [← Set.disjoint_iff_inter_eq_empty, Set.disjoint_left] at hAB
+    tauto
+  have hIJ₂ : I ∪ J = segment ℝ y₁ y₂ := by
+    simp [I, J, Set.ext_iff]
+    grind
+  have hI : IsClosed I := by
+    apply IsSeqClosed.isClosed
+    intro zs z hzI hzs
+    simp only [Set.mem_setOf_eq, I, C] at hzI
+    replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
+    have hz_mem : z ∈ segment ℝ y₁ y₂ :=
+      have cloL : IsClosed (segment ℝ y₁ y₂) := by
+        rw [← closure_openSegment]
+        exact isClosed_closure
+      cloL.isSeqClosed hzI hzs
+    let x := (hC_nonempty z hz_mem).some
+    have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem
+    suffices hn : ∃ n, x ∈ C' (zs n) by
+      use hz_mem
+      rcases hn with ⟨n, hn⟩
+      have hCzn : C (zs n) ⊆ A := hzI2 n
+      replace hCzn : C' (zs n) ⊆ A := by
+        refine (hC'zAB (zs n) (hzI n)).resolve_right ?_
+        intro hC'B
+        exact (h_not_CzAB (zs n) (hzI n)) ⟨hCzn, (hC_subset_C' _).trans hC'B⟩
+      have hxA : x ∈ A := Set.mem_of_mem_of_subset hn hCzn
+      refine (hCzAB z hz_mem).resolve_right ?_
+      intro hCB
+      have hAC : A ∩ C z ⊆ A ∩ B := by apply Set.inter_subset_inter_right _ hCB
+      rw [hAB, Set.subset_empty_iff, Set.ext_iff] at hAC
+      revert hAC
+      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false, not_forall, not_not]
+      exact ⟨x, hxA, hx⟩
+    suffices hn : ∃ n, f x (zs n) < β by
+      refine hn.imp fun n ↦ ?_
+      simp +contextual [C', le_of_lt, hx.left]
+    simp only [Set.mem_setOf_eq, C] at hx
+    rcases hx with ⟨hx₁, hx₂⟩
+    specialize hfc₁ x hx₁
+    replace hx₂ := hx₂.trans_lt hβ₁
+    replace hzI (n) := hT₂.segment_subset hy₁ hy₂ (hzI n)
+    replace hz_mem := hT₂.segment_subset hy₁ hy₂ hz_mem
+    exact (hfc₁.frequently_lt_of_tendsto hzs hx₂ hzI hz_mem).exists
+  have hJ : IsClosed J := by
+    apply IsSeqClosed.isClosed
+    intro zs z hzI hzs
+    simp only [Set.mem_setOf_eq, J, C] at hzI
+    replace ⟨hzI, hzI2⟩ := And.intro (hzI · |>.left) (hzI · |>.right)
+    have hz_mem : z ∈ segment ℝ y₁ y₂ :=
+      have cloL : IsClosed (segment ℝ y₁ y₂) := by
+        rw [← closure_openSegment]
+        exact isClosed_closure
+      cloL.isSeqClosed hzI hzs
+    let x := (hC_nonempty z hz_mem).some
+    have hx : x ∈ C z := (hC_nonempty z hz_mem).some_mem
+    suffices hn : ∃ n, x ∈ C' (zs n) by
+      use hz_mem
+      rcases hn with ⟨n, hn⟩
+      have hCzn : C (zs n) ⊆ B := hzI2 n
+      replace hCzn : C' (zs n) ⊆ B := by
+        refine (hC'zAB (zs n) (hzI n)).resolve_left ?_
+        intro hC'B
+        exact (h_not_CzAB (zs n) (hzI n)) ⟨(hC_subset_C' _).trans hC'B, hCzn⟩
+      have hxA : x ∈ B := Set.mem_of_mem_of_subset hn hCzn
+      refine (hCzAB z hz_mem).resolve_left ?_
+      intro hCB
+      have hAC : C z ∩ B ⊆ A ∩ B := by apply Set.inter_subset_inter_left _ hCB
+      rw [hAB, Set.subset_empty_iff, Set.ext_iff] at hAC
+      revert hAC
+      simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, imp_false, not_forall, not_not]
+      exact ⟨x, hx, hxA⟩
+    suffices hn : ∃ n, f x (zs n) < β by
+      refine hn.imp fun n ↦ ?_
+      simp +contextual [C', le_of_lt, hx.left]
+    simp only [Set.mem_setOf_eq, C] at hx
+    rcases hx with ⟨hx₁, hx₂⟩
+    specialize hfc₁ x hx₁
+    replace hx₂ := hx₂.trans_lt hβ₁
+    replace hzI (n) := hT₂.segment_subset hy₁ hy₂ (hzI n)
+    replace hz_mem := hT₂.segment_subset hy₁ hy₂ hz_mem
+    exact (hfc₁.frequently_lt_of_tendsto hzs hx₂ hzI hz_mem).exists
+  have hConnected := segment.isConnected y₁ y₂
+  rw [IsConnected, isPreconnected_iff_subset_of_fully_disjoint_closed ?_] at hConnected; swap
+  · rw [← closure_openSegment]
+    exact isClosed_closure
+  replace hConnected := hConnected.right I J
+  simp [hIJ, ← hIJ₂, Set.disjoint_iff_inter_eq_empty] at hConnected
+  obtain hL | hR := hConnected hI hJ
+  · rw [Set.inter_eq_self_of_subset_right hL] at hIJ
+    exact hJ₁ hIJ
+  · rw [Set.inter_eq_self_of_subset_left hR] at hIJ
+    exact hI₁ hIJ
+
+include hfc₁ hfq₁ hfc₂ hfq₂ hS₁ hS₂ hT₂ hS₃ in
+private lemma sion_exists_min_fin
+  (h_bddA : BddAbove (Set.image2 f S T)) (h_bddB : BddBelow (Set.image2 f S T))
+  (ys : Finset N) (hys_n : ys.Nonempty) (hys : (ys : Set N) ⊆ T)
+  (a : ℝ) (ha : a < ⨅ x : S, ⨆ yi : ys, f x yi)
+    : ∃ y₀ : T, a < ⨅ x : S, f x y₀ := by
+  induction hys_n using Finset.Nonempty.cons_induction generalizing S
+  case singleton x =>
+    simp at ha hys
+    use ⟨x, hys⟩
+  case cons yₙ t hxt htn ih =>
+    classical rw [Finset.cons_eq_insert] at hys ha
+    simp [Set.insert_subset_iff] at hys
+    rcases hys with ⟨hyₙ, ht⟩
+    let _ := hS₃.to_subtype
+    obtain ⟨b, hab, hb⟩ := exists_between ha
+    let S' := {z : M | z ∈ S ∧ f z yₙ ≤ b}
+    have hS'_sub : S' ⊆ S := Set.sep_subset ..
+    rcases S'.eq_empty_or_nonempty with 

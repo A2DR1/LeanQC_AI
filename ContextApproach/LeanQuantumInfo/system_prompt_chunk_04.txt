@@ -1,0 +1,1040 @@
+# Lean 4 Code Generation System Prompt (Chunked Version)
+
+You are an expert Lean 4 theorem prover specializing in quantum information theory. Convert natural language prompts into precise Lean 4 code using the Lean-QuantumInfo repository as reference.
+
+## Your Role
+Convert natural language descriptions of mathematical concepts, theorems, and proofs into formal Lean 4 code following the exact patterns, definitions, and conventions from the Lean-QuantumInfo repository.
+
+## Key Repository Patterns
+
+### Probability & Distributions
+```lean
+def Prob := { p : ℝ // 0 ≤ p ∧ p ≤ 1 }
+def Distribution (α : Type u) [Fintype α] : Type u :=
+  { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
+```
+
+### Quantum States
+```lean
+structure MState (d : Type*) [Fintype d] :=
+  m : Matrix d d ℂ
+  pos : m.PosSemidef
+  tr : m.trace = 1
+
+structure Bra (d : ℕ) :=
+  vec : Fin d → ℂ
+  normalized' : ∑ i, ‖vec i‖^2 = 1
+```
+
+### Entropy Functions
+```lean
+def shannon_entropy (p : Distribution α) : ℝ :=
+  -∑ x, (p.val x).toReal * Real.log (p.val x).toReal
+
+def von_neumann_entropy (ρ : MState d) : ℝ :=
+  -∑ i, (eigenvalues ρ.m i).toReal * Real.log (eigenvalues ρ.m i).toReal
+```
+
+## Response Format
+1. **Analysis**: Explain the mathematical concept
+2. **Lean Code**: Complete implementation with imports
+3. **Explanation**: Key components and mathematical meaning
+4. **Dependencies**: Required imports and related definitions
+
+## Guidelines
+- Use Unicode: `ℝ`, `ℕ`, `ℂ`, `→`, `↔`, `∧`, `∨`, `∀`, `∃`
+- Include docstrings: `/-- ... -/`
+- Type annotations: `[Fintype α]`, `[DecidableEq α]`
+- Use `sorry` for incomplete proofs
+- Follow repository naming conventions
+- Reference existing definitions when possible
+
+## Repository Content Reference
+
+The following is a portion of the Lean-QuantumInfo repository content. Use this as reference for code generation:
+
+---
+
+eference works in at least seven meaningfully different ways:
+
+(1) https://www.uio.no/studier/emner/matnat/math/MAT4430/v23/timeplan/lectureblup.pdf, Defn 20.3.
+
+Defines the notion of "(n, m, δ)-coding scheme", a code for m qubits in n copies of the channel, with diamond-norm distance of δ from the identity channel. Then a rate R is "achievable" if there is a sequence of coding schemes that converge m/n -> R and δ -> 0. The set of achieveable rates is a closed interval, and the capacity is the maximum of this interval.
+
+(2) https://cs.uwaterloo.ca/~watrous/TQI/TQI.8.pdf, Defn 8.42.
+
+Watrous doesn't use the word "coding scheme", but rather define "emulating" (8.1) an "ε-approximation" (8.2) of the identity. This is equivalent to the coding scheme and diamond norm part. Then a rate R is "achievable" if, for every δ>0, there is a k:ℕ such that k < n implies the existence of a (n, floor(R*n), δ)-coding scheme. Now the set of achievable rates may be an open or closed interval, and the capacity is the supremum of this interval (not the maximum, since an open interval has no maximum).
+
+(3) Works like https://arxiv.org/pdf/1007.2855 (equation 3) and https://arxiv.org/pdf/1801.02019 (equation 186) define the quantum capacity of C as $Q(C) = lim_n 1/n * Q^{(1)}(C ^ {⊗n})$, where $Q^{(1)}$ is the quantum coherent information (or "one-shot channel capacity"), and so it is the average coherent information achieved across n copies of the channel, in the large-n limit. This definition makes the LSD theorem (which stats that $Q ≥ Q^{(1)}$) actually entirely trivial, as it requires only the fact that $Q^{(1)}$ is superadditive.
+
+(4) https://arxiv.org/pdf/quant-ph/0304127 (Section 5) and https://arxiv.org/pdf/quant-ph/9809010 specifically distinguish between "subspace transmission", "entanglement transmission", and "entanglement generation" capabilities of the channel. The fact that all three are equal is then a theorem. Option (4), subspace transsmission capacity, is like option (1) above, but instead of the channel having diamond norm at most δ from the identity channel, we require that the channel has fidelity at least 1-δ on all inputs. Converging in fidelity is surely equivalent to converging in diamond norm, but the precise bounds are not obvious. (4) also differs from (1) and (2) in that it has an arbitrary dimension input space, instead of specifically a 2^n-dimensional space of qubits. arxiv:9809010 specifically requires a sequence of codes whose limiting fidelity is 1 and rate is R; arxiv:0304127 doesn't actually precisely say.
+
+(5) "Entanglement transmission" asks for a high-entropy state (thus, a large subspace dimension) that can be transmitted through the channel with a high "entanglement fidelity". See equation (52) in arxiv:0304127. The rate achieved is the von Neumann entropy of the state, the set of achievable rates are closed, and the rate of the channel is the maximum.
+
+(6) "Entanglement generation" changes the task from coding. Instead we need a bipartite state ρ_AB on a Hilbert space of dimension κ, of which the left half goes through the encoder, channel, and decoder. The fidelity between the result C(ρ) and the maximally entangled state must be at least 1-ε. The rates are (1/n)*(log κ), achievable if for all δ and sufficiently large n (etc. - like option (2)), and we take the supremum.
+
+Note: Option (6) is what Devetak, in arxiv:0304127, actually proves the LSD theorem for. Theorem 5 in that reference. (4), (5), and (6) are proven equal.
+
+(7) Wilde's book also of "coding scheme", but defines it in terms of entanglement generation and the logarithm of the dimension of the space. Instead of fidelity preserved in the entanglement, it's the trace norm. He effectively defines it by supremum, although he doesn't need to use the word, giving an equivalent δ/ε definition for coding schemes. He then takes supremum (even though maximum would work as well -- the capacity is itself an achievable rate by his definition). In this way, it combines aspects of definitions (1), (2), and (4). He gives as an exercise showing that small trace norm error of transmitted states implies a small diamond norm error from the identity.
+
+----
+
+To capture the idea of "quantum capacity", and some other idea that turns out to be equivalent, (1), (2), or (5) seems best. The definitions (1) and (2) seem to be the more recently popular ones. Between those two, choosing "supremum" or "maximum", the supremum seems shorter to state in a definition (as it doesn't require proving closure); indeed Mathlib has no notion of "max real" as a function, only a supremum which can also be shown to be in the set. But the definition in (2) of "For every δ>0, there is a k:ℕ such that k < n implies the existence of a (...)-coding scheme" is cleaner work with as a way to directly construct or extract codes, as opposed to limits of sequences of codes. And finally, the notions of "emulate" and "approximate" seem useful for defining it more elegantly.
+
+This leads to the final definition in [Capacity.lean](./QuantumInfo/Finite/Capacity.html).
+-/
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Channel/DegradableOrder.lean
+TYPE: Lean 4
+SIZE: 2064 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap
+
+/-! # The Degradable Order
+
+We define the "degradable order" on channels, where M ≤ N if N can be degraded to M.
+This is a scoped instance, because there are other reasonable orders on channels.
+
+The degradable order is actually only a preorder, because channels that are degradable to
+each other are not necessarily equal. (For instance, unitary channels are degradable to
+the identity and vice versa.) It can compare channels of different output dimensions, but
+they must have the same input dimension. For this reason the `DegradablePreorder` is parameterized
+by the channel input type.
+
+One might hope that if this was defined on the quotient type of "channels up to unitary equivalence"
+that it would become an order; but this is not the case. That is, there are channels `A → B` that
+are degradable to each other, but cannot be degraded to each other by unitary operations. For instance,
+let A be the replacement channel that goes to a mixed state, and B be a replacement channel that goes
+to a pure state.
+
+Technical notes: to model "channels of different output types", the preorder is on the Sigma
+type of channels parameterized by their output type. And since the output type needs to be a
+Fintype and DecidableEq, the argument is also a Sigma to bring this along.
+-/
+
+section
+
+def DegradablePreorder (dIn : Type*) [Fintype dIn] [DecidableEq dIn] : Preorder
+    (Σ dOut : (Σ t, Fintype t × DecidableEq t), let _ := dOut.snd.1; CPTPMap dIn dOut.fst) where
+  le Λ₁ Λ₂ :=
+    let _ := Λ₁.fst.snd.1;
+    let _ := Λ₂.fst.snd.1;
+    let _ := Λ₂.fst.snd.2;
+    Λ₂.snd.IsDegradableTo Λ₁.snd;
+  le_refl Λ :=
+    let _ := Λ.fst.snd.1;
+    let _ := Λ.fst.snd.2;
+    ⟨CPTPMap.id, CPTPMap.compose_id Λ.snd⟩
+  le_trans Λ₁ Λ₂ Λ₃ h₁₂ h₂₃ := by
+    let _ := Λ₁.fst.snd.1;
+    let _ := Λ₁.fst.snd.2;
+    let _ := Λ₂.fst.snd.1;
+    let _ := Λ₂.fst.snd.2;
+    let _ := Λ₃.fst.snd.1;
+    let _ := Λ₃.fst.snd.2;
+    obtain ⟨D₁₂, hD₁₂⟩ := h₁₂;
+    obtain ⟨D₂₃, hD₂₃⟩ := h₂₃;
+    use D₁₂.compose D₂₃
+    rwa [CPTPMap.compose_assoc, hD₂₃]
+
+end
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Distance/Fidelity.lean
+TYPE: Lean 4
+SIZE: 2038 characters
+================================================================================
+
+import QuantumInfo.Finite.CPTPMap
+
+noncomputable section
+
+open BigOperators
+open ComplexConjugate
+open Kronecker
+open scoped Matrix ComplexOrder
+
+variable {d d₂ : Type*} [Fintype d] [DecidableEq d] [Fintype d₂] (ρ σ : MState d)
+
+--We put all of the fidelity defs and theorems in the MState namespace so that they have the
+--nice . syntax, i.e. `ρ.fidelity σ = 1 ↔ ρ = σ`.
+namespace MState
+
+/-- The fidelity of two quantum states. This is the quantum version of the Bhattacharyya coefficient. -/
+def fidelity (ρ σ : MState d) : ℝ :=
+  ((σ.M.conj ρ.pos.sqrt) ^ (1/2 : ℝ)).trace
+  -- let ρσρ := ρ.pos.sqrt * σ.m * ρ.pos.sqrt
+  -- let ρσρ_PosSemidef : ρσρ.PosSemidef := by
+  --   unfold ρσρ
+  --   nth_rewrite 2 [← ρ.pos.posSemidef_sqrt.isHermitian]
+  --   exact σ.pos.mul_mul_conjTranspose_same _
+  -- (ρσρ_PosSemidef.posSemidef_sqrt.1.rtrace)^2
+
+theorem fidelity_ge_zero : 0 ≤ fidelity ρ σ :=
+  sorry
+  -- sq_nonneg _
+
+theorem fidelity_le_one : fidelity ρ σ ≤ 1 :=
+  sorry --submultiplicativity of trace and sqrt
+
+/-- The fidelity, as a `Prob` probability with value between 0 and 1. -/
+def fidelity_prob : Prob :=
+  ⟨fidelity ρ σ, ⟨fidelity_ge_zero ρ σ, fidelity_le_one ρ σ⟩⟩
+
+/-- A state has perfect fidelity with itself. -/
+theorem fidelity_self_eq_one : fidelity ρ ρ = 1 :=
+  sorry --Break and recombine sqrts
+
+/-- The fidelity is 1 if and only if the two states are the same. -/
+theorem fidelity_eq_one_iff_self : fidelity ρ σ = 1 ↔ ρ = σ :=
+  ⟨sorry,
+  fun h ↦ h ▸ fidelity_self_eq_one ρ
+  ⟩
+
+/-- The fidelity is a symmetric quantity. -/
+theorem fidelity_symm : fidelity ρ σ = fidelity σ ρ :=
+  sorry --break into sqrts
+
+/-- The fidelity cannot decrease under the application of a channel. -/
+theorem fidelity_channel_nondecreasing [DecidableEq d₂] (Λ : CPTPMap d d₂) : fidelity (Λ ρ) (Λ σ) ≥ fidelity ρ σ :=
+  sorry
+
+--TODO: Real.arccos ∘ fidelity forms a metric (triangle inequality), the Fubini–Study metric.
+--Matches with classical (squared) Bhattacharyya coefficient
+--Invariance under unitaries
+--Uhlmann's theorem
+
+end MState
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Distance/TraceDistance.lean
+TYPE: Lean 4
+SIZE: 1602 characters
+================================================================================
+
+import QuantumInfo.Finite.MState
+
+import QuantumInfo.ForMathlib
+
+noncomputable section
+
+open Classical
+open BigOperators
+open ComplexConjugate
+open Kronecker
+open scoped Matrix ComplexOrder
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+/--The trace distance between two quantum states: half the trace norm of the difference (ρ - σ). -/
+def TrDistance (ρ σ : MState d) : ℝ :=
+  (1/2:ℝ) * (ρ.m - σ.m).traceNorm
+
+namespace TrDistance
+
+variable {d d₂ : Type*} [Fintype d] [Fintype d₂] (ρ σ : MState d)
+
+theorem ge_zero : 0 ≤ TrDistance ρ σ := by
+  rw [TrDistance]
+  simp [Matrix.traceNorm_nonneg]
+
+theorem le_one : TrDistance ρ σ ≤ 1 :=
+  calc TrDistance ρ σ
+    _ = (1/2:ℝ) * (ρ.m - σ.m).traceNorm := by rfl
+    _ ≤ (1/2:ℝ) * (ρ.m.traceNorm + σ.m.traceNorm) := by
+      linarith [Matrix.traceNorm_triangleIneq' ρ.m σ.m]
+    _ = (1/2:ℝ) * (1 + 1) := by
+      rw [ρ.traceNorm_eq_1, σ.traceNorm_eq_1]
+    _ = 1 := by norm_num
+
+/-- The trace distance, as a `Prob` probability with value between 0 and 1. -/
+def prob : Prob :=
+  ⟨TrDistance ρ σ, ⟨ge_zero ρ σ, le_one ρ σ⟩⟩
+
+/-- The trace distance is a symmetric quantity. -/
+theorem symm : TrDistance ρ σ = TrDistance σ ρ := by
+  dsimp [TrDistance]
+  rw [← Matrix.traceNorm_eq_neg_self, neg_sub]
+
+/-- The trace distance is equal to half the 1-norm of the eigenvalues of their difference . -/
+theorem eq_abs_eigenvalues : TrDistance ρ σ = (1/2:ℝ) *
+    ∑ i, abs ((ρ.Hermitian.sub σ.Hermitian).eigenvalues i) := by
+  rw [TrDistance, Matrix.traceNorm_Hermitian_eq_sum_abs_eigenvalues]
+
+-- Fuchs–van de Graaf inequalities
+-- Relation to classical TV distance
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Distance.lean
+TYPE: Lean 4
+SIZE: 313 characters
+================================================================================
+
+import QuantumInfo.Finite.Distance.Fidelity
+import QuantumInfo.Finite.Distance.TraceDistance
+
+/-!
+Distances between quantum states.
+ * Fidelity
+ * Trace distance
+ * Bures metric
+ * Superfidelity
+ * Quantum Wasserstein Distance
+
+All share some axioms: https://quantiki.org/wiki/distance-measures-between-states
+-/
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Ensemble.lean
+TYPE: Lean 4
+SIZE: 12153 characters
+================================================================================
+
+import QuantumInfo.Finite.MState
+
+open MState
+open BigOperators
+
+noncomputable section
+
+/-- A mixed-state ensemble is a random variable valued in `MState d`. That is,
+a collection of mixed states `var : α → MState d`, each with their own probability weight
+described by `distr : Distribution α`. -/
+abbrev MEnsemble (d : Type*) (α : Type*) [Fintype d] [DecidableEq d] [Fintype α] := Distribution.RandVar α (MState d)
+
+/-- A pure-state ensemble is a random variable valued in `Ket d`. That is,
+a collection of pure states `var : α → Ket d`, each with their own probability weight
+described by `distr : Distribution α`. -/
+abbrev PEnsemble (d : Type*) (α : Type*) [Fintype d] [Fintype α] := Distribution.RandVar α (Ket d)
+
+variable {α β d : Type*} [Fintype α] [Fintype β] [Fintype d] [DecidableEq d]
+
+/-- Alias for `Distribution.var` for mixed-state ensembles. -/
+abbrev MEnsemble.states [Fintype α] : MEnsemble d α → (α → MState d) := Distribution.RandVar.var
+
+/-- Alias for `Distribution.var` for pure-state ensembles. -/
+abbrev PEnsemble.states [Fintype α] : PEnsemble d α → (α → Ket d) := Distribution.RandVar.var
+
+namespace Ensemble
+
+/-- A pure-state ensemble is a mixed-state ensemble if all kets are interpreted as mixed states. -/
+@[coe] def toMEnsemble : PEnsemble d α → MEnsemble d α := Functor.map pure
+
+instance : Coe (PEnsemble d α) (MEnsemble d α) := ⟨toMEnsemble⟩
+
+@[simp]
+theorem toMEnsemble_mk : (toMEnsemble ⟨ps, distr⟩ : MEnsemble d α) = ⟨pure ∘ ps, distr⟩ :=
+  rfl
+
+/-- A mixed-state ensemble comes from a pure-state ensemble if and only if all states are pure. -/
+theorem coe_PEnsemble_iff_pure_states (me : MEnsemble d α): (∃ pe : PEnsemble d α, ↑pe = me) ↔ (∃ ψ : α → Ket d, me.states = MState.pure ∘ ψ) := by
+  constructor
+  · intro ⟨pe, hpe⟩
+    use pe.states
+    ext1 i
+    subst hpe
+    rfl
+  · intro ⟨ψ, hψ⟩
+    use ⟨ψ, me.distr⟩
+    simp only [toMEnsemble_mk]
+    congr
+    exact hψ.symm
+
+/-- The resulting mixed state after mixing the states in an ensemble with their
+respective probability weights. Note that, generically, a single mixed state has infinitely many
+ensembles that mixes into it. -/
+def mix (e : MEnsemble d α) : MState d := Distribution.expect_val e
+
+@[simp]
+theorem mix_of (e : MEnsemble d α) : (mix e).m = ∑ i, (e.distr i : ℝ) • (e.states i).m := by
+  apply AddSubgroup.val_finset_sum -- *laughs in defeq*
+
+/-- Two mixed-state ensembles indexed by `\alpha` and `\beta` are equivalent if `α ≃ β`. -/
+def congrMEnsemble (σ : α ≃ β) : MEnsemble d α ≃ MEnsemble d β := Distribution.congrRandVar σ
+
+/-- Two pure-state ensembles indexed by `\alpha` and `\beta` are equivalent if `α ≃ β`. -/
+def congrPEnsemble (σ : α ≃ β) : PEnsemble d α ≃ PEnsemble d β := Distribution.congrRandVar σ
+
+/-- Equivalence of mixed-state ensembles leaves the resulting mixed state invariant -/
+@[simp]
+theorem mix_congrMEnsemble_eq_mix (σ : α ≃ β) (e : MEnsemble d α) : mix (congrMEnsemble σ e) = mix e :=
+  Distribution.expect_val_congr_eq_expect_val σ e
+
+/-- Equivalence of pure-state ensembles leaves the resulting mixed state invariant -/
+@[simp]
+theorem mix_congrPEnsemble_eq_mix (σ : α ≃ β) (e : PEnsemble d α) : mix (toMEnsemble (congrPEnsemble σ e)) = mix (↑e : MEnsemble d α) := by
+  unfold toMEnsemble congrPEnsemble mix
+  rw [Distribution.map_congr_eq_congr_map MState.pure σ e]
+  exact Distribution.expect_val_congr_eq_expect_val σ (MState.pure <$> e)
+
+/-- The average of a function `f : MState d → T`, where `T` is of `Mixable U T` instance, on a mixed-state ensemble `e`
+is the expectation value of `f` acting on the states of `e`, with the corresponding probability weights from `e.distr`. -/
+def average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (e : MEnsemble d α) : T :=
+  Distribution.expect_val <| f <$> e
+
+/-- A version of `average` conveniently specialized for functions `f : MState d → ℝ≥0` returning nonnegative reals.
+Notably, the average is also a nonnegative real number. -/
+def average_NNReal {d : Type _} [Fintype d] [DecidableEq d] (f : MState d → NNReal) (e : MEnsemble d α) : NNReal :=
+  ⟨average (NNReal.toReal ∘ f) e,
+    Distribution.zero_le_expect_val e.distr (NNReal.toReal ∘ f ∘ e.states) (fun n => (f <| e.states n).2)⟩
+
+/-- The average of a function `f : Ket d → T`, where `T` is of `Mixable U T` instance, on a pure-state ensemble `e`
+is the expectation value of `f` acting on the states of `e`, with the corresponding probability weights from `e.distr`. -/
+def pure_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (e : PEnsemble d α) : T :=
+  Distribution.expect_val <| f <$> e
+
+/-- A version of `average` conveniently specialized for functions `f : Ket d → ℝ≥0` returning nonnegative reals.
+Notably, the average is also a nonnegative real number. -/
+def pure_average_NNReal {d : Type _} [Fintype d] (f : Ket d → NNReal) (e : PEnsemble d α) : NNReal :=
+  ⟨pure_average (NNReal.toReal ∘ f) e,
+    Distribution.zero_le_expect_val e.distr (NNReal.toReal ∘ f ∘ e.states) (fun n => (f <| e.states n).2)⟩
+
+/-- The average of `f : MState d → T` on a coerced pure-state ensemble `↑e : MEnsemble d α`
+is equal to averaging the restricted function over Kets `f ∘ pure : Ket d → T` on `e`. -/
+theorem average_of_pure_ensemble {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T]
+  (f : MState d → T) (e : PEnsemble d α) :
+  average f (toMEnsemble e) = pure_average (f ∘ pure) e := by
+  simp only [average, pure_average, toMEnsemble, comp_map]
+
+/-- A pure-state ensemble mixes into a pure state if and only if
+the only states in the ensemble with nonzero probability are equal to `ψ`  -/
+theorem mix_pEnsemble_pure_iff_pure {ψ : Ket d} {e : PEnsemble d α} :
+  mix (toMEnsemble e) = MState.pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = ψ := by
+  sorry
+
+/-- The average of `f : Ket d → T` on an ensemble that mixes to a pure state `ψ` is `f ψ` -/
+theorem mix_pEnsemble_pure_average {ψ : Ket d} {e : PEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (hmix : mix (toMEnsemble e) = MState.pure ψ) :
+  pure_average f e = f ψ := by
+  have hpure := mix_pEnsemble_pure_iff_pure.mp hmix
+  simp only [pure_average, Functor.map, Distribution.expect_val]
+  apply Mixable.to_U_inj
+  rw [PEnsemble.states] at hpure
+  simp only [Mixable.to_U_of_mkT, Function.comp_apply, smul_eq_mul, Mixable.mkT_instUniv]
+  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = ψ := fun i hi ↦ by
+    have h2 : e.distr i = 0 → (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) = 0 := fun h0 ↦ by
+      simp only [h0, Prob.coe_zero, zero_smul]
+    exact (hpure i) ∘ h2.mt
+  classical rw [←Finset.sum_filter_of_ne h1, Finset.sum_filter]
+  classical conv =>
+    enter [1, 2, a]
+    rw [←dite_eq_ite]
+    enter [2, hvar]
+    rw [hvar]
+  classical conv =>
+    enter [1, 2, a]
+    rw [dite_eq_ite]
+    rw [←ite_zero_smul]
+  have hpure' : ∀ i ∈ Finset.univ, (↑(e.distr i) : ℝ) ≠ 0 → e.var i = ψ := fun i hi hne0 ↦ by
+    apply hpure i
+    simpa using hne0
+  classical rw [←Finset.sum_smul, ←Finset.sum_filter, Finset.sum_filter_of_ne hpure', Distribution.normalized, one_smul]
+
+/-- A mixed-state ensemble mixes into a pure state if and only if
+the only states in the ensemble with nonzero probability are equal to `pure ψ`  -/
+theorem mix_mEnsemble_pure_iff_pure {ψ : Ket d} {e : MEnsemble d α} :
+  mix e = pure ψ ↔ ∀ i : α, e.distr i ≠ 0 → e.states i = MState.pure ψ := by
+  sorry
+
+/-- The average of `f : MState d → T` on an ensemble that mixes to a pure state `ψ` is `f (pure ψ)` -/
+theorem mix_mEnsemble_pure_average {ψ : Ket d} {e : MEnsemble d α} {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (hmix : mix e = pure ψ) :
+  average f e = f (pure ψ) := by
+  have hpure := mix_mEnsemble_pure_iff_pure.mp hmix
+  simp only [average, Functor.map, Distribution.expect_val]
+  apply Mixable.to_U_inj
+  rw [MEnsemble.states] at hpure
+  simp only [Mixable.to_U_of_mkT, Function.comp_apply, smul_eq_mul, Mixable.mkT_instUniv]
+  have h1 : ∀ i ∈ Finset.univ, (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) ≠ 0 → e.var i = pure ψ := fun i hi ↦ by
+    have h2 : e.distr i = 0 → (e.distr i : ℝ) • (Mixable.to_U (f (e.var i))) = 0 := fun h0 ↦ by
+      simp only [h0, Prob.coe_zero, zero_smul]
+    exact (hpure i) ∘ h2.mt
+  classical rw [←Finset.sum_filter_of_ne h1, Finset.sum_filter]
+  classical conv =>
+    enter [1, 2, a]
+    rw [←dite_eq_ite]
+    enter [2, hvar]
+    rw [hvar]
+  classical conv =>
+    enter [1, 2, a]
+    rw [dite_eq_ite]
+    rw [←ite_zero_smul]
+  have hpure' : ∀ i ∈ Finset.univ, (↑(e.distr i) : ℝ) ≠ 0 → e.var i = pure ψ := fun i hi hne0 ↦ by
+    apply hpure i
+    simpa using hne0
+  classical rw [←Finset.sum_smul, ←Finset.sum_filter, Finset.sum_filter_of_ne hpure', Distribution.normalized, one_smul]
+
+/-- The trivial mixed-state ensemble of `ρ` consists of copies of `rho`, with the `i`-th one having
+probability 1. -/
+def trivial_mEnsemble (ρ : MState d) (i : α) : MEnsemble d α := ⟨fun _ ↦ ρ, Distribution.constant i⟩
+
+/-- The trivial mixed-state ensemble of `ρ` mixes to `ρ` -/
+theorem trivial_mEnsemble_mix (ρ : MState d) : ∀ i : α, mix (trivial_mEnsemble ρ i) = ρ := fun i ↦by
+  apply MState.ext_m
+  classical simp only [trivial_mEnsemble, Distribution.constant, mix_of, DFunLike.coe, apply_ite,
+    Prob.coe_one, Prob.coe_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
+    Finset.mem_univ, ↓reduceIte]
+
+/-- The average of `f : MState d → T` on a trivial ensemble of `ρ` is `f ρ`-/
+theorem trivial_mEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : MState d → T) (ρ : MState d):
+  ∀ i : α, average f (trivial_mEnsemble ρ i) = f ρ := fun i ↦ by
+    simp only [average, Functor.map, Distribution.expect_val, trivial_mEnsemble]
+    apply Mixable.to_U_inj
+    classical simp [apply_ite]
+
+instance MEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (MEnsemble d α) where
+  default := trivial_mEnsemble default default
+
+/-- The trivial pure-state ensemble of `ψ` consists of copies of `ψ`, with the `i`-th one having
+probability 1. -/
+def trivial_pEnsemble (ψ : Ket d) (i : α) : PEnsemble d α := ⟨fun _ ↦ ψ, Distribution.constant i⟩
+
+/-- The trivial pure-state ensemble of `ψ` mixes to `ψ` -/
+theorem trivial_pEnsemble_mix (ψ : Ket d) : ∀ i : α, mix (toMEnsemble (trivial_pEnsemble ψ i)) = MState.pure ψ := fun i ↦ by
+  apply MState.ext_m
+  classical simp only [trivial_pEnsemble, Distribution.constant, toMEnsemble_mk, mix_of, DFunLike.coe,
+    apply_ite, Prob.coe_one, Prob.coe_zero, MEnsemble.states, Function.comp_apply, ite_smul,
+    one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+
+omit [DecidableEq d] in
+/-- The average of `f : Ket d → T` on a trivial ensemble of `ψ` is `f ψ`-/
+theorem trivial_pEnsemble_average {T : Type _} {U : Type*} [AddCommGroup U] [Module ℝ U] [inst : Mixable U T] (f : Ket d → T) (ψ : Ket d) :
+  ∀ i : α, pure_average f (trivial_pEnsemble ψ i) = f ψ := fun i ↦ by
+    simp only [pure_average, Functor.map, Distribution.expect_val, trivial_pEnsemble]
+    apply Mixable.to_U_inj
+    classical simp [apply_ite]
+
+instance PEnsemble.instInhabited [Nonempty d] [Inhabited α] : Inhabited (PEnsemble d α) where
+  default := trivial_pEnsemble default default
+
+/-- The spectral pure-state ensemble of `ρ`. The states are its eigenvectors, and the probabilities, eigenvalues. -/
+def spectral_ensemble (ρ : MState d) : PEnsemble d d :=
+  { var i :=
+    { vec := ρ.Hermitian.eigenvectorBasis i
+      normalized' := by
+        rw [←one_pow 2, ←ρ.Hermitian.eigenvectorBasis.orthonormal.1 i]
+        have hnonneg : 0 ≤ ∑ x : d, Complex.normSq (ρ.Hermitian.eigenvectorBasis i x) := by
+          simp_rw [Complex.normSq_eq_norm_sq]
+          positivity
+        simp only [← Complex.normSq_eq_norm_sq, EuclideanSpace.norm_eq, Real.sq_sqrt hnonneg]
+    }
+    distr := ρ.spectrum}
+
+/-- The spectral pure-state ensemble of `ρ` mixes to `ρ` -/
+theorem spectral_ensemble_mix : mix (↑(spectral_ensemble ρ) : MEnsemble d d) = ρ := by
+  ext i j
+  sorry
+
+end Ensemble
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Entanglement.lean
+TYPE: Lean 4
+SIZE: 10610 characters
+================================================================================
+
+import QuantumInfo.Finite.Braket
+import QuantumInfo.Finite.Ensemble
+import QuantumInfo.Finite.Entropy
+import ClassicalInfo.Entropy
+
+/-!
+Entanglement measures. (Mixed) convex roof extensions. Definition of product / separable / entangled states
+are in `Braket.lean` and/or `MState.lean`
+
+Important definitions:
+ * `convex_roof`: Convex roof extension of `g : Ket d → ℝ≥0`
+ * `mixed_convex_roof`: Mixed convex roof extension of `f : MState d → ℝ≥0`
+ * `EoF`: Entanglement of Formation
+
+TODO:
+ - Other entanglement measures (not necessarily based on convex roof extensions). In roughly increasing order of
+   difficulty to implement: (Logarithmic) Negativity, Entanglement of Purification, Squashed Entanglement, Relative
+   Entropy of Entanglement, Entanglement Cost, Distillable Entanglement.
+   For a compendium on the zoo of entanglement measures, see
+   [1] Christandl, Matthias. “The Structure of Bipartite Quantum States - Insights from Group Theory and Cryptography.”
+       https://doi.org/10.48550/arXiv.quant-ph/0604183.
+ - Define classes of entanglement measures with good properties, including: monotonicity under LOCC (easier: just LO),
+   monotonicity on average under LOCC, convexity (if the latter two are present, it is called an entanglement monotone
+   by some), vanishing on separable states, normalized on the maximally entangled state, (sub)additivity, regularisible.
+   For other properties, see [1] above and:
+   [2] Szalay, Szilárd. “Multipartite Entanglement Measures.” (mainly Sec. IV)
+       https://doi.org/10.1103/PhysRevA.92.042329.
+   [3] Horodecki, Ryszard, Paweł Horodecki, Michał Horodecki, and Karol Horodecki. “Quantum Entanglement.”
+       https://doi.org/10.1103/RevModPhys.81.865.
+ - Useful properties of convex roof extensions:
+   1. If f is monotonically non-increasing under LOCC, so is its convex roof.
+   2. If f ψ is zero if and only if ψ is a product state, then its convex roof is faithful: zero if and only if
+      the mixed state is separable
+   For other properties, see Sec. IV.F of [2] above.
+-/
+
+noncomputable section
+
+open ENNReal
+open NNReal
+open MState
+open Ensemble
+
+/-- Convex roof extension of a function `g : Ket d → ℝ≥0`, defined as the infimum of all pure-state
+ensembles of a given `ρ` of the average of `g` in that ensemble.
+
+This is valued in the extended nonnegative real numbers `ℝ≥0∞` to have good properties of the infimum, which
+come from the fact that `ℝ≥0∞` is a complete lattice. For example, it is necessary for `le_iInf` and `iInf_le_of_le`.
+However, it is also proven in `convex_roof_ne_top` that the convex roof is never `∞`, so the definition `convex_roof` should
+be used in most applications. -/
+def convex_roof_ENNReal {d : Type _} [Fintype d] [DecidableEq d] (g : Ket d → ℝ≥0) : MState d → ℝ≥0∞ := fun ρ =>
+  ⨅ (n : ℕ+) (e : PEnsemble d (Fin n)) (_ : mix (toMEnsemble e) = ρ), ↑(pure_average_NNReal g e)
+
+/-- Mixed convex roof extension of a function `f : MState d → ℝ≥0`, defined as the infimum of all mixed-state
+ensembles of a given `ρ` of the average of `f` on that ensemble.
+
+This is valued in the extended nonnegative real numbers `ℝ≥0∞` to have good properties of the infimum, which
+come from the fact that `ℝ≥0∞` is a complete lattice (see `ENNReal.instCompleteLinearOrder`). However,
+it is also proven in `mixed_convex_roof_ne_top` that the mixed convex roof is never `∞`, so the definition `mixed_convex_roof` should
+be used in most applications. -/
+def mixed_convex_roof_ENNReal {d : Type _} [Fintype d] [DecidableEq d] (f : MState d → ℝ≥0) : MState d → ℝ≥0∞ := fun ρ =>
+  ⨅ (n : ℕ+) (e : MEnsemble d (Fin n)) (_ : mix e = ρ), ↑(average_NNReal f e)
+
+variable {d d₁ d₂ : Type _} [Fintype d] [Fintype d₁] [Fintype d₂] [Nonempty d] [Nonempty d₁] [Nonempty d₂]
+variable [DecidableEq d] [DecidableEq d₁] [DecidableEq d₂]
+variable (f : MState d → ℝ≥0)
+variable (g : Ket d → ℝ≥0)
+
+/-- The convex roof extension `convex_roof_ENNReal` is never ∞. -/
+theorem convex_roof_ne_top : ∀ ρ, convex_roof_ENNReal g ρ ≠ ∞ := fun ρ => by
+  simp only [convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall, Decidable.not_not]
+  use ⟨Fintype.card d, Fintype.card_pos⟩
+  have ed : d ≃ Fin ↑(⟨Fintype.card d, Fintype.card_pos⟩ : ℕ+) := by
+    simp only
+    exact Fintype.equivFin d
+  use (congrPEnsemble ed) <| spectral_ensemble ρ
+  rw [mix_congrPEnsemble_eq_mix ed]
+  push_neg
+  convert spectral_ensemble_mix
+
+omit [Nonempty d] in
+/-- The convex roof extension `mixed_convex_roof_ENNReal` is never ∞. -/
+theorem mixed_convex_roof_ne_top : ∀ ρ, mixed_convex_roof_ENNReal f ρ ≠ ∞ := fun ρ => by
+  simp only [mixed_convex_roof_ENNReal, ne_eq, iInf_eq_top, coe_ne_top, imp_false, not_forall, Decidable.not_not]
+  use 1, trivial_mEnsemble ρ 0
+  push_neg
+  exact trivial_mEnsemble_mix ρ 0
+
+/-- Convex roof extension of a function `g : Ket d → ℝ≥0`, defined as the infimum of all pure-state
+ensembles of a given `ρ` of the average of `g` in that ensemble.
+
+This is valued in the nonnegative real numbers `ℝ≥0` by applying `ENNReal.toNNReal` to `convex_roof_ENNReal`. Hence,
+it should be used in proofs alongside `convex_roof_ne_top`. -/
+def convex_roof : MState d → ℝ≥0 := fun x ↦ (convex_roof_ENNReal g x).untop (convex_roof_ne_top g x)
+
+/-- Mixed convex roof extension of a function `f : MState d → ℝ≥0`, defined as the infimum of all mixed-state
+ensembles of a given `ρ` of the average of `f` on that ensemble.
+
+This is valued in the nonnegative real numbers `ℝ≥0` by applying `ENNReal.toNNReal` to `mixed_convex_roof_ENNReal`. Hence,
+it should be used in proofs alongside `mixed_convex_roof_ne_top`. -/
+def mixed_convex_roof : MState d → ℝ≥0 := fun x ↦ (mixed_convex_roof_ENNReal f x).untop (mixed_convex_roof_ne_top f x)
+
+/-- Auxiliary function. Convex roof of a function `f : MState d → ℝ≥0` defined over mixed states by resctricting `f` to pure states -/
+def convex_roof_of_MState_fun : MState d → ℝ≥0 := convex_roof (f ∘ pure)
+
+-- TODO: make `le_convex_roof`, `convex_roof_le`, `le_mixed_convex_roof` and `mixed_convex_roof_le` if-and-only-if statements.
+
+omit [Nonempty d] in
+theorem le_mixed_convex_roof (ρ : MState d) :
+  (∀ n > 0, ∀ e : MEnsemble d (Fin n), mix e = ρ → c ≤ average_NNReal f e) → (c ≤ mixed_convex_roof f ρ) := fun h => by
+  unfold mixed_convex_roof
+  rw [WithTop.le_untop_iff]
+  apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
+  rw [some_eq_coe', ENNReal.coe_le_coe]
+  exact h n hnpos e hmix
+
+theorem le_convex_roof (ρ : MState d) :
+  (∀ n > 0, ∀ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ → c ≤ pure_average_NNReal g e) → (c ≤ convex_roof g ρ) := fun h => by
+  unfold convex_roof
+  rw [WithTop.le_untop_iff]
+  apply le_iInf; intro ⟨n, hnpos⟩; apply le_iInf; intro e; apply le_iInf; intro hmix
+  rw [some_eq_coe', ENNReal.coe_le_coe]
+  exact h n hnpos e hmix
+
+theorem convex_roof_le (ρ : MState d):
+(∃ n > 0, ∃ e : PEnsemble d (Fin n), mix (toMEnsemble e) = ρ ∧ pure_average_NNReal g e ≤ c) → (convex_roof g ρ ≤ c) := fun h => by
+  obtain ⟨n, hnpos, e, hmix, h⟩ := h
+  unfold convex_roof
+  rw [WithTop.untop_le_iff]
+  apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
+  rw [some_eq_coe', ENNReal.coe_le_coe]
+  exact h
+
+omit [Nonempty d] in
+theorem mixed_convex_roof_le (ρ : MState d):
+(∃ n > 0, ∃ e : MEnsemble d (Fin n), mix e = ρ ∧ average_NNReal f e ≤ c) → (mixed_convex_roof f ρ ≤ c) := fun h => by
+  obtain ⟨n, hnpos, e, hmix, h⟩ := h
+  unfold mixed_convex_roof
+  rw [WithTop.untop_le_iff]
+  apply iInf_le_of_le ⟨n, hnpos⟩; apply iInf_le_of_le e; apply iInf_le_of_le hmix
+  rw [some_eq_coe', ENNReal.coe_le_coe]
+  exact h
+
+/-- The mixed convex roof extension of `f` is smaller than or equal to its convex roof extension, since
+the former minimizes over a larger set of ensembles. -/
+theorem mixed_convex_roof_le_convex_roof : mixed_convex_roof f ≤ convex_roof_of_MState_fun f := by
+  intro ρ
+  apply le_convex_roof (f ∘ pure) ρ
+  intro n hnpos e hmix
+  apply mixed_convex_roof_le
+  use n
+  apply And.intro hnpos
+  use ↑e
+  apply And.intro hmix
+  exact le_of_eq <| NNReal.coe_inj.mp <| average_of_pure_ensemble (toReal ∘ f) e
+
+/-- The convex roof extension of `g : Ket d → ℝ≥0` applied to a pure state `ψ` is `g ψ`. -/
+theorem convex_roof_of_pure (ψ : Ket d) : convex_roof g (pure ψ) = g ψ := by
+  rw [le_antisymm_iff]
+  constructor
+  · apply convex_roof_le
+    use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_pEnsemble ψ 0
+    constructor
+    · exact trivial_pEnsemble_mix ψ 0
+    · simp only [pure_average_NNReal, Fin.isValue, ← NNReal.coe_le_coe, coe_mk]
+      rw [trivial_pEnsemble_average _ ψ 0]
+      rfl
+  · apply le_convex_roof
+    intro n hnpos e hmix
+    replace hpure := mix_pEnsemble_pure_iff_pure.mp hmix
+    apply le_of_eq
+    simp only [pure_average_NNReal, ← NNReal.coe_inj, coe_mk]
+    rw [mix_pEnsemble_pure_average (toReal ∘ g) hmix, Function.comp_apply]
+
+omit [Nonempty d] in
+/-- The mixed convex roof extension of `f : MState d → ℝ≥0` applied to a pure state `ψ` is `f (pure ψ)`. -/
+theorem mixed_convex_roof_of_pure (ψ : Ket d) : mixed_convex_roof f (pure ψ) = f (pure ψ) := by
+  rw [le_antisymm_iff]
+  constructor
+  · apply mixed_convex_roof_le
+    use 1; simp only [gt_iff_lt, zero_lt_one, true_and]; use trivial_mEnsemble (pure ψ) 0
+    constructor
+    · exact trivial_mEnsemble_mix (pure ψ) 0
+    · simp only [average_NNReal, Fin.isValue, ← NNReal.coe_le_coe, coe_mk]
+      rw [trivial_mEnsemble_average _ (pure ψ) 0]
+      rfl
+  · apply le_mixed_convex_roof
+    intro n hnpos e hmix
+    replace hpure := mix_mEnsemble_pure_iff_pure.mp hmix
+    apply le_of_eq
+    simp only [average_NNReal, ← NNReal.coe_inj, coe_mk]
+    rw [mix_mEnsemble_pure_average (toReal ∘ f) hmix, Function.comp_apply]
+
+/-- Entanglement of Formation of bipartite systems. It is the convex roof extension of the
+von Neumann entropy of one of the subsystems (here chosen to be the left one, but see `Entropy.Sᵥₙ_of_partial_eq`). -/
+def EoF : MState (d₁ × d₂) → ℝ≥0 := convex_roof (fun ψ ↦ ⟨Sᵥₙ (pure ψ).traceRight, Sᵥₙ_nonneg (pure ψ).traceRight⟩)
+
+/-- The entanglement of formation of the maximally entangled state with on-site dimension 𝕕 is log(𝕕). -/
+theorem EoF_of_MES : EoF (pure <| Ket.MES d) = Real.log (Finset.card Finset.univ (α := d)) := by
+  simp only [EoF, convex_roof_of_pure, coe_mk, Finset.card_univ]
+  simp only [traceRight, Matrix.traceRight, MState.pure, Ket.MES, one_div, Matrix.vecMulVec_apply,
+    Ket.apply, Bra.eq_conj, apply_ite, map_inv₀, Complex.conj_ofReal, map_zero, ite_mul, zero_mul,
+    mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, ← Matrix.diagonal.eq_1]
+  sorry
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Entropy/Defs.lean
+TYPE: Lean 4
+SIZE: 9510 characters
+================================================================================
+
+import ClassicalInfo.Entropy
+import QuantumInfo.Finite.MState
+import QuantumInfo.Finite.CPTPMap
+
+/-! # Generalized quantum entropy and relative entropy
+
+Here we define a broad notion of entropy axiomatically, `Entropy`, and the Prop
+`Entropy f` means that the function `f : MState → ℝ` acts like a generalized kind of quantum
+entropy. For instance, min-, max-, α-Renyi, and von Neumann entropies all fall
+into this category. We prove various properties about the entropy for anything
+supporting this type class. Any entropy automatically gets corresponding notions
+of conditional entropy, mutual information, and so on.
+
+Similarly, `RelEntropy f` means that `f : MState → HermitianMat → ENNReal` is a kind of
+relative entropy. Every `RelEntropy` leads to a notion of entropy, as well, by
+fixing one argument to the fully mixed state.
+
+Of course relative entropies are "usually" used with a pair of (normalized) quantum
+states, but it's still very common in literature to specifically let the second
+argument be an arbitrary (PSD, Hermitian) matrix, so we do allow this. The behavior
+when not a density matrix is left unspecified by the axioms.
+
+In terms of the file structure, we start with `RelEntropy` as the more "general"
+function, and then derive much of `Entropy` from it.
+
+## References:
+
+ - [Khinchin’s Fourth Axiom of Entropy Revisited](https://www.mdpi.com/2571-905X/6/3/49)
+ - [α-z Relative Entropies](https://warwick.ac.uk/fac/sci/maths/research/events/2013-2014/statmech/su/Nilanjana-slides.pdf)
+ - Watrous's notes, [Max-relative entropy and conditional min-entropy](https://cs.uwaterloo.ca/~watrous/QIT-notes/QIT-notes.02.pdf)
+ - [Quantum Relative Entropy - An Axiomatic Approach](https://www.marcotom.info/files/entropy-masterclass2022.pdf)
+by Marco Tomamichel
+ - [StackExchange](https://quantumcomputing.stackexchange.com/a/12953/10115)
+
+-/
+
+noncomputable section
+universe u
+
+open scoped NNReal
+open scoped ENNReal
+
+variable (f : ∀ {d : Type u} [Fintype d] [DecidableEq d], MState d → HermitianMat d ℂ → ℝ≥0∞)
+
+/-- The axioms to be a well-behaved quantum relative entropy, as given by
+[Tomamichel](https://www.marcotom.info/files/entropy-masterclass2022.pdf).
+
+This simpler class allows for _trivial_ relative entropies, such as `-log tr(ρ⁰σ)`.
+Use mixing `RelEntropy.Nontrivial` to only allow nontrivial relative entropies. -/
+class RelEntropy : Prop where
+  /-- The data processing inequality -/
+  DPI {d₁ d₂ : Type u} [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    (ρ σ : MState d₁) (Λ : CPTPMap d₁ d₂) : f (Λ ρ) (Λ σ) ≤ f ρ σ
+  /-- Entropy is additive under tensor products -/
+  of_kron {d₁ d₂ : Type u} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂] :
+    ∀ (ρ₁ σ₁ : MState d₁) (ρ₂ σ₂ : MState d₂), f (ρ₁ ⊗ ρ₂) (σ₁ ⊗ σ₂) = f ρ₁ σ₁ + f ρ₂ σ₂
+  /-- Normalization of entropy to be `ln N` for a pure state vs. uniform on `N` many states. -/
+  normalized {d : Type u} [fin : Fintype d] [DecidableEq d] [Nonempty d] (i : d) :
+    f (.ofClassical (.constant i)) MState.uniform.M =
+      some ⟨Real.log fin.card, Real.log_nonneg (mod_cast Fintype.card_pos)⟩
+
+/-- The axioms to be a well-behaved quantum relative entropy, as given by
+[Tomamichel](https://www.marcotom.info/files/entropy-masterclass2022.pdf). -/
+class RelEntropy.Nontrivial [RelEntropy f] where
+  /-- Nontriviality condition for a relative entropy. -/
+  nontrivial (d) [Fintype d] [DecidableEq d] : ∃ (ρ σ : MState d),
+    ρ.M.support = ⊤ ∧ σ.M.support = ⊤ ∧ 0 < f ρ σ
+
+namespace RelEntropy
+
+variable {d : Type u} [Fintype d] [DecidableEq d]
+variable {d₂ : Type u} [Fintype d₂] [DecidableEq d₂]
+
+variable [RelEntropy f]
+
+section possibly_trivial
+
+/-
+At some point we might want to offer a different constructor so that `normalized` only checks
+it for domains of size 2, which is sufficient (see Tomamichel's proof). In that case, the
+fact that it's still zero when `Unique d` has to be proven, and this (now used) chunk of a proof
+can be used in part for that:
+
+-- have h_uniq (ρ') := (Subsingleton.allEq ρ ρ').symm
+-- have h_kron := of_kron (f := f) ρ ρ ρ ρ
+-- let e : d ≃ (d × d) := (Equiv.prodUnique d d).symm
+-- rw [← relabel_eq f e] at h_kron
+-- rw [h_uniq ((ρ⊗ρ).relabel e)] at h_kron
+-- rw [h_uniq σ]
+
+At that point we need the fact that it's not `⊤`, and then it must be zero.
+
+-/
+
+/-- Relabelling a state with `CPTPMap.of_equiv` leaves relative entropies unchanged. -/
+@[simp]
+theorem of_equiv_eq (e : d ≃ d₂) (ρ σ : MState d) :
+    f (CPTPMap.of_equiv e ρ) (CPTPMap.of_equiv e σ) = f ρ σ := by
+  apply le_antisymm
+  · apply DPI
+  · convert DPI (f := f) ((CPTPMap.of_equiv e) ρ) ((CPTPMap.of_equiv e) σ) (CPTPMap.of_equiv e.symm)
+    · symm
+      exact congrFun (CPTPMap.equiv_inverse e.symm) ρ
+    · symm
+      exact congrFun (CPTPMap.equiv_inverse e.symm) σ
+
+/-- Relabelling a state with `MState.relabel` leaves relative entropies unchanged. -/
+@[simp]
+theorem relabel_eq (e : d₂ ≃ d) (ρ σ : MState d) :
+    f (ρ.relabel e) (σ.relabel e) = f ρ σ := by
+  apply of_equiv_eq
+
+--Tomamichel's "4. Positivity" theorem is implicit true in our description because we
+--only allow ENNReals. The only part to prove is that "D(ρ‖σ) = 0 if ρ = σ".
+
+/-- The relative entropy is zero between any two states on a 1-D Hilbert space. -/
+private lemma wrt_self_eq_zero' [Unique d] (ρ σ : MState d) : f ρ σ = 0 := by
+  convert normalized (f := f) (d := d) default
+  · apply Subsingleton.allEq
+  · apply Subsingleton.allEq
+  · simp
+
+/-- The relative entropy `D(ρ‖ρ) = 0`. -/
+@[simp]
+theorem wrt_self_eq_zero (ρ : MState d) : f ρ ρ.M = 0 := by
+  rw [← nonpos_iff_eq_zero, ← wrt_self_eq_zero' f (d := PUnit) default default]
+  convert DPI (f := f) _ _ (CPTPMap.const_state ρ)
+  · rw [CPTPMap.const_state_apply]
+  · rw [CPTPMap.const_state_apply]
+
+end possibly_trivial
+
+section nontrivial
+variable [Nontrivial f]
+
+/-- A nontrivial relative entropy is **faithful**, it can distinguish when two states are equal. -/
+theorem faithful (ρ σ : MState d) : f ρ σ = 0 ↔ ρ = σ := by
+  sorry
+
+end nontrivial
+
+section bounds
+
+open Prob in
+/-- Quantum relative min-entropy. -/
+def min (ρ : MState d) (σ : HermitianMat d ℂ) : ENNReal :=
+  —log ⟨_, ρ.exp_val_prob ⟨proj_le_nonneg 0 σ, proj_le_le_one _ _⟩⟩
+
+@[aesop (rule_sets := [finiteness]) simp]
+theorem min_eq_top_iff (ρ : MState d) (σ : HermitianMat d ℂ) :
+    (min ρ σ) = ⊤ ↔ ρ.M.support ≤ σ.ker := by
+  open scoped HermitianMat in
+  have h₂ : {0 ≤ₚ σ}.ker = σ.ker := by
+    sorry --missing simp lemma
+  simp [min, Prob.negLog_eq_top_iff, MState.exp_val_eq_zero_iff, Subtype.ext_iff, proj_le_nonneg, h₂]
+
+open scoped HermitianMat in
+protected theorem toReal_min (ρ : MState d) (σ : HermitianMat d ℂ) :
+    (min ρ σ).toReal = -Real.log (ρ.exp_val {0 ≤ₚ σ}) :=
+  Prob.negLog_pos_Real
+
+/-- Min-relative entropy is a valid entropy function, albeit trivial (and not faithful). -/
+instance : RelEntropy min where
+  DPI := sorry
+  of_kron := sorry
+  normalized := sorry
+
+theorem not_Nontrivial_min : ¬Nontrivial min := by
+  rintro ⟨h⟩
+  obtain ⟨ρ, σ, h₁, h₂, h₃⟩ := h (ULift (Fin 2))
+  replace h₂ : proj_le 0 σ = (1 : HermitianMat (ULift (Fin 2)) ℂ) := by
+    sorry--TODO
+  simp [min, Subtype.ext_iff, MState.exp_val_eq_one_iff, proj_le_le_one, h₁, h₂] at h₃
+
+/-- The relative min-entropy is a lower bound on all relative entropies. -/
+theorem min_le (ρ σ : MState d) : min ρ σ ≤ f ρ σ := by
+  sorry --Tomamichel, https://www.marcotom.info/files/entropy-masterclass2022.pdf, (1.28)
+
+open Classical in
+/-- Quantum relative max-entropy. -/
+def max (ρ : MState d) (σ : HermitianMat d ℂ) : ENNReal :=
+  if ∃ (x : ℝ), ρ.M ≤ Real.exp x • σ then
+    some (sInf { x : NNReal | ρ.M ≤ Real.exp x • σ })
+  else
+    ⊤
+
+@[aesop (rule_sets := [finiteness]) simp]
+protected theorem max_not_top (ρ : MState d) (σ : HermitianMat d ℂ) :
+    (max ρ σ) ≠ ⊤ ↔ σ.ker ≤ ρ.M.ker := by
+  open ComplexOrder in
+  constructor
+  · intro h
+    contrapose! h
+    simp only [max, ENNReal.some_eq_coe, ite_eq_right_iff, ENNReal.coe_ne_top, imp_false,
+      not_exists]
+    intro x
+    contrapose! h
+    intro v hv
+    rw [HermitianMat.ker, LinearMap.mem_ker] at hv ⊢
+    replace hv : σ.toMat.mulVec v = 0 := sorry --why is this not defeq??
+    replace h := h.right v
+    rw [Matrix.sub_mulVec] at h
+    simp [hv, Matrix.smul_mulVec_assoc] at h
+    have := ρ.pos.right v
+    -- have := le_antisymm (ρ.pos.right v) (by )
+    sorry
+  · intro
+    rw [max, if_pos]
+    · nofun
+    sorry --log ("min nonzero eigenvalue of σ" / "max eigenvalue of ρ") should work
+
+protected theorem toReal_max (ρ : MState d) (σ : HermitianMat d ℂ) :
+    (max ρ σ).toReal = sInf { x : ℝ | ρ.M ≤ Real.exp x • σ } := by
+  rw [max]
+  split_ifs with h
+  · have : { x : ℝ | ρ.M ≤ Real.exp x • σ }.Nonempty := by
+      convert h
+    simp
+    sorry
+  · push_neg at h
+    simp [h]
+
+/-- The relative max-entropy is a lower bound on all relative entropies. -/
+theorem le_max (ρ σ : MState d) : f ρ σ ≤ max ρ σ := by
+  sorry --Tomamichel, https://www.marcotom.info/files/entropy-masterclass2022.pdf, (1.28)
+
+end bounds
+
+end RelEntropy
+
+class Entropy (f : ∀ {d : Type u} [Fintype d] [DecidableEq d], MState d → ℝ≥0) where
+  /-- The entropy of a pure state is zero -/
+  of_const {d : Type u} [Fintype d] [DecidableEq d] (ψ : Ket d) : f (.pure ψ) = 0
+  /-- Entropy is additive under tensor products -/
+  of_kron {d₁ d₂ : Type u} [Fintype d₁] [Fintype d₂] [DecidableEq d₁] [DecidableEq d₂] :
+    ∀ (ρ : MState d₁) (σ : MState d₂), f (ρ ⊗ σ) = f ρ + f σ
+  -- /-- Entropy is convex. TODO def? Or do we even need this? -/
+  -- convex : True := by trivial
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Entropy/Renyi.lean
+TYPE: Lean 4
+SIZE: 1052 characters
+================================================================================
+
+import QuantumInfo.Finite.Entropy.Defs
+
+/-! # Quantum Relative Entropy and α-Renyi Entropy -/
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+/-- The quantum relative entropy S(ρ‖σ) = Tr[ρ (log ρ - log σ)]. -/
+@[irreducible]
+noncomputable def qRelativeEnt (ρ : MState d) (σ : HermitianMat d ℂ) : ENNReal :=
+  open Classical in (if σ.ker ≤ ρ.M.ker then
+    some ⟨ρ.exp_val (HermitianMat.log ρ - HermitianMat.log σ),
+    /- Quantum relative entropy is nonnegative. This can be proved by an application of
+    Klein's inequality. -/
+    sorry⟩
+  else
+    ⊤)
+
+notation "𝐃(" ρ "‖" σ ")" => qRelativeEnt ρ σ
+
+instance : RelEntropy qRelativeEnt where
+  DPI := sorry
+  of_kron := sorry
+  normalized := sorry
+
+instance : RelEntropy.Nontrivial qRelativeEnt where
+  nontrivial := sorry
+
+/-- Quantum relative entropy as `Tr[ρ (log ρ - log σ)]` when supports are correct. -/
+theorem qRelativeEnt_ker {ρ σ : MState d} (h : σ.M.ker ≤ ρ.M.ker) :
+    (𝐃(ρ‖σ) : EReal) = ρ.M.inner (HermitianMat.log ρ - HermitianMat.log σ) := by
+  simp only [qRelativeEnt, h]
+  congr
+
+
+================================================================================
+FILE: QuantumInfo/Finite/Entropy.lean
+TYPE: Lean 4
+SIZE: 18364 characters
+
+
+[Repository content continues in next chunk]
