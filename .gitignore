@@ -26,6 +26,7 @@ quantum_env/
 venv/
 env/
 ENV/
+RAGApproach/.env
 
 # Jupyter Notebook
 .ipynb_checkpoints
