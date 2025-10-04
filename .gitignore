@@ -63,7 +63,6 @@ leanpkg.toml.lock
 # Nested Git repositories (submodules)
 LEAN_Files/GPT_LEAN_GEN/
 LEAN_Files/Untitled/
-LeanQC/
 TestLeanCopilotStandalone/
 papers/PROCESS-DRIVEN AUTOFORMALIZATION IN LEAN 4/
 LeanAide/
