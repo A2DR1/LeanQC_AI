@@ -1,0 +1,17 @@
+name = "AutoEvaluation"
+version = "0.1.0"
+defaultTargets = ["autoevaluation"]
+
+[[lean_lib]]
+name = "AutoEvaluation"
+
+[[lean_lib]]
+name = "Generated"
+
+[[lean_exe]]
+name = "autoevaluation"
+root = "Main"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"

@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "title": "Qubit State Normalization",
+    "statement": "Every pure qubit state is represented by a unit vector in the complex Hilbert space ℂ². That is, if a qubit is in state |ψ⟩ = α|0⟩ + β|1⟩, then |α|² + |β|² = 1."
+  },
+  {
+    "id": 2,
+    "title": "Superposition Principle",
+    "statement": "If |ψ₁⟩ and |ψ₂⟩ are valid quantum states in a Hilbert space, then any normalized linear combination α|ψ₁⟩ + β|ψ₂⟩ is also a valid quantum state."
+  },
+  {
+    "id": 3,
+    "title": "Unitary Evolution",
+    "statement": "The time evolution of a closed quantum system is represented by a unitary operator U, such that the final state is U|ψ⟩ and preserves the norm."
+  },
+  {
+    "id": 4,
+    "title": "No Cloning Theorem",
+    "statement": "There does not exist a unitary operator U such that for all normalized states |ψ⟩, U(|ψ⟩⊗|0⟩) = |ψ⟩⊗|ψ⟩."
+  },
+  {
+    "id": 5,
+    "title": "Measurement Postulate",
+    "statement": "Measuring a quantum system in an orthonormal basis {|i⟩} collapses the state |ψ⟩ = ∑ αᵢ|i⟩ to state |j⟩ with probability |αⱼ|²."
+  },
+  {
+    "id": 6,
+    "title": "Tensor Product Structure",
+    "statement": "The Hilbert space of a composite system is the tensor product of the Hilbert spaces of its subsystems."
+  },
+  {
+    "id": 7,
+    "title": "Hadamard Gate Involution",
+    "statement": "The Hadamard gate H satisfies H² = I, where I is the identity operator on ℂ²."
+  },
+  {
+    "id": 8,
+    "title": "CNOT Gate Reversibility",
+    "statement": "The CNOT gate is unitary and its own inverse, satisfying CNOT · CNOT = I."
+  },
+  {
+    "id": 9,
+    "title": "Entanglement Non-separability",
+    "statement": "A quantum state |ψ⟩ ∈ ℂ²⊗ℂ² is entangled if it cannot be written as a tensor product |ψ₁⟩⊗|ψ₂⟩."
+  },
+  {
+    "id": 10,
+    "title": "Bell State Maximal Entanglement",
+    "statement": "The Bell state |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 is a maximally entangled state of two qubits."
+  },
+  {
+    "id": 11,
+    "title": "Quantum No Deletion Theorem",
+    "statement": "There is no physical operation that takes two identical quantum states and deletes one copy without affecting the other."
+  },
+  {
+    "id": 12,
+    "title": "Quantum Teleportation Correctness",
+    "statement": "Quantum teleportation allows the transmission of an arbitrary qubit state using a maximally entangled pair and classical communication, preserving the original state on the receiver's side."
+  },
+  {
+    "id": 13,
+    "title": "QFT Linearity",
+    "statement": "The Quantum Fourier Transform is a linear and unitary transformation acting on basis states by mapping |x⟩ to (1/√N) ∑_{y=0}^{N−1} e^{2πixy/N} |y⟩."
+  },
+  {
+    "id": 14,
+    "title": "Unitarity of Quantum Gates",
+    "statement": "Every valid quantum gate must be represented by a unitary matrix."
+  },
+  {
+    "id": 15,
+    "title": "Phase Kickback in Controlled Gates",
+    "statement": "Applying a controlled-U gate to a control qubit in superposition causes the eigenphase of U to be transferred to the control qubit."
+  },
+  {
+    "id": 16,
+    "title": "Grover Iteration Amplifies Target",
+    "statement": "In Grover's algorithm, each iteration increases the amplitude of the target state quadratically in the number of iterations."
+  },
+  {
+    "id": 17,
+    "title": "Deutsch-Jozsa Algorithm Correctness",
+    "statement": "The Deutsch-Jozsa algorithm distinguishes between constant and balanced Boolean functions with one query, assuming a deterministic oracle."
+  },
+  {
+    "id": 18,
+    "title": "Shor's Algorithm Period Finding",
+    "statement": "Shor’s algorithm efficiently finds the period of the modular exponentiation function f(x) = a^x mod N with high probability."
+  },
+  {
+    "id": 19,
+    "title": "Quantum Parallelism",
+    "statement": "Quantum circuits can evaluate a function f on a superposition of inputs simultaneously due to linearity of quantum evolution."
+  },
+  {
+    "id": 20,
+    "title": "Monogamy of Entanglement",
+    "statement": "If two qubits are maximally entangled with each other, they cannot be entangled with a third system."
+  },
+  {
+    "id": 21,
+    "title": "Pauli Matrices Anticommutation",
+    "statement": "The Pauli matrices X, Y, Z satisfy anticommutation relations: {X,Y} = 0, {Y,Z} = 0, and {Z,X} = 0."
+  },
+  {
+    "id": 22,
+    "title": "Eigenvalues of Observables",
+    "statement": "In quantum mechanics, observables are Hermitian operators whose eigenvalues represent measurable quantities."
+  },
+  {
+    "id": 23,
+    "title": "Non-commutativity Implies Uncertainty",
+    "statement": "If two observables A and B do not commute, then the system exhibits an uncertainty relation between them."
+  },
+  {
+    "id": 24,
+    "title": "Unitarity of QFT Circuit",
+    "statement": "The quantum Fourier transform circuit implements a unitary transformation, preserving inner product structure."
+  },
+  {
+    "id": 25,
+    "title": "Swap Gate Decomposability",
+    "statement": "The SWAP gate can be decomposed into three CNOT gates: SWAP = CNOT · Toffoli · CNOT."
+  },
+  {
+    "id": 26,
+    "title": "Trace Preservation of CPTP Maps",
+    "statement": "Any completely positive trace-preserving (CPTP) map preserves the trace of a density operator under its evolution."
+  },
+  {
+    "id": 27,
+    "title": "Density Matrix Positivity",
+    "statement": "Any valid quantum density matrix ρ must be Hermitian, positive semidefinite, and have trace equal to 1."
+  },
+  {
+    "id": 28,
+    "title": "Purification Theorem",
+    "statement": "Every mixed quantum state can be represented as the partial trace of a pure state on a larger Hilbert space."
+  },
+  {
+    "id": 29,
+    "title": "Partial Trace Linear Operator",
+    "statement": "The partial trace operation is linear and maps operators on a composite Hilbert space to operators on a subsystem."
+  },
+  {
+    "id": 30,
+    "title": "Post-selection Bias",
+    "statement": "Conditioning on a post-selected measurement outcome alters the statistics of future measurements and may introduce non-causal correlations."
+  }
+]
