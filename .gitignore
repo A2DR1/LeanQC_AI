@@ -26,6 +26,10 @@ quantum_env/
 venv/
 env/
 ENV/
+
+# Environment variables
+*.env
+.env
 RAGApproach/.env
 
 # Jupyter Notebook
