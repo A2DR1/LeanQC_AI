@@ -1,0 +1,602 @@
+[
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c, d be integers.\nAssume a is odd.\nAssume b is odd.\nAssume c is odd.\nAssume d is odd.\nAssume 0 < a.\nAssume a < b.\nAssume b < c.\nAssume c < d.\nAssume a * d = b * c.\nThere exists a natural number k.\nThere exists a natural number m.\nAssume a + d = 2^k.\nAssume b + c = 2^m.\nGoal:\na = 1.",
+    "formal_statement": "theorem exists_natural_numbers_and_conditions_imply_a_eq_one : \n    \u2200 (a b c d : \u2124), \n      Odd a \u2192 Odd b \u2192 Odd c \u2192 Odd d \u2192 \n      0 < a \u2192 a < b \u2192 b < c \u2192 c < d \u2192 \n      a * d = b * c \u2192 \n      \u2203 (k m : \u2115), a + d = (2 : \u2124) ^ k \u2227 b + c = (2 : \u2124) ^ m \u2192 a = 1 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean statement incorrectly places the existential quantifiers inside the implication. The English statement says the existence of k and m is part of the assumptions, but the Lean code makes them part of the conclusion that would imply a = 1."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nGoal:\n|a + b| / (1 + |a + b|) \u2264 |a| / (1 + |a|) + |b| / (1 + |b|).",
+    "formal_statement": "theorem abs_sum_inequality (a b : \u211d) : |a + b| / (1 + |a + b|) \u2264 |a| / (1 + |a|) + |b| / (1 + |b|) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 35.\nDefine b = 40.\nDefine c = 1400.\nAssume a * b = c.\nDefine m = 1399.\nAssume m = c - 1.\nDefine k = 160.\nThere exists an integer n.\nAssume 0 \u2264 n < m.\nGoal:\nn = 1058.\nAssume there exists an integer x such that k * n = m * x + 1.",
+    "formal_statement": "theorem exists_solution : \u2203 n : \u2124, 0 \u2264 n \u2227 n < 1399 \u2227 n = 1058 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing key assumptions: The Lean theorem only states existence of n with bounds and n=1058, but misses the critical assumption that there exists integer x such that k * n = m * x + 1 (where k=160, m=1399). Also incorrectly uses \u2124 instead of \u2115 for non-negative n."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine K, L, M, N be natural numbers.\nAssume K > L.\nAssume L > M.\nAssume M > N.\nAssume K * M + L * N = (K + L - M + N) * (-K + L + M + N).\nGoal:\nThere exists an integer d such that d divides (K * L + M * N) and d > 1 and d < K * L + M * N.",
+    "formal_statement": "theorem exists_divisor (K L M N : \u2115) (hK : K > L) (hL : L > M) (hM : M > N) (h : K * M + L * N = (K + L - M + N) * (-K + L + M + N)) : \u2203 (d : \u2124), d \u2223 (K : \u2124) * (L : \u2124) + (M : \u2124) * (N : \u2124) \u2227 d > 1 \u2227 d < (K : \u2124) * (L : \u2124) + (M : \u2124) * (N : \u2124) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Type mismatch: English specifies natural numbers and integer d, but Lean uses \u2124 for the sum K*L + M*N in the divisibility condition, which should be \u2115 since K,L,M,N are natural numbers and the sum is natural"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a positive real number.\nLet y be a positive real number.\nLet z be a positive real number.\nGoal:\n9/(x+y+z) \u2264 2/(x+y) + 2/(y+z) + 2/(z+x).",
+    "formal_statement": "theorem inequality_proof (x : \u211d) (y : \u211d) (z : \u211d) (hx : x > 0) (hy : y > 0) (hz : z > 0) :\n    9 / (x + y + z) \u2264 2 / (x + y) + 2 / (y + z) + 2 / (z + x) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine modulus = 47.\nThere exists an integer n.\nAssume 2 * n \u2261 15 mod modulus.\nGoal:\nn \u2261 31 mod modulus.",
+    "formal_statement": "theorem mod_problem : \u2203 modulus : \u2124, modulus = 47 \u2227 \u2200 n : \u2124, 2 * n \u2261 15 [ZMOD modulus] \u2192 n \u2261 31 [ZMOD modulus] := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean statement incorrectly quantifies modulus as existential when it should be fixed at 47. English defines modulus = 47, but Lean says '\u2203 modulus : \u2124, modulus = 47 \u2227 ...' which means 'there exists some modulus equal to 47 such that...' instead of using modulus = 47 as a fixed definition."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 11.\nDefine m = n^2.\nDefine a = 24.\nThere exists an integer b.\nAssume 0 \u2264 b < m.\nAssume a * b \u2261 1 mod m.\nGoal:\nb = 116.",
+    "formal_statement": "theorem exists_b_satisfies_condition : \u2203 b : \u2124, 0 \u2264 b \u2227 b < (11 : \u2124)^2 \u2227 (24 : \u2124) * b \u2261 1 [ZMOD (11 : \u2124)^2] \u2227 b = 116 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem states there exists some b satisfying the conditions, but the English statement assumes b=116 is given and asks to prove it equals 116 (a tautology). The English should be interpreted as proving that b must be 116 under the given assumptions, not that 116 is one possible b."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x, y, z as integers.\nAssume 3x + y = 17.\nAssume 5y + z = 14.\nAssume 3x + 5z = 41.\nGoal:\nx + y + z = 12.",
+    "formal_statement": "theorem linear_system_solution (x y z : \u2124) (h1 : 3 * x + y = 17) (h2 : 5 * y + z = 14) (h3 : 3 * x + 5 * z = 41) : x + y + z = 12 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 4.\nDefine f(n) = n\u00b2 if n is odd.\nDefine f(n) = n\u00b2 - 4n - 1 if n is even.\nGoal:\nf(f(f(f(f(4))))) = 1.",
+    "formal_statement": "theorem goal_statement : f (f (f (f (f 4)))) = 1 := sorry\n\nwhere\n  f (n : \u2115) : \u2115 :=\n    if n % 2 = 1 then n ^ 2 else n ^ 2 - 4 * n - 1",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Lean definition uses 'n % 2 = 1' for odd numbers, but this incorrectly identifies 0 as odd (since 0 % 2 = 0 \u2260 1). Should use 'n % 2 = 0' for even numbers or '\u00acEven n' for odd numbers."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n \u2265 9.\nDefine f(n) = ((n+2)! - (n+1)!)/n!.\nGoal:\nf(n) is a perfect square.",
+    "formal_statement": "theorem perfect_square_factorial_expression (n : \u2115) (hn : n \u2265 9) : \n    \u2203 (k : \u2115), ((Nat.factorial (n + 2) - Nat.factorial (n + 1)) / Nat.factorial n) = k ^ 2 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing division by factorial n in the expression - Lean computes (factorial (n+2) - factorial (n+1)) / factorial n, but the English defines f(n) = ((n+2)! - (n+1)!)/n!"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nAssume a is irrational.\nAssume b is irrational.\nGoal:\na^b is rational.",
+    "formal_statement": "theorem irrational_power_rational (a b : \u211d) (ha : Irrational a) (hb : Irrational b) : \u2203 (q : \u211a), (a : \u211d) ^ (b : \u211d) = (q : \u211d) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The English statement claims that a^b is rational (a definite assertion), but the Lean theorem uses \u2203 (q : \u211a) which claims there exists some rational q equal to a^b. This changes the meaning from 'a^b is rational' to 'there exists a rational equal to a^b'."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be a natural number.\nAssume k > 0.\nLet n be a natural number.\nAssume n > 0.\nDefine a = 6n + k.\nDefine b = 6n + 3.\nDefine c = 6n + 2.\nDefine d = 6n + 1.\nAssume for all natural numbers n > 0, the greatest common divisor of a and b is 1.\nAssume for all natural numbers n > 0, the greatest common divisor of a and c is 1.\nAssume for all natural numbers n > 0, the greatest common divisor of a and d is 1.\nGoal:\nk = 5.",
+    "formal_statement": "theorem gcd_implies_k_eq_five (k : \u2115) (hk : k > 0) (n : \u2115) (hn : n > 0) : \n    (\u2200 (n : \u2115), n > 0 \u2192 Nat.gcd (6 * n + k) (6 * n + 3) = 1) \u2192\n    (\u2200 (n : \u2115), n > 0 \u2192 Nat.gcd (6 * n + k) (6 * n + 2) = 1) \u2192\n    (\u2200 (n : \u2115), n > 0 \u2192 Nat.gcd (6 * n + k) (6 * n + 1) = 1) \u2192\n    k = 5 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem quantifies over n twice - once as a parameter and once in the universal quantifiers. The English statement assumes the gcd conditions hold for all n > 0, then concludes k = 5 (with k fixed). The Lean theorem incorrectly makes n a parameter, suggesting we need to prove k = 5 for each n, rather than that the gcd conditions imply k = 5."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the set of even digits as {0, 2, 4, 6, 8}.\nLet n be a 4-digit natural number.\nAssume 1000 \u2264 n \u2264 9999.\nAssume each digit of n is in the set {0, 2, 4, 6, 8}.\nAssume n is divisible by 5.\nThere exists an integer k such that n = 5 * k.\n\nGoal:\nThe number of such integers n is 100.",
+    "formal_statement": "theorem count_four_digit_even_divisible_by_five : \n    let evenDigits : Set \u2115 := {0, 2, 4, 6, 8} in\n    Finset.card (Finset.filter (\u03bb n : \u2115 => \n      1000 \u2264 n \u2227 n \u2264 9999 \u2227 \n      (\u2200 d : \u2115, d \u2208 Nat.digits 10 n \u2192 d \u2208 evenDigits) \u2227 \n      5 \u2223 n) (Finset.Icc 1000 9999)) = 100 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that n is a 4-digit natural number with all digits even. The Lean code uses Nat.digits 10 n but doesn't ensure n has exactly 4 digits, and the evenDigits set is defined as \u2115 but should only contain single digits 0-8."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 20.\nDefine m = 100.\nFor k in the set {1, ..., n}, define a_k = log of 3^(k^2) base 5^k.\nFor k in the set {1, ..., m}, define b_k = log of 25^k base 9^k.\nDefine S = (sum of a_k for k in the set {1, ..., n}) * (sum of b_k for k in the set {1, ..., m}).\nGoal:\nS = 21000.",
+    "formal_statement": "theorem log_product_sum_equals_21000 : \n    let n := 20\n    let m := 100\n    let a_k (k : \u2115) : \u211d := Real.logb ((5 : \u211d) ^ k) ((3 : \u211d) ^ (k ^ 2))\n    let b_k (k : \u2115) : \u211d := Real.logb ((9 : \u211d) ^ k) ((25 : \u211d) ^ k)\n    let S := (\u2211 k in Finset.Icc 1 n, a_k k) * (\u2211 k in Finset.Icc 1 m, b_k k)\n    in S = (21000 : \u211d) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong base and argument order in logb definitions. English defines a_k = log of 3^(k^2) base 5^k, which should be Real.logb ((5 : \u211d) ^ k) ((3 : \u211d) ^ (k ^ 2)), but Lean has them swapped. Similarly for b_k: English defines b_k = log of 25^k base 9^k, which should be Real.logb ((9 : \u211d) ^ k) ((25 : \u211d) ^ k), but Lean has them swapped."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 10000.\nFor each natural number k in the set {2, ..., n}, define f(k) = 1/\u221ak.\nGoal:\n\u2211_{k=2}^{n} f(k) < 198.",
+    "formal_statement": "theorem sum_bound : \u2211 k in Finset.Icc 2 10000, (1 : \u211d) / Real.sqrt k < 198 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p(n) = n^2 - n + 41.\nLet n be a natural number.\nAssume n > 0.\nAssume p(n) is prime for many small n.\nGoal:\nThere exists a natural number n such that p(n) and p(n+1) share a common factor greater than 1.\nn = 41.",
+    "formal_statement": "theorem exists_common_factor : \u2203 n : \u2115, n > 0 \u2227 \u2203 k > 1, k \u2223 (n ^ 2 - n + 41) \u2227 k \u2223 ((n + 1) ^ 2 - (n + 1) + 41) := by\n  refine \u27e841, by simp, 41, by simp, ?_, ?_\u27e9\n  sorry\n  sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing the assumption that p(n) is prime for many small n, and the goal incorrectly states n=41 as a specific solution rather than proving existence"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A as an integer.\nDefine B as an integer.\nDefine x as an integer.\nDefine f(x) = 10x\u00b2 - x - 24.\nDefine g(x) = (A x - 8)(B x + 3).\nAssume f(x) = g(x) for all x.\nGoal:\nA B + B = 12.",
+    "formal_statement": "theorem solve_equation : \u2200 (A B : \u2124), (\u2200 (x : \u2124), 10 * x ^ 2 - x - 24 = (A * x - 8) * (B * x + 3)) \u2192 A * B + B = 12 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a positive real number.\nLet b be a positive real number.\nAssume b \u2264 a.\nGoal:\n(a + b)/2 - \u221a(a * b) \u2264 (a - b)^2/(8 * b).",
+    "formal_statement": "theorem inequality_proof (a b : \u211d) (ha : 0 < a) (hb : 0 < b) (h : b \u2264 a) : (a + b)/2 - Real.sqrt (a * b) \u2264 (a - b)^2/(8 * b) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 9.\nDefine P = 1! \u00d7 2! \u00d7 3! \u00d7 ... \u00d7 n!.\nLet k be a natural number.\nAssume k > 0.\nAssume k\u00b2 divides P.\nGoal:\nThe number of such k is 672.",
+    "formal_statement": "theorem count_divisors_of_factorial_product :\n    let n := 9\n    let P := \u220f i in Finset.Icc 1 n, Nat.factorial i in\n    Finset.card {k : \u2115 | k > 0 \u2227 k ^ 2 \u2223 P} = 672 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a positive integer.\nThere exists a positive integer n.\nAssume m * n \u2264 m + n.\nGoal:\nThe number of m is infinitely many.",
+    "formal_statement": "theorem infinite_m : \u2200 (k : \u2115), \u2203 (m : \u2115), m > 0 \u2227 k < m \u2227 \u2203 (n : \u2115), n > 0 \u2227 m * n \u2264 m + n := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over all k and claims there are arbitrarily large m satisfying the condition, but the English statement only asserts that there are infinitely many m (without specifying they must be larger than arbitrary k). The English statement also doesn't require that for each m there exists some n - it says there exists some n that works with the given m."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine V = 1 + i.\nDefine Z = 2 - i.\nDefine I as a complex number.\nAssume V = I * Z.\nGoal:\nI = (1/5) + (3/5)i.",
+    "formal_statement": "theorem complex_identity : I = (1/5 : \u2102) + (3/5 : \u2102) * Complex.I := by\n  intro V Z I hV hZ h\n  have V_def : V = (1 : \u2102) + Complex.I := hV\n  have Z_def : Z = (2 : \u2102) - Complex.I := hZ\n  have relation : V = I * Z := h\n  sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing key assumptions: The Lean code introduces V, Z, I as variables with hypotheses hV, hZ, but the English statement defines V and Z as specific complex numbers (1+i and 2-i), not as arbitrary variables. The theorem should assume V = 1 + i, Z = 2 - i, and V = I * Z, then conclude I = (1/5) + (3/5)i."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n > 0.\nDefine S = 1/2 + 1/3 + 1/7 + 1/n.\nAssume S is an integer.\n\nGoal:\nShow that the statement \"n > 84\" is not necessarily true.",
+    "formal_statement": "theorem not_necessarily_n_gt_84 : \u00ac\u2200 (n : \u2115), n > 0 \u2192 (let S := (1/2 : \u211a) + (1/3 : \u211a) + (1/7 : \u211a) + (1/n : \u211a) in S \u2208 \u2124) \u2192 n > 84 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over all n, but the English statement is about the existence of a counterexample where S is an integer but n \u2264 84. The Lean theorem should assert \u2203 (n : \u2115), n > 0 \u2227 n \u2264 84 \u2227 (let S := (1/2 : \u211a) + (1/3 : \u211a) + (1/7 : \u211a) + (1/n : \u211a) in S \u2208 \u2124) instead of negating a universal statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 30.\nGoal:\n5^n mod 7 = 1.",
+    "formal_statement": "theorem mod_computation : (5 : \u2124)^(30 : \u2115) % (7 : \u2115) = (1 : \u2115) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Type mismatch: English statement uses natural numbers for exponentiation and modulus, but Lean mixes \u2124, \u2115, and \u2115 in the same expression, creating type inconsistencies"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as an integer.\nAssume gcd(n, 40) = 10.\nAssume lcm(n, 40) = 280.\nGoal:\nn = 70.",
+    "formal_statement": "theorem gcd_lcm_implies_n_eq_70 (n : \u2124) (h1 : gcd n 40 = 10) (h2 : lcm n 40 = 280) : n = 70 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that n is positive. The gcd and lcm conditions imply n could be 70 or -70, but the goal only states n = 70. Should include n > 0 assumption."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 7.\nDefine P = (2 + 3) * (2^2 + 3^2) * (2^4 + 3^4) * (2^8 + 3^8) * (2^16 + 3^16) * (2^32 + 3^32) * (2^64 + 3^64).\nLet k be a natural number.\nDefine a_k = 2^(2^k) + 3^(2^k).\nDefine P = a_0 * a_1 * a_2 * a_3 * a_4 * a_5 * a_6.\nThere exists a natural number m such that a_m * a_(m+1) = 3^(2^(m+1)) - 2^(2^(m+1)).\nGoal:\nP = 3^128 - 2^128.",
+    "formal_statement": "theorem exists_product_identity : \u2203 (m : \u2115), (2^(2^m) + 3^(2^m)) * (2^(2^(m+1)) + 3^(2^(m+1))) = 3^(2^(m+1)) - 2^(2^(m+1)) := sorry\n\ntheorem product_equals_power_difference : (2 + 3) * (2^2 + 3^2) * (2^4 + 3^4) * (2^8 + 3^8) * (2^16 + 3^16) * (2^32 + 3^32) * (2^64 + 3^64) = 3^128 - 2^128 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean code defines two separate theorems but misses the connection between them. The English statement establishes that P = a_0 * a_1 * ... * a_6 and uses the identity a_m * a_(m+1) = 3^(2^(m+1)) - 2^(2^(m+1)) to prove P = 3^128 - 2^128. The Lean code treats these as independent statements without showing how the first theorem helps prove the second."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P(x) = x^3 + a x^2 + b x + c.\nDefine r1 = cos(2\u03c0/7).\nDefine r2 = cos(4\u03c0/7).\nDefine r3 = cos(6\u03c0/7).\nAssume r1, r2, r3 are the roots of P(x).\nGoal:\na b c = 1/32.",
+    "formal_statement": "theorem cubic_with_trig_roots : \n    let P : \u211d \u2192 \u211d := \u03bb x => x^3 + a * x^2 + b * x + c\n    let r1 : \u211d := Real.cos (2 * \u03c0 / 7)\n    let r2 : \u211d := Real.cos (4 * \u03c0 / 7)\n    let r3 : \u211d := Real.cos (6 * \u03c0 / 7)\n    in (\u2200 x, P x = (x - r1) * (x - r2) * (x - r3)) \u2192 a * b * c = 1/32 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that r1, r2, r3 are roots of P(x). The Lean theorem incorrectly assumes P(x) = (x - r1)(x - r2)(x - r3) for all x, which is a stronger condition than just r1, r2, r3 being roots."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 98.\nLet a\u2081, a\u2082, a\u2083, ... be an arithmetic progression.\nDefine the common difference d = 1.\nDefine S = a\u2081 + a\u2082 + a\u2083 + ... + a\u2099.\nAssume S = 137.\nGoal:\na\u2082 + a\u2084 + a\u2086 + ... + a\u2089\u2088 = 93.",
+    "formal_statement": "theorem arithmetic_progression_sum : \n    let n : \u2115 := 98\n    let d : \u2124 := 1\n    let S : \u2124 := 137 in\n    \u2200 (a\u2081 : \u2124), (\u2211 i in Finset.range n, (a\u2081 + (d : \u2124) * (i : \u2124))) = S \u2192 \n    (\u2211 i in Finset.range 49, (a\u2081 + (d : \u2124) * ((2 * i + 1) : \u2124))) = 93 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean code sums odd-indexed terms (a\u2081, a\u2083, a\u2085, ...) but the English statement asks for even-indexed terms (a\u2082, a\u2084, a\u2086, ...). The Lean code uses (2 * i + 1) which gives indices 1, 3, 5, ... instead of (2 * i + 2) or similar for indices 2, 4, 6, ..."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the rectangular coordinate system.\nDefine line L1: 3y = x.\nDefine line L2: 2x + 5y = 11.\nThere exists a point A.\nAssume A is the intersection point of L1 and L2.\nGoal:\nThe sum of the coordinates of point A is 4.",
+    "formal_statement": "theorem sum_of_coordinates_of_intersection_point :\n    \u2203 (A : \u211d \u00d7 \u211d), (3 * A.2 = A.1) \u2227 (2 * A.1 + 5 * A.2 = 11) \u2227 (A.1 + A.2 = 4) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nLet a be a positive integer.\nGoal:\nThere exists an integer k such that a^p - a = p * k.",
+    "formal_statement": "theorem exists_int_divisible_by_prime (p : \u2115) (hp : Nat.Prime p) (a : \u2115) (ha : a > 0) : \n    \u2203 (k : \u2124), (a : \u2124) ^ p - (a : \u2124) = (p : \u2124) * k := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that a is positive integer - Lean uses \u2115 with ha : a > 0, but English specifies 'positive integer' which should be reflected in the type or constraint"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) for all positive rational numbers x.\nFor all positive rational numbers a, b, f(a * b) = f(a) + f(b).\nFor every prime natural number p, f(p) = p.\nGoal:\nFor which x in the set {17/32, 11/16, 7/9, 7/6, 25/11} is f(x) < 0?\nShow f(25/11) < 0.",
+    "formal_statement": "theorem f_neg_25_11 : f (25/11 : \u211a) < 0 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing key assumptions: function f defined on positive rationals, multiplicative-to-additive property, and prime value conditions"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a as a real number.\nDefine f(x) = \u221a(4 + \u221a(16 + 16x)) + \u221a(1 + \u221a(1 + x)).\nAssume f(a) = 6.\nGoal:\na = 8.",
+    "formal_statement": "theorem goal_theorem (a : \u211d) (f : \u211d \u2192 \u211d) (h : \u2200 x, f x = Real.sqrt (4 + Real.sqrt (16 + 16 * x)) + Real.sqrt (1 + Real.sqrt (1 + x))) (h2 : f a = 6) : a = 8 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies f over all x, making it a universal property rather than the specific definition given in English. The English statement defines f as a specific function, not requiring it to satisfy the equation for all x."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nAssume a\u00b2 + b\u00b2 = 1.\nGoal:\na \u00d7 b + (a - b) \u2264 1.",
+    "formal_statement": "theorem inequality_proof (a b : \u211d) (h : a ^ 2 + b ^ 2 = 1) : a * b + (a - b) \u2264 1 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N = 1/3.\nDefine f(X) = floor(X).\nGoal:\nf(10 * N) + f(100 * N) + f(1000 * N) + f(10000 * N) = 3702.",
+    "formal_statement": "theorem floor_sum_eq_3702 :\n    let N : \u211a := 1/3 in\n    let f (X : \u211a) : \u2124 := Int.floor X in\n    f (10 * N) + f (100 * N) + f (1000 * N) + f (10000 * N) = 3702 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong type for floor function - English uses floor on rational numbers, Lean uses Int.floor on \u211a which returns \u2124, but the actual values don't match: f(10/3)=3, f(100/3)=33, f(1000/3)=333, f(10000/3)=3333, sum=3+33+333+3333=3702 \u2260 3702 (actually equals 3702, but Lean's Int.floor on \u211a gives different results due to rational arithmetic)"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c, d be positive real numbers.\nGoal:\na^2 / b + b^2 / c + c^2 / d + d^2 / a \u2265 a + b + c + d.",
+    "formal_statement": "theorem inequality_for_positive_reals (a b c d : \u211d) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hd : d > 0) :\n    a ^ 2 / b + b ^ 2 / c + c ^ 2 / d + d ^ 2 / a \u2265 a + b + c + d := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 16^17 \u00d7 17^18 \u00d7 18^19.\nGoal:\nThe units digit of a is 8.",
+    "formal_statement": "theorem units_digit_of_a : (Nat.digits 10 (16^17 * 17^18 * 18^19)).head? = some 8 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the domain as the closed interval [0, \u03c0].\nDefine f(x) = sin((\u03c0/2) cos x).\nDefine g(x) = cos((\u03c0/2) sin x).\nAssume f(x) = g(x).\nGoal:\nThe number of solutions is 2.",
+    "formal_statement": "theorem number_of_solutions :\n    let domain : Set \u211d := Set.Icc (0 : \u211d) \u03c0\n    let f : \u211d \u2192 \u211d := fun x => Real.sin ((\u03c0/2) * Real.cos x)\n    let g : \u211d \u2192 \u211d := fun x => Real.cos ((\u03c0/2) * Real.sin x) in\n    Fintype.card {x : \u211d // x \u2208 domain \u2227 f x = g x} = 2 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption f(x) = g(x) in the theorem statement. The Lean code only considers the set where f(x) = g(x), but the English statement assumes this equality holds for all x in the domain."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet t be a real number.\nDefine f(t) = ((2^t - 3t) * t) / 4^t.\nGoal:\nThe maximum value of f(t) is 1/12.",
+    "formal_statement": "theorem maximum_value_of_f : \n    \u2203 (t : \u211d), f t = 1/12 \u2227 \u2200 (x : \u211d), f x \u2264 1/12 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem claims there exists a t where f(t) = 1/12 and 1/12 is an upper bound for all f(x), but the English statement says 1/12 is the maximum value, which requires that 1/12 is actually attained by f at some point AND is the least upper bound. The Lean statement only captures the 'attained' and 'upper bound' parts but not that it's the maximum (greatest value)."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = x^2 - 14x + 3.\nLet x be a real number.\nGoal:\nx = 7.",
+    "formal_statement": "theorem goal_statement : \u2200 (x : \u211d), (fun (x : \u211d) => x^2 - 14*x + 3) x = (fun (x : \u211d) => x^2 - 14*x + 3) 7 \u2192 x = 7 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly states that if f(x) = f(7) then x = 7, but the English statement has no such implication. The English simply defines f and states the goal x = 7 without any conditional relationship."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine year = 2001.\nDefine I, M, O as distinct positive integers.\nAssume I * M * O = 2001.\nGoal:\nI + M + O = 671.",
+    "formal_statement": "theorem sum_of_factors_equals_671 : \u2203 (I M O : \u2115), I > 0 \u2227 M > 0 \u2227 O > 0 \u2227 I \u2260 M \u2227 I \u2260 O \u2227 M \u2260 O \u2227 I * M * O = 2001 \u2227 I + M + O = 671 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing distinctness assumption - English specifies I, M, O are distinct, but Lean only checks pairwise inequality (I \u2260 M \u2227 I \u2260 O \u2227 M \u2260 O) which doesn't guarantee all three are distinct (could have I = M \u2260 O scenario)"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nAssume x is in the closed interval [0, 2\u03c0].\nDefine f(x) = tan(2x) - cos(x/2).\nGoal:\nThe number of solutions to f(x) = 0 is 5.",
+    "formal_statement": "theorem number_of_solutions : \n    let f : \u211d \u2192 \u211d := \u03bb x => Real.tan (2 * x) - Real.cos (x / 2) in\n    Finset.card ({x | x \u2208 Set.Icc (0 : \u211d) (2 * \u03c0) \u2227 f x = 0} : Finset \u211d) = 5 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong interval: English specifies [0, 2\u03c0] but Lean uses [0, 2*\u03c0] which is [0, 6.283...] instead of [0, 6.283...] - the interval is correct but the notation is misleading; however, the main issue is that the set comprehension {x | ...} creates a Set \u211d, but Finset.card requires a Finset \u211d, and the conversion is missing proper filtering for finiteness."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a positive integer.\nLet n be a positive integer.\nDefine d = 8.\nAssume d = gcd(m, n).\nDefine L = 112.\nAssume L = lcm(m, n).\nGoal:\nm + n = 72.",
+    "formal_statement": "theorem problem_statement : \u2203 (m n : \u2115), 0 < m \u2227 0 < n \u2227\n    let d := 8; L := 112 in\n    d = Nat.gcd m n \u2227 L = Nat.lcm m n \u2227 m + n = 72 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing 'positive integer' constraint - Lean uses \u2115 (includes 0) but should use \u2124 or add explicit positivity constraints; also variables m and n should be quantified with positivity before defining d and L"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 100.\nDefine f(x) = x^n.\nDefine S = sum of the final three digits of f(5).\nGoal:\nS = 13.",
+    "formal_statement": "theorem sum_final_three_digits_eq_13 : \n    let n : \u2115 := 100\n    let f : \u2115 \u2192 \u2115 := \u03bb x => x ^ n\n    let S : \u2115 := (f 5) % 1000 / 100 + (f 5) % 100 / 10 + (f 5) % 10 in\n    S = 13 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Lean code incorrectly calculates the sum of the final three digits. The expression (f 5) % 1000 / 100 + (f 5) % 100 / 10 + (f 5) % 10 gives the sum of the hundreds, tens, and units digits, but this is not the same as the sum of the final three digits when the number has more than three digits. For example, if f(5) = 12345, the final three digits are 345, and their sum is 3+4+5=12, but the Lean expression would give 3+4+5=12 (same in this case, but the method is conceptually wrong for the general case of extracting final three digits)."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine D_0 = 0.\nDefine D_1 = 0.\nDefine D_2 = 1.\nFor every natural number n \u2265 3, define D_n = D_{n-1} + D_{n-3}.\nGoal:\nThe parity of (D_2021, D_2022, D_2023) is (even, odd, even).",
+    "formal_statement": "theorem parity_sequence : (Even (D 2021) \u2227 Odd (D 2022) \u2227 Even (D 2023)) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing sequence definition and recurrence relation. The Lean code assumes D is already defined with the correct recurrence, but the English statement explicitly defines D_0, D_1, D_2 and the recurrence D_n = D_{n-1} + D_{n-3} for n \u2265 3."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n > 0.\nGoal:\nn^(1/n) \u2264 2 - 1/n.",
+    "formal_statement": "theorem n_root_n_le_two_minus_inv_n (n : \u2115) (hn : n > 0) : (n : \u211d) ^ ((n : \u211d)\u207b\u00b9) \u2264 2 - (n : \u211d)\u207b\u00b9 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Incorrect interpretation of n^(1/n) - Lean uses (n : \u211d) ^ ((n : \u211d)\u207b\u00b9) which equals n^(1/n) only when n \u2260 0, but the correct mathematical meaning is the n-th root of n, which should be Real.rpow (n : \u211d) ((n : \u211d)\u207b\u00b9)"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a, b, c be positive real numbers.\nAssume a(b + c) = 152.\nAssume b(c + a) = 162.\nAssume c(a + b) = 170.\nGoal:\nabc = 720.",
+    "formal_statement": "theorem product_abc_eq_720 (a b c : \u211d) (ha : a > 0) (hb : b > 0) (hc : c > 0)\n    (h1 : a * (b + c) = 152) (h2 : b * (c + a) = 162) (h3 : c * (a + b) = 170) :\n    a * b * c = 720 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Goal in Lean is 'a * b * c = 720' but English statement says 'abc = 720', which means the product a*b*c. However, in Lean, 'a * b * c' associates as (a * b) * c, which is correct for the intended meaning. The actual error is that the assumptions in Lean don't match the English: English says 'a(b + c) = 152' meaning a*(b+c), but Lean has 'a * (b + c) = 152' which is correct. Wait, let me re-read. Actually the Lean code correctly captures all assumptions and the goal. The goal 'a * b * c = 720' correctly represents 'abc = 720'. All types, positivity conditions, and equations match. This appears to be correct."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 1529.\nDefine m = 6.\nGoal:\nn mod m = 5.",
+    "formal_statement": "theorem mod_computation : (1529 : \u2115) % 6 = 5 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 91.\nGoal:\nn\u00b2 = 8281.",
+    "formal_statement": "theorem n_squared_eq_8281 : (91 : \u2115)^2 = 8281 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x = log of 27 base 3.\nGoal:\nx = 3.",
+    "formal_statement": "theorem log_base_3_of_27_eq_3 : Real.log 27 / Real.log 3 = 3 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong type - English specifies 'log of 27 base 3' which is discrete logarithm, but Lean uses natural logarithm division (Real.log 27 / Real.log 3) which is the change of base formula for natural log, not the discrete logarithm"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a as an integer.\nDefine 8^(-1) = 1/8.\nDefine 4^(-1) = 1/4.\nDefine a^(-1) = 1/a.\nGoal:\na = -2.",
+    "formal_statement": "theorem inverse_equation : \u2200 (a : \u2124), (8 : \u2124)\u207b\u00b9 = (1 : \u2124)/8 \u2192 (4 : \u2124)\u207b\u00b9 = (1 : \u2124)/4 \u2192 a\u207b\u00b9 = (1 : \u2124)/a \u2192 a = -2 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over all integers a, making the statement false. The English statement defines specific values for 8\u207b\u00b9, 4\u207b\u00b9, and a\u207b\u00b9 as assumptions, then concludes a = -2. The Lean version claims this holds for ALL integers a, which is incorrect since only a = -2 satisfies the equation a\u207b\u00b9 = 1/a in \u2124."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet z be a complex number.\nDefine equation: 12|z|\u00b2 = 2|z+2|\u00b2 + |z\u00b2+1|\u00b2 + 31.\nGoal:\nz + 6/z = -2.",
+    "formal_statement": "theorem complex_equation_implies_sum (z : \u2102) (h : 12 * \u2016z\u2016^2 = 2 * \u2016z + 2\u2016^2 + \u2016z^2 + 1\u2016^2 + 31) : z + 6 / z = -2 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that z \u2260 0 (division by z in goal requires this)"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nLet y be a real number.\nDefine arithmetic_mean = (x + y)/2.\nDefine geometric_mean = \u221a(x * y).\nAssume arithmetic_mean = 7.\nAssume geometric_mean = \u221a19.\nGoal:\nx\u00b2 + y\u00b2 = 158.",
+    "formal_statement": "theorem arithmetic_geometric_means_identity : \n    \u2200 (x y : \u211d) (arithmetic_mean geometric_mean : \u211d), \n    arithmetic_mean = (x + y) / 2 \u2192 \n    geometric_mean = Real.sqrt (x * y) \u2192 \n    arithmetic_mean = 7 \u2192 \n    geometric_mean = Real.sqrt 19 \u2192 \n    x ^ 2 + y ^ 2 = 158 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing non-negativity assumption for geometric mean. The English statement implicitly assumes x * y \u2265 0 since \u221a(x * y) is defined, but Lean theorem allows negative x * y where Real.sqrt would still be defined as 0."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet r be a real number.\nAssume r > 0.\nDefine x = r^(1/3).\nAssume x + 1/x = 3.\nGoal:\nr^3 + 1/(r^3) = 5778.",
+    "formal_statement": "theorem cube_root_identity (r : \u211d) (hpos : r > 0) : \n    let x := Real.rpow r (1/3 : \u211d) in\n    (h : x + 1/x = 3) \u2192 r^3 + 1/(r^3) = 5778 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong definition of cube root - should use Real.log and Real.exp for r^(1/3), not Real.rpow which is for a^b where both are real"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x\u2081 be a real number.\nFor every natural number n \u2265 1, define x\u2099\u208a\u2081 = x\u2099(x\u2099 + 1/n).\nGoal:\nThere exists exactly one real number x\u2081 such that for every natural number n, 0 < x\u2099 < x\u2099\u208a\u2081 < 1.",
+    "formal_statement": "theorem exists_unique_initial_value : \u2203! (x\u2081 : \u211d), \u2200 (n : \u2115), 0 < x\u2081 \u2227 let x := Nat.rec x\u2081 (\u03bb k x\u2096 => x\u2096 * (x\u2096 + 1 / (k + 1))) n in 0 < x \u2227 x < Nat.rec x\u2081 (\u03bb k x\u2096 => x\u2096 * (x\u2096 + 1 / (k + 1))) (n + 1) \u2227 Nat.rec x\u2081 (\u03bb k x\u2096 => x\u2096 * (x\u2096 + 1 / (k + 1))) (n + 1) < 1 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over n in \u2115 (including n=0), but the English statement specifies n \u2265 1. The Lean statement also incorrectly requires 0 < x\u2081 for all n, when it should only require 0 < x\u2099 < x\u2099\u208a\u2081 < 1 for all n \u2265 1."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A as the set of solutions to z^3 - 8 = 0.\nDefine B as the set of solutions to z^3 - 8z^2 - 8z + 64 = 0.\nGoal:\nThe greatest distance between a point of A and a point of B is 2\u221a21.",
+    "formal_statement": "theorem greatest_distance_between_sets :\n    let A : Set \u2102 := {z | z ^ 3 - 8 = 0}\n    let B : Set \u2102 := {z | z ^ 3 - 8 * z ^ 2 - 8 * z + 64 = 0}\n    in sSup {d | \u2203 a \u2208 A, \u2203 b \u2208 B, d = Complex.dist a b} = 2 * Real.sqrt 21 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses sSup (supremum) instead of finding the maximum distance. The English statement asks for the 'greatest distance', which implies the maximum value in the set of distances, not just the supremum. In finite sets like these, the maximum exists and equals the supremum, but the theorem should explicitly state it's finding the maximum distance between points from A and B."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nGoal:\nThere exists an integer k such that 10^n - (-1)^n = 11 \u00d7 k.",
+    "formal_statement": "theorem exists_int_divisible (n : \u2115) : \u2203 (k : \u2124), (10 : \u2124)^n - ((-1 : \u2124))^n = 11 * k := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nFor each natural number i in the set {1, ..., n}, define a_i as a nonnegative real number.\nAssume the sum of a_i for i in the set {1, ..., n} equals n.\nGoal:\nThe product of a_i for i in the set {1, ..., n} is less than or equal to 1.",
+    "formal_statement": "theorem product_bound (n : \u2115) (a : \u2115 \u2192 \u211d) (h_nonneg : \u2200 i, 0 \u2264 a i) (h_sum : \u2211 i in Finset.Icc 1 n, a i = n) : \n    \u220f i in Finset.Icc 1 n, a i \u2264 1 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong type for a_i: English specifies nonnegative real numbers, but Lean uses \u2115 \u2192 \u211d which allows negative values. Should use \u211d \u2192 \u211d or \u211d\u22650 \u2192 \u211d with nonnegativity constraint."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a positive real number.\nDefine y as a positive real number.\nAssume x \u2260 1.\nAssume y \u2260 1.\nAssume log of x base 2 = log of 16 base y.\nAssume x * y = 64.\n\nGoal:\n(log of (x / y) base 2)^2 = 20.",
+    "formal_statement": "theorem log_squared_eq_twenty (x : \u211d) (y : \u211d) (hx_pos : 0 < x) (hy_pos : 0 < y) (hx_ne_one : x \u2260 1) (hy_ne_one : y \u2260 1)\n    (h_log_eq : Real.logb 2 x = Real.logb 2 (16 : \u211d) / Real.logb 2 y) (h_product : x * y = 64) :\n    (Real.logb 2 (x / y)) ^ 2 = 20 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly represents the logarithmic equality. English says 'log of x base 2 = log of 16 base y' but Lean has 'Real.logb 2 x = Real.logb 2 (16 : \u211d) / Real.logb 2 y', which is mathematically different. The Lean version uses division of logs (change of base formula) rather than directly comparing logs with different bases."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = c * x^3 - 9 * x + 3.\nDefine x = 2.\nf(2) = 9.\nGoal:\nc = 3.",
+    "formal_statement": "theorem solve_for_c : c = 3 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumptions: The Lean theorem statement lacks the definitions of f(x) and x, and the premise f(2) = 9. It should include these as hypotheses in the theorem statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nLet n be a natural number.\nAssume x > -1.\nGoal:\n(1 + n \u00d7 x) \u2264 (1 + x)^n.",
+    "formal_statement": "theorem inequality_proof (x : \u211d) (n : \u2115) (hx : x > -1) : (1 + (n : \u211d) * x) \u2264 (1 + x) ^ n := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m = 101.\nLet n be a natural number.\nAssume 0 \u2264 n < m.\nAssume 123456 \u2261 n mod m.\nGoal:\nn = 34.",
+    "formal_statement": "theorem mod_problem : n = 34 := by\n  have m_def : \u2115 := 101\n  have h_bound : 0 \u2264 n \u2227 n < m_def := by\n    intro h\n    exact \u27e8Nat.zero_le n, h\u27e9\n  have h_mod : 123456 % m_def = n % m_def := by\n    intro h\n    exact (Nat.mod_eq_of_eq_modEq h).symm\n  have h_calc : 123456 % 101 = 34 := by\n    native_decide\n  linarith\n  sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Multiple errors: (1) m_def is defined as \u2115 type instead of value 101, (2) h_bound incorrectly uses intro pattern, (3) h_mod incorrectly uses intro pattern and wrong theorem, (4) missing assumption that n is a natural number, (5) linarith cannot solve the final goal without proper context"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f as father's current age.\nDefine s as son's current age.\nAssume f = 5 \u00d7 s.\nDefine f' = f - 3.\nDefine s' = s - 3.\nAssume f' + s' = 30.\nGoal:\ns = 6.",
+    "formal_statement": "theorem son_age_solution : \u2200 (f s : \u2115), f = 5 * s \u2192 \u2200 (f' s' : \u2115), f' = f - 3 \u2192 s' = s - 3 \u2192 f' + s' = 30 \u2192 s = 6 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing natural number subtraction constraints. The English statement implies f \u2265 3 and s \u2265 3 (since we subtract 3 from both), but the Lean theorem allows any natural numbers including cases where subtraction underflows (e.g., s = 0 would make s - 3 = 0 in \u2115, not the intended negative value)."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet d be a real number.\nDefine S_n = (n/2) * (2a + (n - 1)d) for n in the set {1, 2, 3, ...}.\nDefine n = 5.\nDefine S_5 = 70.\nDefine n = 10.\nDefine S_10 = 210.\nGoal:\na = 42/5.",
+    "formal_statement": "theorem arithmetic_sequence_solution : \n    \u2200 (a d : \u211d), \n    (\u2200 n : \u2115, n \u2265 1 \u2192 let S_n : \u211d := (n : \u211d) / 2 * (2 * a + ((n : \u211d) - 1) * d) in True) \u2192 \n    let S_5 : \u211d := (5 : \u211d) / 2 * (2 * a + ((5 : \u211d) - 1) * d) in \n    let S_10 : \u211d := (10 : \u211d) / 2 * (2 * a + ((10 : \u211d) - 1) * d) in \n    S_5 = 70 \u2192 S_10 = 210 \u2192 a = 42/5 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over all natural numbers n \u2265 1 with a trivial 'True' conclusion, while the English statement only defines S_n for specific n values (5 and 10) with given numerical values. The Lean theorem should only use the specific cases n=5 and n=10 with the given S_5=70 and S_10=210 constraints."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 121.\nDefine b = 122.\nDefine c = 123.\nGoal:\n121 * 122 * 123 \u2261 2 mod 4.",
+    "formal_statement": "theorem congruence_goal : (121 : \u2124) * 122 * 123 \u2261 2 [ZMOD 4] := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12.\nGoal:\nS mod 4 = 2.",
+    "formal_statement": "theorem sum_mod_four_eq_two : (\u2211 i in Finset.Icc 1 12, i) % 4 = 2 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x = 4.\nGoal:\n(3x - 2)(4x + 1) - (3x - 2)4x + 1 = 11.",
+    "formal_statement": "theorem simple_algebraic_identity : (3 * (4 : \u2124) - 2) * (4 * (4 : \u2124) + 1) - (3 * (4 : \u2124) - 2) * 4 * (4 : \u2124) + 1 = 11 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Lean code has incorrect parentheses placement. English statement groups as ((3x-2)(4x+1) - (3x-2)4x) + 1, but Lean groups as (3x-2)*(4x+1) - ((3x-2)*4*x) + 1, which changes the order of operations and gives a different result."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = |2 - x|.\nThere exists a real number x.\nAssume f(x) = 3.\nGoal:\nThe sum of all solutions x is 4.",
+    "formal_statement": "theorem sum_of_solutions : \u2203 (x : \u211d), (fun (x : \u211d) => |2 - x|) x = 3 \u2227 (\u2200 (y : \u211d), (fun (y : \u211d) => |2 - y|) y = 3 \u2192 y = x) \u2192 x + x = 4 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies the existence and uniqueness. English asks for the sum of ALL solutions (there are two: x=5 and x=-1), but Lean states there exists exactly one solution (using \u2200 for uniqueness) and then claims x+x=4, which would only make sense if there were exactly one solution with value 2."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = x^2 + 18x + 30.\nDefine g(x) = x^2 + 18x + 45.\nThere exists a real number x.\nAssume f(x) = 2 * sqrt(g(x)).\nGoal:\nThe product of the real roots of the equation is 20.",
+    "formal_statement": "theorem product_of_real_roots_is_twenty :\n    \u2203 (x : \u211d), f x = 2 * Real.sqrt (g x) \u2227\n    let roots := {x : \u211d | f x = 2 * Real.sqrt (g x)}\n    in \u220f x in roots, x = 20 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly defines roots as the set of x satisfying f(x) = 2 * sqrt(g(x)), but the English statement asks for the product of the real roots of the equation (which should be the roots of f(x) = 2 * sqrt(g(x)) after squaring and rearranging to form a polynomial equation). The current definition would include all solutions to the original equation, not necessarily just the polynomial roots."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = a * x^4 - b * x^2 + x + 5.\nDefine x1 = -3.\nDefine x2 = 3.\nf(x1) = 2.\nGoal:\nf(x2) = 8.",
+    "formal_statement": "theorem f_x2_eq_8 : f x2 = 8 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumptions: Lean code does not include the definitions of f, a, b, x1, x2, or the given fact f(x1) = 2"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 40320.\nAssume n = 8!.\nLet a be a natural number.\nLet b be a natural number.\nLet c be a natural number.\nLet d be a natural number.\nAssume a > 0.\nAssume b > 0.\nAssume c > 0.\nAssume d > 0.\nAssume a * b * c * d = n.\nDefine e1 = 524.\nAssume a * b + a + b = e1.\nDefine e2 = 146.\nAssume b * c + b + c = e2.\nDefine e3 = 104.\nAssume c * d + c + d = e3.\n\nGoal:\na - d = 10.",
+    "formal_statement": "theorem problem : a - d = 10 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumptions: The Lean theorem statement does not include any of the given assumptions about n, e1, e2, e3, the positivity constraints, or the equations relating a, b, c, d."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x = 1222 base 3.\nGoal:\nx = 53.",
+    "formal_statement": "theorem base3_1222_eq_53 : (1222 : \u2115) = (53 : \u2115) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing base conversion - English specifies '1222 base 3' but Lean treats it as decimal 1222"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n > 0.\nDefine A = 3^(2^n) - 1.\nGoal:\nA \u2261 2^(n+2) mod 2^(n+3).",
+    "formal_statement": "theorem congruence_property (n : \u2115) (hn : n > 0) : (3^(2^n) - 1) \u2261 2^(n + 2) [MOD 2^(n + 3)] := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet d be a real number.\nDefine f(n) = a + (n - 1) * d.\nDefine f(7) = 30.\nDefine f(11) = 60.\nGoal:\nf(21) = 135.",
+    "formal_statement": "theorem arithmetic_sequence_problem (a d : \u211d) (f : \u2115 \u2192 \u211d) (h1 : \u2200 n, f n = a + ((n : \u211d) - 1) * d) (h2 : f 7 = 30) (h3 : f 11 = 60) : f 21 = 135 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly assumes f is an arbitrary function satisfying the recurrence, but the English statement defines f specifically as f(n) = a + (n - 1) * d. The Lean theorem should not have f as a parameter but should define f explicitly."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(n) = n - 3 if n \u2265 1000.\nDefine f(n) = f(f(n + 5)) if n < 1000.\nGoal:\nf(84) = 997.",
+    "formal_statement": "theorem f_goal : f 84 = 997 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing function definition. The Lean code declares a theorem about function f but does not define f according to the recursive specification in the English statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine \u2124 as the set of integers.\nLet a be an integer.\nLet b be an integer.\nDefine f: \u2124 \u2192 \u2124.\nAssume for all integers a and b, f(2a) + 2f(b) = f(f(a + b)).\nGoal:\nf(x) = 0 for all integers x, or f(x) = c x for some integer c.",
+    "formal_statement": "theorem functional_equation_solution : \u2200 (f : \u2124 \u2192 \u2124), (\u2200 (a b : \u2124), f (2 * a) + 2 * f b = f (f (a + b))) \u2192 (\u2200 (x : \u2124), f x = 0) \u2228 (\u2203 (c : \u2124), \u2200 (x : \u2124), f x = c * x) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing universal quantifier for 'a' and 'b' in assumptions. English states 'Let a be an integer. Let b be an integer.' but Lean quantifies them inside the functional equation assumption, making them local to that assumption rather than universally quantified parameters."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x) = x + 1.\nDefine g(x) = x^2 + 3.\nDefine x = 2.\nGoal:\nf(g(2)) = 8.",
+    "formal_statement": "theorem composition_result : f (g (2 : \u211d)) = (8 : \u211d) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing function definitions f and g, and wrong type (\u211d instead of \u2115 or \u2124 for given integer values)"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a as an integer.\nDefine b as an integer.\nAssume 3a + 2b = 5.\nAssume a + b = 2.\nGoal:\na = 1.\nb = 1.",
+    "formal_statement": "theorem solve_system (a b : \u2124) (h1 : 3 * a + 2 * b = 5) (h2 : a + b = 2) : a = 1 \u2227 b = 1 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the set S = {5, 7, 11, 13, 17}.\nLet p and q be prime numbers.\nAssume p is in S.\nAssume q is in S.\nAssume p \u2260 q.\nDefine expression = p * q - (p + q).\nGoal:\nexpression = 119.",
+    "formal_statement": "theorem expression_eq_119 : \u2203 (p q : \u2115), Nat.Prime p \u2227 Nat.Prime q \u2227 p \u2208 ({5, 7, 11, 13, 17} : Set \u2115) \u2227 q \u2208 ({5, 7, 11, 13, 17} : Set \u2115) \u2227 p \u2260 q \u2227 p * q - (p + q) = 119 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "English statement assumes specific p and q from S with p\u2260q, but Lean uses existential quantifier (\u2203) which allows any such pair to satisfy the equation, not necessarily that all such pairs satisfy it"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = 239.\nDefine W = 174.\nDefine Z = 83.\nDefine T = S + W + Z.\nDefine T = 496.\nDefine P = 10.\nGoal:\nThere exists a natural number R such that T - R is divisible by P.\nThere exists an integer k such that T - R = P * k.\nGoal:\nR = 6.",
+    "formal_statement": "theorem exists_natural_R_divisible_by_P : \u2203 (R : \u2115), (T - R) % P = 0 := sorry\n\ntheorem exists_integer_k_relation : \u2203 (R : \u2115) (k : \u2124), (T : \u2124) - (R : \u2124) = P * k := sorry\n\ntheorem specific_R_value : R = 6 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing variable definitions (S, W, Z, T, P) and type mismatches - T is defined as both 496 and S+W+Z, and the theorems don't match the English statement's specific requirements"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f(x, y) for natural numbers x, y.\nAssume f(x, x) = x.\nAssume f(x, y) = f(y, x).\nAssume (x + y) * f(x, y) = y * f(x, x + y).\n\nGoal:\nf(14, 52) = 364.",
+    "formal_statement": "theorem f_property (f : \u2115 \u2192 \u2115 \u2192 \u2115) (h1 : \u2200 x, f x x = x) (h2 : \u2200 x y, f x y = f y x) (h3 : \u2200 x y, (x + y) * f x y = y * f x (x + y)) : f 14 52 = 364 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption: f is defined for natural numbers x, y, but Lean theorem uses f : \u2115 \u2192 \u2115 \u2192 \u2115 which is correct. However, the third assumption in Lean is incorrect - English says (x + y) * f(x, y) = y * f(x, x + y) but Lean has (x + y) * f x y = y * f x (x + y) which is the same. Actually, the error is that the English statement defines f for natural numbers but doesn't specify that f takes natural number arguments and returns natural numbers, which the Lean theorem correctly includes. Upon closer inspection, the Lean theorem appears to correctly capture all assumptions and the goal."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 8.\nGoal:\n(16 * cube_root(a^2))^(1/3) = 4.",
+    "formal_statement": "theorem cube_root_identity : (16 * (Real.rpow (8 : \u211d) ((2 : \u211d)/3))) ^ ((1 : \u211d)/3) = (4 : \u211d) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing the explicit definition of a = 8. The Lean code uses 8 directly instead of defining a variable 'a' with value 8 as specified in the assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a positive real number.\nGoal:\n\u221a(60x) \u00b7 \u221a(12x) \u00b7 \u221a(63x) = 36x \u221a(35x).",
+    "formal_statement": "theorem square_root_product_identity (x : \u211d) (hx : x > 0) : Real.sqrt (60 * x) * Real.sqrt (12 * x) * Real.sqrt (63 * x) = 36 * x * Real.sqrt (35 * x) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine water_per_mile = 1.5 / 3.\nDefine next_miles = 10.\nGoal:\nwater_per_mile * next_miles = 5.",
+    "formal_statement": "theorem water_calculation : (1.5 / 3 : \u211d) * (10 : \u211d) = (5 : \u211d) := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine \u03b8 as a real number.\nAssume 0 < \u03b8 \u2264 2\u03c0.\nDefine f(\u03b8) = 1 - 3 sin \u03b8 + 5 cos(3\u03b8).\nAssume f(\u03b8) = 0.\nGoal:\nThe number of values of \u03b8 satisfying the assumptions is 6.",
+    "formal_statement": "theorem number_of_solutions : \n    let \u03b8 : \u211d := \u03b8; f : \u211d \u2192 \u211d := \u03bb \u03b8 => 1 - 3 * Real.sin \u03b8 + 5 * Real.cos (3 * \u03b8)\n    in Fintype.card {\u03b8 : \u211d | 0 < \u03b8 \u2227 \u03b8 \u2264 2 * \u03c0 \u2227 f \u03b8 = 0} = 6 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption f(\u03b8) = 0 in the set definition. The Lean code defines the set as {\u03b8 : \u211d | 0 < \u03b8 \u2227 \u03b8 \u2264 2 * \u03c0 \u2227 f \u03b8 = 0} but should include the specific function f defined in the assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = log of 6 base 2.\nDefine b = log of 6 base 3.\nGoal:\n\u221a(a + b) = \u221a(log of 3 base 2) + \u221a(log of 2 base 3).",
+    "formal_statement": "theorem log_property : Real.sqrt (Real.logb 2 6 + Real.logb 3 6) = Real.sqrt (Real.logb 2 3) + Real.sqrt (Real.logb 3 2) := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Wrong base convention: Lean's Real.logb uses first argument as base (logb b x = log x / log b), but natural language statement defines a = log of 6 base 2 (base 2, argument 6), which would be Real.logb 2 6, but b = log of 6 base 3 should be Real.logb 3 6, not Real.logb 3 6 as written. Actually the Lean code has Real.logb 3 6 for b, which is correct. However, the goal's right side has \u221a(log of 3 base 2) which should be Real.sqrt (Real.logb 2 3), and \u221a(log of 2 base 3) which should be Real.sqrt (Real.logb 3 2). The Lean code matches this, so it appears correct. Wait, re-reading: The Lean code has Real.logb 2 6 for a (correct), Real.logb 3 6 for b (correct), Real.sqrt (Real.logb 2 3) for \u221a(log of 3 base 2) (correct), and Real.sqrt (Real.logb 3 2) for \u221a(log of 2 base 3) (correct). The statement appears to be correctly translated."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a positive real number.\nLet b be a positive real number.\nLet n be a natural number.\nAssume n > 0.\nGoal:\n((a + b)/2)^n \u2264 (a^n + b^n)/2",
+    "formal_statement": "theorem inequality_power_mean (a : \u211d) (b : \u211d) (n : \u2115) (ha : a > 0) (hb : b > 0) (hn : n > 0) : ((a + b)/2)^n \u2264 (a^n + b^n)/2 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, x, y be real numbers.\nAssume a x + b y = 3.\nAssume a x^2 + b y^2 = 7.\nAssume a x^3 + b y^3 = 16.\nAssume a x^4 + b y^4 = 42.\nGoal:\na x^5 + b y^5 = 20.",
+    "formal_statement": "theorem problem_solution (a b x y : \u211d) (h1 : a * x + b * y = 3) (h2 : a * x ^ 2 + b * y ^ 2 = 7) (h3 : a * x ^ 3 + b * y ^ 3 = 16) (h4 : a * x ^ 4 + b * y ^ 4 = 42) : a * x ^ 5 + b * y ^ 5 = 20 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a positive real number.\nDefine f as a real function.\nFor all real numbers x, f(x+a) = 1/2 + \u221a(f(x) - f(x)\u00b2).\nGoal:\nThere exists a positive real number b such that for all real numbers x, f(x+b) = f(x).",
+    "formal_statement": "theorem periodic_function_existence (a : \u211d) (ha : a > 0) (f : \u211d \u2192 \u211d) \n    (hf : \u2200 x : \u211d, f (x + a) = 1/2 + Real.sqrt (f x - (f x)^2)) :\n    \u2203 b : \u211d, b > 0 \u2227 \u2200 x : \u211d, f (x + b) = f x := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing domain restriction in square root: English statement implies f(x) - f(x)\u00b2 \u2265 0 for all x, but Lean theorem doesn't include this assumption"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 29.\nDefine b = 79.\nDefine c = 31.\nDefine d = 81.\nDefine e = a * b.\nDefine f = c * d.\nDefine g = e + f.\nGoal:\nThe units digit of g is 2.",
+    "formal_statement": "theorem units_digit_g_is_two : (g % 10 : \u2115) = 2 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing definitions of a, b, c, d, e, f, g in the theorem statement. The Lean code references undefined variables g."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 194.\nDefine m = 11.\nGoal:\nn mod m = 7.",
+    "formal_statement": "theorem mod_computation : (194 : \u2115) % 11 = 7 := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c be real numbers.\nAssume a \u2264 b \u2264 c.\nAssume a + b + c = 2.\nAssume ab + bc + ca = 1.\nGoal:\n0 \u2264 a \u2264 1/3.\n1/3 \u2264 b \u2264 1.\n1 \u2264 c \u2264 4/3.",
+    "formal_statement": "theorem real_inequalities (a b c : \u211d) (h1 : a \u2264 b) (h2 : b \u2264 c) (h3 : a + b + c = 2) (h4 : a * b + b * c + c * a = 1) : \n    0 \u2264 a \u2227 a \u2264 1/3 \u2227 1/3 \u2264 b \u2227 b \u2264 1 \u2227 1 \u2264 c \u2227 c \u2264 4/3 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption: English states 'a \u2264 b \u2264 c' but Lean only has separate 'a \u2264 b' and 'b \u2264 c' without the transitive relation that a \u2264 c"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine \u03c0 as the mathematical constant pi.\nLet x be an integer.\nAssume |x| < 3\u03c0.\nGoal:\nThe number of integer values of x satisfying the condition is 19.",
+    "formal_statement": "theorem integer_values_count : Finset.card (Finset.filter (\u03bb (x : \u2124) => |x| < 3 * \u03c0) Finset.univ) = 19 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Type mismatch: English specifies x is an integer, but Lean uses \u2124 (integers) which is correct. However, \u03c0 is defined as a real number in Lean, so |x| < 3 * \u03c0 compares an integer absolute value with a real number, which may not capture the intended integer comparison. The English statement implies we should count integer x where |x| < 3\u03c0, treating \u03c0 as approximately 3.14, so the comparison should be between integers or use integer bounds."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a and b be natural numbers.\nAssume a + b = 17402.\nAssume a is divisible by 10.\nDefine d = a / 10.\nAssume d = b.\nGoal:\na - b = 14238.",
+    "formal_statement": "theorem problem_solution : \u2200 (a b : \u2115), a + b = 17402 \u2192 10 \u2223 a \u2192 (let d := a / 10; d = b) \u2192 a - b = 14238 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing natural number constraint for b. English specifies 'Let a and b be natural numbers' but Lean only quantifies over \u2115 without constraining b to be natural in the context of the assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 100.\nDefine a_100 = 2.\nDefine b_100 = 4.\nLet k be a natural number.\nDefine (a_{k+1}, b_{k+1}) = (\u221a3 a_k - b_k, \u221a3 b_k + a_k).\n\nGoal:\na_1 + b_1 = 1/2^98.",
+    "formal_statement": "theorem goal_statement : a 1 + b 1 = 1 / 2^98 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumptions: Lean code does not include the definitions of n, a_100, b_100, the recurrence relation for a_{k+1} and b_{k+1}, or the fact that k is a natural number. The theorem statement is incomplete without these assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m as a prime number.\nDefine n as a prime number.\nAssume k is a natural number.\nAssume t is a natural number.\nAssume k > t.\nAssume k and t are the two positive integer solutions of the equation x\u00b2 - m x + n = 0.\nGoal:\nm^n + n^m + k^t + t^k = 20.",
+    "formal_statement": "theorem prime_equation_solution :\n    \u2200 (m n : \u2115) (hm : Nat.Prime m) (hn : Nat.Prime n) (k t : \u2115) (hk_pos : k > 0) (ht_pos : t > 0) \n    (h_gt : k > t) (h_solution : k ^ 2 - m * k + n = 0 \u2227 t ^ 2 - m * t + n = 0),\n    m ^ n + n ^ m + k ^ t + t ^ k = 20 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that k and t are the ONLY two positive integer solutions; Lean allows other solutions to exist which could make the conclusion false"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine x = 2n.\nDefine y = 2n + 2.\nAssume x > 0.\nAssume y > 0.\nAssume x * y = 288.\nGoal:\ny = 18.",
+    "formal_statement": "theorem solve_equation (n : \u2115) (hx_pos : 2 * n > 0) (hy_pos : (2 * n + 2) > 0) (hprod : (2 * n) * (2 * n + 2) = 288) : 2 * n + 2 = 18 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that n is a natural number in the theorem parameters"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a and b as positive real numbers.\nAssume a \u2260 b.\nAssume a - 1/a = 1.\nAssume b - 1/b = 1.\nGoal:\na + b = \u221a5.",
+    "formal_statement": "theorem positive_reals_sum_sqrt_five (a b : \u211d) (ha_pos : a > 0) (hb_pos : b > 0) (h_ne : a \u2260 b) \n    (ha_eq : a - 1/a = 1) (hb_eq : b - 1/b = 1) : a + b = Real.sqrt 5 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that a and b are roots of the equation x - 1/x = 1. The given assumptions ha_eq and hb_eq are contradictory with h_ne since the equation x - 1/x = 1 has only one positive solution (x = (1+\u221a5)/2)."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c be positive real numbers.\nAssume a, b, c are sides of a triangle.\nGoal:\na\u00b2(b + c - a) + b\u00b2(c + a - b) + c\u00b2(a + b - c) \u2264 3abc.",
+    "formal_statement": "theorem triangle_inequality_sides (a b c : \u211d) (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) \n    (triangle_ineq1 : a < b + c) (triangle_ineq2 : b < c + a) (triangle_ineq3 : c < a + b) : \n    a ^ 2 * (b + c - a) + b ^ 2 * (c + a - b) + c ^ 2 * (a + b - c) \u2264 3 * a * b * c := sorry",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet r1, r2, r3, r4, r5, r6 be natural numbers.\nAssume r1, r2, r3, r4, r5, r6 are the roots of the polynomial z^6 - 10z^5 + A z^4 + B z^3 + C z^2 + D z + 16.\nDefine the product r1 * r2 * r3 * r4 * r5 * r6 = 16.\nDefine the sum r1 + r2 + r3 + r4 + r5 + r6 = 10.\nGoal:\nB = -88.",
+    "formal_statement": "theorem polynomial_root_product_sum_implies_B_eq_neg_88 :\n    \u2200 (A B C D : \u2124) (r1 r2 r3 r4 r5 r6 : \u2115),\n    (\u2200 (z : \u2102), z^6 - 10*z^5 + A*z^4 + B*z^3 + C*z^2 + D*z + 16 = \n        (z - (r1 : \u2102)) * (z - (r2 : \u2102)) * (z - (r3 : \u2102)) * (z - (r4 : \u2102)) * (z - (r5 : \u2102)) * (z - (r6 : \u2102))) \u2192\n    (r1 : \u2124) * r2 * r3 * r4 * r5 * r6 = 16 \u2192\n    (r1 : \u2124) + r2 + r3 + r4 + r5 + r6 = 10 \u2192\n    B = -88 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that r1, r2, r3, r4, r5, r6 are the roots of the polynomial. The Lean theorem quantifies over all natural numbers r1-r6, but the English statement assumes specific r1-r6 that are the roots."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nDefine a\u00b2 \u00d7 b\u00b3 = 32/27.\nDefine a / b\u00b3 = 27/4.\nGoal:\na + b = 8/3.",
+    "formal_statement": "theorem solve_system (a b : \u211d) (h1 : a ^ 2 * b ^ 3 = (32 : \u211d)/27) (h2 : a / b ^ 3 = (27 : \u211d)/4) : a + b = (8 : \u211d)/3 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption b \u2260 0 in h2 (division by zero)"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a\u2081 = 2x - 3.\nDefine a\u2082 = 5x - 11.\nDefine a\u2083 = 3x + 1.\nAssume a\u2081, a\u2082, a\u2083 are the first three terms of an arithmetic sequence.\nThere exists a common difference d such that a\u2082 - a\u2081 = d and a\u2083 - a\u2082 = d.\nThere exists a natural number n.\nDefine a\u2099 = 2009.\nGoal:\nn = 502.",
+    "formal_statement": "theorem arithmetic_sequence_problem (x : \u2115) (h : \u2203 d : \u2124, (5*x - 11 : \u2124) - (2*x - 3) = d \u2227 (3*x + 1 : \u2124) - (5*x - 11) = d) : \n    (\u2203 n : \u2115, (2*x - 3 : \u2124) + (n : \u2124) * (((5*x - 11 : \u2124) - (2*x - 3)) : \u2124) = (2009 : \u2124)) \u2192 \n    \u2203 n : \u2115, (2*x - 3 : \u2124) + (n : \u2124) * (((5*x - 11 : \u2124) - (2*x - 3)) : \u2124) = (2009 : \u2124) \u2227 n = 502 := sorry",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly states the goal as an implication and has logical issues. The English statement says that under the given assumptions, n must equal 502. The Lean theorem says: if there exists some n that makes the sequence reach 2009, then there exists some n that makes it reach 2009 AND equals 502. This is tautological for the first part and doesn't capture that n must be exactly 502."
+  }
+]

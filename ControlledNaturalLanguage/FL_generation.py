@@ -1,8 +1,20 @@
 import os
 import sys
+from pathlib import Path
 import re
+import json
 from dotenv import load_dotenv
 from openai import OpenAI
+from handle_miniF2F import readFolder
+from CNL_generation import read_cnl_lst
+from eval_semantic import evaluate_translation
+from tqdm import tqdm 
+
+checker_path = '/Users/austinshen/Documents/Umich/Research/LeanQC_AI/AutoEvaluation'
+sys.path.append(checker_path)
+
+from lean_checker import check_lean_code
+from lean_server import LeanServer
 
 # 1. Load environment variables
 load_dotenv()
@@ -25,13 +37,19 @@ except Exception as e:
 # The "Oracle Context": Standard imports to help the model find definitions.
 # In a full system, you would retrieve these dynamically. For PoC, this covers 90% of undergrad math.
 STANDARD_IMPORTS = """
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Nat.Prime
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib.Data.Complex.Basic
-import Mathlib.Topology.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-open BigOperators Real Nat Topology Rat
+import Mathlib
+set_option maxHeartbeats 0
+set_option autoImplicit false
+set_option pp.numericTypes true
+set_option pp.coercions true
+set_option pp.letVarTypes true
+set_option pp.structureInstanceTypes true
+set_option pp.instanceTypes true
+set_option pp.mvars.withType true
+set_option pp.funBinderTypes true
+set_option pp.piBinderTypes true
+open scoped BigOperators
+open Real Nat Topology Rat Filter Finset Set
 """
 
 def clean_lean_output(raw_text):
@@ -51,7 +69,7 @@ def generate_lean(cnl_statement, imports=STANDARD_IMPORTS):
     """
     Autoformalizes a CNL/NL statement into a Lean 4 Theorem.
     """
-    print(f"🤖 Autoformalizing: '{cnl_statement[:50]}...'")
+    # print(f"🤖 Autoformalizing: '{cnl_statement[:50]}...'")
 
     system_prompt = f"""
     You are an expert Lean 4 formalizer.
@@ -97,30 +115,96 @@ def generate_lean(cnl_statement, imports=STANDARD_IMPORTS):
     except Exception as e:
         return f"❌ API Error: {e}"
 
+def generate_write(folder_path, name=None, json_output_path=None):
+    """
+    Utility to write content to a file.
+    """
+    if "miniF2F/informal" in folder_path:
+        informal_statements = readFolder(folder_path)
+    
+    else:
+        informal_statements = read_cnl_lst(folder_path)
+
+    if len(informal_statements) == 0:
+        print("❌ No informal statements found.")
+        return 
+
+    syntactic_corrects = []
+    logs = []
+    corrects = []
+    reasons = []
+    formal_statements = []
+
+
+    lean = LeanServer(checker_path)
+
+    for statement in tqdm(informal_statements):
+        # generate lean statement
+        lean_statement = generate_lean(statement)
+        formal_statements.append(lean_statement)
+
+        # syntactic check
+        # is_syntactic_valid, log = check_lean_code(STANDARD_IMPORTS + '\n\n' + lean_statement, checker_path)
+        is_syntactic_valid, log = lean.check(lean_statement)
+        syntactic_corrects.append(is_syntactic_valid)
+        logs.append(log)
+
+        # semantic evaluation
+        sem_eval = evaluate_translation(statement, lean_statement)
+        err = sem_eval.get("reason", "No reason provided.")
+        is_correct = sem_eval.get("is_correct", False)
+        corrects.append(is_correct)
+        reasons.append(err)
+    
+    lean.close()
+
+    n = len(informal_statements)
+
+    # write into lean file 
+    if name:
+        with open(name, "w") as f:
+            f.write(STANDARD_IMPORTS + "\n\n")
+            for i in range(n):
+                lean_statement = formal_statements[i]
+                f.write(lean_statement + "\n\n")
+
+    # write into json file
+    if json_output_path:
+        with open(json_output_path, "w") as jf:
+            data = []
+            for i in range(n):
+                json_entry = {
+                    "informal_statement": informal_statements[i],
+                    "formal_statement": formal_statements[i],
+                    "is_syntactically_correct": syntactic_corrects[i],
+                    "syntactic_evaluation_log": logs[i],
+                    "is_semantically_correct": corrects[i],
+                    "semantic_evaluation_reason": reasons[i]
+                }
+                data.append(json_entry.copy())
+            jf.write(json.dumps(data) + "\n")
+
+    # print summary statistics
+    syntax_accuracy = sum(syntactic_corrects) / len(syntactic_corrects) * 100
+    print(f"\n✅ syntactic accuracy: {syntax_accuracy:.2f}% ({sum(syntactic_corrects)}/{len(syntactic_corrects)})")
+    
+    syntactic_correct_indices = [i for i, x in enumerate(syntactic_corrects) if x]
+
+    if len(syntactic_correct_indices) > 0:
+        corrects_filtered = [corrects[i] for i in syntactic_correct_indices]
+    else:
+        corrects_filtered = []
+    if len(corrects_filtered) > 0:
+        semantic_accuracy = sum(corrects_filtered) / len(corrects_filtered) * 100
+    else:
+        semantic_accuracy = 0.0
+    print(f"✅ semantic accuracy: {semantic_accuracy:.2f}% ({sum(corrects_filtered)}/{len(corrects_filtered)})")
+
 # --- Execution ---
 if __name__ == "__main__":
-    # Example 1: Simple Number Theory
-    print("\n--- Test Case 1: Simple ---")
-    cnl_1 = "Show that for every natural number n, there exists a prime number p greater than n."
-    lean_1 = generate_lean(cnl_1)
-    print(f"result:\n{lean_1}")
 
-    # Example 2: Your Logarithm Problem (From CNL_generation.py)
-    print("\n--- Test Case 2: Complex (Logarithms) ---")
-    cnl_2 = (
-        "Let x, y, and z be real numbers greater than 1. "
-        "Let w be a positive real number. "
-        "Assume log_x(w) = 24. "
-        "Assume log_y(w) = 40. "
-        "Assume log_(xyz)(w) = 12. "
-        "Show that log_z(w) = 60."
-    )
-    lean_2 = generate_lean(cnl_2)
-    print(f"result:\n{lean_2}")
-    
-    # Optional: Save to file for the compiler check later
-    with open("Autoformalized_Theorems.lean", "w") as f:
-        f.write(STANDARD_IMPORTS + "\n\n")
-        f.write(lean_1 + "\n\n")
-        f.write(lean_2 + "\n")
-    print("\n✅ Saved results to Autoformalized_Theorems.lean")
+    # generate_write("miniF2F/informal/test", name="Autoformalized_miniF2F_Theorems_temp.lean")
+    # print("\n✅ Saved miniF2F autoformalizations to Autoformalized_miniF2F_Theorems.lean")
+
+    generate_write("history/CNL/cnl_statements_test.json", name=None, json_output_path="history/NL_FL_pairs/NL_FL_pairs_CNL_test.json")
+    print("\n✅ Saved CNL autoformalizations to Autoformalized_CNL_Theorems.lean")

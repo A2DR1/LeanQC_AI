@@ -2,6 +2,8 @@ import os
 import sys
 from dotenv import load_dotenv
 from openai import OpenAI
+import json
+from handle_miniF2F import readFolder
 
 # Initialize the client using DeepSeek's base URL
 # Ensure you have set your API key in your environment variables:
@@ -17,16 +19,59 @@ client = OpenAI(
     base_url="https://api.deepseek.com"
 )
 
-def generate_cnl(input_text, cnl_rules=None): 
+folder_path = "miniF2F/informal/test"
+
+def generate_cnl_list(folder_path, limit=100, version=2):
+    """
+    Reads informal statements from JSON files in the specified folder,
+    generates Controlled Natural Language (CNL) versions for each,
+    and returns a list of CNL statements.
+    """
+    informal_statements = readFolder(folder_path, limit=limit)
+    cnl_statements = []
+
+    with open("cnl_rules.json", "r") as f:
+        cnl_rules_data = json.load(f).get(f"v{version}", None)
+        if cnl_rules_data is None:
+            print(f"❌ Error: CNL rules for version {version} not found in cnl_rules.json.")
+            return []
+        cnl_rules = cnl_rules_data.get('rules', None)
+        input_example = cnl_rules_data.get('example_input', None)
+        output_example = cnl_rules_data.get('example_output', None)
+
+    print(f"Using CNL rules: {cnl_rules[:50]}.")
+    
+    for statement in informal_statements:
+        cnl = generate_cnl(statement, cnl_rules=cnl_rules,
+                           input_example=input_example, output_example=output_example)
+        cnl_statements.append(cnl)
+    
+    return cnl_statements
+
+def read_cnl_lst(filename="cnl_statements.json"):
+    """
+    Reads a list of CNL statements from a specified json file.
+    """
+    with open(filename, 'r') as f:
+        cnl_statements = json.load(f)
+    return cnl_statements
+
+def write_cnl_to_file(cnl_statements, filename="cnl_statements.json"):
+    """
+    Writes a list of CNL statements to a specified json file.
+    """
+    with open(filename, 'w') as f:
+        json.dump(cnl_statements, f, indent=4)
+    print(f"✅ Saved CNL statements to {filename}")
+
+def generate_cnl(input_text, cnl_rules=None, input_example=None, output_example=None): 
     """
     Converts standard natural language into a Controlled Natural Language (CNL)
     based on a specific set of rules.
     """
 
     print("Generating Controlled Natural Language...")
-    api_key=os.getenv("DEEPSEEK_API_KEY")
-    print(f"key: {api_key}")
-    
+
     # Default rules for a simple CNL (e.g., Simplified English)
     if cnl_rules is None:
         cnl_rules = (
@@ -41,6 +86,14 @@ def generate_cnl(input_text, cnl_rules=None):
     Your task is to rewrite the user's input text so that it adheres perfectly to the following rules:
 
     {cnl_rules}
+
+    {
+        "" if not input_example or not output_example else 
+        f'''Here is an example of how to apply these rules:
+        Input: {input_example}
+        Output: {output_example}
+        '''
+    }
 
     Output ONLY the rewritten text. Do not provide explanations or conversational filler.
     """
@@ -63,16 +116,8 @@ def generate_cnl(input_text, cnl_rules=None):
 
 # --- Example Usage ---
 if __name__ == "__main__":
-    # Informal, complex input
-    raw_text = (
-        # "The server might have crashed because it was overloaded by too many requests "
-        # "sent by the client, which is something that happens occasionally."
-        "Let $x$, $y$ and $z$ all exceed $1$ and let $w$ be a positive number such that $\\log_x w = 24$, $\\log_y w = 40$ and $\\log_{xyz} w = 12$. Find $\\log_z w$. Show that it is 060."
-    )
 
-    print(f"--- Original Text ---\n{raw_text}\n")
+    cnl_statements = generate_cnl_list(folder_path, 100, version=4)
+    write_cnl_to_file(cnl_statements, filename="cnl_statements_v4.json")
+
     
-    # Convert to CNL
-    cnl_output = generate_cnl(raw_text)
-    
-    print(f"--- Controlled Natural Language Output ---\n{cnl_output}")
