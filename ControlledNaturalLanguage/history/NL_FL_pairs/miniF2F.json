@@ -1,0 +1,312 @@
+
+import Mathlib
+set_option maxHeartbeats 0
+set_option autoImplicit false
+set_option pp.numericTypes true
+set_option pp.coercions true
+set_option pp.letVarTypes true
+set_option pp.structureInstanceTypes true
+set_option pp.instanceTypes true
+set_option pp.mvars.withType true
+set_option pp.funBinderTypes true
+set_option pp.piBinderTypes true
+open scoped BigOperators
+open Real Nat Topology Rat Filter Finset Set
+
+
+theorem odd_integers_condition (a b c d : ℤ) (ha : Odd a) (hb : Odd b) (hc : Odd c) (hd : Odd d) (hpos : 0 < a) (hlt : a < b ∧ b < c ∧ c < d) (had : a * d = b * c) (hk : ∃ k : ℤ, a + d = 2 ^ k) (hm : ∃ m : ℤ, b + c = 2 ^ m) : a = 1 := sorry
+
+theorem inequality_for_absolute_values (a b : ℝ) : |a + b| / (1 + |a + b|) ≤ |a| / (1 + |a|) + |b| / (1 + |b|) := sorry
+
+theorem exists_inverse_mod_1399 : ∃ n : ℤ, 0 ≤ n ∧ n < 1399 ∧ (160 * n) % 1399 = 1 := sorry
+
+theorem not_prime_of_condition (K L M N : ℕ) (hK : K > 0) (hL : L > 0) (hM : M > 0) (hN : N > 0) (h_ineq : K > L ∧ L > M ∧ M > N) (h_eq : K * M + L * N = (K + L - M + N) * (-K + L + M + N)) : ¬ Nat.Prime (K * L + M * N) := sorry
+
+theorem inequality_for_positive_reals (x y z : ℝ) (hx : x > 0) (hy : y > 0) (hz : z > 0) : 9 / (x + y + z) ≤ 2 / (x + y) + 2 / (y + z) + 2 / (z + x) := sorry
+
+theorem solve_congruence : ∃ n : ZMod 47, (2 : ZMod 47) * n = (15 : ZMod 47) ∧ n = (31 : ZMod 47) := sorry
+
+theorem find_modular_inverse : ∃ (b : ℕ), b < 11^2 ∧ 24 * b % (11^2) = 1 ∧ b = 116 := sorry
+
+theorem sum_of_variables : ∃ (x y z : ℤ), 3*x + y = 17 ∧ 5*y + z = 14 ∧ 3*x + 5*z = 41 ∧ x + y + z = 12 := sorry
+
+theorem f_value : f (f (f (f (f (4))))) = 1 := sorry
+
+theorem problem_statement : ∀ (n : ℕ) (h : n ≥ 9), ∃ (k : ℕ), ((Nat.factorial (n + 2) - Nat.factorial (n + 1)) / Nat.factorial n) = k ^ 2 := sorry
+
+theorem exist_irrational_power_rational : ∃ (a b : ℝ), Irrational a ∧ Irrational b ∧ Rational (a ^ b) := sorry
+
+theorem smallest_k_such_that_for_all_n_gcd_condition : 
+    let candidates := Finset.Icc 1 5 in
+    let condition (k : ℕ) : Prop := ∀ n : ℕ, 0 < n → 
+      Nat.Coprime (6 * n + k) (6 * n + 3) ∧ 
+      Nat.Coprime (6 * n + k) (6 * n + 2) ∧ 
+      Nat.Coprime (6 * n + k) (6 * n + 1) in
+    (∃ k ∈ candidates, condition k) ∧ 
+    (∀ m ∈ candidates, condition m → 5 ≤ m) := sorry
+
+theorem count_four_digit_even_digits_divisible_by_five : Finset.card (Finset.filter (λ n : ℕ => 1000 ≤ n ∧ n ≤ 9999 ∧ (∀ d : ℕ, d ∈ Nat.digits 10 n → Even d) ∧ 5 ∣ n) (Finset.Icc 1000 9999)) = 100 := sorry
+
+theorem problem_value : (∑ k in Finset.Icc 1 20, Real.log (3^(k^2 : ℝ)) / Real.log ((5 : ℝ)^k)) * (∑ k in Finset.Icc 1 100, Real.log ((25 : ℝ)^k) / Real.log ((9 : ℝ)^k)) = (21000 : ℝ) := sorry
+
+theorem sum_reciprocal_sqrt_lt_198 : ∑ k in Finset.Icc 2 10000, (1 : ℝ) / Real.sqrt k < 198 := sorry
+
+theorem euler_polynomial_common_factor : 
+    let p (n : ℕ) := n ^ 2 - n + 41 in
+    ∃ n : ℕ, 0 < n ∧ 1 < Nat.gcd (p n) (p (n + 1)) ∧ 
+    ∀ m : ℕ, 0 < m → m < n → ¬ (1 < Nat.gcd (p m) (p (m + 1))) := sorry
+
+theorem factor_expression : ∃ (A B : ℤ), (10 : ℤ) * x ^ 2 - x - 24 = (A * x - 8) * (B * x + 3) ∧ A * B + B = 12 := sorry
+
+theorem inequality_of_positive_reals (a b : ℝ) (ha : 0 < a) (hb : 0 < b) (hle : b ≤ a) : (a + b) / 2 - Real.sqrt (a * b) ≤ (a - b)^2 / (8 * b) := sorry
+
+theorem number_of_perfect_square_divisors : Finset.card (Finset.filter (fun d : ℕ => ∃ k : ℕ, d = k ^ 2) (Nat.divisors (∏ i in Finset.Icc 1 9, Nat.factorial i))) = 672 := sorry
+
+theorem problem_2002_amc_12b_22 : Set.Infinite {m : ℕ | m > 0 ∧ ∃ n : ℕ, n > 0 ∧ m * n ≤ m + n} := sorry
+
+theorem find_current : (1 + Complex.I) / (2 - Complex.I) = (1/5 : ℂ) + (3/5 : ℂ) * Complex.I := sorry
+
+theorem problem_statement : ∃ (n : ℕ) (hn : n > 0), 
+    (1/2 : ℚ) + 1/3 + 1/7 + (1 : ℚ)/n = ((1/2 : ℚ) + 1/3 + 1/7 + (1 : ℚ)/n).floor ∧
+    ¬(2 ∣ n) ∧
+    ¬(3 ∣ n) ∧
+    ¬(6 ∣ n) ∧
+    ¬(7 ∣ n) ∧
+    ¬(n > 84) := sorry
+
+theorem remainder_of_5_pow_30_mod_7 : (5 ^ 30) % 7 = 1 := sorry
+
+theorem find_n_gcd_lcm : ∃ n, Nat.gcd n 40 = 10 ∧ Nat.lcm n 40 = 280 ∧ n = 70 := sorry
+
+theorem product_identity : (2 + 3) * (2^2 + 3^2) * (2^4 + 3^4) * (2^8 + 3^8) * (2^16 + 3^16) * (2^32 + 3^32) * (2^64 + 3^64) = 3^128 - 2^128 := sorry
+
+theorem problem_roots_cos_polynomial : 
+    let P : ℝ → ℝ := λ x => x^3 + a * x^2 + b * x + c
+    let r1 := Real.cos (2 * π / 7)
+    let r2 := Real.cos (4 * π / 7)
+    let r3 := Real.cos (6 * π / 7)
+    in (∀ x, P x = (x - r1) * (x - r2) * (x - r3)) → a * b * c = 1/32 := sorry
+
+theorem arithmetic_progression_sum_of_even_terms : 
+    let (a : ℕ → ℤ) := λ n => (a₁ : ℤ) + (n - 1) in
+    let a₁ : ℤ := 0 in
+    let h : ∑ k in Finset.range 98, a (k + 1) = 137 := by
+      sorry in
+    ∑ k in Finset.range 49, a (2 * k + 2) = 93 := sorry
+
+theorem sum_of_coordinates_of_intersection : 
+    ∃ (A : ℝ × ℝ), (3 * A.2 = A.1) ∧ (2 * A.1 + 5 * A.2 = 11) ∧ (A.1 + A.2 = 4) := sorry
+
+theorem divides_pow_sub (p : ℕ) (hp : Nat.Prime p) (a : ℕ) (ha : a > 0) : p ∣ a ^ p - a := sorry
+
+theorem problem_choice : ∀ (f : ℚ → ℚ) (h_mul : ∀ (a b : ℚ), 0 < a → 0 < b → f (a * b) = f a + f b) (h_prime : ∀ (p : ℕ), Nat.Prime p → f (p : ℚ) = (p : ℚ)), 
+    (f (17/32 : ℚ) < 0) = false ∧ 
+    (f (11/16 : ℚ) < 0) = false ∧ 
+    (f (7/9 : ℚ) < 0) = false ∧ 
+    (f (7/6 : ℚ) < 0) = false ∧ 
+    (f (25/11 : ℚ) < 0) = true := sorry
+
+theorem solve_for_a : ∃ a : ℝ, (Real.sqrt (4 + Real.sqrt (16 + 16 * a))) + Real.sqrt (1 + Real.sqrt (1 + a)) = 6 ∧ a = 8 := sorry
+
+theorem real_inequality (a b : ℝ) (h : a ^ 2 + b ^ 2 = 1) : a * b + (a - b) ≤ 1 := sorry
+
+theorem floor_sum_value : (Int.floor ((10 : ℝ) * ((1 : ℝ) / 3)) + Int.floor ((100 : ℝ) * ((1 : ℝ) / 3)) + Int.floor ((1000 : ℝ) * ((1 : ℝ) / 3)) + Int.floor ((10000 : ℝ) * ((1 : ℝ) / 3))) = 3702 := sorry
+
+theorem inequality_of_positive_reals (a b c d : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hd : d > 0) :
+    a ^ 2 / b + b ^ 2 / c + c ^ 2 / d + d ^ 2 / a ≥ a + b + c + d := sorry
+
+theorem units_digit_product : (Nat.mod (16^17 * 17^18 * 18^19) 10) = 8 := sorry
+
+theorem number_of_solutions_in_interval : Finset.card ((Set.mem_setOf_eq (fun (x : ℝ) => Real.sin ((π / 2) * Real.cos x) = Real.cos ((π / 2) * Real.sin x))).filter (λ x => x ∈ Set.Icc (0 : ℝ) π))).toFinset = 2 := sorry
+
+theorem max_value_of_expression : 
+    IsGreatest {x : ℝ | ∃ (t : ℝ), x = ((2 : ℝ) ^ t - 3 * t) * t / ((4 : ℝ) ^ t)} (1/12) := sorry
+
+theorem min_value_at_seven : ∃ x, (∀ y, x^2 - 14*x + 3 ≤ y^2 - 14*y + 3) ∧ x = 7 := sorry
+
+theorem imo_2001_problem : 
+    let factors := Finset.filter (fun (x : ℕ) => 0 < x) (Nat.divisors 2001) in
+    Finset.sup' factors (by simp) (fun I => 
+      Finset.sup' factors (by simp) (fun M => 
+        Finset.sup' factors (by simp) (fun O => 
+          if h : I ≠ M ∧ M ≠ O ∧ I ≠ O ∧ I * M * O = 2001 then I + M + O else 0))) = 671 := sorry
+
+theorem number_of_solutions_tan2x_eq_cos_halfx : 
+    let interval : Set ℝ := Set.Icc (0 : ℝ) (2 * π) in
+    let solutions : Set ℝ := {x | x ∈ interval ∧ Real.tan (2 * x) = Real.cos (x / 2)} in
+    Finset.card (solutions.toFinite.toFinset) = 5 := sorry
+
+theorem gcd_lcm_sum_min : ∃ (m n : ℕ), 0 < m ∧ 0 < n ∧ Nat.gcd m n = 8 ∧ Nat.lcm m n = 112 ∧ m + n = 72 := sorry
+
+theorem sum_of_last_three_digits_of_5_pow_100 : (Nat.digits 10 (5 ^ 100)).reverse.take 3 |>.sum = 13 := sorry
+
+theorem parity_sequence : (Even (D 2021) ∧ Odd (D 2022) ∧ Even (D 2023)) := sorry
+
+theorem inequality_for_positive_n (n : ℕ) (hn : n > 0) : (Real.ofNat n) ^ ((1 : ℝ) / (Real.ofNat n)) ≤ 2 - (1 : ℝ) / (Real.ofNat n) := sorry
+
+theorem problem_abc (a b c : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (h1 : a * (b + c) = 152) (h2 : b * (c + a) = 162) (h3 : c * (a + b) = 170) : a * b * c = 720 := sorry
+
+theorem remainder_of_1529_mod_6 : 1529 % 6 = 5 := sorry
+
+theorem compute_91_squared : (91 : ℕ) ^ 2 = 8281 := sorry
+
+theorem log_327_eq_3 : Real.logb 3 27 = 3 := sorry
+
+theorem solve_for_a : ∃ a : ℚ, (8⁻¹ / 4⁻¹) - a⁻¹ = (1 : ℚ) ∧ a = (-2 : ℚ) := sorry
+
+theorem complex_equation_solution : ∃ (z : ℂ), (12 : ℂ) * Complex.normSq z = (2 : ℂ) * Complex.normSq (z + 2) + Complex.normSq (z ^ 2 + 1) + (31 : ℂ) ∧ z + 6 / z = (-2 : ℂ) := sorry
+
+theorem find_sum_of_squares (x y : ℝ) (h_am : (x + y) / 2 = 7) (h_gm : Real.sqrt (x * y) = Real.sqrt 19) : x ^ 2 + y ^ 2 = 158 := sorry
+
+theorem cube_root_condition_implies_cube_sum (r : ℝ) (h : r ^ (1/3 : ℝ) + (1 : ℝ) / (r ^ (1/3 : ℝ)) = 3) : r ^ 3 + (1 : ℝ) / r ^ 3 = 5778 := sorry
+
+theorem exists_unique_initial_value : ∃! (x₁ : ℝ), ∀ n : ℕ, 0 < x₁ ∧ (∀ k : ℕ, k ≥ 1 → let x := Nat.rec x₁ (λ n x_n => x_n * (x_n + 1 / (n : ℝ))) k in 0 < x ∧ x < 1 ∧ (k ≥ 1 → x < Nat.rec x₁ (λ n x_n => x_n * (x_n + 1 / (n : ℝ))) (k + 1))) := sorry
+
+theorem greatest_distance_between_sets : 
+    let A : Set ℂ := {z | z ^ 3 - 8 = 0} 
+    let B : Set ℂ := {z | z ^ 3 - 8 * z ^ 2 - 8 * z + 64 = 0} 
+    in sSup (Set.image2 (λ a b => Complex.dist a b) A B) = Real.sqrt 84 := sorry
+
+theorem divisibility_condition (n : ℕ) : 11 ∣ (10 ^ n - ((-1 : ℤ) ^ n)) := sorry
+
+theorem product_bound (n : ℕ) (a : ℕ → ℝ) (h_nonneg : ∀ i, 0 ≤ a i) (h_sum : ∑ i in Finset.range n, a i = n) : 
+    ∏ i in Finset.range n, a i ≤ 1 := sorry
+
+theorem problem_solution : (Real.log (x / y) / Real.log 2) ^ 2 = 20 := sorry
+
+theorem find_c : ∃ c : ℝ, (fun (x : ℝ) => c * x ^ 3 - 9 * x + 3) 2 = 9 ∧ c = 3 := sorry
+
+theorem bernoulli_inequality (x : ℝ) (n : ℕ) (hx : x > -1) : (1 + n * x) ≤ (1 + x) ^ n := sorry
+
+theorem find_mod_value : ∃! n : ℤ, 0 ≤ n ∧ n < (101 : ℤ) ∧ (123456 : ℤ) ≡ n [ZMOD (101 : ℤ)] := by
+  refine ⟨34, ?_, ?_⟩
+  · refine ⟨by norm_num, by norm_num, ?_⟩
+    show (123456 : ℤ) ≡ (34 : ℤ) [ZMOD (101 : ℤ)]
+    norm_num
+  · intro n ⟨hn_lower, hn_upper, hn_mod⟩
+    have : (123456 : ℤ) % (101 : ℤ) = (34 : ℤ) := by norm_num
+    have h := Int.emod_eq_zero_of_dvd (Int.modEq_iff_eq_mod_eq_zero.mp hn_mod)
+    have : n = 34 := by
+      apply Int.eq_of_modEq_of_lt_of_lt hn_mod ?_ ?_
+      · exact hn_lower
+      · exact hn_upper
+    exact this
+:= sorry
+
+theorem son_age_today : ∃ (father_age son_age : ℕ), father_age = 5 * son_age ∧ (father_age - 3) + (son_age - 3) = 30 ∧ son_age = 6 := sorry
+
+theorem arithmetic_series_first_term : 
+    ∃ (a d : ℚ), (∑ k in Finset.range 5, (a + (k : ℚ) * d)) = 70 ∧ (∑ k in Finset.range 10, (a + (k : ℚ) * d)) = 210 ∧ a = 42/5 := sorry
+
+theorem residue_mod_four : (121 * 122 * 123) % 4 = 2 := sorry
+
+theorem sum_mod_four : (∑ i in Finset.range 12, i + 1) % 4 = 2 := sorry
+
+theorem problem_2000_AMC_8_Q1 : ((3 * (4 : ℝ) - 2) * (4 * (4 : ℝ) + 1) - (3 * (4 : ℝ) - 2) * 4 * (4 : ℝ) + 1) = (11 : ℝ) := sorry
+
+theorem sum_of_solutions_eq_four : (∑ x : ℝ, if |2 - x| = 3 then x else 0) = 4 := sorry
+
+theorem product_of_real_roots : 
+    let f (x : ℝ) := x^2 + 18*x + 30 - 2 * Real.sqrt (x^2 + 18*x + 45) in
+    let roots : Set ℝ := {x | f x = 0} in
+    ∏ x in roots, x = 20 := sorry
+
+theorem problem_statement : ∀ (a b : ℝ) (f : ℝ → ℝ), (∀ x, f x = a * x ^ 4 - b * x ^ 2 + x + 5) → (f (-3) = 2) → (f 3 = 8) := sorry
+
+theorem problem_solution : ∃ (a b c d : ℕ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hd : d > 0), 
+    a * b * c * d = Nat.factorial 8 ∧ 
+    a * b + a + b = 524 ∧ 
+    b * c + b + c = 146 ∧ 
+    c * d + c + d = 104 ∧ 
+    a - d = 10 := sorry
+
+theorem father_age_base_ten : (1222 : ℕ) = 53 := sorry
+
+theorem remainder_mod_power_of_two (n : ℕ) (hn : n > 0) : (3^(2^n) - 1) % (2^(n+3)) = 2^(n+2) := sorry
+
+theorem arithmetic_sequence_problem : ∃ (a d : ℤ), (a + 6 * d = 30) ∧ (a + 10 * d = 60) ∧ (a + 20 * d = 135) := sorry
+
+theorem f_value_at_84 : f 84 = 997 := sorry
+
+theorem functional_equation_on_integers : 
+    {f : ℤ → ℤ | ∀ (a b : ℤ), f (2 * a) + 2 * f b = f (f (a + b))} = {f | f = fun _ => 0} ∪ {f | f = fun x => x} ∪ {f | f = fun x => 2 * x} := sorry
+
+theorem composition_value : (fun (x : ℝ) => x + 1) ((fun (x : ℝ) => x ^ 2 + 3) (2 : ℝ)) = (8 : ℝ) := sorry
+
+theorem solve_system : ∃ (a b : ℤ), 3 * a + 2 * b = 5 ∧ a + b = 2 ∧ (a, b) = (1, 1) := sorry
+
+theorem possible_result_of_operation : 
+    ∃ (p q : ℕ) (hp : Nat.Prime p) (hq : Nat.Prime q) (hne : p ≠ q) (hplo : 4 < p) (hqlo : 4 < q) (hphi : p < 18) (hqhi : q < 18), 
+      p * q - (p + q) = 119 := sorry
+
+theorem marbles_to_remove : (239 + 174 + 83) % 10 = 6 := sorry
+
+theorem f_properties_and_value : 
+    ∃ (f : ℕ → ℕ → ℕ), 
+    (∀ (x : ℕ), f x x = x) ∧ 
+    (∀ (x y : ℕ), f x y = f y x) ∧ 
+    (∀ (x y : ℕ), (x + y) * f x y = y * f x (x + y)) ∧ 
+    f 14 52 = 364 := sorry
+
+theorem cube_root_problem : (16 * ((Real.ofNat 8 : ℝ) ^ ((2 : ℕ) : ℝ) / 3)) ^ ((1 : ℕ) : ℝ / 3) = (4 : ℝ) := sorry
+
+theorem sqrt_product_simplification (x : ℝ) (hx : 0 ≤ x) : Real.sqrt (60 * x) * Real.sqrt (12 * x) * Real.sqrt (63 * x) = 36 * x * Real.sqrt (35 * x) := sorry
+
+theorem water_consumption : (1.5 * (10 / 3)) = 5 := sorry
+
+theorem count_theta_solutions : Finset.card (Finset.filter (λ θ : ℝ => 1 - 3 * Real.sin θ + 5 * Real.cos (3 * θ) = 0) (Finset.Icc (0 : ℝ) (2 * π) \ {0})) = 6 := sorry
+
+theorem sqrt_log_sum_eq : Real.sqrt (Real.log 6 / Real.log 2 + Real.log 6 / Real.log 3) = Real.sqrt (Real.log 3 / Real.log 2) + Real.sqrt (Real.log 2 / Real.log 3) := sorry
+
+theorem inequality_of_power_means (a b : ℝ) (ha : 0 < a) (hb : 0 < b) (n : ℕ) (hn : 0 < n) : ((a + b) / 2) ^ n ≤ (a ^ n + b ^ n) / 2 := sorry
+
+theorem find_ax5_by5 (a b x y : ℝ) (h1 : a * x + b * y = 3) (h2 : a * x ^ 2 + b * y ^ 2 = 7) (h3 : a * x ^ 3 + b * y ^ 3 = 16) (h4 : a * x ^ 4 + b * y ^ 4 = 42) : a * x ^ 5 + b * y ^ 5 = 20 := sorry
+
+theorem periodic_function_exists (a : ℝ) (ha : a > 0) (f : ℝ → ℝ) (hf : ∀ x : ℝ, f (x + a) = 1/2 + Real.sqrt (f x - (f x)^2)) : ∃ b : ℝ, b > 0 ∧ ∀ x : ℝ, f (x + b) = f x := sorry
+
+theorem units_digit_sum : (29 * 79 + 31 * 81) % 10 = 2 := sorry
+
+theorem remainder_194_mod_11 : 194 % 11 = 7 := sorry
+
+theorem real_inequalities : ∀ (a b c : ℝ), a ≤ b → b ≤ c → a + b + c = 2 → a * b + b * c + c * a = 1 → (0 ≤ a ∧ a ≤ 1/3) ∧ (1/3 ≤ b ∧ b ≤ 1) ∧ (1 ≤ c ∧ c ≤ 4/3) := sorry
+
+theorem count_integer_solutions_abs_x_lt_three_pi : Finset.card (Finset.Icc (-⌊3 * π⌋) (⌊3 * π⌋) : Finset ℤ) = 19 := sorry
+
+theorem problem : ℕ := by
+  let total_sum : ℕ := 17402
+  have h : ∃ (x y : ℕ), x + y = total_sum ∧ 10 ∣ x ∧ y = x / 10 := by
+    refine ⟨17402 - 1582, 1582, ?_, ?_, ?_⟩
+    · omega
+    · refine ⟨1582, ?_⟩
+      omega
+    · omega
+  rcases h with ⟨x, y, h_sum, h_div, h_erase⟩
+  exact if x ≥ y then x - y else y - x := sorry
+
+theorem problem_statement : ∃ (a₁ b₁ : ℝ), (∀ n : ℕ, let (a, b) := Nat.rec (a₁, b₁) (λ _ (ab : ℝ × ℝ) => (Real.sqrt 3 * ab.1 - ab.2, Real.sqrt 3 * ab.2 + ab.1)) n in (a, b) = (a, b)) ∧ (let (a, b) := Nat.rec (a₁, b₁) (λ _ (ab : ℝ × ℝ) => (Real.sqrt 3 * ab.1 - ab.2, Real.sqrt 3 * ab.2 + ab.1)) 99 in (a, b) = (2, 4)) ∧ (a₁ + b₁ = (1 : ℝ) / ((2 : ℝ) ^ 98)) := sorry
+
+theorem sum_of_powers (m n k t : ℕ) (hm : Nat.Prime m) (hn : Nat.Prime n) (hk : k > 0) (ht : t > 0) (h_roots : k > t) (h_eq : k * t = n) (h_sum : k + t = m) : m ^ n + n ^ m + k ^ t + t ^ k = 20 := sorry
+
+theorem consecutive_even_product : ∃ (n : ℕ), 0 < n ∧ Even n ∧ Even (n + 2) ∧ (n * (n + 2) = 288) ∧ (n + 2 = 18) := sorry
+
+theorem problem_solution : ∃ (a b : ℝ) (ha : a > 0) (hb : b > 0) (hne : a ≠ b), (|a - (1 / a)| = 1 ∧ |b - (1 / b)| = 1) ∧ a + b = Real.sqrt 5 := sorry
+
+theorem triangle_inequality_sum_squares (a b c : ℝ) (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (h_triangle : a + b > c ∧ b + c > a ∧ c + a > b) : a ^ 2 * (b + c - a) + b ^ 2 * (c + a - b) + c ^ 2 * (a + b - c) ≤ 3 * a * b * c := sorry
+
+theorem problem_2002_AMC_12B_25 : 
+    let A B C D : ℤ := ?_ in
+    let p : ℤ[X] := X^6 - 10 * X^5 + A * X^4 + B * X^3 + C * X^2 + D * X + 16 in
+    (∀ (z : ℂ), p.eval₂ (algebraMap ℤ ℂ) z = 0 → ∃ (n : ℕ), z = (n : ℂ) ∧ n > 0) → 
+    B = -88 := sorry
+
+theorem solve_for_sum (a b : ℝ) (h1 : a ^ 2 * b ^ 3 = 32/27) (h2 : a / b ^ 3 = 27/4) : a + b = 8/3 := sorry
+
+theorem arithmetic_sequence_nth_term : 
+    ∃ (x n : ℕ) (seq : ℕ → ℕ), 
+      (∀ k, seq (k + 1) - seq k = seq 1 - seq 0) ∧ 
+      seq 0 = 2 * x - 3 ∧ 
+      seq 1 = 5 * x - 11 ∧ 
+      seq 2 = 3 * x + 1 ∧ 
+      seq n = 2009 ∧ 
+      n = 502 := sorry
+

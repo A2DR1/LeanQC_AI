@@ -9,12 +9,8 @@ from handle_miniF2F import readFolder
 from CNL_generation import read_cnl_lst
 from eval_semantic import evaluate_translation
 from tqdm import tqdm 
-
-checker_path = '/Users/austinshen/Documents/Umich/Research/LeanQC_AI/AutoEvaluation'
-sys.path.append(checker_path)
-
-from lean_checker import check_lean_code
-from lean_server import LeanServer
+from lean_interact import LeanREPLConfig, LeanServer, Command, TempRequireProject, LeanRequire
+import time
 
 # 1. Load environment variables
 load_dotenv()
@@ -119,9 +115,11 @@ def generate_write(folder_path, name=None, json_output_path=None):
     """
     Utility to write content to a file.
     """
+    print(f"📂 Processing folder/file: {folder_path}")
+    t0 = time.time()
+
     if "miniF2F/informal" in folder_path:
         informal_statements = readFolder(folder_path)
-    
     else:
         informal_statements = read_cnl_lst(folder_path)
 
@@ -135,8 +133,9 @@ def generate_write(folder_path, name=None, json_output_path=None):
     reasons = []
     formal_statements = []
 
-
-    lean = LeanServer(checker_path)
+    project = TempRequireProject(lean_version="v4.8.0", require="mathlib")
+    config = LeanREPLConfig(verbose=True, project = project)
+    server = LeanServer(config)
 
     for statement in tqdm(informal_statements):
         # generate lean statement
@@ -145,7 +144,17 @@ def generate_write(folder_path, name=None, json_output_path=None):
 
         # syntactic check
         # is_syntactic_valid, log = check_lean_code(STANDARD_IMPORTS + '\n\n' + lean_statement, checker_path)
-        is_syntactic_valid, log = lean.check(lean_statement)
+        # is_syntactic_valid, log = lean.check(lean_statement)
+        response = server.run(Command(cmd = STANDARD_IMPORTS + '\n\n' + lean_statement))
+        if response.messages and response.messages[0].severity == "error":
+            is_syntactic_valid = False
+            log = response.messages[0].data
+        elif response.messages:
+            is_syntactic_valid = True
+            log = response.messages[0].severity + ". " + response.messages[0].data
+        else:
+            is_syntactic_valid = True
+            log = "No syntax errors."
         syntactic_corrects.append(is_syntactic_valid)
         logs.append(log)
 
@@ -156,7 +165,6 @@ def generate_write(folder_path, name=None, json_output_path=None):
         corrects.append(is_correct)
         reasons.append(err)
     
-    lean.close()
 
     n = len(informal_statements)
 
@@ -200,11 +208,13 @@ def generate_write(folder_path, name=None, json_output_path=None):
         semantic_accuracy = 0.0
     print(f"✅ semantic accuracy: {semantic_accuracy:.2f}% ({sum(corrects_filtered)}/{len(corrects_filtered)})")
 
+    print(f"⏱️ Total Time Spent: {time.time() - t0:.2f} seconds")
+
 # --- Execution ---
 if __name__ == "__main__":
 
-    # generate_write("miniF2F/informal/test", name="Autoformalized_miniF2F_Theorems_temp.lean")
+    # generate_write("miniF2F/informal/test", name="history/NL_FL_pairs/miniF2F.json")
     # print("\n✅ Saved miniF2F autoformalizations to Autoformalized_miniF2F_Theorems.lean")
 
-    generate_write("history/CNL/cnl_statements_test.json", name=None, json_output_path="history/NL_FL_pairs/NL_FL_pairs_CNL_test.json")
+    generate_write("history/CNL/cnl_statements_v6.json", name=None, json_output_path="history/NL_FL_pairs/NL_FL_pairs_CNL_v6.json")
     print("\n✅ Saved CNL autoformalizations to Autoformalized_CNL_Theorems.lean")
