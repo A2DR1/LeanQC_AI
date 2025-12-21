@@ -64,10 +64,4 @@ def overall_accuracy(version = None, file_path = None):
     return overall_accuracy
 
 if __name__ == "__main__":
-    # run_version(version="7")
-    # count_corrects(7)
-    # overall_correctness(7)
-
-    overall_accuracy(file_path="history/NL_FL_pairs/miniF2F_trail1.json")
-    for i in range(1,8):
-        overall_accuracy(version=str(i))
+    pass
