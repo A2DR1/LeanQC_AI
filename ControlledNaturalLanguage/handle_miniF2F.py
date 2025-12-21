@@ -9,17 +9,26 @@ def readJson(file_path):
         data = json.load(f)
     return data
 
-def readFolder(folder_path, limit=100):
+def readFolder(folder_path, limit=100, randomize=False):
     data_list = []
-    for i, filename in enumerate(os.listdir(folder_path)):
-        # Limit to first 100 files for testing
-        if i >= limit:
-            break
-        if filename.endswith(".json"):
+    if randomize:
+        import random
+        all_filenames = [filename for filename in os.listdir(folder_path) if filename.endswith(".json")]
+        random.shuffle(all_filenames)
+        selected_filenames = all_filenames[:limit]
+        for filename in selected_filenames:
             file_path = os.path.join(folder_path, filename)
-            print(f"Reading file: {file_path}")
             data = readJson(file_path)
             data_list.append(data['informal_statement'])
+    else:
+        for i, filename in enumerate(os.listdir(folder_path)):
+            # Limit to first 100 files for testing
+            if i >= limit:
+                break
+            if filename.endswith(".json"):
+                file_path = os.path.join(folder_path, filename)
+                data = readJson(file_path)
+                data_list.append(data['informal_statement'])
     return data_list
 
 if __name__ == "__main__":

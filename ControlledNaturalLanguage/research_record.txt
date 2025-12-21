@@ -1,0 +1,71 @@
+Trial 1:
+Trial 1:
+MiniF2F - Syntactic Accuracy: 70.00%, Semantic Accuracy: 24.29%
+CNL_v1 - Syntactic Accuracy: 70.00%, Semantic Accuracy: 24.29%
+CNL_v2 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 38.46%
+CNL_v3 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 26.76%
+CNL_v4 - Syntactic Accuracy: 72.00%, Semantic Accuracy: 33.33%
+CNL_v5 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 38.46%
+CNL_v6 - Syntactic Accuracy: 66.00%, Semantic Accuracy: 30.30%
+CNL_v7 - Syntactic Accuracy: 57.00%, Semantic Accuracy: 49.12%
+
+Trial 2:
+MiniF2F - Syntactic Accuracy: 70.00%, Semantic Accuracy: 21.43%
+CNL_v1 - Syntactic Accuracy: 67.00%, Semantic Accuracy: 19.40%
+CNL_v2 - Syntactic Accuracy: 63.00%, Semantic Accuracy: 39.68%
+CNL_v3 - Syntactic Accuracy: 70.00%, Semantic Accuracy: 24.29%
+CNL_v4 - Syntactic Accuracy: 70.00%, Semantic Accuracy: 31.43%
+CNL_v5 - Syntactic Accuracy: 67.00%, Semantic Accuracy: 38.81%
+CNL_v6 - Syntactic Accuracy: 63.00%, Semantic Accuracy: 39.68%
+CNL_v7 - Syntactic Accuracy: 58.00%, Semantic Accuracy: 53.45%
+
+Trial 3:
+MiniF2F - Syntactic Accuracy: 72.00%, Semantic Accuracy: 22.22%
+CNL_v1 - Syntactic Accuracy: 63.00%, Semantic Accuracy: 23.81%
+CNL_v2 - Syntactic Accuracy: 61.00%, Semantic Accuracy: 44.26%
+CNL_v3 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 25.35%
+CNL_v4 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 38.03%
+CNL_v5 - Syntactic Accuracy: 66.00%, Semantic Accuracy: 40.91%
+CNL_v6 - Syntactic Accuracy: 64.00%, Semantic Accuracy: 34.38%
+CNL_v7 - Syntactic Accuracy: 55.00%, Semantic Accuracy: 52.73%
+
+Trial 4:
+MiniF2F - Syntactic Accuracy: 69.00%, Semantic Accuracy: 24.64%
+CNL_v1 - Syntactic Accuracy: 67.00%, Semantic Accuracy: 20.90%
+CNL_v2 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 40.00%
+CNL_v3 - Syntactic Accuracy: 70.00%, Semantic Accuracy: 30.00%
+CNL_v4 - Syntactic Accuracy: 68.00%, Semantic Accuracy: 32.35%
+CNL_v5 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 38.46%
+CNL_v6 - Syntactic Accuracy: 64.00%, Semantic Accuracy: 37.50%
+CNL_v7 - Syntactic Accuracy: 58.00%, Semantic Accuracy: 53.45%
+
+Trial 5:
+MiniF2F - Syntactic Accuracy: 71.00%, Semantic Accuracy: 23.94%
+CNL_v1 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 20.00%
+CNL_v2 - Syntactic Accuracy: 66.00%, Semantic Accuracy: 36.36%
+CNL_v3 - Syntactic Accuracy: 70.00%, Semantic Accuracy: 24.29%
+CNL_v4 - Syntactic Accuracy: 73.00%, Semantic Accuracy: 35.62%
+CNL_v5 - Syntactic Accuracy: 69.00%, Semantic Accuracy: 40.58%
+CNL_v6 - Syntactic Accuracy: 64.00%, Semantic Accuracy: 35.94%
+CNL_v7 - Syntactic Accuracy: 58.00%, Semantic Accuracy: 46.55%
+
+Trial 6:
+MiniF2F - Syntactic Accuracy: 70.00%, Semantic Accuracy: 22.86%
+CNL_v1 - Syntactic Accuracy: 65.00%, Semantic Accuracy: 20.00%
+CNL_v2 - Syntactic Accuracy: 62.00%, Semantic Accuracy: 37.10%
+CNL_v3 - Syntactic Accuracy: 68.00%, Semantic Accuracy: 27.94%
+CNL_v4 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 36.62%
+CNL_v5 - Syntactic Accuracy: 67.00%, Semantic Accuracy: 41.79%
+CNL_v6 - Syntactic Accuracy: 63.00%, Semantic Accuracy: 30.16%
+CNL_v7 - Syntactic Accuracy: 59.00%, Semantic Accuracy: 49.15%
+
+Trial 7:
+MiniF2F - Syntactic Accuracy: 70.00%, Semantic Accuracy: 22.86%
+CNL_v1 - Syntactic Accuracy: 64.00%, Semantic Accuracy: 18.75%
+CNL_v2 - Syntactic Accuracy: 62.00%, Semantic Accuracy: 38.71%
+CNL_v3 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 22.54%
+CNL_v4 - Syntactic Accuracy: 71.00%, Semantic Accuracy: 35.21%
+CNL_v5 - Syntactic Accuracy: 66.00%, Semantic Accuracy: 40.91%
+CNL_v6 - Syntactic Accuracy: 66.00%, Semantic Accuracy: 30.30%
+CNL_v7 - Syntactic Accuracy: 60.00%, Semantic Accuracy: 48.33%
+

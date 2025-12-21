@@ -210,11 +210,36 @@ def generate_write(folder_path, name=None, json_output_path=None):
 
     print(f"⏱️ Total Time Spent: {time.time() - t0:.2f} seconds")
 
+    return syntax_accuracy, semantic_accuracy
+
 # --- Execution ---
 if __name__ == "__main__":
 
     # generate_write("miniF2F/informal/test", name="history/NL_FL_pairs/miniF2F.json")
     # print("\n✅ Saved miniF2F autoformalizations to Autoformalized_miniF2F_Theorems.lean")
 
-    generate_write("history/CNL/cnl_statements_v6.json", name=None, json_output_path="history/NL_FL_pairs/NL_FL_pairs_CNL_v6.json")
-    print("\n✅ Saved CNL autoformalizations to Autoformalized_CNL_Theorems.lean")
+    # generate_write("history/CNL/cnl_statements_v6.json", name=None, json_output_path="history/NL_FL_pairs/NL_FL_pairs_CNL_v6.json")
+    # print("\n✅ Saved CNL autoformalizations to Autoformalized_CNL_Theorems.lean")
+
+    # for version in [1,2,3,4,5]:
+    #     generate_write(f"history/CNL/cnl_statements_v{version}.json", name=None, json_output_path=f"history/NL_FL_pairs/NL_FL_pairs_CNL_v{version}.json")
+    #     print(f"\n✅ Saved CNL v{version} autoformalizations to Autoformalized_CNL_v{version}.lean")
+
+
+    # seven iterations
+    for trial in range(7):
+        print(f"\n=== Trial {trial + 1} ===\n")
+
+        with open("research_record.txt", "a") as f:
+            f.write(f"Trial {trial + 1}:\n")
+        syntactic_accuracy, semantic_accuracy = generate_write("miniF2F/informal/test", name=None, json_output_path=f"history/NL_FL_pairs/miniF2F_trail{trial + 1}.json")
+        with open("research_record.txt", "a") as f:
+            f.write(f"MiniF2F - Syntactic Accuracy: {syntactic_accuracy:.2f}%, Semantic Accuracy: {semantic_accuracy:.2f}%\n")
+
+        for version in [1,2,3,4,5, 6, 7]:
+            syntactic_accuracy, semantic_accuracy = generate_write(f"history/CNL/cnl_statements_v{version}.json", name=None, json_output_path=f"history/NL_FL_pairs/NL_FL_pairs_CNL_v{version}_trial{trial + 1}.json")
+            with open("research_record.txt", "a") as f:
+                f.write(f"CNL_v{version} - Syntactic Accuracy: {syntactic_accuracy:.2f}%, Semantic Accuracy: {semantic_accuracy:.2f}%\n")
+
+        with open("research_record.txt", "a") as f:
+            f.write("\n")
