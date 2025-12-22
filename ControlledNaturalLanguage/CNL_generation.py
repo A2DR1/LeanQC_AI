@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
-from handle_miniF2F import readFolder
+from read_file.handle_miniF2F import readFolder
 
 # Initialize the client using DeepSeek's base URL
 # Ensure you have set your API key in your environment variables:
@@ -19,7 +19,6 @@ client = OpenAI(
     base_url="https://api.deepseek.com"
 )
 
-folder_path = "miniF2F/informal/test"
 
 def generate_cnl_list(folder_path, limit=100, version=2):
     """

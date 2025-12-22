@@ -1,10 +1,31 @@
 from CNL_generation import generate_cnl_list, read_cnl_lst, write_cnl_to_file
 from FL_generation import generate_write
+from read_file.handle_miniF2F import readFolder
+
 
 CNL_path = 'history/CNL'
 Lean_files_path = 'history/Lean_files'
 NL_FL_pairs_path = 'history/NL_FL_pairs'
-folder_path = "miniF2F/informal/test"
+folder_path = "testbench/miniF2F/test"
+
+def run_baseline(limit=100, randomize=False, tag="baseline"):
+    # 1. read raw informal statements, no CNL rewrite
+    raw_statements = readFolder(folder_path, limit=limit, randomize=randomize)
+
+    # 2. save it in json format
+    raw_json_path = f"{CNL_path}/raw_statements_{tag}.json"
+    write_cnl_to_file(raw_statements, filename=raw_json_path)
+
+    # 3. autoformalization
+    generate_write(
+        raw_json_path,
+        name=f"{Lean_files_path}/Autoformalized_{tag}.lean",
+        json_output_path=f"{NL_FL_pairs_path}/NL_FL_pairs_{tag}.json"
+    )
+
+    print(f"\n✅ Saved raw statements to {raw_json_path}")
+    print(f"✅ Saved Lean output to {Lean_files_path}/Autoformalized_{tag}.lean")
+    print(f"✅ Saved NL-FL pairs to {NL_FL_pairs_path}/NL_FL_pairs_{tag}.json")
 
 def run_version(version = None):
     if version is None:
@@ -64,4 +85,9 @@ def overall_accuracy(version = None, file_path = None):
     return overall_accuracy
 
 if __name__ == "__main__":
-    pass
+    run_baseline(limit=100, randomize=True, tag="baseline")
+    count_corrects(file_path=f"{NL_FL_pairs_path}/NL_FL_pairs_baseline.json")
+    overall_accuracy(file_path=f"{NL_FL_pairs_path}/NL_FL_pairs_baseline.json")
+    # run_version(0)
+    # count_corrects()
+    # overall_accuracy()

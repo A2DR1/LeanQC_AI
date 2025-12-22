@@ -5,7 +5,7 @@ import re
 import json
 from dotenv import load_dotenv
 from openai import OpenAI
-from handle_miniF2F import readFolder
+from read_file.handle_miniF2F import readFolder
 from CNL_generation import read_cnl_lst
 from eval_semantic import evaluate_translation
 from tqdm import tqdm 
