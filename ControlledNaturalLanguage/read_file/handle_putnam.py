@@ -1,7 +1,17 @@
 import json
 import random
+import os
 
-folder_path = "testbench/MiniF2F/test"
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
+
+F2F_FILE_PATH = os.path.join(
+    PROJECT_ROOT,
+    "testbench",
+    "Putnam",
+    "putnam.json"
+)
 
 def readPutnamJson(file_path):
     """Read the full putnam.json file."""
@@ -11,7 +21,7 @@ def readPutnamJson(file_path):
 
 
 def readPutnam(
-    file_path="putnam.json",
+    file_path=F2F_FILE_PATH,
     limit=100,
     randomize=False,
     include_solution=True
@@ -50,7 +60,7 @@ def readPutnam(
 
 
 if __name__ == "__main__":
-    problems = readPutnam(limit=5, randomize=True)
+    problems = readPutnam(limit=100, randomize=True)
     print(f"Total Putnam problems read: {len(problems)}")
     print()
     print(problems[0])

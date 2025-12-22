@@ -5,7 +5,7 @@ import re
 import json
 from dotenv import load_dotenv
 from openai import OpenAI
-from read_file.handle_miniF2F import readFolder
+from read_file.handle_miniF2F import readFolder_miniF2F
 from CNL_generation import read_cnl_lst
 from eval_semantic import evaluate_translation
 from tqdm import tqdm 
@@ -119,7 +119,7 @@ def generate_write(folder_path, name=None, json_output_path=None):
     t0 = time.time()
 
     if "miniF2F/informal" in folder_path:
-        informal_statements = readFolder(folder_path)
+        informal_statements = readFolder_miniF2F(folder_path)
     else:
         informal_statements = read_cnl_lst(folder_path)
 

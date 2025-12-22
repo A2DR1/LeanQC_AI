@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
-from read_file.handle_miniF2F import readFolder
+from read_file.handle_miniF2F import readFolder_miniF2F
 
 # Initialize the client using DeepSeek's base URL
 # Ensure you have set your API key in your environment variables:
@@ -26,7 +26,7 @@ def generate_cnl_list(folder_path, limit=100, version=2):
     generates Controlled Natural Language (CNL) versions for each,
     and returns a list of CNL statements.
     """
-    informal_statements = readFolder(folder_path, limit=limit)
+    informal_statements = readFolder_miniF2F(folder_path, limit=limit)
     cnl_statements = []
 
     with open("cnl_rules.json", "r") as f:
@@ -115,8 +115,8 @@ def generate_cnl(input_text, cnl_rules=None, input_example=None, output_example=
 
 # --- Example Usage ---
 if __name__ == "__main__":
-
-    cnl_statements = generate_cnl_list(folder_path, 100, version=4)
-    write_cnl_to_file(cnl_statements, filename="cnl_statements_v4.json")
+    pass
+    # cnl_statements = generate_cnl_list(folder_path, 100, version=4)
+    # write_cnl_to_file(cnl_statements, filename="cnl_statements_v4.json")
 
     

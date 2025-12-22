@@ -18,7 +18,7 @@ def readJson(file_path):
         data = json.load(f)
     return data
 
-def readFolder(folder_path=F2F_TEST_PATH, limit=100, randomize=False):
+def readFolder_miniF2F(folder_path=F2F_TEST_PATH, limit=100, randomize=False):
     data_list = []
     if randomize:
         import random
@@ -42,7 +42,7 @@ def readFolder(folder_path=F2F_TEST_PATH, limit=100, randomize=False):
 
 if __name__ == "__main__":
 
-    informal_statements = readFolder()
+    informal_statements = readFolder_miniF2F()
     print(f"Total informal statements read: {len(informal_statements)}")
     print(informal_statements[0])
 
