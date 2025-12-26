@@ -111,103 +111,121 @@ def generate_lean(cnl_statement, imports=STANDARD_IMPORTS):
     except Exception as e:
         return f"❌ API Error: {e}"
 
-def generate_write(folder_path, name=None, json_output_path=None):
+def generate_write(input_path, name=None, json_output_path=None):
     """
-    Utility to write content to a file.
+    Generate Lean formalizations for a list of statements.
+
+    input_path can be:
+      - a directory of miniF2F json files (readFolder_miniF2F)
+      - a json file containing List[str] (read_cnl_lst)
     """
-    print(f"📂 Processing folder/file: {folder_path}")
+    print(f"📂 Processing: {input_path}")
     t0 = time.time()
 
-    if "miniF2F/informal" in folder_path:
-        informal_statements = readFolder_miniF2F(folder_path)
+    # ---------- Load statements ----------
+    if os.path.isdir(input_path):
+        # treat as dataset folder
+        informal_statements = readFolder_miniF2F(input_path, limit=100)
     else:
-        informal_statements = read_cnl_lst(folder_path)
+        # treat as json file containing List[str]
+        informal_statements = read_cnl_lst(input_path)
 
-    if len(informal_statements) == 0:
-        print("❌ No informal statements found.")
-        return 
+    if not informal_statements:
+        print("❌ No statements found.")
+        return
 
-    syntactic_corrects = []
-    logs = []
-    corrects = []
-    reasons = []
-    formal_statements = []
+    syntactic_corrects: list[bool] = []
+    logs: list[str] = []
+    semantic_corrects: list[bool] = []
+    reasons: list[str] = []
+    formal_statements: list[str] = []
 
     project = TempRequireProject(lean_version="v4.8.0", require="mathlib")
-    config = LeanREPLConfig(verbose=True, project = project)
+    config = LeanREPLConfig(verbose=False, project=project)
     server = LeanServer(config)
 
-    for statement in tqdm(informal_statements):
-        # generate lean statement
-        lean_statement = generate_lean(statement)
-        formal_statements.append(lean_statement)
+    try:
+        for statement in tqdm(informal_statements):
+            lean_statement = generate_lean(statement)
+            formal_statements.append(lean_statement)
 
-        # syntactic check
-        # is_syntactic_valid, log = check_lean_code(STANDARD_IMPORTS + '\n\n' + lean_statement, checker_path)
-        # is_syntactic_valid, log = lean.check(lean_statement)
-        response = server.run(Command(cmd = STANDARD_IMPORTS + '\n\n' + lean_statement))
-        if response.messages and response.messages[0].severity == "error":
-            is_syntactic_valid = False
-            log = response.messages[0].data
-        elif response.messages:
-            is_syntactic_valid = True
-            log = response.messages[0].severity + ". " + response.messages[0].data
-        else:
-            is_syntactic_valid = True
-            log = "No syntax errors."
-        syntactic_corrects.append(is_syntactic_valid)
-        logs.append(log)
+            # --- Syntactic check ---
+            resp = server.run(Command(cmd=STANDARD_IMPORTS + "\n\n" + lean_statement))
 
-        # semantic evaluation
-        sem_eval = evaluate_translation(statement, lean_statement)
-        err = sem_eval.get("reason", "No reason provided.")
-        is_correct = sem_eval.get("is_correct", False)
-        corrects.append(is_correct)
-        reasons.append(err)
-    
+            # If ANY error message exists → fail
+            error_msgs = [m for m in (resp.messages or []) if getattr(m, "severity", "") == "error"]
+            if error_msgs:
+                is_syntactic_valid = False
+                # join all error messages for debugging
+                log = "\n".join([getattr(m, "data", str(m)) for m in error_msgs])
+            else:
+                is_syntactic_valid = True
+                # include warnings if present
+                if resp.messages:
+                    log = "\n".join([f"{m.severity}: {m.data}" for m in resp.messages])
+                else:
+                    log = "No messages."
+
+            syntactic_corrects.append(is_syntactic_valid)
+            logs.append(log)
+
+            # --- Semantic evaluation (only if syntactically valid) ---
+            if is_syntactic_valid:
+                sem_eval = evaluate_translation(statement, lean_statement)
+                is_correct = bool(sem_eval.get("is_correct", False))
+                reason = sem_eval.get("reason", "No reason provided.")
+            else:
+                is_correct = False
+                reason = "Skipped semantic eval because syntactic check failed."
+
+            semantic_corrects.append(is_correct)
+            reasons.append(reason)
+
+    finally:
+        # important: cleanup
+        try:
+            server.close()
+        except Exception:
+            pass
+        try:
+            project.close()
+        except Exception:
+            pass
 
     n = len(informal_statements)
 
-    # write into lean file 
+    # ---------- Write Lean file ----------
     if name:
-        with open(name, "w") as f:
-            f.write(STANDARD_IMPORTS + "\n\n")
-            for i in range(n):
-                lean_statement = formal_statements[i]
-                f.write(lean_statement + "\n\n")
+        with open(name, "w", encoding="utf-8") as f:
+            f.write(STANDARD_IMPORTS.strip() + "\n\n")
+            for st in formal_statements:
+                f.write(st.strip() + "\n\n")
 
-    # write into json file
+    # ---------- Write JSON file ----------
     if json_output_path:
-        with open(json_output_path, "w") as jf:
-            data = []
-            for i in range(n):
-                json_entry = {
-                    "informal_statement": informal_statements[i],
-                    "formal_statement": formal_statements[i],
-                    "is_syntactically_correct": syntactic_corrects[i],
-                    "syntactic_evaluation_log": logs[i],
-                    "is_semantically_correct": corrects[i],
-                    "semantic_evaluation_reason": reasons[i]
-                }
-                data.append(json_entry.copy())
-            jf.write(json.dumps(data) + "\n")
+        data = []
+        for i in range(n):
+            data.append({
+                "informal_statement": informal_statements[i],
+                "formal_statement": formal_statements[i],
+                "is_syntactically_correct": syntactic_corrects[i],
+                "syntactic_evaluation_log": logs[i],
+                "is_semantically_correct": semantic_corrects[i],
+                "semantic_evaluation_reason": reasons[i],
+            })
 
-    # print summary statistics
-    syntax_accuracy = sum(syntactic_corrects) / len(syntactic_corrects) * 100
-    print(f"\n✅ syntactic accuracy: {syntax_accuracy:.2f}% ({sum(syntactic_corrects)}/{len(syntactic_corrects)})")
-    
-    syntactic_correct_indices = [i for i, x in enumerate(syntactic_corrects) if x]
+        with open(json_output_path, "w", encoding="utf-8") as jf:
+            json.dump(data, jf, indent=2, ensure_ascii=False)
 
-    if len(syntactic_correct_indices) > 0:
-        corrects_filtered = [corrects[i] for i in syntactic_correct_indices]
-    else:
-        corrects_filtered = []
-    if len(corrects_filtered) > 0:
-        semantic_accuracy = sum(corrects_filtered) / len(corrects_filtered) * 100
-    else:
-        semantic_accuracy = 0.0
-    print(f"✅ semantic accuracy: {semantic_accuracy:.2f}% ({sum(corrects_filtered)}/{len(corrects_filtered)})")
+    # ---------- Summary ----------
+    syntax_accuracy = (sum(syntactic_corrects) / n) * 100 if n else 0.0
 
+    syntactic_pass_idxs = [i for i, ok in enumerate(syntactic_corrects) if ok]
+    semantic_filtered = [semantic_corrects[i] for i in syntactic_pass_idxs]
+    semantic_accuracy = (sum(semantic_filtered) / len(semantic_filtered)) * 100 if semantic_filtered else 0.0
+
+    print(f"\n✅ syntactic accuracy: {syntax_accuracy:.2f}% ({sum(syntactic_corrects)}/{n})")
+    print(f"✅ semantic accuracy:  {semantic_accuracy:.2f}% ({sum(semantic_filtered)}/{len(semantic_filtered)})")
     print(f"⏱️ Total Time Spent: {time.time() - t0:.2f} seconds")
 
     return syntax_accuracy, semantic_accuracy
