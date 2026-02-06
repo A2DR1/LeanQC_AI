@@ -1,0 +1,42 @@
+[
+  {
+    "informal_statement": "How many integers between 15 and 85 are divisible by 20? Show that it is 4.",
+    "formal_statement": "theorem number_of_integers_in_set : {x : ℤ | 15 ≤ x ∧ x < 85 ∧ 20 ∣ x}.ncard = 4 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses 'x < 85' instead of 'x ≤ 85' as specified in the English statement 'between 15 and 85' (inclusive). Additionally, the English statement asks for integers divisible by 20, but the Lean theorem uses '20 ∣ x' which is correct for divisibility. However, the main error is the boundary condition: the English statement implies the interval [15, 85] (inclusive at both ends), while the Lean theorem uses [15, 85) (exclusive at the upper bound)."
+  },
+  {
+    "informal_statement": "What is the remainder when 5 to the 999,999th power is divided by 7? Show that it is 6.",
+    "formal_statement": "theorem fifth_power_of_five : 5^999999 ≡ 6 [MOD 7] := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem statement incorrectly uses 'fifth_power_of_five' as the name when it should describe the 999,999th power. More importantly, the English statement asks 'What is the remainder when 5 to the 999,999th power is divided by 7? Show that it is 6.' This is a statement about the remainder, not a congruence modulo 7. The Lean theorem should state something like 'theorem remainder_is_six : (5^999999) % 7 = 6 := by sorry' instead of using congruence modulo notation."
+  },
+  {
+    "informal_statement": "Show that for any natural number $n$, 12 divides $4^{n+1} + 20$.",
+    "formal_statement": "theorem formalization (n : ℕ) : 12 ∣ 4^(n+1) + 20 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "When the two-digit integer $``\\text{AB}\"$ is cubed, the value is $912,\\!673$. What is $A + B$? Show that it is 16.",
+    "formal_statement": "theorem number_theory_8244 (A B : ℕ) (h₀ : A < 10) (h₁ : B < 10)\n    (h₂ : (10 * A + B)^3 = 912673) : A + B = 16 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Missing assumption that A and B are digits (0-9). The English statement implies AB is a two-digit integer, meaning A should be between 1 and 9 (not 0-9) and B between 0 and 9. The Lean code allows A=0, which would make AB a one-digit number, contradicting 'two-digit integer'."
+  },
+  {
+    "informal_statement": "Given that $(1+\\sin t)(1+\\cos t)=5/4$ and\n:$(1-\\sin t)(1-\\cos t)=\\frac mn-\\sqrt{k},$\nwhere $k, m,$ and $n_{}$ are [[positive integer]]s with $m_{}$ and $n_{}$ [[relatively prime]], find $k+m+n.$ Show that it is 027.",
+    "formal_statement": "theorem formalization\n  (t : ℝ)\n  (h₀ : (1 + sin t) * (1 + cos t) = 5 / 4)\n  (k m n : ℕ)\n  (hk : 0 < k)\n  (hm : 0 < m)\n  (hn : 0 < n)\n  (hrel : Nat.Coprime m n)\n  (hprod : (1 - sin t) * (1 - cos t) = m / n - sqrt k) :\n  k + m + n = 27 := by\n  sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  (↑k).sqrt : ℚ\n  \n  k.sqrt : ℕ\n  \n  √↑k : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  }
+]

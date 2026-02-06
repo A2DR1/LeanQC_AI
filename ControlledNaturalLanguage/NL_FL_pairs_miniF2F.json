@@ -1,0 +1,42 @@
+[
+  {
+    "informal_statement": "Let $a,b,c,d$ be odd integers such that $0<a<b<c<d$ and $ad=bc$. Prove that if $a+d=2^k$ and $b+c=2^m$ for some integers $k$ and $m$, then $a=1$.",
+    "formal_statement": "theorem formalization_987654\n  (a b c d k m : ℕ)\n  (h₀ : Odd a)\n  (h₁ : Odd b)\n  (h₂ : Odd c)\n  (h₃ : Odd d)\n  (h₄ : 0 < a)\n  (h₅ : a < b)\n  (h₆ : b < c)\n  (h₇ : c < d)\n  (h₈ : a * d = b * c)\n  (h₉ : a + d = 2 ^ k)\n  (h₁₀ : b + c = 2 ^ m) :\n  a = 1 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Type mismatch: English specifies 'odd integers' but Lean uses ℕ (natural numbers) with separate Odd hypotheses. While ℕ can represent non-negative integers, the English statement implies integers (which could be negative), though the context of 0<a<b<c<d suggests positive integers. More critically, the English statement requires a, b, c, d to be integers, not necessarily natural numbers, though the inequalities make them positive. The main issue is that 'Odd' in Lean might not be defined for ℕ in the same way as for integers (ℤ). Additionally, the English statement says 'odd integers' which in Lean would typically be represented as `a : ℤ` with `Odd a` (where `Odd` is defined for integers), not `a : ℕ` with `Odd a`."
+  },
+  {
+    "informal_statement": "Show that for any real numbers $a$ and $b$, $\\frac{|a+b|}{1+|a+b|}\\leq \\frac{|a|}{1+|a|}+\\frac{|b|}{1+|b|}$.",
+    "formal_statement": "theorem inequalities_98765 (a b : ℝ) :\n    |a + b| / (1 + |a + b|) ≤ |a| / (1 + |a|) + |b| / (1 + |b|) := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Notice that  \\[35\\cdot40=1400.\\]Find some integer $n$ with $0\\leq n<1399$ such that $n$ is the multiplicative inverse to 160 modulo 1399. Show that it is 1058.",
+    "formal_statement": "theorem find_inv_160 : ∃ n, 0 ≤ n ∧ n < 1399 ∧ 160 * n ≡ 1 [MOD 1399] := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem statement incorrectly uses '160 * n ≡ 1 [MOD 1399]' which represents 160*n ≡ 1 mod 1399, but the English statement requires 'n' to be the multiplicative inverse of 160 modulo 1399, meaning 160*n ≡ 1 mod 1399 AND n*160 ≡ 1 mod 1399 (though these are equivalent for integers). More importantly, the English statement specifies the exact value n=1058, so the theorem should be '∃ n, n = 1058 ∧ 0 ≤ n ∧ n < 1399 ∧ 160 * n ≡ 1 [MOD 1399]' or simply state '160 * 1058 ≡ 1 [MOD 1399] ∧ 0 ≤ 1058 ∧ 1058 < 1399'."
+  },
+  {
+    "informal_statement": "$K > L > M > N$ are positive integers such that $KM + LN = (K + L - M + N)(-K + L + M + N)$. Prove that $KL + MN$ is not prime.",
+    "formal_statement": "theorem formalization {K L M N : ℤ} (hpos : K > 0 ∧ L > 0 ∧ M > 0 ∧ N > 0)\n  (hord : K > L ∧ L > M ∧ M > N) (h : K * M + L * N = (K + L - M + N) * (-K + L + M + N)) :\n  ¬ Nat.Prime (K * L + M * N) := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  K * L + M * N\nhas type\n  ℤ : outParam Type\nbut is expected to have type\n  ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that for any three positive real numbers $x$, $y$, and $z$, $9/(x+y+z)\\leq 2/(x+y)+2/(y+z)+2/(z+x)$.",
+    "formal_statement": "theorem\n    (x y z : ℝ)\n    (hx : 0 < x)\n    (hy : 0 < y)\n    (hz : 0 < z) :\n    9 / (x + y + z) ≤ 2 / (x + y) + 2 / (y + z) + 2 / (z + x) := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  }
+]

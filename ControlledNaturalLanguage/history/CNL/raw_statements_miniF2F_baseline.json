@@ -1,0 +1,7 @@
+[
+    "How many integers between 15 and 85 are divisible by 20? Show that it is 4.",
+    "What is the remainder when 5 to the 999,999th power is divided by 7? Show that it is 6.",
+    "Show that for any natural number $n$, 12 divides $4^{n+1} + 20$.",
+    "When the two-digit integer $``\\text{AB}\"$ is cubed, the value is $912,\\!673$. What is $A + B$? Show that it is 16.",
+    "Given that $(1+\\sin t)(1+\\cos t)=5/4$ and\n:$(1-\\sin t)(1-\\cos t)=\\frac mn-\\sqrt{k},$\nwhere $k, m,$ and $n_{}$ are [[positive integer]]s with $m_{}$ and $n_{}$ [[relatively prime]], find $k+m+n.$ Show that it is 027."
+]

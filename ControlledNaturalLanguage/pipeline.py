@@ -1,17 +1,18 @@
 import json
 
-from CNL_generation import generate_cnl, write_cnl_to_file
-from FL_generation import generate_write
+from CNL_generation import CNL_generator
+from FL_generation import FL_generator
 
-from read_file.handle_miniF2F import readFolder_miniF2F
-from read_file.handle_putnam import readPutnam
-from read_file.handle_FIMO import readFolder_fimo
+# from read_file.handle_miniF2F import readFolder_miniF2F
+# from read_file.handle_putnam import readPutnam
+# from read_file.handle_FIMO import readFolder_fimo
 
 CNL_PATH = "history/CNL"
 LEAN_FILES_PATH = "history/Lean_files"
 NL_FL_PAIRS_PATH = "history/NL_FL_pairs"
 
 MINIF2F_FOLDER = "testbench/miniF2F/test"
+PUTNAM_FOLDER = "testbench/Putnam/putnam.json"
 FIMO_FOLDER = "testbench/FIMO"
 
 
@@ -62,13 +63,19 @@ def load_cnl_rules(version: int) -> tuple[str, str | None, str | None]:
 
 def read_dataset_statements(dataset_name: str, limit: int, randomize: bool, include_fimo_proof: bool) -> list[str]:
     if dataset_name == "miniF2F":
-        return readFolder_miniF2F(MINIF2F_FOLDER, limit=limit, randomize=randomize)
+        from read_file.handle_miniF2F import miniF2FHandler
+        handler = miniF2FHandler()
+        return handler.read(MINIF2F_FOLDER, limit=limit, randomize=randomize)
 
-    if dataset_name == "putnam":
-        return readPutnam(limit=limit, randomize=randomize, include_solution=True)
+    if dataset_name == "Putnam":
+        from read_file.handle_Putnam import PutnamHandler
+        handler = PutnamHandler()
+        return handler.read(limit=limit, randomize=randomize, include_solution=True)
 
-    if dataset_name == "fimo":
-        return readFolder_fimo(
+    if dataset_name == "FIMO":
+        from read_file.handle_FIMO import FIMOHandler
+        handler = FIMOHandler()
+        return handler.read(
             folder_path=FIMO_FOLDER,
             limit=limit,
             randomize=randomize,
@@ -90,9 +97,11 @@ def run_baseline_dataset(dataset_name: str, limit=100, randomize=False, tag="bas
     )
 
     raw_json_path = f"{CNL_PATH}/raw_statements_{tag}.json"
-    write_cnl_to_file(raw_statements, filename=raw_json_path)
+    fl_generator = FL_generator(isCNL=True)
+    cnl_generator = CNL_generator() # just for writing raw statements to json, not actually generating CNL
+    cnl_generator.write_cnl_to_file(raw_statements, filename=raw_json_path)
 
-    generate_write(
+    fl_generator.generate_write(
         raw_json_path,
         name=f"{LEAN_FILES_PATH}/Autoformalized_{tag}.lean",
         json_output_path=f"{NL_FL_PAIRS_PATH}/NL_FL_pairs_{tag}.json",
@@ -115,16 +124,17 @@ def run_cnl_dataset(dataset_name: str, version: int, limit=100, tag=None, includ
     )
 
     cnl_rules, input_example, output_example = load_cnl_rules(version)
-
+    cnl_generator = CNL_generator(benchmark_name=dataset_name, cnl_rules_path="cnl_rules.json")
     cnl_statements = [
-        generate_cnl(s, cnl_rules=cnl_rules, input_example=input_example, output_example=output_example)
+        cnl_generator.generate_cnl(s, cnl_rules=cnl_rules, input_example=input_example, output_example=output_example)
         for s in base_statements
     ]
 
     cnl_json_path = f"{CNL_PATH}/cnl_statements_{tag}.json"
-    write_cnl_to_file(cnl_statements, filename=cnl_json_path)
+    cnl_generator.write_cnl_to_file(cnl_statements, filename=cnl_json_path)
 
-    generate_write(
+    fl_generator = FL_generator(isCNL=True)
+    fl_generator.generate_write(
         cnl_json_path,
         name=f"{LEAN_FILES_PATH}/Autoformalized_{tag}.lean",
         json_output_path=f"{NL_FL_PAIRS_PATH}/NL_FL_pairs_{tag}.json",
@@ -172,17 +182,17 @@ if __name__ == "__main__":
     dataset_sel = prompt_int(
         prompt=(
             "\nSelect dataset:\n"
-            "  1) MiniF2F\n"
+            "  1) miniF2F\n"
             "  2) Putnam\n"
             "  3) FIMO\n"
             "> "
         ),
         valid_range={1, 2, 3},
     )
-    dataset_name = {1: "miniF2F", 2: "putnam", 3: "fimo"}[dataset_sel]
+    dataset_name = {1: "miniF2F", 2: "Putnam", 3: "FIMO"}[dataset_sel]
 
     include_fimo_proof = False
-    if dataset_name == "fimo":
+    if dataset_name == "FIMO":
         include_fimo_proof = ask_include_fimo_proof()
 
     run_mode = prompt_choice(
@@ -190,13 +200,15 @@ if __name__ == "__main__":
         valid={"b", "c"},
     )
 
+    limit = prompt_int("\nHow many problems to process? (e.g., 100)\n> ", valid_range=set(range(1, 1001)))
+
     if run_mode == "b":
         tag = f"{dataset_name}_baseline" + ("_withproof" if include_fimo_proof else "")
-        run_baseline_dataset(dataset_name, limit=100, randomize=True, tag=tag, include_fimo_proof=include_fimo_proof)
+        run_baseline_dataset(dataset_name, limit=limit, randomize=True, tag=tag, include_fimo_proof=include_fimo_proof)
     else:
         version_sel = prompt_int("\nWhich CNL version? (1-7)\n> ", valid_range=set(range(1, 8)))
         tag = f"{dataset_name}_cnl_v{version_sel}" + ("_withproof" if include_fimo_proof else "")
-        run_cnl_dataset(dataset_name, version_sel, limit=100, tag=tag, include_fimo_proof=include_fimo_proof)
+        run_cnl_dataset(dataset_name, version_sel, limit=limit, tag=tag, include_fimo_proof=include_fimo_proof)
 
     output_json = f"{NL_FL_PAIRS_PATH}/NL_FL_pairs_{tag}.json"
     print(f"\n📌 Scoring file: {output_json}\n")
