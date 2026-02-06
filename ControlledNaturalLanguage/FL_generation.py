@@ -5,7 +5,6 @@ import re
 import json
 from dotenv import load_dotenv
 from openai import OpenAI
-from handle_miniF2F import readFolder
 from CNL_generation import read_cnl_lst
 from eval_semantic import evaluate_translation
 from tqdm import tqdm 
@@ -118,7 +117,11 @@ def generate_write(folder_path, name=None, json_output_path=None):
     print(f"📂 Processing folder/file: {folder_path}")
     t0 = time.time()
 
-    if "miniF2F/informal" in folder_path:
+    if "miniF2F/informal" in folder_path and "CNL" not in folder_path:
+        from handle_miniF2F import readFolder
+        informal_statements = readFolder(folder_path)
+    if "ProofNet" in folder_path and "CNL" not in folder_path:
+        from handle_ProofNet import readFolder
         informal_statements = readFolder(folder_path)
     else:
         informal_statements = read_cnl_lst(folder_path)
@@ -214,4 +217,4 @@ def generate_write(folder_path, name=None, json_output_path=None):
 
 # --- Execution ---
 if __name__ == "__main__":
-    pass
+    generate_write("ProofNet/test.jsonl", name="example_output.lean", json_output_path="NL_FL_pairs_example.json")

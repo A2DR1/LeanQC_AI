@@ -1,0 +1,42 @@
+[
+  {
+    "informal_statement": "If $r$ is rational $(r \\neq 0)$ and $x$ is irrational, prove that $rx$ is irrational.",
+    "formal_statement": "theorem rational_mul_irrational_irrational (r : \u211a) (x : \u211d) (hr : r \u2260 0) (hx : Irrational x) : Irrational (r * x) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning. declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Type mismatch: English specifies r is rational (\u211a), but multiplication r * x in Lean uses \u211a * \u211d which yields \u211a, not \u211d. The theorem should use \u211d for r with hypothesis that r is rational and nonzero, or use coercion. Also, Irrational is typically defined for \u211d, not \u211a."
+  },
+  {
+    "informal_statement": "Let $E$ be a nonempty subset of an ordered set; suppose $\\alpha$ is a lower bound of $E$ and $\\beta$ is an upper bound of $E$. Prove that $\\alpha \\leq \\beta$.",
+    "formal_statement": "theorem lower_bound_le_upper_bound {\u03b1 : Type _} [Preorder \u03b1] (E : Set \u03b1) (hE : E.Nonempty) (\u03b1_lb : \u03b1) (\u03b2_ub : \u03b1) (h\u03b1 : \u03b1_lb \u2208 lowerBounds E) (h\u03b2 : \u03b2_ub \u2208 upperBounds E) : \u03b1_lb \u2264 \u03b2_ub := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning. declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses '\u03b1' for both the type parameter and the lower bound variable, causing confusion. The English statement uses \u03b1 as a specific lower bound value, not as a type parameter. The Lean theorem should have distinct names for the type parameter and the bound variables."
+  },
+  {
+    "informal_statement": "Prove that no order can be defined in the complex field that turns it into an ordered field.",
+    "formal_statement": "theorem no_order_on_complex : \u00ac\u2203 (order : \u2102 \u2192 \u2102 \u2192 Prop) [IsOrder \u2102 order], IsOrderedField \u2102 order := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '['; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem uses 'IsOrder \u2102 order' and 'IsOrderedField \u2102 order' which are not standard Lean 4 constructs. The English statement is about the impossibility of defining an order on complex numbers that makes it an ordered field. The Lean code should express: there exists no total order \u2264 on \u2102 such that (\u2102, +, *, \u2264) is an ordered field. The current formulation uses non-existent type classes and incorrectly structures the existential quantification."
+  },
+  {
+    "informal_statement": "If $z_1, \\ldots, z_n$ are complex, prove that $|z_1 + z_2 + \\ldots + z_n| \\leq |z_1| + |z_2| + \\cdots + |z_n|$.",
+    "formal_statement": "theorem complex_sum_inequality (n : \u2115) (z : Fin n \u2192 \u2102) : \n    Complex.abs (\u2211 i : Fin n, z i) \u2264 \u2211 i : Fin n, Complex.abs (z i) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning. declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "If $z$ is a complex number such that $|z|=1$, that is, such that $z \\bar{z}=1$, compute $|1+z|^{2}+|1-z|^{2}$.",
+    "formal_statement": "theorem compute_sum_of_squares (z : \u2102) (hz : Complex.abs z = 1) : Complex.abs (1 + z) ^ 2 + Complex.abs (1 - z) ^ 2 = 4 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning. declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The English statement asks to compute the expression |1+z|\u00b2 + |1-z|\u00b2, which is a value calculation, not an equality proof. The Lean theorem states an equality (= 4) as the conclusion, but the English doesn't specify what the computed value should be - it only asks to compute it. The theorem should have the expression as the conclusion, not an equality with a specific value."
+  }
+]

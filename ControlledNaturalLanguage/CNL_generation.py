@@ -3,7 +3,6 @@ import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
-from handle_miniF2F import readFolder
 
 # Initialize the client using DeepSeek's base URL
 # Ensure you have set your API key in your environment variables:
@@ -19,14 +18,18 @@ client = OpenAI(
     base_url="https://api.deepseek.com"
 )
 
-folder_path = "miniF2F/informal/test"
-
 def generate_cnl_list(folder_path, limit=100, version=2):
     """
     Reads informal statements from JSON files in the specified folder,
     generates Controlled Natural Language (CNL) versions for each,
     and returns a list of CNL statements.
     """
+
+    if 'miniF2F' in folder_path and 'CNL' not in folder_path:
+        from handle_miniF2F import readFolder
+    elif 'ProofNet' in folder_path and 'CNL' not in folder_path:
+        from handle_ProofNet import readFolder
+
     informal_statements = readFolder(folder_path, limit=limit)
     cnl_statements = []
 
@@ -117,7 +120,9 @@ def generate_cnl(input_text, cnl_rules=None, input_example=None, output_example=
 # --- Example Usage ---
 if __name__ == "__main__":
 
-    cnl_statements = generate_cnl_list(folder_path, 100, version=4)
-    write_cnl_to_file(cnl_statements, filename="cnl_statements_v4.json")
-
-    
+    # folder_path = "miniF2F/informal/test"
+    folder_path = "ProofNet/test.jsonl"
+    cnl_statements = generate_cnl_list(folder_path, limit=5, version=2)
+    for i, cnl in enumerate(cnl_statements):
+        print(f"CNL Statement {i+1}:\n{cnl}\n")
+    write_cnl_to_file(cnl_statements, filename="cnl_statements_example.json")

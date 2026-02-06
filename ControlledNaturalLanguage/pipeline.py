@@ -1,12 +1,20 @@
 from CNL_generation import generate_cnl_list, read_cnl_lst, write_cnl_to_file
 from FL_generation import generate_write
 
-CNL_path = 'history/CNL'
-Lean_files_path = 'history/Lean_files'
-NL_FL_pairs_path = 'history/NL_FL_pairs'
-folder_path = "miniF2F/informal/test"
+benchmark = "ProofNet"
+CNL_path = f'history/{benchmark}/CNL'
+Lean_files_path = f'history/{benchmark}/Lean_files'
+NL_FL_pairs_path = f'history/{benchmark}/NL_FL_pairs'
 
-def run_version(version = None):
+def run_control(folder_path = None):
+    if folder_path is None:
+        folder_path = input("Folder path: ")
+
+    generate_write(folder_path, name=f"{Lean_files_path}/control.lean", json_output_path=f"{NL_FL_pairs_path}/NL_FL_pairs_control.json")
+
+    print(f"\n✅ Saved NL-FL pairs to {NL_FL_pairs_path}/NL_FL_pairs_control.json")
+
+def run_version(version = None, folder_path = None):
     if version is None:
         version = input("Version: ")
 
@@ -64,4 +72,6 @@ def overall_accuracy(version = None, file_path = None):
     return overall_accuracy
 
 if __name__ == "__main__":
-    pass
+    folder_path = "ProofNet/test.jsonl"
+    # run_control(folder_path=folder_path)
+    run_version(version="7", folder_path=folder_path)
