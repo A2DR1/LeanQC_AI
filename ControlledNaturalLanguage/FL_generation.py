@@ -12,18 +12,26 @@ from tqdm import tqdm
 from lean_interact import LeanREPLConfig, LeanServer, Command, TempRequireProject, LeanRequire
 import time
 
+from config import models
+
 # 1. Load environment variables
 load_dotenv()
 
+model_name = "kimina_autoformalizer"
+model = models.get(model_name, {})
+if not model:
+    print(f"❌ Error: '{model_name}' config not found in config.py.")
+    sys.exit(1)
+
 # 2. Security Check
-api_key = os.getenv("DEEPSEEK_API_KEY")
+api_key = model.get("api_key", "")
 if not api_key:
-    print("❌ Error: DEEPSEEK_API_KEY not found in .env file.")
+    print(f"❌ Error: API key for '{model_name}' not found in config.py.")
     sys.exit(1)
 
 # 3. Initialize Client
 try:
-    client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+    client = OpenAI(api_key=api_key, base_url=model.get("base_url", ""))
 except Exception as e:
     print(f"❌ Error initializing client: {e}")
     sys.exit(1)
@@ -96,7 +104,7 @@ def generate_lean(cnl_statement, imports=STANDARD_IMPORTS):
 
     try:
         response = client.chat.completions.create(
-            model="deepseek-chat", # Or "deepseek-coder" if available/preferred
+            model=model.get("model_name", ""),
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
