@@ -36,14 +36,15 @@ def evaluate_translation(english_text, lean_code):
        - Missing assumptions (e.g., English says "x is positive", Lean misses `x > 0`).
        - Wrong types (e.g., English says "integer", Lean uses `Real`).
        - Incorrect logical operators (e.g., "and" vs "implies").
+    4. Some informal statements may not be a proof problem, accept valid Lean code that made reasonable adjustments to make it a proof problem.
 
     Input English: "{english_text}"
     Generated Lean: "{lean_code}"
 
     Answer with JSON only:
     {{
+        "reason": "Short explanation of the error or 'Correct'",
         "is_correct": true/false,
-        "reason": "Short explanation of the error or 'Correct'"
     }}
     """
 

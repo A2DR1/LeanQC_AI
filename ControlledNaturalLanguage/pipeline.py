@@ -3,10 +3,6 @@ import json
 from CNL_generation import CNL_generator
 from FL_generation import FL_generator
 
-# from read_file.handle_miniF2F import readFolder_miniF2F
-# from read_file.handle_putnam import readPutnam
-# from read_file.handle_FIMO import readFolder_fimo
-
 CNL_PATH = "history/CNL"
 LEAN_FILES_PATH = "history/Lean_files"
 NL_FL_PAIRS_PATH = "history/NL_FL_pairs"
