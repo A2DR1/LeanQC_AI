@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "Assumptions:\nDefine the set S = {1, 3, 5, 7, 9, 11, 13}.\nGoal:\nThe ones digit of the product of all elements in S is 5.",
+    "formal_statement": "/-- Assumptions:\nDefine the set S = {1, 3, 5, 7, 9, 11, 13}.\nGoal:\nThe ones digit of the product of all elements in S is 5. -/\ntheorem ones_digit_prod_S : (∏ x in ({1, 3, 5, 7, 9, 11, 13} : Finset ℕ), x).mod 10 = 5 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it computes the product of all elements in the given set S (represented as a Finset ℕ), takes the modulo 10 to get the ones digit, and states that this equals 5. The types are appropriate (ℕ for natural numbers), and the logical structure matches the English statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = x^4.\nDefine g : ℝ → ℝ by g(x) = (5*(x^2)) - 6.\nAssume for all real numbers x, f(x) = g(x) if and only if x is in the set {a, b, c, d}.\nAssume a = √(m).\nAssume b = -√(m).\nAssume c = √(n).\nAssume d = -√(n).\nAssume m > n.\nAssume m is a real number.\nAssume n is a real number.\nGoal:\n(m - n) = 1.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ by f(x) = x^4.\nDefine g : ℝ → ℝ by g(x) = (5*(x^2)) - 6.\nAssume for all real numbers x, f(x) = g(x) if and only if x is in the set {a, b, c, d}.\nAssume a = √(m).\nAssume b = -√(m).\nAssume c = √(n).\nAssume d = -√(n).\nAssume m > n.\nAssume m is a real number.\nAssume n is a real number.\nGoal:\n(m - n) = 1. -/\ntheorem m_minus_n_eq_one (f g : ℝ → ℝ) (a b c d : ℝ) (m n : ℝ) (hm : m > n) (h₁ : ∀ x, f x = x^4) (h₂ : ∀ x, g x = 5 * x^2 - 6) (h₃ : a = Real.sqrt m) (h₄ : b = -Real.sqrt m) (h₅ : c = Real.sqrt n) (h₆ : d = -Real.sqrt n) : m - n = 1  :=  by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the key assumption about when f(x) = g(x). The English states 'for all real numbers x, f(x) = g(x) if and only if x is in the set {a, b, c, d}', but the Lean code omits this crucial biconditional relationship. Instead, it includes separate definitions for f and g (h₁ and h₂) that don't capture their equality condition relative to the set {a, b, c, d}. This changes the mathematical meaning significantly."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m = 121.\nDefine a = 24.\nLet b be an integer.\nAssume (a * b) ≡ 1 mod m.\nGoal:\nb = 116.",
+    "formal_statement": "/-- Assumptions:\nDefine m = 121.\nDefine a = 24.\nLet b be an integer.\nAssume (a * b) ≡ 1 mod m.\nGoal:\nb = 116. -/\ntheorem b_eq_116 : b = 116 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'b'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nGoal:\nThere exists an integer k such that ((4^(n+1)) + 20) = 12 * k.",
+    "formal_statement": "/-- Assumptions:\nLet n be a natural number.\nGoal:\nThere exists an integer k such that ((4^(n+1)) + 20) = 12 * k. -/\ntheorem four_pow_add_twenty_dvd_by_twelve : ∀ n : ℕ, ∃ k : ℤ, (4:ℝ)^(n+1) + 20 = 12 * k := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem uses ℝ for the base 4 instead of ℕ or ℤ, which changes the mathematical meaning. The original statement is about integer arithmetic (natural number n, integer k), but using ℝ allows non-integer results for 4^(n+1) + 20, making the existence of integer k trivial and different from the intended divisibility statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℝ as the set of real numbers.\nLet x be a real number.\nAssume (3 - x) ≥ 0.\nAssume (x + 1) ≥ 0.\nAssume (√(3 - x) - √(x + 1)) ≥ 0.\nDefine f : ℝ → ℝ by f(x) = √(√(3 - x) - √(x + 1)).\nGoal:\nThe set of real numbers x such that (f(x) > (1 / 2)) is equal to the interval [ -1, (1 - (√(127) / 32)) ).",
+    "formal_statement": "/-- Assumptions:\nDefine ℝ as the set of real numbers.\nLet x be a real number.\nAssume (3 - x) ≥ 0.\nAssume (x + 1) ≥ 0.\nAssume (√(3 - x) - √(x + 1)) ≥ 0.\nDefine f : ℝ → ℝ by f(x) = √(√(3 - x) - √(x + 1)).\nGoal:\nThe set of real numbers x such that (f(x) > (1 / 2)) is equal to the interval [ -1, (1 - (√(127) / 32)) ). -/\ntheorem f_pos_interval : {x | 1 / 2 < f x} = Icc (-1 : ℝ) (1 - √(127) / 32) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 100.\nDefine S = 1 + 2 + 3 + ... + n.\nGoal:\nS mod 6 = 4.",
+    "formal_statement": "/-- Assumptions:\nDefine n = 100.\nDefine S = 1 + 2 + 3 + ... + n.\nGoal:\nS mod 6 = 4. -/\ntheorem sum_range_nat_mod_six_eq_four : (∑ k in range 100, k) % 6 = 4 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:  \nLet n be a positive integer.  \nDefine k = floor(sqrt(n)).  \nAssume k is a nonnegative integer.  \nAssume k ≤ sqrt(n) < (k + 1).  \nAssume (n + 1000) / 70 = k.  \n\nGoal:  \nThe size of the set {n in ℕ | n > 0 and (n + 1000) / 70 = floor(sqrt(n))} = 6.",
+    "formal_statement": "Goal:  \nThe size of the set {n in ℕ | n > 0 and (n + 1000) / 70 = floor(sqrt(n))} = 6. -/\ntheorem card_filter_condition_eq_six : (filter (fun n => 0 < n ∧ (n + 1000) / 70 = ⌊Real.sqrt n⌋) (Icc 1 1000)).card = 6 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\ntype mismatch\n  Set.Icc (1 : ℕ) (1000 : ℕ)\nhas type\n  Set ℕ : Type\nbut is expected to have type\n  Finset ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of natural numbers.\nDefine ℤ as the set of integers.\nDefine ℝ as the set of real numbers.\nLet n be a natural number.\nAssume n > 1.\nAssume there exists an integer k such that n = k^3.\nAssume there exists an integer m such that n = m^4.\nGoal:\nn = 4096.",
+    "formal_statement": "/-- Assumptions:\nDefine ℕ as the set of natural numbers.\nDefine ℤ as the set of integers.\nDefine ℝ as the set of real numbers.\nLet n be a natural number.\nAssume n > 1.\nAssume there exists an integer k such that n = k^3.\nAssume there exists an integer m such that n = m^4.\nGoal:\nn = 4096. -/\ntheorem n_eq_4096 (n : ℕ) (hn : 1 < n) (k : ℤ) (hk : ↑k ^ 3 = ↑n) (m : ℤ) (hm : ↑m ^ 4 = ↑n) : n = 4096 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℤ ℕ ℕ\nfailed to synthesize instance\n  HPow ℤ ℕ ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a positive real number.\nLet n be a positive real number.\nAssume m^3 = 2.\nAssume n^3 = 4.\nLet a be a rational number.\nLet b be a rational number.\nLet c be a rational number.\nAssume (a + (b * m) + (c * n)) = 0.\n\nGoal:\n(a = 0) AND (b = 0) AND (c = 0).",
+    "formal_statement": "Goal:\n(a = 0) AND (b = 0) AND (c = 0). -/\ntheorem a_eq_b_eq_c_eq_zero_of_a_add_b_mul_m_add_c_mul_n_eq_zero {a b c : ℚ} {m n : ℝ}\n    (hm : 0 < m) (hn : 0 < n) (h1 : m^3 = 2) (h2 : n^3 = 4) (h3 : a + b * m + c * n = 0) :\n    a = 0 ∧ b = 0 ∧ c = 0  :=  by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine F : ℕ → ℕ.\nDefine F(0) = 1.\nDefine F(1) = 1.\nFor every natural number n ≥ 2, define F(n) = F(n-1) + F(n-2).\nGoal:\n(F(99) mod 4) = 3.",
+    "formal_statement": "/-- Assumptions:\nDefine F : ℕ → ℕ.\nDefine F(0) = 1.\nDefine F(1) = 1.\nFor every natural number n ≥ 2, define F(n) = F(n-1) + F(n-2).\nGoal:\n(F(99) mod 4) = 3. -/\ntheorem fib_99_mod_4 : (fib 99) % 4 = 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem uses the standard library's `fib` function, which has different base cases (fib 0 = 0, fib 1 = 1) than the specified function F (F(0) = 1, F(1) = 1). This changes the mathematical definition being analyzed, making it a different sequence."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n be an integer.\nAssume n > 10.\nThere exists an integer k such that n = k^2.\nThere exists an integer m such that n = m^3.\nGoal:\nn = 64.",
+    "formal_statement": "/-- Assumptions:\nDefine n be an integer.\nAssume n > 10.\nThere exists an integer k such that n = k^2.\nThere exists an integer m such that n = m^3.\nGoal:\nn = 64. -/\ntheorem {n : ℤ} (h : n > 10) (k : ℤ) (hk : n = k^2) (m : ℤ) (hm : n = m^3) : n = 64 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '{'; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nFor every integer i in the set {1, ..., n}, define a_i : ℝ.\nAssume for every integer i in the set {1, ..., n}, a_i ≥ 0.\nAssume (∑_{i=1}^{n} a_i) = n.\nGoal:\n(∏_{i=1}^{n} a_i) ≤ 1.",
+    "formal_statement": "/-- Assumptions:\nLet n be a natural number.\nFor every integer i in the set {1, ..., n}, define a_i : ℝ.\nAssume for every integer i in the set {1, ..., n}, a_i ≥ 0.\nAssume (∑_{i=1}^{n} a_i) = n.\nGoal:\n(∏_{i=1}^{n} a_i) ≤ 1. -/\ntheorem geom_mean_le_one_extracted (n : ℕ) (a : Fin n → ℝ) (ha : ∀ (i : Fin n), 0 ≤ a i) : ∑ i, a i = ↑n → ∏ i, a i ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N = 10000.\nDefine S : ℕ → ℝ by S(n) = sum for k in the set {2, ..., n} of (1 / sqrt(k)).\nGoal:\nS(N) < 198.",
+    "formal_statement": "/-- Assumptions:\nDefine N = 10000.\nDefine S : ℕ → ℝ by S(n) = sum for k in the set {2, ..., n} of (1 / sqrt(k)).\nGoal:\nS(N) < 198. -/\ntheorem s_lt_one_nine_eight : s 10000 < 198 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 's'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = x^2.\nDefine g : ℝ → ℝ by g(x) = 1 - x.\nLet x be a real number.\nAssume f(x) = g(x).\nGoal:\nThe distance between the points (x1, f(x1)) and (x2, f(x2)) = √(10).",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ by f(x) = x^2.\nDefine g : ℝ → ℝ by g(x) = 1 - x.\nLet x be a real number.\nAssume f(x) = g(x).\nGoal:\nThe distance between the points (x1, f(x1)) and (x2, f(x2)) = √(10). -/\ntheorem distance_between_points_eq_sqrt_10 (x1 x2 : ℝ) (f g : ℝ → ℝ) (hf : f = fun x => x^2) (hg : g = fun x => 1 - x) (h : f x1 = g x2) : Real.sqrt 10 = dist (x1, f x1) (x2, f x2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature has multiple errors: 1) It introduces x1 and x2 as separate variables instead of using the single x from the English statement, 2) It incorrectly assumes f(x1) = g(x2) instead of f(x) = g(x) for the same x, 3) It makes f and g parameters when they should be fixed definitions, 4) The distance calculation uses 'dist' which may not be the Euclidean distance formula, and 5) The equality is reversed (Real.sqrt 10 = dist(...) instead of dist(...) = √10)."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 40.\nDefine b = 280.\nLet n be a natural number.\nAssume there exists an integer k1 such that a = (gcd(n, a)) * k1.\nAssume there exists an integer k2 such that n = (gcd(n, a)) * k2.\nAssume gcd(k1, k2) = 1.\nAssume (gcd(n, a)) * (lcm(n, a)) = n * a.\nGoal:\nn = 70.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 40.\nDefine b = 280.\nLet n be a natural number.\nAssume there exists an integer k1 such that a = (gcd(n, a)) * k1.\nAssume there exists an integer k2 such that n = (gcd(n, a)) * k2.\nAssume gcd(k1, k2) = 1.\nAssume (gcd(n, a)) * (lcm(n, a)) = n * a.\nGoal:\nn = 70. -/\ntheorem n_eq_70_extracted {a b n : ℕ} : ((a = (a.gcd n) * (b.gcd a)) ∧ (n = (a.gcd n) * (n.lcm a))) ∧ (a.gcd n).Coprime (b.gcd a) → n = 70 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement defines specific values a=40 and b=280, but the Lean theorem treats them as arbitrary natural numbers. The English statement has specific assumptions about k1 and k2, but the Lean theorem incorrectly replaces k1 with (b.gcd a) and k2 with (n.lcm a). The assumption (gcd(n, a)) * (lcm(n, a)) = n * a is missing from the Lean theorem's premise. The logical structure is fundamentally different."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = (x + 1).\nDefine g : ℝ → ℝ by g(x) = (x^2 + 3).\nGoal:\nf(g(2)) = 8.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ by f(x) = (x + 1).\nDefine g : ℝ → ℝ by g(x) = (x^2 + 3).\nGoal:\nf(g(2)) = 8. -/\ntheorem f_g_two : f (g 2) = 8 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a rational number a.\nDefine (8^(-1)) = (1 / 8).\nDefine (4^(-1)) = (1 / 4).\nGoal:\na = -2.",
+    "formal_statement": "/-- Assumptions:\nDefine a rational number a.\nDefine (8^(-1)) = (1 / 8).\nDefine (4^(-1)) = (1 / 4).\nGoal:\na = -2. -/\ntheorem rational_a_eq_neg_two : (1 / 8 : ℚ) + (1 / 4 : ℚ) + (-2 : ℚ) = -2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem proves a different mathematical fact. The English statement defines a rational number 'a' and three equalities, then states the goal 'a = -2'. The Lean theorem instead proves that (1/8 + 1/4 + (-2)) = -2, which is a different statement about arithmetic rather than the original goal about the variable 'a'."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an integer.\nLet y be an integer.\nAssume (y^2) + (3 * (x^2) * (y^2)) = (30 * (x^2)) + 517.\nGoal:\n(3 * (x^2) * (y^2)) = 588.",
+    "formal_statement": "/-- Assumptions:\nLet x be an integer.\nLet y be an integer.\nAssume (y^2) + (3 * (x^2) * (y^2)) = (30 * (x^2)) + 517.\nGoal:\n(3 * (x^2) * (y^2)) = 588. -/\ntheorem diff_of_int_ext (x y : ℤ) (h : y^2 + 3 * x^2 * y^2 = 30 * x^2 + 517) : 3 * x^2 * y^2 = 588 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n > 0.\nDefine P : ℕ → ℚ by P(n) = ∏_{k in the set {1, ..., n}} (1 + (1 / (2^k))).\nGoal:\nP(n) < (5 / 2).",
+    "formal_statement": "/-- Assumptions:\nLet n be a natural number.\nAssume n > 0.\nDefine P : ℕ → ℚ by P(n) = ∏_{k in the set {1, ..., n}} (1 + (1 / (2^k))).\nGoal:\nP(n) < (5 / 2). -/\ntheorem prod_lt_five_div_two {n : ℕ} (hn : 0 < n) : (∏ k in Finset.Icc 1 n, (1 + (1 / (2 ^ k)))) < 5 / 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 29.\nDefine b = 79.\nDefine c = 31.\nDefine d = 81.\nGoal:\nThe units digit of ((a * b) + (c * d)) is 2.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 29.\nDefine b = 79.\nDefine c = 31.\nDefine d = 81.\nGoal:\nThe units digit of ((a * b) + (c * d)) is 2. -/\ntheorem units_digit_of_multiplication_addition (a b c d : ℕ) (ha : a = 29) (hb : b = 79) (hc : c = 31) (hd : d = 81) : (a * b + c * d) % 10 = 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a positive real number.\nLet b be a positive real number.\nLet c be a positive real number.\nLet d be a positive real number.\nGoal:\n((a^2) / b) + ((b^2) / c) + ((c^2) / d) + ((d^2) / a) ≥ a + b + c + d.",
+    "formal_statement": "/-- Assumptions:\nLet a be a positive real number.\nLet b be a positive real number.\nLet c be a positive real number.\nLet d be a positive real number.\nGoal:\n((a^2) / b) + ((b^2) / c) + ((c^2) / d) + ((d^2) / a) ≥ a + b + c + d. -/\ntheorem lean_4_ineq_extracted {a b c d : ℝ} : a > 0 → b > 0 → c > 0 → d > 0 → a^2 / b + b^2 / c + c^2 / d + d^2 / a ≥ a + b + c + d := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine f : ℝ → ℝ by f(t) = ((2^t - 3*t) * t) / (4^t).  \nGoal:  \nThe maximum value of f(t) for real numbers t is 1/12.",
+    "formal_statement": "/-- The maximum value of f(t) for real numbers t is 1/12. -/\ntheorem max_value_f_real : ∀ t : ℝ, (2^t - 3*t) * t / 4^t ≤ 1/12 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem states that for all real t, f(t) ≤ 1/12, which only establishes that 1/12 is an upper bound, not that it is the maximum value. The English statement claims that 1/12 is the actual maximum value, which requires both that f(t) ≤ 1/12 for all t AND that there exists some t where f(t) = 1/12. The generated theorem is missing the existence condition."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nAssume x ≠ 0.\n\nGoal:\n((12 / (x * x)) * ((x^4) / (14 * x)) * (35 / (3 * x))) = 10.",
+    "formal_statement": "Goal:\n((12 / (x * x)) * ((x^4) / (14 * x)) * (35 / (3 * x))) = 10. -/\ntheorem calculate_expression (x : ℝ) (hx : x ≠ 0) : (12 / (x * x)) * (x^4 / (14 * x)) * (35 / (3 * x)) = 10 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine X as a positive integer.  \nAssume there exists an integer k such that X = (3 * k) + 2.  \nAssume there exists an integer m such that the units digit of X equals the units digit of ((5 * m) + 4).  \n\nGoal:  \nX = 14.",
+    "formal_statement": "Goal:  \nX = 14. -/\ntheorem X_eq_14 (hX : ∃ k : ℤ, X = 3 * k + 2) (hX' : ∃ m : ℤ, X % 10 = (5 * m + 4) % 10) : X = 14 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunknown identifier 'X'\nunknown identifier 'X'\nunknown identifier 'X'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a ∈ ℝ.  \nDefine b ∈ ℝ.  \nDefine x ∈ ℝ.  \nDefine y ∈ ℝ.  \nAssume (a*x + b*y) = 3.  \nAssume (a*(x^2) + b*(y^2)) = 7.  \nAssume (a*(x^3) + b*(y^3)) = 16.  \nAssume (a*(x^4) + b*(y^4)) = 42.  \n\nGoal:  \n(a*(x^5) + b*(y^5)) = 20.",
+    "formal_statement": "Goal:  \n(a*(x^5) + b*(y^5)) = 20. -/\ntheorem a_x_pow_5_add_b_y_pow_5_eq_20 (a b x y : ℝ) (h₁ : a * x + b * y = 3) (h₂ : a * x ^ 2 + b * y ^ 2 = 7) (h₃ : a * x ^ 3 + b * y ^ 3 = 16) (h₄ : a * x ^ 4 + b * y ^ 4 = 42) : a * x ^ 5 + b * y ^ 5 = 20 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 8.\nGoal:\n((16 * (a^2)^(1/3)))^(1/3) = 4.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 8.\nGoal:\n((16 * (a^2)^(1/3)))^(1/3) = 4. -/\ntheorem example_with_a (a : ℝ) (ha : a = 8) : (16 * (a^2)^(1/3))^(1/3) = 4 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes a is a real number equal to 8, and states that the given expression equals 4. The types are appropriate (ℝ for a), the constraint a=8 is explicitly included, and the logical implication flows correctly from assumptions to conclusion."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine x as a real number.  \nDefine y as a real number.  \nDefine z as a real number.  \nAssume (2 * x) = (5 * y).  \nAssume (7 * y) = (10 * z).  \n\nGoal:  \n(z / x) = (7 / 25).",
+    "formal_statement": "Goal:  \n(z / x) = (7 / 25). -/\ntheorem div_eq_div_of_eq_mul_of_eq_mul_extracted {x y z : ℝ} : 2 * x = 5 * y → 7 * y = 10 * z → z / x = 7 / 25 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a ∈ ℝ.\nDefine b ∈ ℝ.\nDefine c ∈ ℝ.\nDefine d ∈ ℝ.\nAssume (4^a) = 5.\nAssume (5^b) = 6.\nAssume (6^c) = 7.\nAssume (7^d) = 8.\nGoal:\n(a * b * c * d) = (3/2).",
+    "formal_statement": "/-- Assumptions:\nDefine a ∈ ℝ.\nDefine b ∈ ℝ.\nDefine c ∈ ℝ.\nDefine d ∈ ℝ.\nAssume (4^a) = 5.\nAssume (5^b) = 6.\nAssume (6^c) = 7.\nAssume (7^d) = 8.\nGoal:\n(a * b * c * d) = (3/2). -/\ntheorem mul_mul_mul_mul_extracted {a b c d : ℝ} : 4 ^ a = 5 → 5 ^ b = 6 → 6 ^ c = 7 → 7 ^ d = 8 → a * b * c * d = 3 / 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℕ ℝ (?m.103 : Sort ?u.11)\nfailed to synthesize instance\n  HPow ℕ ℝ (?m.251 : Sort ?u.159)\nfailed to synthesize instance\n  HPow ℕ ℝ (?m.399 : Sort ?u.307)\nfailed to synthesize instance\n  HPow ℕ ℝ (?m.547 : Sort ?u.455)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A = 180.\nDefine P = 54.\nLet L be a positive real number.\nLet W be a positive real number.\nAssume (L * W) = A.\nAssume (2 * (L + W)) = P.\nGoal:\n((L)^2 + (W)^2) = 369.",
+    "formal_statement": "/-- Assumptions:\nDefine A = 180.\nDefine P = 54.\nLet L be a positive real number.\nLet W be a positive real number.\nAssume (L * W) = A.\nAssume (2 * (L + W)) = P.\nGoal:\n((L)^2 + (W)^2) = 369. -/\ntheorem length_width_squared_sum (A : ℝ) (P : ℝ) (L W : ℝ) (hA : A = 180) (hP : P = 54) (hL : 0 < L) (hW : 0 < W) (hA' : L * W = A) (hP' : 2 * (L + W) = P) : L^2 + W^2 = 369 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures all mathematical assumptions from the English statement: A=180, P=54, L and W are positive reals, L*W=A, 2*(L+W)=P, and concludes L^2+W^2=369. All types match (ℝ for real numbers), constraints are present (hL:0<L, hW:0<W), and the logical flow is preserved."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine n1 = 20.  \nDefine n2 = 100.  \nDefine S1 : ℕ → ℝ by S1(n) = (∑_{k in the set {1, ..., n}} log_base(5^k, 3^(k^2))).  \nDefine S2 : ℕ → ℝ by S2(n) = (∑_{k in the set {1, ..., n}} log_base(9^k, 25^k)).  \n\nGoal:  \n(S1(20)) * (S2(100)) = 21000.",
+    "formal_statement": "Goal:  \n(S1(20)) * (S2(100)) = 21000. -/\ntheorem final_product : (∑ k in Finset.Icc 1 20, Real.logb (5^k) (3^(k^2))) * (∑ k in Finset.Icc 1 100, Real.logb (9^k) (25^k)) = 21000 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m be a prime number.\nDefine n be a prime number.\nDefine k be a positive integer.\nDefine t be a positive integer.\nAssume k > t.\nAssume for every real number x, (x^2) - (m * x) + n = (x - k) * (x - t).\nGoal:\n(m^n) + (n^m) + (k^t) + (t^k) = 20.",
+    "formal_statement": "/-- Assumptions:\nDefine m be a prime number.\nDefine n be a prime number.\nDefine k be a positive integer.\nDefine t be a positive integer.\nAssume k > t.\nAssume for every real number x, (x^2) - (m * x) + n = (x - k) * (x - t).\nGoal:\n(m^n) + (n^m) + (k^t) + (t^k) = 20. -/\ntheorem m_n_k_t_eq_20 (m n k t : ℕ) (hm : m.Prime) (hn : n.Prime) (hk : 0 < k) (ht : 0 < t)\n    (h : ∀ x : ℝ, x^2 - m * x + n = (x - k) * (x - t)) : m^n + n^m + k^t + t^k = 20 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures all mathematical assumptions and the goal: m and n are prime natural numbers, k and t are positive natural numbers with k > t, the polynomial identity holds for all real x, and the conclusion is m^n + n^m + k^t + t^k = 20. All types and constraints match the English statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 120.\nDefine a as a natural number.\nDefine b as a natural number.\nDefine l = 3720.\nDefine d = 8.\nAssume l is the least common multiple of a and b.\nAssume d is the greatest common divisor of a and b.\nGoal:\nb = 248.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 120.\nDefine a as a natural number.\nDefine b as a natural number.\nDefine l = 3720.\nDefine d = 8.\nAssume l is the least common multiple of a and b.\nAssume d is the greatest common divisor of a and b.\nGoal:\nb = 248. -/\ntheorem b_eq_248 (a b l d : ℕ) (hl : l = 3720) (hA : a = 120) (hd : d = 8) (hab : a.lcm b = l) (h : a.gcd b = d) : b = 248 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly swaps the roles of l and d in the assumptions. The English states 'l is the least common multiple of a and b' and 'd is the greatest common divisor of a and b', but the Lean code has `a.lcm b = l` (correct) and `a.gcd b = d` (correct). However, the problem defines specific values: a=120, l=3720, d=8. The Lean theorem should use these specific values as assumptions rather than making them parameters. The current signature allows arbitrary a, l, d values that satisfy the conditions, which doesn't match the specific problem statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 999999.\nGoal:\nThe remainder when (5^n) is divided by 7 is 6.",
+    "formal_statement": "/-- Assumptions:\nDefine n = 999999.\nGoal:\nThe remainder when (5^n) is divided by 7 is 6. -/\ntheorem remainder_of_power_5_by_7 :\n  (5^999999) % 7 = 6 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it fixes n=999999 as specified, computes 5^n, takes modulo 7, and asserts the result is 6. The types are appropriate (Nat exponentiation and modulo), and all constraints from the English statement are preserved."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℕ → ℕ.\nDefine f(2) = 0.\nAssume f(3) > 0.\nDefine f(9999) = 3333.\nAssume for all natural numbers m and n, (f(m + n) - f(m) - f(n)) = 0 or (f(m + n) - f(m) - f(n)) = 1.\nGoal:\nf(1982) = 660.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℕ → ℕ.\nDefine f(2) = 0.\nAssume f(3) > 0.\nDefine f(9999) = 3333.\nAssume for all natural numbers m and n, (f(m + n) - f(m) - f(n)) = 0 or (f(m + n) - f(m) - f(n)) = 1.\nGoal:\nf(1982) = 660. -/\ntheorem f_1982 : f 1982 = 660 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine y as a real number.\nAssume (√(19 + (3*y))) = 7.\nGoal:\ny = 10.",
+    "formal_statement": "/-- Assumptions:\nDefine y as a real number.\nAssume (√(19 + (3*y))) = 7.\nGoal:\ny = 10. -/\ntheorem y_eq_10 : √(19 + 3 * y) = 7 → y = 10 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'y'\nunknown identifier 'y'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℝ.\nDefine d : ℝ.\nDefine T : ℕ → ℝ by T(n) = a + ((n - 1) * d).\nAssume T(1) = (2 / 3).\nAssume T(9) = (4 / 5).\n\nGoal:\nT(5) = (11 / 15).",
+    "formal_statement": "Goal:\nT(5) = (11 / 15). -/\ntheorem T_5_extracted {a d : ℝ} (T : ℕ → ℝ) : T 1 = 2 / 3 → T 9 = 4 / 5 → T 5 = 11 / 15 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine the first even number as (2*n).\nDefine the second even number as (2*n + 2).\nDefine the third even number as (2*n + 4).\nAssume ((2*n)^2 + ((2*n + 2))^2 + ((2*n + 4))^2) = 12296.\n\nGoal:\n(((2*n) * (2*n + 2) * (2*n + 4)) / 8) = 32736.",
+    "formal_statement": "Goal:\n(((2*n) * (2*n + 2) * (2*n + 4)) / 8) = 32736. -/\ntheorem even_prod_div_eight_extracted (n : ℕ) : (2 * n) ^ 2 + (2 * n + 2) ^ 2 + (2 * n + 4) ^ 2 = 12296 → ((2 * n) * (2 * n + 2) * (2 * n + 4)) / 8 = 32736 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine S1 : ℕ → ℕ by S1(n) = (sum for k in the set {0, ..., (n - 1)} of (k^3)).\nDefine S2 : ℕ → ℕ by S2(n) = (sum for k in the set {0, ..., (n - 1)} of k).\nGoal:\nS1(n) = (S2(n))^2.",
+    "formal_statement": "/-- Assumptions:\nLet n be a natural number.\nDefine S1 : ℕ → ℕ by S1(n) = (sum for k in the set {0, ..., (n - 1)} of (k^3)).\nDefine S2 : ℕ → ℕ by S2(n) = (sum for k in the set {0, ..., (n - 1)} of k).\nGoal:\nS1(n) = (S2(n))^2. -/\ntheorem sum_cube_of_sum_range_tac_7488 (n : ℕ) (S1 : ℕ → ℕ) (S2 : ℕ → ℕ) (h₁ : S1 n = ∑ k ∈ range n, k ^ 3) (h₂ : S2 n = ∑ k ∈ range n, k) : S1 n = (S2 n) ^ 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly treats S1 and S2 as arbitrary functions with additional hypotheses about their values, rather than directly defining them as specified in the English statement. The English statement defines S1 and S2 explicitly, but the Lean theorem introduces them as parameters with additional assumptions, which changes the mathematical intent."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine x as a real number.  \nDefine a₁ = (2*x - 3).  \nDefine a₂ = (5*x - 11).  \nDefine a₃ = (3*x + 1).  \nAssume (a₁, a₂, a₃) are consecutive terms of an arithmetic sequence.  \nDefine d as a real number.  \nAssume d = (a₂ - a₁).  \nAssume d = (a₃ - a₂).  \nDefine n as a natural number.  \nDefine a : ℕ → ℝ by a(k) = a₁ + ((k - 1) * d).  \nAssume a(n) = 2009.  \n\nGoal:  \nn = 502.",
+    "formal_statement": "Goal:  \nn = 502. -/\ntheorem n_eq_502 (x : ℝ) (a₁ a₂ a₃ : ℝ) (d : ℝ) (n : ℕ) (a : ℕ → ℝ) :\n  a₁ = 2 * x - 3 ∧ a₂ = 5 * x - 11 ∧ a₃ = 3 * x + 1 ∧ a₂ - a₁ = d ∧ a₃ - a₂ = d ∧ a n = 2009 → n = 502  :=  by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine m = 2009.  \nDefine a = 2010.  \nDefine b = 4018.  \nLet n be a natural number.  \nDefine S = (a + (a+1) + ... + b).  \nGoal:  \nS mod m = 0.",
+    "formal_statement": "/-- Assumptions:  \nDefine m = 2009.  \nDefine a = 2010.  \nDefine b = 4018.  \nLet n be a natural number.  \nDefine S = (a + (a+1) + ... + b).  \nGoal:  \nS mod m = 0. -/\ntheorem mod_eq_zero (m a b : ℕ) (n : ℕ) (S : ℕ) (h₁ : m = 2009) (h₂ : a = 2010) (h₃ : b = 4018) (h₄ : S = (a + (a+1) + ... + b)) : S % m = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '...'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of positive integers.\nDefine f : ℕ × ℕ → ℕ.\nFor every natural number x, define f(x, x) = x.\nFor every natural number x and every natural number y, define f(x, y) = f(y, x).\nFor every natural number x and every natural number y, define ((x + y) * f(x, y)) = (y * f(x, x + y)).\nGoal:\nf(14, 52) = 364.",
+    "formal_statement": "/-- Assumptions:\nDefine ℕ as the set of positive integers.\nDefine f : ℕ × ℕ → ℕ.\nFor every natural number x, define f(x, x) = x.\nFor every natural number x and every natural number y, define f(x, y) = f(y, x).\nFor every natural number x and every natural number y, define ((x + y) * f(x, y)) = (y * f(x, x + y)).\nGoal:\nf(14, 52) = 364. -/\ntheorem f_14_52 : f 14 52 = 364 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 121.\nDefine b = 122.\nDefine c = 123.\nGoal:\nThe remainder when ((a * b) * c) is divided by 4 is 2.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 121.\nDefine b = 122.\nDefine c = 123.\nGoal:\nThe remainder when ((a * b) * c) is divided by 4 is 2. -/\ntheorem remainder_of_multiplication_by_4_extracted : (121 * 122 * 123) % 4 = 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a positive integer.\nLet y be a positive integer.\nAssume (x^(y^2)) = (y^x).\n\nGoal:\n((x = 1) AND (y = 1)) OR ((x = 16) AND (y = 2)) OR ((x = 27) AND (y = 3)).",
+    "formal_statement": "Goal:\n((x = 1) AND (y = 1)) OR ((x = 16) AND (y = 2)) OR ((x = 27) AND (y = 3)). -/\ntheorem x_eq_one_and_y_eq_one_or_x_eq_16_and_y_eq_2_or_x_eq_27_and_y_eq_3 (hx : 0 < x) (hy : 0 < y) (h : x^(y^2) = y^x) : (x = 1 ∧ y = 1) ∨ (x = 16 ∧ y = 2) ∨ (x = 27 ∧ y = 3) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunknown identifier 'x'\nunknown identifier 'y'\nunknown identifier 'x'\nunknown identifier 'y'\nunknown identifier 'y'\nunknown identifier 'x'\nunknown identifier 'x'\nunknown identifier 'y'\nunknown identifier 'x'\nunknown identifier 'y'\nunknown identifier 'x'\nunknown identifier 'y'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a positive real number.\nLet y be a positive real number.\nLet z be a positive real number.\n\nGoal:\n(9 / (x + y + z)) ≤ ((2 / (x + y)) + (2 / (y + z)) + (2 / (z + x))).",
+    "formal_statement": "Goal:\n(9 / (x + y + z)) ≤ ((2 / (x + y)) + (2 / (y + z)) + (2 / (z + x))). -/\ntheorem nine_div_sum_le_sum_of_pos {x y z : ℝ} (hx : 0 < x) (hy : 0 < y) (hz : 0 < z) :\n  9 / (x + y + z) ≤ 2 / (x + y) + 2 / (y + z) + 2 / (z + x)  :=  by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p : ℝ.\nAssume (0 < p) ∧ (p < 15).\nDefine f : ℝ → ℝ by f(x) = |x - p| + |x - 15| + |x - (p + 15)|.\nGoal:\nThe minimum value of f(x) for x in the set {x in ℝ | (p ≤ x) ∧ (x ≤ 15)} is 15.",
+    "formal_statement": "/-- Assumptions:\nDefine p : ℝ.\nAssume (0 < p) ∧ (p < 15).\nDefine f : ℝ → ℝ by f(x) = |x - p| + |x - 15| + |x - (p + 15)|.\nGoal:\nThe minimum value of f(x) for x in the set {x in ℝ | (p ≤ x) ∧ (x ≤ 15)} is 15. -/\ntheorem min_displacement_p_15_p_15_p (p : ℝ) (hp_pos : 0 < p) (hp_lt_15 : p < 15) :\n  IsLeast {x | p ≤ x ∧ x ≤ 15} (p + 15) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem states that (p + 15) is the least element of the set {x | p ≤ x ∧ x ≤ 15}, but the English statement asks for the minimum value of f(x) over that set to be 15. The Lean theorem is about the domain set's least element, not about the function f's minimum value."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the coordinate system as ℝ².\nDefine f : ℝ → ℝ by f(x) = (1/3)*x.\nDefine g : ℝ → ℝ by g(x) = (11 - 2*x)/5.\nAssume for all real numbers x, the point (x, f(x)) lies on the line 3*y = x.\nAssume for all real numbers x, the point (x, g(x)) lies on the line 2*x + 5*y = 11.\nThere exists a point A in ℝ² such that A = (x, y) and f(x) = y and g(x) = y.\n\nGoal:\nThe sum of the coordinates of point A is 4.",
+    "formal_statement": "Goal:\nThe sum of the coordinates of point A is 4. -/\ntheorem sum_coordinates_of_A_is_4 (A : ℝ × ℝ) (h₁ : 3 * A.2 = A.1) (h₂ : 2 * A.1 + 5 * A.2 = 11) : A.1 + A.2 = 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = (c * (x^3)) - (9 * x) + 3.\nDefine x = 2.\nAssume f(2) = 9.\nGoal:\nc = 3.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ by f(x) = (c * (x^3)) - (9 * x) + 3.\nDefine x = 2.\nAssume f(2) = 9.\nGoal:\nc = 3. -/\ntheorem c_eq_3 (f : ℝ → ℝ) (x : ℝ) (c : ℝ) (h₁ : f = fun x => c * x ^ 3 - 9 * x + 3) (h₂ : x = 2) (h₃ : f 2 = 9) : c = 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly treats x as a variable parameter when it should be fixed at 2. The English statement defines x = 2 as a fixed value, not as a variable assumption. The theorem should have c as the only variable, with f defined explicitly and x fixed at 2. The current signature allows x to vary while still requiring x = 2, creating redundant assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a = 5.6.  \nLet x be an integer.  \nAssume |x - 2| ≤ a.  \n\nGoal:  \nThe size of the set {x in ℤ | |x - 2| ≤ a} = 11.",
+    "formal_statement": "Goal:  \nThe size of the set {x in ℤ | |x - 2| ≤ a} = 11. -/\ntheorem set_size_eq_11 : (Finset.filter (fun x : ℤ => abs (x - 2) ≤ 5.6) Finset.univ).card = 11 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nfailed to synthesize instance\n  OfScientific ℤ\nfailed to synthesize instance\n  Fintype ℤ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nLet m be a positive integer.  \nLet n be a positive integer.  \nAssume m * n ≤ m + n.  \n\nGoal:  \nThe size of the set {m in ℕ | m > 0 and there exists a positive integer n such that (m * n) ≤ (m + n)} is infinite.",
+    "formal_statement": "Goal:  \nThe size of the set {m in ℕ | m > 0 and there exists a positive integer n such that (m * n) ≤ (m + n)} is infinite. -/\ntheorem infinite_setOf_mul_le_add {m n : ℕ} (hm : 0 < m) (hn : 0 < n) (hmn : m * n ≤ m + n) :\n    {m : ℕ | 0 < m ∧ ∃ n : ℕ, 0 < n ∧ m * n ≤ m + n}.Infinite := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an integer.\nLet y be an integer.\nGoal:\nNOT (x^5 = (y^2) + 4).",
+    "formal_statement": "/-- Assumptions:\nLet x be an integer.\nLet y be an integer.\nGoal:\nNOT (x^5 = (y^2) + 4). -/\ntheorem not_x_to_the_power_five_eq_y_squared_add_four (x y : ℤ) : ¬(x^5 = y^2 + 4) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nFor every real number x, define f(x) + f(x - 1) = x^2.\nDefine f(19) = 94.\nGoal:\nThere exists an integer r such that f(94) = 1000 * k + r for some integer k, and r = 561.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ.\nFor every real number x, define f(x) + f(x - 1) = x^2.\nDefine f(19) = 94.\nGoal:\nThere exists an integer r such that f(94) = 1000 * k + r for some integer k, and r = 561. -/\ntheorem exists_int_f_94_eq_k_mul_1000_add_561 (f : ℝ → ℝ) (hf : ∀ x, f x + f (x - 1) = x^2) (h19 : f 19 = 94) : ∃ r : ℤ, f 94 = 1000 * r + 561  :=  by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly swaps the roles of k and r. The English statement says: f(94) = 1000 * k + r where k is an integer and r = 561. This means r is fixed at 561, and we need to show there exists some integer k such that f(94) = 1000 * k + 561. The Lean theorem instead states: ∃ r : ℤ, f 94 = 1000 * r + 561, which means r is the variable and 561 is the constant remainder. This reverses the intended roles - in the English, r is the constant remainder (561) and k is the variable coefficient."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nGoal:\n((x + 1)^2) * x = (x^3) + (2*(x^2)) + x.",
+    "formal_statement": "/-- Assumptions:\nDefine x as a real number.\nGoal:\n((x + 1)^2) * x = (x^3) + (2*(x^2)) + x. -/\ntheorem real_polynomial_expansion (x : ℝ) : ((x + 1)^2) * x = x^3 + (2 * (x^2)) + x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 5.\nDefine b = 3.\nGoal:\nb^a = 243.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 5.\nDefine b = 3.\nGoal:\nb^a = 243. -/\ntheorem ba_eq_243 : (3 : ℝ) ^ (5 : ℕ) = 243 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem uses ℝ for the base (3) and ℕ for the exponent (5), but the natural language statement defines both a=5 and b=3 as constants without specifying types. The mathematical intent is simply to verify that 3^5 = 243, which the Lean theorem correctly expresses mathematically. The type adaptations (ℝ and ℕ) are reasonable formalizations that don't change the mathematical fact."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nDefine h : ℝ → ℝ.\nAssume for all real numbers x, h(x) = f⁻¹(x).\nAssume h(2) = 10.\nAssume h(10) = 1.\nAssume h(1) = 2.\nGoal:\nf(f(10)) = 1.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ.\nDefine h : ℝ → ℝ.\nAssume for all real numbers x, h(x) = f⁻¹(x).\nAssume h(2) = 10.\nAssume h(10) = 1.\nAssume h(1) = 2.\nGoal:\nf(f(10)) = 1. -/\ntheorem f_f_10 : f (f 10) = 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 100.\nDefine S : ℕ → ℤ by S(k) = sum_{i in the set {0, ..., k}} (2^i).\nGoal:\nThe remainder when S(n) is divided by 7 is 3.",
+    "formal_statement": "/-- Assumptions:\nDefine n = 100.\nDefine S : ℕ → ℤ by S(k) = sum_{i in the set {0, ..., k}} (2^i).\nGoal:\nThe remainder when S(n) is divided by 7 is 3. -/\ntheorem remainder_of_sum_two_pow_nat_mod_seven (n : ℕ) (hn : n = 100) (S : ℕ → ℤ)\n    (hS : S = fun k => ∑ i in Finset.range (k + 1), 2 ^ i) :\n    S n % 7 = 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 98.\nLet a be a function from ℕ to ℝ.\nAssume a is an arithmetic progression.\nDefine d = 1.\nFor every natural number k, define a(k+1) = a(k) + d.\nDefine S = a(1) + a(2) + a(3) + ... + a(n).\nAssume S = 137.\nGoal:\nThe sum a(2) + a(4) + a(6) + ... + a(98) = 93.",
+    "formal_statement": "/-- Assumptions:\nDefine n = 98.\nLet a be a function from ℕ to ℝ.\nAssume a is an arithmetic progression.\nDefine d = 1.\nFor every natural number k, define a(k+1) = a(k) + d.\nDefine S = a(1) + a(2) + a(3) + ... + a(n).\nAssume S = 137.\nGoal:\nThe sum a(2) + a(4) + a(6) + ... + a(98) = 93. -/\ntheorem sum_even_index_of_arithmetic_progression (n : ℕ) (a : ℕ → ℝ) (d : ℝ) (h : ∀ k, a (k + 1) = a k + d) (h_sum : ∑ k in Finset.range n, a k = 137) : ∑ k in Finset.range (n/2), a (2 * k + 2) = 93  :=  by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement explicitly defines n=98, d=1, and S=137 as fixed values, but the Lean theorem treats n and d as arbitrary parameters and uses a different summation formula (range n instead of explicit n=98, and range (n/2) with a(2*k+2) instead of explicit even indices up to 98). The types are correct (ℕ, ℝ), but the theorem generalizes the problem rather than capturing the specific instance described."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine V : ℂ = (1 + i).\nDefine Z : ℂ = (2 - i).\nGoal:\nThere exists a complex number I such that V = (I * Z) and I = ((1/5) + ((3/5) * i)).",
+    "formal_statement": "/-- Assumptions:\nDefine V : ℂ = (1 + i).\nDefine Z : ℂ = (2 - i).\nGoal:\nThere exists a complex number I such that V = (I * Z) and I = ((1/5) + ((3/5) * i)). -/\ntheorem exists_I_eq_and_V_eq_I_mul_Z : ∃ I, I = (1/5 + (3/5)*I) ∧ V = I * Z := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'V'\nunknown identifier 'Z'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be an integer.\nLet q be an integer.\nLet r be an integer.\nAssume (1 < p) and (p < q) and (q < r).\nAssume there exists an integer k such that ((p * q * r) - 1) = ((p - 1) * (q - 1) * (r - 1)) * k.\nGoal:\n((p = 2) and (q = 4) and (r = 8)) or ((p = 3) and (q = 5) and (r = 15)).",
+    "formal_statement": "/-- Assumptions:\nLet p be an integer.\nLet q be an integer.\nLet r be an integer.\nAssume (1 < p) and (p < q) and (q < r).\nAssume there exists an integer k such that ((p * q * r) - 1) = ((p - 1) * (q - 1) * (r - 1)) * k.\nGoal:\n((p = 2) and (q = 4) and (r = 8)) or ((p = 3) and (q = 5) and (r = 15)). -/\ntheorem abc_conjecture_helper : ∀ p q r : ℤ, 1 < p ∧ p < q ∧ q < r → (p * q * r - 1) = (p - 1) * (q - 1) * (r - 1) * ∃ k, k = 1 → p = 2 ∧ q = 4 ∧ r = 8 ∨ p = 3 ∧ q = 5 ∧ r = 15 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HMul ℤ Prop ℤ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nLet c be a real number.\nAssume a ≤ b.\nAssume b ≤ c.\nAssume (a + b + c) = 2.\nAssume (a*b + b*c + c*a) = 1.\n\nGoal:\n(0 ≤ a) ∧ (a ≤ (1/3)) ∧ ((1/3) ≤ b) ∧ (b ≤ 1) ∧ (1 ≤ c) ∧ (c ≤ (4/3)).",
+    "formal_statement": "Goal:\n(0 ≤ a) ∧ (a ≤ (1/3)) ∧ ((1/3) ≤ b) ∧ (b ≤ 1) ∧ (1 ≤ c) ∧ (c ≤ (4/3)). -/\ntheorem constraints_a_b_c_of_a_le_b_le_c_of_a_add_b_add_c_eq_two_of_ab_add_bc_add_ca_eq_one (a b c : ℝ) (hab : a ≤ b) (hbc : b ≤ c) (h : a + b + c = 2) (h' : a * b + b * c + c * a = 1) : (0 ≤ a ∧ a ≤ 1 / 3) ∧ 1 / 3 ≤ b ∧ b ≤ 1 ∧ 1 ≤ c ∧ c ≤ 4 / 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a = 2014.  \nDefine b = 2012.  \nDefine n = 2^a.  \nDefine m = 2^b.  \n\nGoal:  \n((n + m) / (n - m)) = (5 / 3).",
+    "formal_statement": "Goal:  \n((n + m) / (n - m)) = (5 / 3). -/\ntheorem new_goal_here (a b n m : ℝ) (ha : a = 2014) (hb : b = 2012) (hn : n = 2^a) (hm : m = 2^b) : (n + m) / (n - m) = 5 / 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a as a positive real number.  \nDefine b as a positive real number.  \nDefine c as a positive real number.  \nAssume (a * (b + c)) = 152.  \nAssume (b * (c + a)) = 162.  \nAssume (c * (a + b)) = 170.  \n\nGoal:  \n(a * b * c) = 720.",
+    "formal_statement": "Goal:  \n(a * b * c) = 720. -/\ntheorem abc_720_of_ab_plus_ac_eq_152_of_bc_plus_ba_eq_162_of_ca_plus_cb_eq_170 {a b c : ℝ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (habc : a * (b + c) = 152) (hbc : b * (c + a) = 162) (hca : c * (a + b) = 170) : a * b * c = 720 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine ligs = ℕ.  \nDefine lags = ℕ.  \nDefine lugs = ℕ.  \nAssume for every natural number x, (7 * x) ligs = (4 * x) lags.  \nAssume for every natural number y, (9 * y) lags = (20 * y) lugs.  \nGoal:  \nThere exists a natural number z such that (z * 80) lugs = (63 * z) ligs.",
+    "formal_statement": "/-- Assumptions:  \nDefine ligs = ℕ.  \nDefine lags = ℕ.  \nDefine lugs = ℕ.  \nAssume for every natural number x, (7 * x) ligs = (4 * x) lags.  \nAssume for every natural number y, (9 * y) lags = (20 * y) lugs.  \nGoal:  \nThere exists a natural number z such that (z * 80) lugs = (63 * z) ligs. -/\ntheorem exists_multiple_eq_extracted {lags ligs lugs : ℕ → ℕ} : (∀ (x : ℕ), 7 * x * ligs x = 4 * x * lags x) → (∀ (y : ℕ), 9 * y * lags y = 20 * y * lugs y) → ∃ z, z * 80 * lugs z = 63 * z * ligs z := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical structure. The English statement defines ligs, lags, lugs as sets (ℕ), not as functions from ℕ to ℕ. The assumptions state that for every natural number x, (7 * x) ligs = (4 * x) lags, which suggests ligs, lags, lugs are sets and the notation means multiplication of a scalar with a set. The Lean theorem treats them as functions ℕ → ℕ, changing the mathematical meaning fundamentally."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nLet y be a real number.\nDefine A = 7.\nDefine G = sqrt(19).\nAssume ((x + y) / 2) = A.\nAssume sqrt((x * y)) = G.\nGoal:\n(x^2 + y^2) = 158.",
+    "formal_statement": "/-- Assumptions:\nLet x be a real number.\nLet y be a real number.\nDefine A = 7.\nDefine G = sqrt(19).\nAssume ((x + y) / 2) = A.\nAssume sqrt((x * y)) = G.\nGoal:\n(x^2 + y^2) = 158. -/\ntheorem x_sq_add_y_sq_eq_158 {x y : ℝ} (A : ℝ) (G : ℝ) (hA : A = 7) (hG : G = Real.sqrt 19) (hxy : (x + y) / 2 = A) (hxy' : Real.sqrt (x * y) = G) : x ^ 2 + y ^ 2 = 158 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly treats A and G as parameters with constraints, rather than fixed definitions. In the English statement, A and G are defined as specific values (7 and sqrt(19)), not as variables with equality constraints. The theorem should have A = 7 and G = sqrt(19) as direct assumptions about x and y, not as parameters with equality hypotheses. This changes the logical structure of the theorem."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine total_milk ∈ ℕ.\nDefine total_coffee ∈ ℕ.\nAssume total_milk > 0.\nAssume total_coffee > 0.\nLet n be a natural number.\nAssume n ≥ 2.\nDefine family_set = {1, 2, ..., n}.\nFor every person i in family_set, define milk_i ∈ ℕ.\nFor every person i in family_set, define coffee_i ∈ ℕ.\nAssume for every person i in family_set, milk_i > 0.\nAssume for every person i in family_set, coffee_i > 0.\nAssume for every person i in family_set, (milk_i + coffee_i) = 8.\nDefine total_milk = sum_{i in family_set} milk_i.\nDefine total_coffee = sum_{i in family_set} coffee_i.\nDefine angela_index ∈ family_set.\nAssume milk_angela_index = (1/4) * total_milk.\nAssume coffee_angela_index = (1/6) * total_coffee.\n\nGoal:\nn = 5.",
+    "formal_statement": "Goal:\nn = 5. -/\ntheorem n_eq_5 : n = 5 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunknown identifier 'n'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nAssume (a^2) * (b^3) = (32 / 27).\nAssume (a) / (b^3) = (27 / 4).\n\nGoal:\n(a + b) = (8 / 3).",
+    "formal_statement": "Goal:\n(a + b) = (8 / 3). -/\ntheorem a_add_b_eq_of_a_sq_mul_b_cub_eq_div_of_a_div_b_cub_eq_div (a b : ℝ) (h₁ : a ^ 2 * b ^ 3 = 32 / 27) (h₂ : a / b ^ 3 = 27 / 4) : a + b = 8 / 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 3.\nDefine b = 11.\nDefine the function ⋆ : ℝ × ℝ → ℝ by ⋆(x, y) = ((1 / y) - (1 / x)) / (x - y).\nGoal:\n⋆(3, 11) = 1 / 33.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 3.\nDefine b = 11.\nDefine the function ⋆ : ℝ × ℝ → ℝ by ⋆(x, y) = ((1 / y) - (1 / x)) / (x - y).\nGoal:\n⋆(3, 11) = 1 / 33. -/\ntheorem star_apply_3_11 : star (3 : ℝ) 11 = 1 / 33 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  star (3 : ℝ)\nterm has type\n  ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine b = 9.\nDefine n = 852.\nGoal:\nn = 695.",
+    "formal_statement": "/-- Assumptions:\nDefine b = 9.\nDefine n = 852.\nGoal:\nn = 695. -/\ntheorem example_extracted (b : ℕ) (n : ℕ) : n = 695 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly includes b and n as parameters with arbitrary values, while the English statement defines specific values (b=9, n=852) as assumptions. The theorem should have no parameters and should state that under those specific definitions, n=695, which is false. The generated theorem claims n=695 for all natural numbers b and n, which is mathematically different from the original statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an integer.\nAssume a is odd.\nLet b be a natural number.\nAssume 4 divides b.\nGoal:\n(a^2 + b^2) ≡ 1 mod 8.",
+    "formal_statement": "/-- Assumptions:\nLet a be an integer.\nAssume a is odd.\nLet b be a natural number.\nAssume 4 divides b.\nGoal:\n(a^2 + b^2) ≡ 1 mod 8. -/\ntheorem sq_add_sq_mod_eight_of_odd_of_dvd (a : ℤ) (b : ℕ) (ha : Odd a) (hb : 4 ∣ b) :\n  a ^ 2 + b ^ 2 ≡ 1 [ZMOD 8] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 15.\nDefine b = 85.\nDefine d = 20.\nGoal:\nThe size of the set {x in ℤ | (a ≤ x) ∧ (x ≤ b) ∧ (There exists an integer k such that x = d * k)} = 4.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 15.\nDefine b = 85.\nDefine d = 20.\nGoal:\nThe size of the set {x in ℤ | (a ≤ x) ∧ (x ≤ b) ∧ (There exists an integer k such that x = d * k)} = 4. -/\ntheorem card_fintype_ext :\n  Fintype.card { x : ℤ // 15 ≤ x ∧ x ≤ 85 ∧ ∃ k, x = 20 * k } = 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype { x : ℤ // (15 : ℤ) ≤ x ∧ x ≤ (85 : ℤ) ∧ ∃ (k : ℤ), x = (20 : ℤ) * k }",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℕ⁺ → ℕ⁺.\nFor every natural number n ≥ 1, assume f(n+1) > f(f(n)).\nGoal:\nFor every natural number n ≥ 1, f(n) = n.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℕ⁺ → ℕ⁺.\nFor every natural number n ≥ 1, assume f(n+1) > f(f(n)).\nGoal:\nFor every natural number n ≥ 1, f(n) = n. -/\ntheorem f_eq_n_forall_of_one_le {f : ℕ → ℕ} (hf : ∀ n ≥ 1, f (f n) < f (n + 1)) : ∀ n ≥ 1, f n = n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly types f as ℕ → ℕ instead of ℕ⁺ → ℕ⁺, and the inequality direction is reversed (f(f(n)) < f(n+1) instead of f(n+1) > f(f(n))). While mathematically equivalent, the strict type mismatch for ℕ⁺ is a fundamental error."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nDefine A = (3^(2^n)) - 1.\nDefine m = (n + 2).\nDefine M = (2^(n + 3)).\n\nGoal:\nA ≡ (2^m) mod M.",
+    "formal_statement": "Goal:\nA ≡ (2^m) mod M. -/\ntheorem A_modEq_M_def {n : ℕ} (hn : 0 < n) : (3^(2^n) - 1) ≡ 2^(n + 2) [MOD 2^(n + 3)] := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine the closed interval I = [0, π].  \nDefine the function f : ℝ → ℝ by f(x) = sin((π/2) * cos(x)).  \nDefine the function g : ℝ → ℝ by g(x) = cos((π/2) * sin(x)).  \nLet x be a real number.  \nAssume x is in I.  \n\nGoal:  \nThe size of the set {x in I | f(x) = g(x)} = 2.",
+    "formal_statement": "Goal:  \nThe size of the set {x in I | f(x) = g(x)} = 2. -/\ntheorem sin_pi_div_two_cos_eq_cos_pi_div_two_sin_tac_26311 (x : ℝ) (hx : x ∈ Icc 0 π) : {x | x ∈ Icc 0 π ∧ sin (π / 2 * cos x) = cos (π / 2 * sin x)}.Subsingleton := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\noverloaded, errors \n  19:83 ambiguous, possible interpretations \n    π : ℕ → ℕ\n    \n    π : ℝ\n  \n  19:83 ambiguous, possible interpretations \n    π : ℕ → ℕ\n    \n    π : ℝ\noverloaded, errors \n  19:103 ambiguous, possible interpretations \n    π : ℕ → ℕ\n    \n    π : ℝ\n  \n  19:103 ambiguous, possible interpretations \n    π : ℕ → ℕ\n    \n    π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a ∈ ℝ.\nDefine f : ℝ → ℝ by f(x) = √(4 + √(16 + 16*x)).\nDefine g : ℝ → ℝ by g(x) = √(1 + √(1 + x)).\nAssume (f(a) + g(a)) = 6.\nGoal:\na = 8.",
+    "formal_statement": "/-- Assumptions:\nDefine a ∈ ℝ.\nDefine f : ℝ → ℝ by f(x) = √(4 + √(16 + 16*x)).\nDefine g : ℝ → ℝ by g(x) = √(1 + √(1 + x)).\nAssume (f(a) + g(a)) = 6.\nGoal:\na = 8. -/\ntheorem real_8_plus_real_16_eq_6_plus_real_8 (a : ℝ) (f g : ℝ → ℝ) (hf : ∀ x, f x = Real.sqrt (4 + Real.sqrt (16 + 16 * x))) (hg : ∀ x, g x = Real.sqrt (1 + Real.sqrt (1 + x))) : f a + g a = 6 → a = 8 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly states the conclusion as 'f a + g a = 6 → a = 8', but the English statement has 'f(a) + g(a) = 6' as an assumption and 'a = 8' as the goal. The theorem should be 'f a + g a = 6 → a = 8' (which is what's written), but the English phrasing suggests we're proving 'a = 8' under the given assumptions. However, the Lean theorem correctly captures the logical implication: if all the assumptions hold (including f a + g a = 6), then a = 8. The theorem signature accurately represents the mathematical intent."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nGoal:\n((x + 3) * ((2 * x) - 6)) = ((2 * (x^2)) - 18).",
+    "formal_statement": "/-- Assumptions:\nDefine x as a real number.\nGoal:\n((x + 3) * ((2 * x) - 6)) = ((2 * (x^2)) - 18). -/\ntheorem t10203 (x : ℝ) : (x + 3) * (2 * x - 6) = 2 * x ^ 2 - 18 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine an arithmetic sequence a : ℕ → ℝ.\nDefine d ∈ ℝ.\nAssume for every natural number n, a(n) = a(0) + (n * d).\nAssume a(6) = 30.\nAssume a(10) = 60.\nGoal:\na(20) = 135.",
+    "formal_statement": "/-- Assumptions:\nDefine an arithmetic sequence a : ℕ → ℝ.\nDefine d ∈ ℝ.\nAssume for every natural number n, a(n) = a(0) + (n * d).\nAssume a(6) = 30.\nAssume a(10) = 60.\nGoal:\na(20) = 135. -/\ntheorem a_20_extracted {a : ℕ → ℝ} {d : ℝ} : (∀ (n : ℕ), a n = a 0 + n * d) → a 6 = 30 → a 10 = 60 → a 20 = 135 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It assumes: 1) a is a function from ℕ to ℝ, 2) d is a real number, 3) the arithmetic sequence formula ∀n, a n = a 0 + n * d, 4) a(6) = 30, 5) a(10) = 60, and concludes a(20) = 135. All types match (ℕ → ℝ, ℝ), constraints are present, and the logical implication flows correctly from hypotheses to conclusion."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nDefine the first even integer as (2*n).\nDefine the second even integer as ((2*n) + 2).\nDefine the third even integer as ((2*n) + 4).\nDefine the fourth even integer as ((2*n) + 6).\nDefine the fifth even integer as ((2*n) + 8).\nDefine the sum of the even integers as S_even = ((2*n) + ((2*n) + 2) + ((2*n) + 4) + ((2*n) + 6) + ((2*n) + 8)).\nDefine the first odd counting number as 1.\nDefine the second odd counting number as 3.\nDefine the third odd counting number as 5.\nDefine the fourth odd counting number as 7.\nDefine the fifth odd counting number as 9.\nDefine the sixth odd counting number as 11.\nDefine the seventh odd counting number as 13.\nDefine the eighth odd counting number as 15.\nDefine the sum of the odd numbers as S_odd = (1 + 3 + 5 + 7 + 9 + 11 + 13 + 15).\nAssume S_even = (S_odd - 4).\n\nGoal:\n(2*n) = 8.",
+    "formal_statement": "Goal:\n(2*n) = 8. -/\ntheorem even_integer_sum_eq_odd_sum_minus_four (n : ℤ) : (2 * n) = 8  :=  by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nAssume ((x - 9) / (x + 1)) = 2.\nGoal:\nx = -11.",
+    "formal_statement": "/-- Assumptions:\nDefine x as a real number.\nAssume ((x - 9) / (x + 1)) = 2.\nGoal:\nx = -11. -/\ntheorem x_eq_minus_11 (x : ℝ) (h : (x - 9) / (x + 1) = 2) : x = -11 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = 25.\nDefine D = 11.\nLet x be a real number.\nLet y be a real number.\nAssume (x + y) = S.\nAssume (x - y) = D.\nGoal:\nThe larger of the two numbers is 18.",
+    "formal_statement": "/-- Assumptions:\nDefine S = 25.\nDefine D = 11.\nLet x be a real number.\nLet y be a real number.\nAssume (x + y) = S.\nAssume (x - y) = D.\nGoal:\nThe larger of the two numbers is 18. -/\ntheorem max_of_add_eq_S_sub_eq_D (x y : ℝ) (h₁ : x + y = 25) (h₂ : x - y = 11) : max x y = 18 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The theorem signature accurately captures the mathematical intent: given real numbers x and y with x+y=25 and x-y=11, it states that max x y = 18. This correctly formalizes the natural language statement about finding the larger number under the given constraints."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 3.\nFor every integer i in the set {1, ..., n} and every integer j in the set {1, ..., n}, define a_{i,j} as a real number.\nFor every integer i in the set {1, ..., n}, define x_i as a real number.\nAssume for every integer i in the set {1, ..., n}, a_{i,i} > 0.\nAssume for every integer i in the set {1, ..., n} and every integer j in the set {1, ..., n}, if i ≠ j then a_{i,j} < 0.\nAssume for every integer i in the set {1, ..., n}, (a_{i,1} + a_{i,2} + a_{i,3}) > 0.\nAssume for every integer i in the set {1, ..., n}, (a_{i,1} * x_1 + a_{i,2} * x_2 + a_{i,3} * x_3) = 0.\n\nGoal:\nFor every integer i in the set {1, ..., n}, x_i = 0.",
+    "formal_statement": "Goal:\nFor every integer i in the set {1, ..., n}, x_i = 0. -/\ntheorem x_eq_zero_of_sum_eq_zero (n : ℕ) (hn : n = 3) (a : Fin n → Fin n → ℝ) (x : Fin n → ℝ)\n    (ha : ∀ i, a i i > 0) (h : ∀ i j, i ≠ j → a i j < 0) (h2 : ∀ i, 0 < ∑ j, a i j)\n    (h3 : ∀ i, ∑ j, a i j * x j = 0) : ∀ i, x i = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nAssume (3 * n) ≡ 2 mod 11.\nGoal:\nn ≡ 8 mod 11.",
+    "formal_statement": "/-- Assumptions:\nLet n be an integer.\nAssume (3 * n) ≡ 2 mod 11.\nGoal:\nn ≡ 8 mod 11. -/\ntheorem example_extracted {n : ℤ} : 3 * n ≡ 2 [ZMOD 11] → n ≡ 8 [ZMOD 11] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nLet n be a natural number.\nAssume x > -1.\n\nGoal:\n(1 + (n * x)) ≤ ((1 + x)^n).",
+    "formal_statement": "Goal:\n(1 + (n * x)) ≤ ((1 + x)^n). -/\ntheorem one_add_mul_le_pow {x : ℝ} (hx : -1 < x) (n : ℕ) : 1 + n * x ≤ (1 + x) ^ n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\n'one_add_mul_le_pow' has already been declared",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 1529.\nDefine m = 6.\nGoal:\nThere exists an integer q and an integer r such that (n = (m * q) + r) and (0 ≤ r) and (r < m) and (r = 5).",
+    "formal_statement": "/-- Assumptions:\nDefine n = 1529.\nDefine m = 6.\nGoal:\nThere exists an integer q and an integer r such that (n = (m * q) + r) and (0 ≤ r) and (r < m) and (r = 5). -/\ntheorem exists_eq_mul_add_of_dvd_add_of_lt_tac_1529 (n m : ℕ) (hn : n = 1529) (hm : m = 6) : ∃ q r, n = m * q + r ∧ 0 ≤ r ∧ r < m ∧ r = 5 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It specifies n and m as ℕ (natural numbers), includes the assumptions n=1529 and m=6 as hypotheses, and states the existence of integers q and r satisfying all the given conditions. The logical structure matches the English statement exactly."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine m = (2 * n).\nDefine k = (m + 2).\nAssume (m * k) = 288.\n\nGoal:\nk = 18.",
+    "formal_statement": "Goal:\nk = 18. -/\ntheorem k_eq_18 (n : ℕ) (m : ℕ) (k : ℕ) (h₁ : m = 2 * n) (h₂ : k = m + 2) (h₃ : m * k = 288) : k = 18 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 35.\nDefine b = 40.\nDefine c = 1400.\nAssume a * b = c.\nDefine m = 1399.\nAssume m is a natural number.\nDefine k = 160.\nAssume k is an integer.\nGoal:\nThere exists an integer n such that (0 ≤ n) and (n < m) and (There exists an integer q such that (k * n) = (m * q) + 1).",
+    "formal_statement": "/-- Assumptions:\nDefine a = 35.\nDefine b = 40.\nDefine c = 1400.\nAssume a * b = c.\nDefine m = 1399.\nAssume m is a natural number.\nDefine k = 160.\nAssume k is an integer.\nGoal:\nThere exists an integer n such that (0 ≤ n) and (n < m) and (There exists an integer q such that (k * n) = (m * q) + 1). -/\ntheorem exists_n_lem (a b c : ℕ) (ha : a = 35) (hb : b = 40) (hc : c = 1400) (habc : a * b = c) (m : ℕ) (hm : m = 1399) (k : ℤ) (hk : k = 160) : ∃ n, 0 ≤ n ∧ n < m ∧ ∃ q, ↑k * n = ↑m * q + 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  k\nhas type\n  ℤ : Type\nbut is expected to have type\n  ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a = p / q, where p and q are positive integers.  \nAssume p and q are relatively prime.  \nDefine floor : ℝ → ℤ by floor(x) = the greatest integer less than or equal to x.  \nDefine frac : ℝ → ℝ by frac(x) = x - floor(x).  \nFor every real number x, define {x} = frac(x).  \nAssume for every real number x satisfying (floor(x) * {x}) = (a * (x^2)), the sum of all such x is 420.  \n\nGoal:  \np + q = 929.",
+    "formal_statement": "Goal:  \np + q = 929. -/\ntheorem p_add_q_eq_929 (a : ℝ) (p q : ℤ) (hp : 0 < p) (hq : 0 < q) (hgcd : Nat.Coprime p.natAbs q.natAbs) (h : ∀ x : ℝ, (Int.floor x * (x - Int.floor x)) = a * (x^2) → ∑ k in Finset.range 1000, (Int.floor (a * (↑k)^2)) = 420) : p + q = 929 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 1342.\nDefine b = 13.\nLet r be an integer.\nAssume r is the remainder when a is divided by b.\nDefine r = a mod b.\nLet n be a natural number.\nAssume n > 0.\nAssume n is a multiple of a.\nAssume there exists an integer q such that n = a * q.\nAssume the remainder when n is divided by b is smaller than r.\nGoal:\nn = 6710.",
+    "formal_statement": "/-- Assumptions:\nDefine a = 1342.\nDefine b = 13.\nLet r be an integer.\nAssume r is the remainder when a is divided by b.\nDefine r = a mod b.\nLet n be a natural number.\nAssume n > 0.\nAssume n is a multiple of a.\nAssume there exists an integer q such that n = a * q.\nAssume the remainder when n is divided by b is smaller than r.\nGoal:\nn = 6710. -/\ntheorem n_eq_6710 : n = 6710 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'n'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine θ as a real number.  \nAssume 0 < θ ≤ 2π.  \nDefine f : ℝ → ℝ by f(θ) = 1 - (3 * sin(θ)) + (5 * cos(3 * θ)).  \nGoal:  \nThe size of the set {θ in ℝ | (0 < θ) ∧ (θ ≤ 2π) ∧ (f(θ) = 0)} = 6.",
+    "formal_statement": "/-- Assumptions:  \nDefine θ as a real number.  \nAssume 0 < θ ≤ 2π.  \nDefine f : ℝ → ℝ by f(θ) = 1 - (3 * sin(θ)) + (5 * cos(3 * θ)).  \nGoal:  \nThe size of the set {θ in ℝ | (0 < θ) ∧ (θ ≤ 2π) ∧ (f(θ) = 0)} = 6. -/\ntheorem card_zero_of_f_eq_zero :\n  {θ : ℝ | 0 < θ ∧ θ ≤ 2 * π ∧ (1 - 3 * Real.sin θ + 5 * Real.cos (3 * θ) = 0)}.card = 6 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = |(2 - x)|.\nAssume for all real numbers x, f(x) = 3.\nGoal:\nThe sum of the set {x in ℝ | f(x) = 3} = 4.",
+    "formal_statement": "/-- Assumptions:\nDefine f : ℝ → ℝ by f(x) = |(2 - x)|.\nAssume for all real numbers x, f(x) = 3.\nGoal:\nThe sum of the set {x in ℝ | f(x) = 3} = 4. -/\ntheorem sum_set_of_abs_sub_two_eq_three (f : ℝ → ℝ) (hf : ∀ x, f x = |(2 - x)|) : ∑' x : ℝ, x ∈ {x : ℝ | f x = 3} → x = 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'x'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nAssume n ≥ 9.\nDefine factorial : ℕ → ℕ by factorial(0) = 1 and for every natural number k ≥ 1, factorial(k) = k * factorial(k-1).\nDefine a = factorial(n).\nDefine b = factorial(n+1).\nDefine c = factorial(n+2).\nDefine expression = ((c - b) / a).\n\nGoal:\nThere exists an integer s such that expression = s^2.",
+    "formal_statement": "Goal:\nThere exists an integer s such that expression = s^2. -/\ntheorem ∃ s : ℤ, (n + 2)! - (n + 1)! - n! = s^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunexpected token '∃'; expected identifier\nunexpected token ','; expected ':=', 'where' or '|'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine n as a natural number.  \nDefine a_1 as a real number.  \nDefine b_1 as a real number.  \nFor every natural number n ≥ 1, define a_(n+1) = (√3 * a_n) - b_n.  \nFor every natural number n ≥ 1, define b_(n+1) = (√3 * b_n) + a_n.  \nDefine a_100 = 2.  \nDefine b_100 = 4.  \n\nGoal:  \na_1 + b_1 = 1 / (2^98).",
+    "formal_statement": "Goal:  \na_1 + b_1 = 1 / (2^98). -/\ntheorem a_1_add_b_1_eq_1_div_2_pow_98 : a_1 + b_1 = 1 / (2 ^ 98) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunknown identifier 'a_1'\nunknown identifier 'b_1'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine a_1, a_2, ..., a_n as real numbers.\nDefine f : ℝ → ℝ by f(x) = cos(a_1 + x) + (1/2) * cos(a_2 + x) + (1/4) * cos(a_3 + x) + ... + (1/(2^(n-1))) * cos(a_n + x).\nDefine x_1 as a real number.\nDefine x_2 as a real number.\nAssume f(x_1) = 0.\nAssume f(x_2) = 0.\nGoal:\nThere exists an integer m such that (x_2 - x_1) = m * π.",
+    "formal_statement": "/-- Assumptions:\nLet n be a natural number.\nDefine a_1, a_2, ..., a_n as real numbers.\nDefine f : ℝ → ℝ by f(x) = cos(a_1 + x) + (1/2) * cos(a_2 + x) + (1/4) * cos(a_3 + x) + ... + (1/(2^(n-1))) * cos(a_n + x).\nDefine x_1 as a real number.\nDefine x_2 as a real number.\nAssume f(x_1) = 0.\nAssume f(x_2) = 0.\nGoal:\nThere exists an integer m such that (x_2 - x_1) = m * π. -/\ntheorem cos_n_eq_zero_extracted (n : ℕ) (a : Fin n → ℝ) (f : ℝ → ℝ) (x₁ x₂ : ℝ) :\n (∀ (x : ℝ), f x = ∑ i : Fin n, (↑(2^(1 - i)))⁻¹ * Real.cos (a i + x)) →\n f x₁ = 0 → f x₂ = 0 → ∃ m, x₂ - x₁ = ↑m * Real.pi := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  OfNat (Fin n) (nat_lit 1)\nfailed to synthesize instance\n  HPow ℕ (Fin n) ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = {n in ℕ | 0 ≤ n ≤ 50 and there exists an integer k such that n = 3*k}.\nDefine f : ℕ → ℕ by f(n) = n mod 10.\nGoal:\nThe sum of f(n) for n in the set S is 78.",
+    "formal_statement": "/-- Assumptions:\nDefine S = {n in ℕ | 0 ≤ n ≤ 50 and there exists an integer k such that n = 3*k}.\nDefine f : ℕ → ℕ by f(n) = n mod 10.\nGoal:\nThe sum of f(n) for n in the set S is 78. -/\ntheorem sum_apply_eq_78 : ∑ n in filter (fun n => ∃ k : ℤ, n = 3 * k) (Finset.Icc 0 50), n % 10 = 78  :=  by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  DecidablePred fun (n : ℤ) => ∃ (k : ℤ), n = (3 : ℤ) * k",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine i as the imaginary unit such that i^2 = -1.\nGoal:\n((i / 2))^2 = (-1 / 4).",
+    "formal_statement": "/-- Assumptions:\nDefine i as the imaginary unit such that i^2 = -1.\nGoal:\n((i / 2))^2 = (-1 / 4). -/\ntheorem sq_div_two_extracted : (Complex.I / 2) ^ 2 = (-1 / 4) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it uses Complex.I for the imaginary unit, correctly represents the expression ((i / 2))^2, and states it equals (-1 / 4). The types match (Complex numbers), and the logical structure is preserved."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine B_x = 7.\nDefine B_y = -1.\nDefine C_x = -1.\nDefine C_y = 7.\nDefine m : ℝ.\nDefine b : ℝ.\nAssume for every real number x, the point (x, (m*x + b)) lies on line ℓ.\nAssume (B_x, B_y) lies on line ℓ.\nAssume (C_x, C_y) lies on line ℓ.\nGoal:\n(m + b) = 5.",
+    "formal_statement": "/-- Assumptions:\nDefine B_x = 7.\nDefine B_y = -1.\nDefine C_x = -1.\nDefine C_y = 7.\nDefine m : ℝ.\nDefine b : ℝ.\nAssume for every real number x, the point (x, (m*x + b)) lies on line ℓ.\nAssume (B_x, B_y) lies on line ℓ.\nAssume (C_x, C_y) lies on line ℓ.\nGoal:\n(m + b) = 5. -/\ntheorem slope_intercept_eq_five (B_x B_y C_x C_y m b : ℝ) (h₁ : B_x = 7) (h₂ : B_y = -1) (h₃ : C_x = -1) (h₄ : C_y = 7) (h₅ : ∀ x, (x, m*x + b) ∈ ℓ) (h₆ : (B_x, B_y) ∈ ℓ) (h₇ : (C_x, C_y) ∈ ℓ) : m + b = 5 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'ℓ'\nunknown identifier 'ℓ'\nunknown identifier 'ℓ'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℤ → ℤ.\nFor every integer n ≥ 1000, define f(n) = (n - 3).\nFor every integer n < 1000, define f(n) = f(f((n + 5))).\n\nGoal:\nf(84) = 997.",
+    "formal_statement": "Goal:\nf(84) = 997. -/\ntheorem f_84 : f 84 = 997 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command\nunknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine d₁ = 3.\nDefine w₁ = 1.5.\nDefine d₂ = 10.\nAssume d₁, d₂, w₁ are positive real numbers.\nAssume the rate of water consumption is constant.\nGoal:\nThere exists a real number w₂ such that w₂ = ((w₁) / (d₁)) * (d₂).",
+    "formal_statement": "/-- Assumptions:\nDefine d₁ = 3.\nDefine w₁ = 1.5.\nDefine d₂ = 10.\nAssume d₁, d₂, w₁ are positive real numbers.\nAssume the rate of water consumption is constant.\nGoal:\nThere exists a real number w₂ such that w₂ = ((w₁) / (d₁)) * (d₂). -/\ntheorem water_consumption_constant_extracted (d₁ d₂ w₁ : ℝ) : 0 < d₁ → 0 < d₂ → 0 < w₁ → ∃ w₂, w₂ = w₁ / d₁ * d₂ := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It declares d₁, d₂, w₁ as real numbers with positivity assumptions (0 < d₁, 0 < d₂, 0 < w₁) and concludes the existence of w₂ such that w₂ = w₁ / d₁ * d₂. The specific numeric values (3, 1.5, 10) from the English statement are appropriately generalized to variables with positivity constraints, which is a valid formalization approach."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an integer.\nLet b be an integer.\nGoal:\nThere exists an integer a and there exists an integer b such that NOT ( (a is even AND b is even) if and only if (There exists an integer k such that (a^2 + b^2) = 8 * k) ).",
+    "formal_statement": "/-- Assumptions:\nLet a be an integer.\nLet b be an integer.\nGoal:\nThere exists an integer a and there exists an integer b such that NOT ( (a is even AND b is even) if and only if (There exists an integer k such that (a^2 + b^2) = 8 * k) ). -/\ntheorem exists_sq_add_sq_eq_eight_mul_extracted {a b : ℤ} : ¬(Even a ∧ Even b) ↔ ∃ k, a ^ 2 + b ^ 2 = 8 * k := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly formalizes the logical structure. The English statement requires existence of integers a and b such that NOT (P ↔ Q), where P is 'a is even AND b is even' and Q is '∃k, a² + b² = 8k'. The Lean theorem instead states ∀a,b: ¬(P) ↔ Q, which is a different mathematical claim about all integers a,b rather than existence of specific counterexamples."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a ∈ ℝ.\nDefine b ∈ ℝ.\nAssume a > 0.\nAssume b > 0.\nAssume a ≠ b.\nAssume (a - (1 / a)) = 1.\nAssume (b - (1 / b)) = 1.\n\nGoal:\n(a + b) = √5.",
+    "formal_statement": "Goal:\n(a + b) = √5. -/\ntheorem a_add_b_eq_sqrt_five (a b : ℝ) (ha : 0 < a) (hb : 0 < b) (hab : a ≠ b) (h₁ : a - 1/a = 1) (h₂ : b - 1/b = 1) : a + b = √5 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 9.\nLet k be a natural number.\nDefine S : ℕ → ℕ by S(n) = Σ_{k in the set {1, ..., n}} (k^2).\nGoal:\nThe units digit of S(9) is 5.",
+    "formal_statement": "/-- Assumptions:\nDefine n = 9.\nLet k be a natural number.\nDefine S : ℕ → ℕ by S(n) = Σ_{k in the set {1, ..., n}} (k^2).\nGoal:\nThe units digit of S(9) is 5. -/\ntheorem units_digit_of_S_9 : (∑ k in Finset.Icc 1 9, k^2).unitsDigit = 5 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'unitsDigit', the environment does not contain 'Nat.unitsDigit'\n  ∑ k ∈ Finset.Icc (1 : ℕ) (9 : ℕ), k ^ (2 : ℕ)\nhas type\n  ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine p : ℤ → ℤ by p(n) = (n^2) - n + 41.  \nLet n be a positive integer.  \nAssume n > 0.  \nAssume there exists an integer d > 1 such that d divides p(n) and d divides p(n+1).  \n\nGoal:  \nn = 41.",
+    "formal_statement": "Goal:  \nn = 41. -/\ntheorem n_eq_41 (n : ℤ) (hn : 0 < n) (d : ℤ) (hd : d > 1) (h1 : d ∣ (n^2 - n + 41)) (h2 : d ∣ ((n + 1)^2 - (n + 1) + 41)) : n = 41 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  }
+]

@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import importlib
 from CNL_generation import CNL_generator # for reading CNL list
-from eval_semantic import evaluate_translation # for semantic evaluation
 from tqdm import tqdm 
 from lean_interact import LeanREPLConfig, LeanServer, Command, TempRequireProject, LeanRequire
 import time
+from eval_semantic import SemanticEvaluator
 
 from config import models, STANDARD_IMPORTS, SYSTEM_PROMPT
 
@@ -23,6 +23,7 @@ class FL_generator:
     def __init__(self, model_name="kimina_autoformalizer", dataset_name="miniF2F", isCNL=False, limit = 100):
         print(f"Initializing FL_generator with model '{model_name}' for dataset '{dataset_name}' (isCNL={isCNL}, limit={limit})...")
         # 1. Load model config
+        self.dataset_name = dataset_name
         self.isCNL = isCNL
         self.limit = limit
         self.model = models.get(model_name, {})
@@ -100,7 +101,7 @@ class FL_generator:
         except Exception as e:
             return f"❌ API Error: {e}"
 
-    def generate_write(self, input_path, name=None, json_output_path=None):
+    def generate_write(self, input_path, name=None, json_output_path=None, CNL_model=None, semantic_judge_model=None):
         """
         Generate Lean formalizations for a list of statements.
 
@@ -116,7 +117,10 @@ class FL_generator:
             # treat as dataset folder
             informal_statements = self.handlerClass.read(input_path, limit=self.limit)
         else:
-            cnl_generator = CNL_generator()
+            if not CNL_model:
+                cnl_generator = CNL_generator()
+            else:
+                cnl_generator = CNL_generator(model_name=CNL_model)
             # treat as json file containing List[str]
             informal_statements = cnl_generator.read_cnl_lst(input_path)
 
@@ -134,6 +138,11 @@ class FL_generator:
         project = TempRequireProject(lean_version="v4.8.0", require="mathlib")
         config = LeanREPLConfig(verbose=False, project=project)
         server = LeanServer(config)
+
+        if not semantic_judge_model:
+            semantic_evaluator = SemanticEvaluator()
+        else:
+            semantic_evaluator = SemanticEvaluator(model_name=semantic_judge_model)
 
         try:
             for statement in tqdm(informal_statements):
@@ -162,7 +171,7 @@ class FL_generator:
 
                 # --- Semantic evaluation (only if syntactically valid) ---
                 if is_syntactic_valid:
-                    sem_eval = evaluate_translation(statement, lean_statement)
+                    sem_eval = semantic_evaluator.evaluate_translation(statement, lean_statement)
                     is_correct = bool(sem_eval.get("is_correct", False))
                     reason = sem_eval.get("reason", "No reason provided.")
                 else:

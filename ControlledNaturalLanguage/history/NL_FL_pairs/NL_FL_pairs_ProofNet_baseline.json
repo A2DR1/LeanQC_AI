@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "If $r$ is rational $(r \\neq 0)$ and $x$ is irrational, prove that $rx$ is irrational.",
+    "formal_statement": "theorem rational_number_mul_ironic (r : ℚ) (hr : r ≠ 0) (x : ℝ) (hx : Irrational x) :\n    Irrational (r * x) := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Let $E$ be a nonempty subset of an ordered set; suppose $\\alpha$ is a lower bound of $E$ and $\\beta$ is an upper bound of $E$. Prove that $\\alpha \\leq \\beta$.",
+    "formal_statement": "theorem lower_bound (α : Type*) [PartialOrder α] (E : Set α)\n  (hE : E.Nonempty) (α₀ : α) (h₁ : α₀ ∈ lowerBounds E) :\n  α₀ ≤ sSup E :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  SupSet α",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that no order can be defined in the complex field that turns it into an ordered field.",
+    "formal_statement": "theorem no_total_order : ¬ ∃ f : ℂ → ℂ, Function.Injective f ∧ ∀ x y, f x = f y → x = y ∧ (∀ x, f x ≠ 0) ∧ (∀ x, f x * f (x + 1) > 0) ∧ (∀ x, f x * f (x - 1) < 0) := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  LT ℂ\nfailed to synthesize instance\n  LT ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "If $z_1, \\ldots, z_n$ are complex, prove that $|z_1 + z_2 + \\ldots + z_n| \\leq |z_1| + |z_2| + \\cdots + |z_n|$.",
+    "formal_statement": "theorem sum_of_norms (n : ℕ) (f : Fin n → ℂ) :\n    abs (∑ i : Fin n, f i) ≤ ∑ i : Fin n, abs (f i) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Lattice ℂ\nfailed to synthesize instance\n  Lattice ℂ\nfailed to synthesize instance\n  LE ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "If $z$ is a complex number such that $|z|=1$, that is, such that $z \\bar{z}=1$, compute $|1+z|^{2}+|1-z|^{2}$.",
+    "formal_statement": "theorem norm_1 (z : ℂ) (hz : abs z = 1) :\n    abs (1 + z) ^ 2 + abs (1 - z) ^ 2 = 4 := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Lattice ℂ\nfailed to synthesize instance\n  Lattice ℂ\nfailed to synthesize instance\n  Lattice ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that $|\\mathbf{x}+\\mathbf{y}|^{2}+|\\mathbf{x}-\\mathbf{y}|^{2}=2|\\mathbf{x}|^{2}+2|\\mathbf{y}|^{2}$ if $\\mathbf{x} \\in R^{k}$ and $\\mathbf{y} \\in R^{k}$.",
+    "formal_statement": "theorem norm_eq (n : ℕ) (x y : EuclideanSpace ℝ (Fin n)) :\n    ‖x + y‖^2 + ‖x - y‖^2 = 2 * ‖x‖^2 + 2 * ‖y‖^2 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it states the parallelogram law for vectors in ℝⁿ, with explicit type annotations for Euclidean space and appropriate norm notation. The theorem signature correctly includes the vector space dimension parameter and maintains the exact equation structure from the English statement."
+  },
+  {
+    "informal_statement": "If $k = 1$ and $\\mathbf{x} \\in R^{k}$, prove that there does not exist $\\mathbf{y} \\in R^{k}$ such that $\\mathbf{y} \\neq 0$ but $\\mathbf{x} \\cdot \\mathbf{y}=0$",
+    "formal_statement": "theorem no_zero_divisor {R : Type*} [CommRing R] (x : R) :\n  ¬ ∃ y : R, y ≠ 0 ∧ x * y = 0 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly generalizes the problem. The English statement is about vectors in ℝ¹ (specifically when k=1), where the dot product of a non-zero vector with any non-zero vector cannot be zero. The Lean theorem instead states a property about commutative rings (no zero divisors), which is a different mathematical concept. The types are wrong (R vs ℝ¹ vectors) and the operation is wrong (ring multiplication vs dot product of vectors)."
+  },
+  {
+    "informal_statement": "If $A$ and $B$ are disjoint closed sets in some metric space $X$, prove that they are separated.",
+    "formal_statement": "theorem separated_set {X : Type*} [MetricSpace X]\n  {A B : Set X} (hA : IsClosed A) (hB : IsClosed B)\n  (hAB : Disjoint A B) :\n  SeparatedSet A B :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'SeparatedSet'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that every compact metric space $K$ has a countable base.",
+    "formal_statement": "theorem countable_base {K : Type*} [MetricSpace K] [CompactSpace K] :\n    ∃ B : Set (Set K), Set.Countable B ∧ IsTopologicalBasis B :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsTopologicalBasis'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $E\\subset\\mathbb{R}^k$ is uncountable, and let $P$ be the set of condensation points of $E$. Prove that at most countably many points of $E$ are not in $P$.",
+    "formal_statement": "theorem uncountable_set_not_in_condensation_points {k : ℕ} (E : Set (EuclideanSpace ℝ (Fin k))) (hE : ¬ Countable E)\n    (P : Set (EuclideanSpace ℝ (Fin k))) (hP : P = {x | ∀ U ∈ 𝓝 x, (P ∩ E).Nonempty ∧ ¬ Countable (P ∩ E)}) :\n    Set.Countable (E \\ P) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Inter Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that every open set in $\\mathbb{R}$ is the union of an at most countable collection of disjoint segments.",
+    "formal_statement": "theorem segmentUnion (U : Set ℝ) (hU : IsOpen U) :\n    ∃ (f : ℕ → Set ℝ), (∀ i j, i ≠ j → f i ∩ f j = ∅) ∧\n      (∀ i, ∃ a b, f i = Ioo a b) ∧\n      (∀ x, x ∈ U ↔ ∃ i, x ∈ f i) ∧\n      Set.Countable {i | ∃ a b, f i = Ioo a b} :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  Set.Ioo a b : Set (?m.484 : Sort ?u.473)\n  \n  Finset.Ioo a b : Finset (?m.561 : Sort ?u.473)\nambiguous, possible interpretations \n  Set.Ioo a b : Set (?m.745 : Sort ?u.734)\n  \n  Finset.Ioo a b : Finset (?m.822 : Sort ?u.734)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that $\\lim_{n \\rightarrow \\infty}\\sqrt{n^2 + n} -n = 1/2$.",
+    "formal_statement": "theorem Tendsto_sqrt : Tendsto (λ n => sqrt (n ^ 2 + n) - n) atTop (𝓝 (1 / 2)) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  (n ^ (2 : (?m.55 : Type ?u.16)) + n).sqrt : ℚ\n  \n  (n ^ (2 : (?m.129 : Type ?u.98)) + n).sqrt : ℕ\n  \n  √(n ^ (2 : (?m.206 : Type ?u.175)) + n) : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "For any two real sequences $\\left\\{a_{n}\\right\\},\\left\\{b_{n}\\right\\}$, prove that $\\limsup _{n \\rightarrow \\infty}\\left(a_{n}+b_{n}\\right) \\leq \\limsup _{n \\rightarrow \\infty} a_{n}+\\limsup _{n \\rightarrow \\infty} b_{n},$ provided the sum on the right is not of the form $\\infty-\\infty$.",
+    "formal_statement": "theorem limsup_add\n  (a b : ℕ → ℝ)\n  (h : limsup a + limsup b ≠ 0) :\n  limsup (λ n => a n + b n) ≤ limsup a + limsup b :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly handles the condition about ∞-∞. The English statement requires that the sum on the right is not of the form ∞-∞, which occurs when one limsup is +∞ and the other is -∞. The Lean condition `limsup a + limsup b ≠ 0` is mathematically different - it only checks that the sum isn't zero, not that it's not ∞-∞. Additionally, the Lean theorem uses `limsup a + limsup b ≠ 0` as a hypothesis, but the English statement provides this as a condition for the inequality to hold, so the logical structure is reversed."
+  },
+  {
+    "informal_statement": "Prove that the convergence of $\\Sigma a_{n}$ implies the convergence of $\\sum \\frac{\\sqrt{a_{n}}}{n}$ if $a_n\\geq 0$.",
+    "formal_statement": "theorem sum_of_squares_convergence\n  (a : ℕ → ℝ)\n  (h : ∃ L, Tendsto (λ n => (∑ i in range n, a i)) atTop (𝓝 L))\n  (ha : ∀ n, 0 ≤ a n) :\n  ∃ L, Tendsto (λ n => (∑ i in range n, sqrt (a i) / n)) atTop (𝓝 L) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical statement. The English statement requires proving that convergence of Σa_n implies convergence of Σ(√a_n/n), but the Lean theorem incorrectly uses (∑ i in range n, sqrt (a i) / n) where the division by n is inside the sum, not applied to each term individually. The correct formalization should have sqrt(a i)/i for each term in the sum, not sqrt(a i)/n."
+  },
+  {
+    "informal_statement": "Prove that the Cauchy product of two absolutely convergent series converges absolutely.",
+    "formal_statement": "theorem cauchyProduct\n  (a b : ℕ → ℝ)\n  (ha : ∃ y, Tendsto (λ n => (∑ i in range n, |a i|)) atTop (𝓝 y))\n  (hb : ∃ y, Tendsto (λ n => (∑ i in range n, |b i|)) atTop (𝓝 y)) :\n  ∃ y, Tendsto (λ n => (∑ i in range n, (∑ j in range (i + 1), a j * b (i - j)))) atTop (𝓝 y) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical intent. The English statement requires proving absolute convergence of the Cauchy product, but the Lean theorem only states convergence (not absolute convergence). The hypotheses correctly specify absolute convergence of the input series, but the conclusion should involve the absolute value of the Cauchy product terms, not just the Cauchy product itself."
+  },
+  {
+    "informal_statement": "If $\\left\\{E_{n}\\right\\}$ is a sequence of closed nonempty and bounded sets in a complete metric space $X$, if $E_{n} \\supset E_{n+1}$, and if $\\lim _{n \\rightarrow \\infty} \\operatorname{diam} E_{n}=0,$ then $\\bigcap_{1}^{\\infty} E_{n}$ consists of exactly one point.",
+    "formal_statement": "theorem\n  (X : Type*) [MetricSpace X] [CompleteSpace X]\n  (E : ℕ → Set X)\n  (hE : ∀ n, IsClosed (E n))\n  (hE1 : ∀ n, E n ≠ ∅)\n  (hE2 : ∀ n, BddAbove (E n))\n  (hE3 : ∀ n, E n ⊆ E (n + 1))\n  (hE4 : Tendsto (λ n => (MeasureTheory.volume (E n)).toReal) atTop (𝓝 0)) :\n  ∃! x, ∀ n, x ∈ E n :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $f$ is a real function defined on $\\mathbb{R}$ which satisfies $\\lim_{h \\rightarrow 0} f(x + h) - f(x - h) = 0$ for every $x \\in \\mathbb{R}$. Show that $f$ does not need to be continuous.",
+    "formal_statement": "theorem non_continuous_f : ∃ f : ℝ → ℝ, (∀ x, Tendsto (λ y => f (x + y) - f (x - y)) (𝓝[≠] 0) (𝓝 0)) ∧ ¬ Continuous f :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem states there exists a function f with the given limit property that is not continuous, which directly captures the mathematical intent to show such functions exist (i.e., the condition doesn't imply continuity). All types match (ℝ → ℝ, limits in ℝ), constraints are properly encoded via the limit condition, and the logical structure correctly expresses existence of a counterexample."
+  },
+  {
+    "informal_statement": "Let $f$ be a continuous real function on a metric space $X$. Let $Z(f)$ (the zero set of $f$ ) be the set of all $p \\in X$ at which $f(p)=0$. Prove that $Z(f)$ is closed.",
+    "formal_statement": "theorem closure_of_zero_set {α : Type*} [MetricSpace α] {f : α → ℝ}\n  (hf : Continuous f) :\n  IsClosed {x | f x = 0} :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Let $f$ and $g$ be continuous mappings of a metric space $X$ into a metric space $Y$, and let $E$ be a dense subset of $X$. Prove that if $g(p) = f(p)$ for all $p \\in P$ then $g(p) = f(p)$ for all $p \\in X$.",
+    "formal_statement": "theorem\n  {α : Type} [MetricSpace α]\n  {β : Type} [MetricSpace β]\n  (f g : α → β)\n  (s : Set α)\n  (h₁ : Continuous f)\n  (h₂ : Continuous g)\n  (h₃ : Dense s)\n  (h₄ : ∀ x ∈ s, f x = g x) :\n  f = g :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '{'; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that there exist a set $E \\subset \\mathbb{R}$ and a real continuous function $f$ defined on $E$, such that there does not exist a continuous real function $g$ on $\\mathbb{R}$ such that $g(x)=f(x)$ for all $x \\in E$.",
+    "formal_statement": "theorem exists_set_f : ∃ (E : Set ℝ) (f : ℝ → ℝ), ContinuousOn f E ∧ ¬∃ g : ℝ → ℝ, Continuous g ∧ ∀ x ∈ E, f x = g x :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Let $f$ be a real uniformly continuous function on the bounded set $E$ in $R^{1}$. Prove that $f$ is bounded on $E$.",
+    "formal_statement": "theorem UniformContinuousOn (f : ℝ → ℝ) (E : Set ℝ)\n  (hE : Bornology.IsBounded E) (hf : UniformContinuousOn f E) :\n  Bornology.IsBounded (Set.image f E) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "'UniformContinuousOn' has already been declared",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $f$ is a uniformly continuous mapping of a metric space $X$ into a metric space $Y$ and prove that $\\left\\{f\\left(x_{n}\\right)\\right\\}$ is a Cauchy sequence in $Y$ for every Cauchy sequence $\\{x_n\\}$ in $X$.",
+    "formal_statement": "theorem UniformContinuousMap {X Y : Type*} [MetricSpace X] [MetricSpace Y]\n  (f : X → Y) (hf : UniformContinuous f) :\n  ∀ (x : ℕ → X), CauchySeq x → CauchySeq (λ n => f (x n)) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes f is uniformly continuous between metric spaces X and Y, and concludes that for every Cauchy sequence x in X, the sequence f∘x is Cauchy in Y. The types match (metric spaces, sequences as ℕ → X/Y), constraints are present (UniformContinuous f), and logical implication flows correctly from assumptions to conclusion."
+  },
+  {
+    "informal_statement": "Prove that every continuous open mapping of $R^{1}$ into $R^{1}$ is monotonic.",
+    "formal_statement": "theorem monotononeContinuousOpenMap {f : ℝ → ℝ} (hf : Continuous f)\n  (hopen : IsOpenMap f) : Monotone f :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes f is a continuous open mapping from ℝ to ℝ (Continuous f ∧ IsOpenMap f) and concludes f is monotonic (Monotone f). The types match (ℝ → ℝ), constraints are present, and logical implication flows correctly from hypothesis to conclusion."
+  },
+  {
+    "informal_statement": "Suppose $K$ and $F$ are disjoint sets in a metric space $X, K$ is compact, $F$ is closed. Prove that there exists $\\delta>0$ such that $d(p, q)>\\delta$ if $p \\in K, q \\in F$.",
+    "formal_statement": "theorem\n  (X : Type*) [MetricSpace X]\n  (K F : Set X)\n  (hK : IsCompact K)\n  (hF : IsClosed F)\n  (hKF : Disjoint K F) :\n  ∃ δ > 0, ∀ p ∈ K, ∀ q ∈ F, dist p q ≥ δ :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $f$ be defined for all real $x$, and suppose that $|f(x)-f(y)| \\leq (x-y)^{2}$ for all real $x$ and $y$. Prove that $f$ is constant.",
+    "formal_statement": "theorem formalization_98765 {f : ℝ → ℝ} (hf : ∀ x y, |f x - f y| ≤ (x - y)^2) :\n    ∃ c, f = λ x => c :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes f is a real-valued function on ℝ, assumes the given Lipschitz-type condition ∀ x y, |f x - f y| ≤ (x - y)^2, and concludes that f is constant (∃ c, f = λ x => c). The types match (ℝ → ℝ), the constraint is present, and the logical implication flows correctly from hypothesis to conclusion."
+  },
+  {
+    "informal_statement": "Suppose $g$ is a real function on $R^{1}$, with bounded derivative (say $\\left|g^{\\prime}\\right| \\leq M$ ). Fix $\\varepsilon>0$, and define $f(x)=x+\\varepsilon g(x)$. Prove that $f$ is one-to-one if $\\varepsilon$ is small enough.",
+    "formal_statement": "theorem formalization_98762 {g : ℝ → ℝ} (hg : ContDiff ℝ 1 g)\n  (M : ℝ) (hM : ∀ x, |deriv g x| ≤ M) :\n  ∃ N, ∀ ε > 0, ε < N → Function.Injective (λ x => x + ε * g x) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement requires proving that f is one-to-one when ε is small enough (for some specific bound), but the Lean theorem states there exists some N such that for all ε > 0 with ε < N, f is injective. This is logically stronger than the original statement, which only requires existence of some sufficiently small ε, not all ε below some threshold. Additionally, the English statement specifies |g'| ≤ M (bounded derivative), but the Lean theorem uses ContDiff ℝ 1 g (continuously differentiable) and |deriv g x| ≤ M, which are not equivalent - bounded derivative doesn't imply continuous differentiability."
+  },
+  {
+    "informal_statement": "Suppose $f$ is defined and differentiable for every $x>0$, and $f^{\\prime}(x) \\rightarrow 0$ as $x \\rightarrow+\\infty$. Put $g(x)=f(x+1)-f(x)$. Prove that $g(x) \\rightarrow 0$ as $x \\rightarrow+\\infty$.",
+    "formal_statement": "theorem Tendsto_diff_f_prime_to_0\n  {f : ℝ → ℝ}\n  (hf : DifferentiableOn ℝ f (Set.Ioi 0))\n  (hfn : Tendsto (deriv f) atTop (𝓝 0)) :\n  Tendsto (λ x => f (x + 1) - f x) atTop (𝓝 0) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It assumes f is differentiable on (0,∞) (DifferentiableOn ℝ f (Set.Ioi 0)), assumes the derivative tends to 0 at infinity (Tendsto (deriv f) atTop (𝓝 0)), and concludes that g(x)=f(x+1)-f(x) tends to 0 at infinity (Tendsto (λ x => f (x + 1) - f x) atTop (𝓝 0)). The types match (ℝ → ℝ), constraints are present (x>0 domain), and logical implication flows correctly from hypotheses to conclusion."
+  },
+  {
+    "informal_statement": "Suppose $f^{\\prime}(x), g^{\\prime}(x)$ exist, $g^{\\prime}(x) \\neq 0$, and $f(x)=g(x)=0$. Prove that $\\lim _{t \\rightarrow x} \\frac{f(t)}{g(t)}=\\frac{f^{\\prime}(x)}{g^{\\prime}(x)}.$",
+    "formal_statement": "theorem Tendsto_ratio (f g : ℝ → ℝ) (x : ℝ)\n  (hf : DifferentiableAt ℝ f x) (hg : DifferentiableAt ℝ g x)\n  (hfn0 : deriv g x ≠ 0) (hf0 : f x = 0) (hg0 : g x = 0) :\n  Tendsto (λ t => f t / g t) (𝓝 x) (𝓝 (deriv f x / deriv g x)) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of L'Hôpital's Rule for the 0/0 case at a point. It assumes differentiability at x (which implies derivative existence), derivative of g nonzero at x, and f(x)=g(x)=0. The conclusion correctly states the limit of f(t)/g(t) as t→x equals the ratio of derivatives at x. All types match (ℝ→ℝ functions, ℝ point), constraints are properly included, and the logical flow matches the English statement."
+  },
+  {
+    "informal_statement": "Suppose $f$ is a real, three times differentiable function on $[-1,1]$, such that $f(-1)=0, \\quad f(0)=0, \\quad f(1)=1, \\quad f^{\\prime}(0)=0 .$ Prove that $f^{(3)}(x) \\geq 3$ for some $x \\in(-1,1)$.",
+    "formal_statement": "theorem iteratedDeriv_eval (f : ℝ → ℝ)\n    (hf : DifferentiableOn ℝ f (Set.Icc (-1) 1))\n    (hfn : DifferentiableOn ℝ (deriv f) (Set.Icc (-1) 1))\n    (hfn' : DifferentiableOn ℝ (deriv (deriv f)) (Set.Icc (-1) 1))\n    (hf1 : f (-1) = 0)\n    (hf2 : f 0 = 0)\n    (hf3 : f 1 = 1)\n    (hf4 : deriv f 0 = 0) :\n    ∃ x ∈ Set.Ioo (-1) 1, iteratedDeriv 3 f x ≥ 3 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature accurately captures the mathematical intent of the natural language statement. It correctly specifies: f as ℝ → ℝ; three times differentiability on [-1,1] (via hf, hfn, hfn'); the four given conditions (f(-1)=0, f(0)=0, f(1)=1, f'(0)=0); and the conclusion that there exists x in (-1,1) where the third derivative is ≥3. The types match (ℝ for real numbers), constraints are properly encoded, and the logical implication flows correctly from hypotheses to conclusion."
+  },
+  {
+    "informal_statement": "Show that the collection $$\\mathcal{T}_\\infty = \\{U | X - U \\text{ is infinite or empty or all of X}\\}$$ does not need to be a topology on the set $X$.",
+    "formal_statement": "theorem no_topology_needed :\n  ¬ (∀ X : Type, ∀ U : Set X, Infinite U ∨ U = ∅ ∨ U = ⊤ → IsOpen U) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  TopologicalSpace X",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "If $\\mathcal{T}_\\alpha$ is a family of topologies on $X$, show that $\\bigcup \\mathcal{T}_\\alpha$ does not need to be a topology on $X$.",
+    "formal_statement": "theorem\n  : ∃ (X : Type*) (T : ℕ → Set (Set X)), (∀ i, IsTopologicalSpace (T i)) ∧ ¬IsTopologicalSpace (⋂ i, T i) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ':'; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $\\mathcal{T}_\\alpha$ be a family of topologies on $X$. Show that there is a unique largest topology on $X$ contained in all the collections $\\mathcal{T}_\\alpha$.",
+    "formal_statement": "theorem generateFrom (X I : Type*) [TopologicalSpace X] (T : I → Set (Set X)) :\n    ∃! T', IsGreatest {T' | ∀ i, T' ⊆ T i} ∧\n    (∀ i, T' ⊆ T i) ∧\n    (∀ T'', (∀ i, T'' ⊆ T i) → T' ⊆ T'') :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  And (IsGreatest {T' : Set (Set X) | ∀ (i : I), T' ⊆ T i})\nargument\n  IsGreatest {T' : Set (Set X) | ∀ (i : I), T' ⊆ T i}\nhas type\n  Set (Set X) → Prop : Type u_1\nbut is expected to have type\n  Prop : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that if $\\mathcal{A}$ is a subbasis for a topology on $X$, then the topology generated by $\\mathcal{A}$ equals the intersection of all topologies on $X$ that contain $\\mathcal{A}$.",
+    "formal_statement": "theorem generateFrom {X : Type*} [TopologicalSpace X]\n  (A : Set (Set X)) (hA : IsTopologicalBasis A) :\n  generateFrom A = generateFrom (⋂ (T : Set (Set X)), if T ⊆ A then T else ⊥) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsTopologicalBasis'\nunknown identifier 'generateFrom'\nunknown identifier 'generateFrom'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that the collection $\\{(a,b) \\mid a < b, a \\text{ and } b \\text{ rational}\\}$ is a basis that generates the standard topology on $\\mathbb{R}$.",
+    "formal_statement": "theorem generateFrom (S : Set (Set ℝ)) :\n  IsTopologicalBasis S ↔\n  (∀ T ∈ S, ∃ a b : ℚ, a < b ∧ T = {x | a < x ∧ x < b}) ∧\n  (∀ U : Set ℝ, IsOpen U → ∃ T ∈ S, T ⊆ U) ∧\n  (∀ U ∈ S, IsOpen U) ∧\n  (∀ T ∈ S, T ≠ ∅) := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsTopologicalBasis'\ntype mismatch\n  {x : ℚ | a < x ∧ x < b}\nhas type\n  Set ℚ : Type\nbut is expected to have type\n  Set ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that if $Y$ is a subspace of $X$, and $A$ is a subset of $Y$, then the topology $A$ inherits as a subspace of $Y$ is the same as the topology it inherits as a subspace of $X$.",
+    "formal_statement": "theorem base_topology {X Y A : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  [TopologicalSpace A] (hY : Y ≤ X) (hA : A ≤ Y) :\n  A = (univ : Set A) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  X\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Type u_2 : Type (u_2 + 1)\ntype mismatch\n  Y\nhas type\n  Type u_2 : Type (u_2 + 1)\nbut is expected to have type\n  Type u_3 : Type (u_3 + 1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that the countable collection \\[\\{(a, b) \\times (c, d) \\mid a < b \\text{ and } c < d, \\text{ and } a, b, c, d \\text{ are rational}\\}\\] is a basis for $\\mathbb{R}^2$.",
+    "formal_statement": "theorem formalization_487964 :\n  IsTopologicalBasis {S : Set (ℝ × ℝ) | ∃ a b c d : ℚ, a < b ∧ c < d ∧ S = {(x, y) | a < x ∧ x < b ∧ c < y ∧ y < d}} :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsTopologicalBasis'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $Y$ be an ordered set in the order topology. Let $f, g: X \\rightarrow Y$ be continuous. Show that the set $\\{x \\mid f(x) \\leq g(x)\\}$ is closed in $X$.",
+    "formal_statement": "theorem order_topology {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  [LinearOrder Y] [OrderTopology Y] {f g : X → Y}\n  (hf : Continuous f) (hg : Continuous g) :\n  IsClosed {x | f x ≤ g x} :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes X and Y are topological spaces with Y linearly ordered and having the order topology, assumes f and g are continuous functions from X to Y, and concludes that the set {x | f x ≤ g x} is closed in X. All types and constraints match the English statement."
+  },
+  {
+    "informal_statement": "Let $A \\subset X$; let $f: A \\rightarrow Y$ be continuous; let $Y$ be Hausdorff. Show that if $f$ may be extended to a continuous function $g: \\bar{A} \\rightarrow Y$, then $g$ is uniquely determined by $f$.",
+    "formal_statement": "theorem h : Continuous f ∧ T2Space Y → (∃! g : ℝ → Y, Continuous g ∧ ∀ x, g x = f x) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'\nunknown identifier 'Y'\nunknown identifier 'Y'\nunknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that $\\mathbb{R} \\times \\mathbb{R}$ in the dictionary order topology is metrizable.",
+    "formal_statement": "theorem metrizable : MetrizableSpace (ℝ × ℝ) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'MetrizableSpace'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Define $f_{n}:[0,1] \\rightarrow \\mathbb{R}$ by the equation $f_{n}(x)=x^{n}$. Show that the sequence $\\left(f_{n}\\right)$ does not converge uniformly.",
+    "formal_statement": "theorem noUniformConvergence :\n  ¬ ∃ L, Tendsto (λ n => f n) atTop (𝓝 L) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $p: X \\rightarrow Y$ be a continuous map. Show that if there is a continuous map $f: Y \\rightarrow X$ such that $p \\circ f$ equals the identity map of $Y$, then $p$ is a quotient map.",
+    "formal_statement": "theorem quotientMap {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  (p : X → Y) (hp : Continuous p)\n  (h : ∃ f : Y → X, Continuous f ∧ p ∘ f = id) :\n  IsQuotientMap p :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsQuotientMap'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $p \\colon X \\rightarrow Y$ be an open map. Show that if $A$ is open in $X$, then the map $q \\colon A \\rightarrow p(A)$ obtained by restricting $p$ is an open map.",
+    "formal_statement": "theorem restrictOpenMap {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  (p : X → Y) (hp : IsOpenMap p) (A : Set X) (hA : IsOpen A) :\n  IsOpenMap (p ∘ Subtype.val : A → Y) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the restriction map. The English statement requires restricting p to A with codomain p(A), but the Lean code uses p ∘ Subtype.val : A → Y (which maps to all of Y, not just p(A)). Additionally, the conclusion should be about the map q: A → p(A) being open, not about the composition mapping to Y."
+  },
+  {
+    "informal_statement": "Let $\\left\\{A_{\\alpha}\\right\\}$ be a collection of connected subspaces of $X$; let $A$ be a connected subset of $X$. Show that if $A \\cap A_{\\alpha} \\neq \\varnothing$ for all $\\alpha$, then $A \\cup\\left(\\bigcup A_{\\alpha}\\right)$ is connected.",
+    "formal_statement": "theorem\n    (X : Type*) [TopologicalSpace X]\n    (A : ℕ → Set X)\n    (hA : ∀ i, IsConnected (A i))\n    (A₀ : Set X)\n    (hA₀ : IsConnected A₀)\n    (h : ∀ i, A₀ ∩ A i ≠ ∅) :\n    IsConnected (A₀ ∪ (⋃ i, A i)) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $A \\subset X$. Show that if $C$ is a connected subspace of $X$ that intersects both $A$ and $X-A$, then $C$ intersects $\\operatorname{Bd} A$.",
+    "formal_statement": "theorem formalization_487964 {X : Type*} [TopologicalSpace X]\n  (A : Set X) (C : Set X) (hC : IsOpen C) (hCA : C ⊆ A)\n  (hCB : C ∩ (Aᶜ) ≠ ∅) :\n  C ∩ (frontier A) ≠ ∅ :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem has incorrect assumptions: it requires C to be open (hC : IsOpen C) and a subset of A (hCA : C ⊆ A), but the English statement only requires C to be a connected subspace intersecting both A and X-A. The English statement doesn't require C to be open or a subset of A."
+  },
+  {
+    "informal_statement": "Let $p: X \\rightarrow Y$ be a quotient map. Show that if each set $p^{-1}(\\{y\\})$ is connected, and if $Y$ is connected, then $X$ is connected.",
+    "formal_statement": "theorem quotient_topology {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  (p : X → Y) (hp : Function.Surjective p)\n  (h : ∀ y, IsConnected (p ⁻¹' {y}))\n  (h' : IsConnectedSpace Y) :\n  IsConnectedSpace X :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsConnectedSpace'\nunknown identifier 'IsConnectedSpace'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $f \\colon X \\rightarrow X$ be continuous. Show that if $X = [0, 1]$, there is a point $x$ such that $f(x) = x$. (The point $x$ is called a fixed point of $f$.)",
+    "formal_statement": "theorem fixed_point {f : ℝ → ℝ} (hf : Continuous f)\n  (h : ∀ x ∈ Set.Icc 0 1, f x ∈ Set.Icc 0 1) :\n  ∃ x ∈ Set.Icc 0 1, f x = x :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it assumes f is continuous (hf : Continuous f) and maps [0,1] to itself (h : ∀ x ∈ Set.Icc 0 1, f x ∈ Set.Icc 0 1), then concludes there exists x in [0,1] with f(x)=x. The type ℝ → ℝ is appropriate for functions on [0,1], and Set.Icc 0 1 correctly represents the closed interval."
+  },
+  {
+    "informal_statement": "Let $G$ be a topological group; let $C$ be the component of $G$ containing the identity element $e$. Show that $C$ is a normal subgroup of $G$.",
+    "formal_statement": "theorem component_of_group {G : Type*} [TopologicalSpace G] [Group G]\n  (C : Set G) (hC : C = {x | ∃ y, x * y = 1}) :\n  IsNormalSubgroup C :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the component C. The English statement defines C as the connected component containing the identity element e, which is a topological concept (connected component in a topological space). The Lean code defines C as {x | ∃ y, x * y = 1}, which is the set of elements with right inverses - an algebraic property unrelated to connected components. This changes the mathematical meaning fundamentally."
+  },
+  {
+    "informal_statement": "Let $p: X \\rightarrow Y$ be a closed continuous surjective map such that $p^{-1}(\\{y\\})$ is compact, for each $y \\in Y$. (Such a map is called a perfect map.) Show that if $Y$ is compact, then $X$ is compact.",
+    "formal_statement": "theorem perfectMap {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]\n  (p : X → Y) (h : Function.Surjective p) (hc : Continuous p)\n  (hp : ∀ y, IsCompact (p ⁻¹' {y})) :\n  CompactSpace X :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem is missing the 'closed map' condition from the English statement. The English specifies 'closed continuous surjective map', but the Lean theorem only includes 'Continuous p' and 'Function.Surjective p' without the closed map property. Additionally, the English statement has the hypothesis 'if Y is compact', but the Lean theorem doesn't include this as an assumption - it tries to prove CompactSpace X from the perfect map conditions alone."
+  },
+  {
+    "informal_statement": "A space $X$ is said to be countably compact if every countable open covering of $X$ contains a finite subcollection that covers $X$. Show that for a $T_1$ space $X$, countable compactness is equivalent to limit point compactness.",
+    "formal_statement": "theorem countably_compact_iff_limit_point_compact {X : Type*} [TopologicalSpace X]\n  (hT1 : T1Space X) :\n  countably_compact X ↔ limit_point_compact X :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'countably_compact'\nunknown identifier 'limit_point_compact'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $(X, d)$ be a metric space. If $f: X \\rightarrow X$ satisfies the condition $d(f(x), f(y))=d(x, y)$ for all $x, y \\in X$, then $f$ is called an isometry of $X$. Show that if $f$ is an isometry and $X$ is compact, then $f$ is bijective and hence a homeomorphism.",
+    "formal_statement": "theorem isometric_homeomorphism {X : Type*} [MetricSpace X] [CompactSpace X]\n  (f : X → X) (h : Isometry f) :\n  Function.Bijective f ∧ ∃ h : X → X, Continuous h ∧ ∀ x, f x = h x :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the conclusion. The English statement concludes that f is bijective and hence a homeomorphism, meaning f itself is a homeomorphism. The Lean theorem instead states that f is bijective AND there exists some other function h that is continuous and equal to f everywhere. This changes the mathematical intent - it should state that f is bijective and f is continuous with continuous inverse (or directly that f is a homeomorphism)."
+  },
+  {
+    "informal_statement": "Show that $[0, 1]^\\omega$ is not locally compact in the uniform topology.",
+    "formal_statement": "theorem nonlocally_compact : ¬ LocallyCompactSpace (Set.Icc 0 1) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical statement. The English statement refers to the infinite product space [0,1]^ω (the space of sequences in [0,1]) with the uniform topology, while the Lean theorem refers to the closed interval [0,1] as a set. The types are fundamentally different: one is a function space/product space, the other is a simple interval subset of ℝ."
+  },
+  {
+    "informal_statement": "Show that if $X$ is a countable product of spaces having countable dense subsets, then $X$ has a countable dense subset.",
+    "formal_statement": "theorem countable_product_of_countable_dense_set {X : ℕ → Type*} [∀ i, TopologicalSpace (X i)]\n  (h : ∀ i, ∃ (s : Set (X i)), Countable s ∧ Dense s) :\n  ∃ (s : Set (Π i, X i)), Countable s ∧ Dense s :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Show that if $X$ is regular, every pair of points of $X$ have neighborhoods whose closures are disjoint.",
+    "formal_statement": "theorem regular_space {X : Type*} [TopologicalSpace X]\n  (h : RegularSpace X) (x y : X) :\n  ∃ U V : Set X, IsOpen U ∧ IsOpen V ∧ x ∈ U ∧ y ∈ V ∧ closure U ∩ closure V = ∅ :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it states that in a regular topological space X, for any two points x and y, there exist open neighborhoods U of x and V of y whose closures are disjoint. The theorem signature correctly includes the topological space structure, the regularity assumption, the two points, and the existence of the required neighborhoods with the closure condition."
+  },
+  {
+    "informal_statement": "Show that every order topology is regular.",
+    "formal_statement": "theorem order_topology_regular {X : Type*} [TopologicalSpace X] [OrderTopology X] :\n    RegularSpace X :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Preorder X",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that if $\\prod X_\\alpha$ is Hausdorff, then so is $X_\\alpha$. Assume that each $X_\\alpha$ is nonempty.",
+    "formal_statement": "theorem prod_hausdorff {α : Type*} [TopologicalSpace α]\n  (X : α → Type*) [∀ i, TopologicalSpace (X i)] (hX : ∀ i, Nonempty (X i))\n  (h : T2Space (Π i, X i)) :\n  ∀ i, T2Space (X i) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes a product space is Hausdorff (T2Space) and each factor is nonempty, then concludes each factor space is Hausdorff. The types and logical flow match the English statement, including the nonempty assumption."
+  },
+  {
+    "informal_statement": "Show that if $\\prod X_\\alpha$ is normal, then so is $X_\\alpha$. Assume that each $X_\\alpha$ is nonempty.",
+    "formal_statement": "theorem prod_normal {ι : Type*} {X : ι → Type*}\n  [∀ i, TopologicalSpace (X i)] (h : ∀ i, Nonempty (X i))\n  (h2 : NormalSpace (Π i, X i)) :\n  ∀ i, NormalSpace (X i) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes each X_α is nonempty (h : ∀ i, Nonempty (X i)) and that the product space Π i, X i is normal (h2 : NormalSpace (Π i, X i)), then concludes each X_α is normal (∀ i, NormalSpace (X i)). The types match the topological context, and the logical implication flows correctly from product normality to component normality with the nonempty assumption."
+  },
+  {
+    "informal_statement": "Show that every locally compact Hausdorff space is completely regular.",
+    "formal_statement": "theorem LocallyCompactHausdorffSpace.IsRegular (X : Type*) [TopologicalSpace X]\n  [LocallyCompactSpace X] [T2Space X] :\n  ∀ x A, IsClosed A → ∃ U, IsOpen U ∧ x ∈ U ∧ U ⊆ A :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "typeclass instance problem is stuck, it is often due to metavariables\n  TopologicalSpace (?m.951 : Type ?u.38)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $X$ be a compact Hausdorff space that is the union of the closed subspaces $X_1$ and $X_2$. If $X_1$ and $X_2$ are metrizable, show that $X$ is metrizable.",
+    "formal_statement": "theorem metrizable_compact_hausdorff {X : Type*} [CompactSpace X] [T2Space X]\n  (X1 X2 : Set X) (hX1 : IsClosed X1) (hX2 : IsClosed X2)\n  (hX : X1 ∪ X2 = univ) (hX1m : MetrizableSpace X1)\n  (hX2m : MetrizableSpace X2) :\n  MetrizableSpace X :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  TopologicalSpace X",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $(X, d_X)$ and $(Y, d_Y)$ be metric spaces; let $Y$ be complete. Let $A \\subset X$. Show that if $f \\colon A \\rightarrow Y$ is uniformly continuous, then $f$ can be uniquely extended to a continuous function $g \\colon \\bar{A} \\rightarrow Y$, and $g$ is uniformly continuous.",
+    "formal_statement": "theorem\n    (X : Type*) [MetricSpace X]\n    (Y : Type*) [MetricSpace Y]\n    (hY : CompleteSpace Y)\n    (A : Set X)\n    (f : X → Y)\n    (hf : UniformContinuousOn f A)\n    : ∃! g : X → Y, ContinuousOn g (closure A) ∧ UniformContinuousOn g (closure A) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that $\\frac{-1 + \\sqrt{3}i}{2}$ is a cube root of 1 (meaning that its cube equals 1).",
+    "formal_statement": "theorem cbrt_1 : ((-1 : ℂ) + Real.sqrt 3 * .I) / 2 ^ 3 = 1 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical intent. The English statement asks to show that the complex number (-1 + √3 i)/2 is a cube root of 1, meaning its cube equals 1. However, the Lean theorem states that ((-1 : ℂ) + Real.sqrt 3 * .I) / 2 ^ 3 = 1, which mathematically means ((-1 + √3 i) divided by 8) = 1. This is a different mathematical statement - it divides by 2^3 (which is 8) instead of cubing the entire expression. The correct formalization should be something like `(((-1 : ℂ) + Real.sqrt 3 * .I) / 2) ^ 3 = 1`."
+  },
+  {
+    "informal_statement": "Prove that if $a \\in \\mathbf{F}$, $v \\in V$, and $av = 0$, then $a = 0$ or $v = 0$.",
+    "formal_statement": "theorem algebra_498724 {F V : Type*} [AddCommGroup F] [AddCommGroup V]\n  [Module F V] (a v : F) (h : a • v = 0) :\n  a = 0 ∨ v = 0 :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Semiring F",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Give an example of a nonempty subset $U$ of $\\mathbf{R}^2$ such that $U$ is closed under scalar multiplication, but $U$ is not a subspace of $\\mathbf{R}^2$.",
+    "formal_statement": "theorem example_nonempty_U : ∃ U : Set (ℝ × ℝ), Nonempty U ∧ (∀ x ∈ U, ∀ c : ℝ, c • x ∈ U) ∧ ¬∃ L : Submodule ℝ (ℝ × ℝ), U = ↑L :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Prove that the union of two subspaces of $V$ is a subspace of $V$ if and only if one of the subspaces is contained in the other.",
+    "formal_statement": "theorem union_of_submodule (F V : Type*) [AddCommGroup V] [Field F]\n  [Module F V] (U W : Submodule F V) :\n  ∃ U' : Submodule F V, U' = ↑U ∪ ↑W ↔ (U ≤ W ∨ W ≤ U) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Union (Submodule F V)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose that $V$ is finite dimensional and that $T \\in \\mathcal{L}(V, W)$. Prove that there exists a subspace $U$ of $V$ such that $U \\cap \\operatorname{null} T=\\{0\\}$ and range $T=\\{T u: u \\in U\\}$.",
+    "formal_statement": "theorem linearMapToModuleHom {F V W : Type*} [AddCommGroup V] [AddCommGroup W]\n  [Field F] [Module F V] [Module F W] (T : V →ₗ[F] W) :\n  ∃ U : Submodule F V, U ⊓ (range T) = ⊥ ∧\n  ∀ x : V, T x ∈ range T ↔ x ∈ U :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "overloaded, errors \n  type mismatch\n    Set.range ⇑T\n  has type\n    Set W : Type u_3\n  but is expected to have type\n    Submodule F V : Type u_2\n  \n  19:34 application type mismatch\n    Finset.range T\n  argument\n    T\n  has type\n    V →ₗ[F] W : Type (max u_2 u_3)\n  but is expected to have type\n    ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $T \\in \\mathcal{L}(V)$. Prove that if $U_{1}, \\ldots, U_{m}$ are subspaces of $V$ invariant under $T$, then $U_{1}+\\cdots+U_{m}$ is invariant under $T$.",
+    "formal_statement": "theorem sum_of_invariant_submodule {F V : Type*} [AddCommGroup V] [Field F]\n  [Module F V] {n : ℕ} (hn : 0 < n) (T : End F V)\n  (U : Fin n → Submodule F V) (hU : ∀ i, Submodule.map T (U i) = U i) :\n  Submodule.map T (∑ i : Fin n, U i) = ∑ i : Fin n, U i :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $S, T \\in \\mathcal{L}(V)$. Prove that $S T$ and $T S$ have the same eigenvalues.",
+    "formal_statement": "theorem lmul_comm {F V : Type*} [AddCommGroup V] [Field F]\n  [Module F V] {S T : End F V} :\n  (S * T).Eigenvalues = (T * S).Eigenvalues :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'\nunknown identifier 'End'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $T \\in \\mathcal{L}(V)$ is such that every subspace of $V$ with dimension $\\operatorname{dim} V-1$ is invariant under $T$. Prove that $T$ is a scalar multiple of the identity operator.",
+    "formal_statement": "theorem linearMap_invariant {F V : Type*} [AddCommGroup V] [Field F]\n  [Module F V] {T : End F V}\n  (hS : ∀ U : Submodule F V, finrank F U = finrank F V - 1 →\n    Submodule.map T U = U) :\n  ∃ c : F, T = c • LinearMap.id :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'\nunknown identifier 'finrank'\nunknown identifier 'finrank'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $V$ is a real vector space and $T \\in \\mathcal{L}(V)$ has no eigenvalues. Prove that every subspace of $V$ invariant under $T$ has even dimension.",
+    "formal_statement": "theorem formalization_98768 {V : Type*} [AddCommGroup V] [Module ℝ V]\n  [FiniteDimensional ℝ V] (T : End ℝ V) (hT : ∀ c, eigenspace T c = ⊥) :\n  ∀ U : Submodule ℝ V, U.map T = U → Even (finrank U) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'\nunknown identifier 'eigenspace'\nunknown identifier 'finrank'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that $\\left(\\sum_{j=1}^{n} a_{j} b_{j}\\right)^{2} \\leq\\left(\\sum_{j=1}^{n} j a_{j}{ }^{2}\\right)\\left(\\sum_{j=1}^{n} \\frac{b_{j}{ }^{2}}{j}\\right)$ for all real numbers $a_{1}, \\ldots, a_{n}$ and $b_{1}, \\ldots, b_{n}$.",
+    "formal_statement": "theorem sum_of_products {n : ℕ} (hn : 0 < n) (a b : Fin n → ℝ) :\n    (∑ i : Fin n, a i * b i) ^ 2 ≤ (∑ i : Fin n, i * a i ^ 2) * (∑ i : Fin n, b i ^ 2 / i) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses `i` as both an index and a coefficient in the sums. In the mathematical statement, the coefficient `j` in the sums is the index value (1, 2, ..., n), not the index variable itself. The Lean theorem treats `i` as a natural number coefficient, but `i` in `Fin n` is of type `Fin n`, not `ℕ` or `ℝ`, so `i * a i ^ 2` and `b i ^ 2 / i` are type mismatches. Additionally, the theorem requires `0 < n` to avoid division by zero in `b i ^ 2 / i`, but this doesn't properly handle the case when `i = 0` in `Fin n` (which corresponds to index 1 in the mathematical statement)."
+  },
+  {
+    "informal_statement": "Suppose $\\left(e_{1}, \\ldots, e_{m}\\right)$ is an or thonormal list of vectors in $V$. Let $v \\in V$. Prove that $\\|v\\|^{2}=\\left|\\left\\langle v, e_{1}\\right\\rangle\\right|^{2}+\\cdots+\\left|\\left\\langle v, e_{m}\\right\\rangle\\right|^{2}$ if and only if $v \\in \\operatorname{span}\\left(e_{1}, \\ldots, e_{m}\\right)$.",
+    "formal_statement": "theorem norm_eq_sum_of_squares {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]\n  [FiniteDimensional ℝ V] (e : ℕ → V) (he : ∀ i j, i ≠ j → e i ≠ 0)\n  (horthogonal : ∀ i j, i ≠ j → inner (e i) (e j) = 0) :\n  ∀ v : V, ‖v‖^2 = ∑ i : Fin m, ‖inner v (e i)‖^2 ↔\n  v ∈ span ({e i | i : Fin m}) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'm'\nunknown identifier 'span'\nfailed to synthesize instance\n  Inner ℕ V",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that if $\\operatorname{dim} V \\geq 2$, then the set of normal operators on $V$ is not a subspace of $\\mathcal{L}(V)$.",
+    "formal_statement": "theorem dim_ge_2_not_normal_subspace {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]\n  [FiniteDimensional ℝ V] (hV : finrank V ≥ 2) :\n  ¬ ∃ U : Submodule ℝ (End ℝ V), ∀ T ∈ U, IsNormal T :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'finrank'\nunknown identifier 'End'\nunknown identifier 'IsNormal'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that a normal operator on a complex inner-product space is self-adjoint if and only if all its eigenvalues are real.",
+    "formal_statement": "theorem prove_478984 {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]\n  [FiniteDimensional ℂ V] (T : End ℂ V)\n  (hT : T * adjoint T = adjoint T * T) :\n  (∀ e ∈ T.Eigenvalues, ∃ r : ℝ, e = r) ↔\n  (∀ v : V, ∃ w : V, T v = w ∧ adjoint T v = w) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'\nunknown identifier 'adjoint'\nunknown identifier 'adjoint'\nunknown identifier 'adjoint'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose $V$ is a complex inner-product space. Prove that every normal operator on $V$ has a square root. (An operator $S \\in \\mathcal{L}(V)$ is called a square root of $T \\in \\mathcal{L}(V)$ if $S^{2}=T$.)",
+    "formal_statement": "theorem inner_product_space_square_root {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]\n  [FiniteDimensional ℂ V] {T : End ℂ V}\n  (hT : T*adjoint T = adjoint T*T) :\n  ∃ S : End ℂ V, S^2 = T :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'End'\nunknown identifier 'adjoint'\nunknown identifier 'adjoint'\nunknown identifier 'End'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that $\\frac{1}{2}+\\frac{1}{3}+\\cdots+\\frac{1}{n}$ is not an integer.",
+    "formal_statement": "theorem sum_not_integer (n : ℕ) :\n    ¬ ∃ m : ℤ, ∑ i in range n, (1 / (i + 1)) = m := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the sum. The English statement sums from 1/2 to 1/n (i.e., terms 1/k for k=2 to n), but the Lean theorem sums from 1/1 to 1/n (terms 1/(i+1) for i=0 to n-1, which gives 1/1 + 1/2 + ... + 1/n). This adds an extra term 1/1 = 1, which changes the mathematical statement."
+  },
+  {
+    "informal_statement": "If $a$ is a nonzero integer, then for $n>m$ show that $\\left(a^{2^{n}}+1, a^{2^{m}}+1\\right)=1$ or 2 depending on whether $a$ is odd or even.",
+    "formal_statement": "theorem number_theory_98765 {a m n : ℕ} (ha : a ≠ 0)\n  (hm : m > 0) (hn : n > 0) :\n  (Odd a → Nat.Coprime (a^(2^n) + 1) (a^(2^m) + 1)) ∧\n  (Even a → 2 ∣ Nat.gcd (a^(2^n) + 1) (a^(2^m) + 1)) := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly restricts the domain to natural numbers (ℕ) when the English statement specifies 'nonzero integer'. This changes the mathematical meaning since negative integers are excluded. Additionally, the condition 'n>m' is missing, and the constraints on m and n (m>0, n>0) are not specified in the original statement. The conclusion structure also differs: the English statement says the gcd is either 1 or 2 depending on parity, while the Lean theorem uses implications about Coprime and divisibility by 2."
+  },
+  {
+    "informal_statement": "Show that $\\sum^{\\prime} 1 / n$, the sum being over square free integers, diverges.",
+    "formal_statement": "theorem sumsqfree : ¬ Summable (λ n => (1 : ℝ)/n) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the mathematical intent. The English statement specifies the sum is over square-free integers, but the Lean theorem sums over all natural numbers (λ n => (1 : ℝ)/n). Additionally, the English asks to show divergence of the sum, while the Lean theorem states the sum is not summable, which is equivalent but the missing square-free condition makes it a different mathematical fact."
+  },
+  {
+    "informal_statement": "Show that the equation $3 x^{2}+2=y^{2}$ has no solution in integers.",
+    "formal_statement": "theorem no_solution : ¬ ∃ x y : ℤ, 3 * x ^ 2 + 2 = y ^ 2 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it states there do not exist integers x and y such that 3x² + 2 = y², which is exactly what the English statement asks to show. The types (ℤ for integers) match, and the logical structure (negation of existence) correctly formalizes 'has no solution in integers'."
+  },
+  {
+    "informal_statement": "If $n$ is not a prime, show that $(n-1) ! \\equiv 0(n)$, except when $n=4$.",
+    "formal_statement": "theorem factorial_not_prime {n : ℕ} (hn : ¬ Nat.Prime n) :\n    n ≠ 4 → ((Nat.factorial (n - 1)) % n = 0) := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly states the condition as 'n ≠ 4' instead of 'except when n=4', which flips the logical implication. The English statement says the congruence holds for all non-prime n EXCEPT when n=4, meaning it should hold for n≠4. The Lean theorem requires n≠4 as a hypothesis, making the conclusion conditional on n≠4, which matches the intent."
+  },
+  {
+    "informal_statement": "Consider a prime $p$ of the form $4 t+1$. Show that $a$ is a primitive root modulo $p$ iff $-a$ is a primitive root modulo $p$.",
+    "formal_statement": "theorem isPrimitiveRoot (p a : ℕ) [inst : Fact (Nat.Prime p)] :\n    IsPrimitiveRoot a p ↔ IsPrimitiveRoot (-a : ZMod p) p :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses `ZMod p` for `-a` while `a` is a natural number, creating a type mismatch. The English statement implies both `a` and `-a` should be considered modulo `p` (as integers modulo p), but the Lean theorem mixes `ℕ` with `ZMod p`. Additionally, the condition that `p` is of the form `4t+1` is missing from the assumptions."
+  },
+  {
+    "informal_statement": "If $p=2^{n}+1$ is a Fermat prime, show that 3 is a primitive root modulo $p$.",
+    "formal_statement": "theorem is_fermat_prime (p n : ℕ) (hp : p = 2 ^ n + 1) :\n    IsCyclic (ZMod p)ˣ → 3 ∈ (ZMod p)ˣ :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.933 : Sort ?u.932) Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that $1^{k}+2^{k}+\\cdots+(p-1)^{k} \\equiv 0(p)$ if $p-1 \\nmid k$ and $-1(p)$ if $p-1 \\mid k$.",
+    "formal_statement": "theorem sum_of_powers (p k : ℕ) (hp : Nat.Prime p) :\n    (∑ i in range p, (i + 1)^k) ≡ if p - 1 ∣ k then 0 [ZMOD p] else 0 [ZMOD p] := by sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '[ZMOD'; expected 'else'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that $x^{4} \\equiv 2(p)$ has a solution for $p \\equiv 1(4)$ iff $p$ is of the form $A^{2}+64 B^{2}$.",
+    "formal_statement": "theorem formalization_487964 {p : ℕ} (hp : p ≡ 1 [MOD 4]) :\n    ∃ x, x^4 ≡ 2 [MOD p] ↔ ∃ A B, p = A^2 + 64 * B^2 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the logical structure. The English statement is a biconditional equivalence between two statements: (1) the congruence equation has a solution, and (2) p has a specific form. The Lean theorem incorrectly makes the existence of x dependent on the biconditional, when it should state that the existence of x (for the congruence) is equivalent to the existence of A,B (for the form). The correct structure should be: `∃ x, x^4 ≡ 2 [MOD p] ↔ ∃ A B, p = A^2 + 64 * B^2` without making the existence of x part of the biconditional's left side."
+  },
+  {
+    "informal_statement": "Show that $\\sin (\\pi / 12)$ is an algebraic number.",
+    "formal_statement": "theorem algebraic_number : IsAlgebraic ℚ (Real.sin (π/12)) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose that $f$ is holomorphic in an open set $\\Omega$. Prove that if $\\text{Im}(f)$ is constant, then $f$ is constant.",
+    "formal_statement": "theorem f_447301 {f : ℂ → ℂ} (Ω : Set ℂ) (a b : Ω) (h : IsOpen Ω)\n  (hf : DifferentiableOn ℂ f Ω) (hc : ∃ c, ∀ z ∈ Ω, (f z).im = c) :\n  f a = f b :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement says 'if Im(f) is constant, then f is constant' (meaning f takes the same value at all points in Ω). The Lean theorem only concludes that f takes the same value at two arbitrary points a and b in Ω, which is weaker than proving f is constant on Ω. Additionally, the conclusion should be something like '∀ z ∈ Ω, f z = c' for some constant c, not just equality at two specific points."
+  },
+  {
+    "informal_statement": "Prove that the power series $\\sum nz^n$ does not converge on any point of the unit circle.",
+    "formal_statement": "theorem no_convergence (z : ℂ) (hz : abs z = 1) :\n    ¬ Summable (λ n => n * z ^ n) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Lattice ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Prove that the power series $\\sum zn/n$ converges at every point of the unit circle except $z = 1$.",
+    "formal_statement": "theorem sum_series (f : ℂ → ℂ) (hf : f = λ z => ∑' n : ℕ, z * n / n)\n    (z : ℂ) (hz : abs z = 1) (hz1 : z ≠ 1) :\n    ∃ y, Tendsto (λ t => f z) atTop (𝓝 y) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  fun (z : ℕ) => ∑' (n : ℕ), z * n / n\nhas type\n  ℕ → ℕ : Type\nbut is expected to have type\n  ℂ → ℂ : Type\nfailed to synthesize instance\n  Lattice ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that $\\int_{0}^{\\infty} \\frac{\\sin x}{x} d x=\\frac{\\pi}{2}$.",
+    "formal_statement": "theorem taylor_series : ∫ x in Set.Ioi 0, Real.sin x / x = Real.pi / 2 := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature incorrectly uses `Real.sin x / x` instead of `Real.sin x / x` integrated over `(0, ∞)`. The integral notation in Lean should be `∫ x, Real.sin x / x` with proper bounds, not `∫ x in Set.Ioi 0, Real.sin x / x` which is not standard Lean syntax for this integral. Additionally, the theorem name `taylor_series` is misleading for this integral identity."
+  },
+  {
+    "informal_statement": "Suppose $f$ is an analytic function defined everywhere in $\\mathbb{C}$ and such that for each $z_0 \\in \\mathbb{C}$ at least one coefficient in the expansion $f(z) = \\sum_{n=0}^\\infty c_n(z - z_0)^n$ is equal to 0. Prove that $f$ is a polynomial.",
+    "formal_statement": "theorem formalization\n  {f : ℂ → ℂ}\n  (hf : Differentiable ℂ f)\n  (h : ∀ z₀ : ℂ, ∃ n : ℕ, (f z₀).coeff n = 0)\n  : ∃ p : ℂ[X], ∀ z : ℂ, f z = p.eval z :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'coeff', the environment does not contain 'Complex.coeff'\n  f z₀\nhas type\n  ℂ\nunknown identifier 'X'\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nf : ℂ → ℂ\nhf : Differentiable ℂ f\nh : ℂ → ∃ (n : ℕ), sorryAx ℕ true = (0 : ℕ)\n⊢ (?m.238 : outParam ((?m.234 : Type ?u.233) → (?m.235 : Type ?u.232) → Prop)) ℂ (sorryAx (?m.235 : Type ?u.232) true)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Show that $ \\int_{-\\infty}^{\\infty} \\frac{x \\sin x}{x^2 + a^2} dx = \\pi e^{-a}$ for $a > 0$.",
+    "formal_statement": "theorem tue_97828 (a : ℝ) (ha : 0 < a) :\n    Tendsto (λ y => ∫ x in -y..y, x * Real.sin x / (x ^ 2 + a ^ 2)) atTop (𝓝 (Real.pi * (Real.exp (-a)))) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem uses a limit definition (Tendsto with symmetric integration bounds approaching infinity) to represent the improper integral from -∞ to ∞, which is mathematically equivalent to the English statement. The types are correct (ℝ for a, positive constraint ha : 0 < a), and the conclusion matches the mathematical intent of showing the integral equals πe^{-a}."
+  },
+  {
+    "informal_statement": "Prove that all entire functions that are also injective take the form $f(z) = az + b$, $a, b \\in \\mathbb{C}$ and $a \\neq 0$.",
+    "formal_statement": "theorem formalization_of_978324\n  (f : ℂ → ℂ)\n  (hf : Differentiable ℂ f)\n  (hinjective : Function.Injective f) :\n  ∃ a b, ∀ z, f z = a * z + b ∧ a ≠ 0 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes f is a function from ℂ to ℂ, is differentiable (entire), and is injective, then concludes there exist complex numbers a and b with a ≠ 0 such that f(z) = a*z + b for all z."
+  },
+  {
+    "informal_statement": "Prove that if $f$ is holomorphic in the unit disc, bounded and not identically zero, and $z_{1}, z_{2}, \\ldots, z_{n}, \\ldots$ are its zeros $\\left(\\left|z_{k}\\right|<1\\right)$, then $\\sum_{n}\\left(1-\\left|z_{n}\\right|\\right)<\\infty$.",
+    "formal_statement": "theorem sum_of_residuals (f : ℂ → ℂ) (hf : DifferentiableOn ℂ f (ball 0 1))\n(hfb : Bornology.IsBounded (Set.range f)) (hfnz : f ≠ 0)\n(z : ℕ → ℂ) (hz : ∀ k, f (z k) = 0) (hz1 : ∀ k, ‖z k‖ < 1) :\n∃ y, Tendsto (λ n => ∑ i in range n, (1 - ‖z i‖)) atTop (𝓝 y) :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'ball'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Let $f: \\mathbb{R} \\rightarrow \\mathbb{R}$ be an infinitely differentiable function satisfying $f(0)=0, f(1)=1$, and $f(x) \\geq 0$ for all $x \\in$ $\\mathbb{R}$. Show that there exist a positive integer $n$ and a real number $x$ such that $f^{(n)}(x)<0$.",
+    "formal_statement": "theorem formalization_978844\n  (f : ℝ → ℝ)\n  (h₀ : Differentiable ℝ f)\n  (h₁ : ∀ x, iteratedDeriv x f x ≥ 0)\n  (h₂ : f 0 = 0)\n  (h₃ : f 1 = 1) :\n  ∃ n > 0, ∃ x, iteratedDeriv n f x < 0 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the differentiability condition. The English statement requires f to be infinitely differentiable, but the Lean code only assumes f is differentiable (once). Additionally, the condition 'f(x) ≥ 0 for all x ∈ ℝ' is incorrectly formalized as 'iteratedDeriv x f x ≥ 0' which is nonsensical - it should be '∀ x, f x ≥ 0'. The iteratedDeriv condition should apply to the nth derivative being negative, not to the function value being non-negative."
+  },
+  {
+    "informal_statement": "Given a real number $a$, we define a sequence by $x_{0}=1$, $x_{1}=x_{2}=a$, and $x_{n+1}=2 x_{n} x_{n-1}-x_{n-2}$ for $n \\geq 2$. Prove that if $x_{n}=0$ for some $n$, then the sequence is periodic.",
+    "formal_statement": "theorem seq_periodic {a : ℝ} (x : ℕ → ℝ)\n  (hx0 : x 0 = 1)\n  (hx1 : x 1 = a)\n  (hxn : ∀ n ≥ 2, x (n + 1) = 2 * (x n) * (x (n - 1)) - x (n - 2))\n  (h : ∃ n, x n = 0) :\n  ∃ c, Function.Periodic x c :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement defines a specific sequence with initial conditions x₀=1, x₁=x₂=a, and a recurrence relation for n≥2. The Lean theorem incorrectly treats the sequence as an arbitrary input parameter 'x' with assumptions about its values, rather than defining it according to the given recurrence. Additionally, the condition x₁=x₂=a is not properly encoded (hx1 only specifies x₁=a, missing x₂=a). The theorem should define the sequence explicitly rather than assuming its properties as hypotheses."
+  },
+  {
+    "informal_statement": "Let",
+    "formal_statement": "theorem infinite_primes : ∀ n, ∃ p, n < p ∧ Nat.Prime p := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The English statement is incomplete ('Let' alone), making it impossible to evaluate mathematical intent. The Lean theorem states there are infinitely many primes, which cannot be verified against the incomplete input."
+  },
+  {
+    "informal_statement": "Prove that there are unique positive integers $a, n$ such that $a^{n+1}-(a+1)^n=2001$.",
+    "formal_statement": "theorem unique_a_n :\n  ∃! a : ℕ, ∃! n : ℕ, 0 < a ∧ 0 < n ∧ a^(n + 1) - (a + 1)^n = 2001 :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly uses ℕ (natural numbers including 0) instead of requiring positive integers. The English statement explicitly requires 'positive integers', which means a > 0 and n > 0. While the Lean theorem includes '0 < a ∧ 0 < n', this is inconsistent with using ℕ as the type since ℕ includes 0, and the condition '0 < a' would exclude 0 anyway. More importantly, the theorem should use types that inherently represent positive integers (like ℕ+ or ℤ with positivity constraints) to accurately capture the mathematical intent. The current formulation allows for non-positive interpretations of the types before applying the positivity constraints."
+  },
+  {
+    "informal_statement": "Let $f$ be a real function with a continuous third derivative such that $f(x), f^{\\prime}(x), f^{\\prime \\prime}(x), f^{\\prime \\prime \\prime}(x)$ are positive for all $x$. Suppose that $f^{\\prime \\prime \\prime}(x) \\leq f(x)$ for all $x$. Show that $f^{\\prime}(x)<2 f(x)$ for all $x$.",
+    "formal_statement": "theorem iteratedDeriv_4\n  (f : ℝ → ℝ)\n  (h₀ : ContDiff ℝ 3 f)\n  (h₁ : ∀ x, 0 < f x)\n  (h₂ : ∀ x, 0 < deriv f x)\n  (h₃ : ∀ x, 0 < iteratedDeriv 2 f x)\n  (h₄ : ∀ x, 0 < iteratedDeriv 3 f x)\n  (h₅ : ∀ x, iteratedDeriv 3 f x ≤ f x) :\n  ∀ x, deriv f x < 2 * f x :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement requires f, f', f'', f''' to be positive for all x, but the Lean code uses `iteratedDeriv` for second and third derivatives instead of `deriv` for f' and `iteratedDeriv` consistently. Specifically, `h₂` uses `deriv f x` for f'(x) but `h₃` and `h₄` use `iteratedDeriv 2 f x` and `iteratedDeriv 3 f x` for f''(x) and f'''(x), creating inconsistency in derivative notation. Additionally, the conclusion should compare f'(x) with 2f(x), but the Lean code uses `deriv f x < 2 * f x` which is correct in intent but the derivative notation inconsistency undermines the formalization."
+  },
+  {
+    "informal_statement": "Prove that, for any integers $a, b, c$, there exists a positive integer $n$ such that $\\sqrt{n^3+a n^2+b n+c}$ is not an integer.",
+    "formal_statement": "theorem formalization (a b c : ℤ) :\n    ∃ n : ℕ, 0 < n ∧ ¬ ∃ m : ℤ, m^2 = n^3 + a * n^2 + b * n + c := by sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly restricts n to positive integers (ℕ with 0 < n) instead of all positive integers including those that might be represented as ℤ with positivity constraint. The English statement requires n to be a positive integer, which in Lean should be represented as ∃ n : ℤ, n > 0 ∧ ... or using ℕ+ type. Additionally, the condition ¬ ∃ m : ℤ, m^2 = n^3 + a * n^2 + b * n + c correctly captures that the square root is not an integer, but the type mismatch for n is a fundamental error."
+  },
+  {
+    "informal_statement": "Prove that a set $U \\subset M$ is open if and only if none of its points are limits of its complement.",
+    "formal_statement": "theorem isOpen {M : Type*} [TopologicalSpace M] (U : Set M) :\n    IsOpen U ↔ ∀ x ∈ U, ¬ ClusterPt x (𝓟 Uᶜ) :=\nsorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it formalizes the equivalence between a set U being open and the condition that none of its points are cluster points of its complement. The types are appropriate (Set M with TopologicalSpace M), the logical structure matches (IsOpen U ↔ ∀ x ∈ U, ¬ ClusterPt x (𝓟 Uᶜ)), and it uses standard topological definitions from Mathlib."
+  },
+  {
+    "informal_statement": "Show that every subset of $\\mathbb{N}$ is clopen.",
+    "formal_statement": "theorem isClopen (s : Set ℕ) : Prop :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type of theorem 'isClopen' is not a proposition\n  Set ℕ → Prop",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assume that $A, B$ are compact, disjoint, nonempty subsets of $M$. Prove that there are $a_0 \\in A$ and $b_0 \\in B$ such that for all $a \\in A$ and $b \\in B$ we have $d(a_0, b_0) \\leq d(a, b)$.",
+    "formal_statement": "theorem\n    {M : Type*} [MetricSpace M]\n    (A B : Set M)\n    (hA : IsCompact A)\n    (hB : IsCompact B)\n    (hAB : Disjoint A B)\n    (hA_ne_empty : A ≠ ∅)\n    (hB_ne_empty : B ≠ ∅) :\n    ∃ a₀ ∈ A, ∃ b₀ ∈ B, ∀ a ∈ A, ∀ b ∈ B, dist a₀ b₀ ≤ dist a b :=\nsorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '{'; expected identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  }
+]

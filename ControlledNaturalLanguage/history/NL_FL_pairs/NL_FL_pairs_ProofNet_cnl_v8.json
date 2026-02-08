@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "Assumptions:\nLet S be a finite set.\nDefine σ : S → S as a permutation.\nDefine τ : S → S as a permutation.\nAssume for every x in S, σ(x) ≠ x implies τ(x) = x.\nAssume for every x in S, τ(x) ≠ x implies σ(x) = x.\nAssume σ ∘ τ = id_S.\nGoal:\nσ = id_S AND τ = id_S.",
+    "formal_statement": "theorem permutations_id {S : Type*} [Fintype S] (σ : Equiv.Perm S) (τ : Equiv.Perm S) \n  (h1 : ∀ x : S, σ x ≠ x → τ x = x) \n  (h2 : ∀ x : S, τ x ≠ x → σ x = x) \n  (h3 : σ ∘ τ = Equiv.refl S) : \n  σ = Equiv.refl S ∧ τ = Equiv.refl S := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a commutative ring.\nLet a be an element of R.\nDefine L : R → Set where for all x in R, L(a) = {x in R | x * a = 0}.\nGoal:\nFor all a in R, L(a) is an ideal of R.",
+    "formal_statement": "theorem left_annihilator_is_ideal (R : Type*) [CommRing R] (a : R) : Ideal R (fun x => x * a = 0) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  Ideal R\nterm has type\n  Type u_1",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine D = {z in ℂ | |z| < 1}.\nDefine f : D → ℂ.\nAssume f is holomorphic on D.\nAssume there exists M in ℝ such that for all z in D, |f(z)| ≤ M.\nAssume f is not identically zero.\nDefine Z = {z_n in D | n in ℕ AND f(z_n) = 0}.\nAssume for all n in ℕ, |z_n| < 1.\nGoal:\nThe sum over n in ℕ of (1 - |z_n|) converges.",
+    "formal_statement": "theorem sum_convergence : \n  let D := {z : ℂ | Complex.abs z < 1};\n  ∀ (f : D → ℂ), HolomorphicOn f D → \n  (∃ (M : ℝ), ∀ (z : D), Complex.abs (f z) ≤ M) → \n  (∃ (z : D), f z ≠ 0) → \n  ∀ (Z : ℕ → D), (∀ (n : ℕ), f (Z n) = 0) → \n  (∀ (n : ℕ), Complex.abs (Z n) < 1) → \n  Summable fun n => 1 - Complex.abs (Z n) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'HolomorphicOn'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℝ.\nDefine b : ℕ → ℝ.\nAssume limsup a(n) exists in ℝ ∪ {±∞}.\nAssume limsup b(n) exists in ℝ ∪ {±∞}.\nAssume limsup a(n) + limsup b(n) is not ∞ - ∞.\nGoal:\nlimsup (a(n) + b(n)) ≤ limsup a(n) + limsup b(n).",
+    "formal_statement": "theorem limsup_add_le_add_limsup (a b : ℕ → ℝ) (ha : ∃ l, Filter.limsup (fun n => a n) Filter.atTop = l) (hb : ∃ m, Filter.limsup (fun n => b n) Filter.atTop = m) (hsum : Filter.limsup (fun n => a n) Filter.atTop + Filter.limsup (fun n => b n) Filter.atTop ≠ ⊤) : Filter.limsup (fun n => a n + b n) Filter.atTop ≤ Filter.limsup (fun n => a n) Filter.atTop + Filter.limsup (fun n => b n) Filter.atTop := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Top ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine U as a subset of ℝ × ℝ.\nDefine U = {(x, y) ∈ ℝ × ℝ | x = 0 OR y = 0}.\nGoal:\nU is nonempty AND U is closed under scalar multiplication AND U is not a subspace of ℝ × ℝ.",
+    "formal_statement": "theorem subset_properties : ∃ (U : Set (ℝ × ℝ)), U = {(x, y) | x = 0 ∨ y = 0} ∧ Set.Nonempty U ∧ (∀ (c : ℝ) (p : ℝ × ℝ), p ∈ U → (c • p) ∈ U) ∧ ¬ (∀ (p q : ℝ × ℝ), p ∈ U → q ∈ U → p + q ∈ U) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be an abelian group.\nAssume the order of G = p^n * m, where p is a prime AND p does not divide m.\nLet H be a subgroup of G.\nAssume the order of H = p^n.\nGoal:\nFor every automorphism f : G → G, f(H) = H.",
+    "formal_statement": "theorem subgroup_power_order_fixed_by_automorphisms (G : Type*) [AddCommGroup G] (p : ℕ) [Nat.Prime p] (m n : ℕ) (hpm : ¬p ∣ m) (H : AddSubgroup G) (hG : Nat.card G = p ^ n * m) (hH : Nat.card H = p ^ n) (f : AddAut G) : AddSubgroup.map (f.toAddMonoidHom) H = H := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid binder annotation, type is not a class instance\n  p.Prime\nuse the command `set_option checkBinderAnnotations false` to disable the check",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume G is solvable.\nLet N be a normal subgroup of G.\nDefine π : G → G/N as the canonical projection.\nGoal:\nG/N is solvable.",
+    "formal_statement": "theorem quotient_of_solvable_is_solvable {G : Type*} [Group G] [IsSolvable G] (N : Subgroup G) [N.Normal] : IsSolvable (G ⧸ N) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℚ be the set of rational numbers.\nDefine B = {(a, b) ∈ ℚ × ℚ | a < b}.\nAssume the standard topology on ℝ is generated by open intervals (c, d) where c, d ∈ ℝ and c < d.\nGoal:\nThe collection B is a basis for the standard topology on ℝ.",
+    "formal_statement": "theorem rational_intervals_basis : TopologicalSpace.IsTopologicalBasis {U | ∃ (a b : ℚ), a < b ∧ U = Set.Ioo (↑a) (↑b)} := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nLet q be a prime number.\nAssume p > q.\nAssume q divides (p - 1).\nLet G1 be a nonabelian group.\nAssume the size of G1 = p * q.\nLet G2 be a nonabelian group.\nAssume the size of G2 = p * q.\nGoal:\nG1 is isomorphic to G2.",
+    "formal_statement": "theorem groups_of_order_pq_isomorphic (p : ℕ) (q : ℕ) (hp : Nat.Prime p) (hq : Nat.Prime q) (hpq : p > q) (hdiv : q ∣ (p - 1)) (G1 : Type*) [Group G1] (hG1 : ¬CommGroup.toGroup (CommGroup.mk G1 _)) (hsize1 : Nat.card G1 = p * q) (G2 : Type*) [Group G2] (hG2 : ¬CommGroup.toGroup (CommGroup.mk G2 _)) (hsize2 : Nat.card G2 = p * q) : Nonempty (G1 ≃* G2) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  CommGroup.toGroup\nterm has type\n  Group (?m.96 : Type ?u.95)\nfunction expected at\n  CommGroup.toGroup\nterm has type\n  Group (?m.335 : Type ?u.334)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an element of ℝᵏ.\nLet y be an element of ℝᵏ.\nGoal:\n|x + y|² + |x - y|² = 2|x|² + 2|y|².",
+    "formal_statement": "theorem parallelogram_law {k : ℕ} (x y : EuclideanSpace ℝ (Fin k)) : ‖x + y‖^2 + ‖x - y‖^2 = 2 * ‖x‖^2 + 2 * ‖y‖^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "'parallelogram_law' has already been declared",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume for every subgroup H of G, H = {e} OR H = G.\nGoal:\nThere exists a prime p in ℕ such that G is cyclic AND the size of G = p.",
+    "formal_statement": "theorem exists_prime_order_cyclic_group (G : Type*) [Group G] (h : ∀ (H : Subgroup G), H = ⊥ ∨ H = ⊤) : ∃ (p : ℕ), Nat.Prime p ∧ Nonempty (G ≃* Multiplicative (ZMod p)) ∧ Nat.card G = p := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be an integral domain.\nAssume for all nonzero a, b in R, there exist r, s in R such that gcd(a, b) = r a + s b.\nAssume for every sequence a : ℕ → R where for all i in ℕ, a(i) ≠ 0 AND a(i+1) divides a(i), there exists N in ℕ such that for all n ≥ N, a(n) = u a(N) for some unit u in R.\nGoal:\nR is a Principal Ideal Domain.",
+    "formal_statement": "theorem integral_domain_to_principal_ideal_domain (R : Type*) [CommRing R] [IsDomain R] \n  (hbezout : ∀ (a b : R), a ≠ 0 → b ≠ 0 → ∃ r s : R, gcd a b = r * a + s * b)\n  (hacc : ∀ (a : ℕ → R), (∀ i : ℕ, a i ≠ 0) → (∀ i : ℕ, a (i + 1) ∣ a i) → ∃ N : ℕ, ∃ (u : R) (hu : IsUnit u), ∀ n ≥ N, a n = u * a N) : \n  IsPrincipalIdealRing R := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  NormalizedGCDMonoid R\napplication type mismatch\n  (?m.856 : Finset (?m.471 : Type ?u.469)).gcd b\nargument\n  b\nhas type\n  R : Type u_1\nbut is expected to have type\n  (?m.8240 : R → R → R → R → Type ?u.469) a b r s → R : Type (max u_1 ?u.469)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the size of G = 56.\nLet p be a prime number.\nAssume p divides 56.\n\nGoal:\nThere exists a Sylow p-subgroup H of G such that H is normal in G.",
+    "formal_statement": "theorem exists_normal_Sylow_subgroup (G : Type*) [Group G] (hG : Nat.card G = 56) (p : ℕ) (hp : Nat.Prime p) (hdiv : p ∣ 56) : ∃ (H : Subgroup G), IsSylow p H ∧ Subgroup.Normal H := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsSylow'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a commutative ring.\nAssume 1 ∈ R AND 1 ≠ 0.\nLet a ∈ R.\nAssume there exists n ∈ ℕ such that a^n = 0.\nLet b ∈ R.\nGoal:\n1 - a*b is a unit in R.",
+    "formal_statement": "theorem unit_of_one_minus_ab {R : Type*} [CommRing R] (h1 : (1 : R) ∈ R) (h1_ne_zero : (1 : R) ≠ 0) (a : R) (n : ℕ) (h_pow : a ^ n = 0) (b : R) : IsUnit (1 - a * b) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership R (Type u_1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite group.\nLet H be a subgroup of G.\nAssume H ≠ G.\nGoal:\nThere exists a subgroup M of G such that:\n1. H is a subset of M.\n2. M ≠ G.\n3. For every subgroup K of G, if M is a subset of K, then K = M OR K = G.",
+    "formal_statement": "theorem exists_maximal_subgroup_containing_proper_subgroup (G : Type*) [Group G] [Fintype G] (H : Subgroup G) (hH : H ≠ ⊤) : ∃ M : Subgroup G, H ≤ M ∧ M ≠ ⊤ ∧ ∀ K : Subgroup G, M ≤ K → K = M ∨ K = ⊤ := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine p = 2^n + 1.\nAssume p is prime.\nGoal:\n3 is a primitive root modulo p.",
+    "formal_statement": "theorem primitive_root_three_mod_p (n : ℕ) (p : ℕ) (hp : p = 2^n + 1) (hprime : Nat.Prime p) : IsPrimitiveRoot (3 : ZMod p) (p - 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine I = [0, 1].\nDefine X = I^ω (the product space).\nAssume the uniform topology on X is given by the metric d(f, g) = sup_{n ∈ ℕ} |f(n) - g(n)|.\nGoal:\nX is not locally compact.",
+    "formal_statement": "theorem not_locally_compact : ¬ LocallyCompactSpace (∀ n : ℕ, Set.Icc (0 : ℝ) 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a ring.\nLet I be an ideal of R.\nLet J be an ideal of R.\nAssume I + J = R.\nGoal:\nI J = I ∩ J.",
+    "formal_statement": "theorem product_eq_intersection {R : Type*} [Ring R] (I J : Ideal R) (h : I + J = ⊤) : I * J = I ⊓ J := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HMul (Ideal R) (Ideal R) (?m.7342 : outParam (Type ?u.602))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a ring.\nLet S be a ring.\nDefine φ : R → S.\nAssume φ is a surjective homomorphism.\nDefine Z(R) = {z in R | for all r in R, z * r = r * z}.\nDefine Z(S) = {z in S | for all s in S, z * s = s * z}.\nGoal:\nFor all z in Z(R), φ(z) is in Z(S).",
+    "formal_statement": "theorem center_image_in_center {R : Type*} [Ring R] {S : Type*} [Ring S] (φ : R →+* S) \n(hφ : Function.Surjective φ) (z : R) (hz : ∀ r : R, z * r = r * z) : \n∀ s : S, φ z * s = s * φ z := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'φ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nAssume n > 3.\nAssume n is squarefree.\nDefine R = {a + b√(-n) | a ∈ ℤ AND b ∈ ℤ}.\n\nGoal:\nThe element 2 is irreducible in R.\nThe element √(-n) is irreducible in R.\nThe element 1 + √(-n) is irreducible in R.",
+    "formal_statement": "theorem irreducibles_in_R (n : ℕ) (hn_gt : n > 3) (hn_squarefree : Squarefree n) : \n  Irreducible (2 : {a : ℤ // ∃ b : ℤ, a = a + b * Real.sqrt (-↑n)}) ∧ \n  Irreducible (Real.sqrt (-↑n) : {a : ℤ // ∃ b : ℤ, a = a + b * Real.sqrt (-↑n)}) ∧ \n  Irreducible ((1 + Real.sqrt (-↑n)) : {a : ℤ // ∃ b : ℤ, a = a + b * Real.sqrt (-↑n)}) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  OfNat { a : ℤ // ∃ (b : ℤ), ↑a = ↑a + ↑b * √(-↑n) } (nat_lit 2)\nfailed to synthesize instance\n  Monoid { a : ℤ // ∃ (b : ℤ), ↑a = ↑a + ↑b * √(-↑n) }\ntype mismatch\n  √(-(?m.11332 : (?m.11331 : Sort ?u.11330)))\nhas type\n  ℝ : Type\nbut is expected to have type\n  { a : ℤ // ∃ (b : ℤ), ↑a = ↑a + ↑b * √(-↑n) } : Type\ntype mismatch\n  (1 : ℝ) + √(-↑n)\nhas type\n  ℝ : outParam Type\nbut is expected to have type\n  { a : ℤ // ∃ (b : ℤ), ↑a = ↑a + ↑b * √(-↑n) } : Type\nfailed to synthesize instance\n  Monoid { a : ℤ // ∃ (b : ℤ), ↑a = ↑a + ↑b * √(-↑n) }",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite set.\nLet · be a binary operation on G.\nAssume (G, ·) forms a group with identity element e.\nLet a be an element of G.\nGoal:\nThere exists n in ℕ such that n ≥ 1 AND a^n = e.",
+    "formal_statement": "theorem exists_pow_eq_identity {G : Type*} [Fintype G] (· : G → G → G) [Group G] (e : G) (a : G) : ∃ n : ℕ, 1 ≤ n ∧ (Nat.iterate (fun x => · a x) n e) = e := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '·'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a vector space over ℝ.\nLet T be an element of ℒ(V).\nAssume T has no eigenvalues.\nLet U be a subspace of V.\nAssume U is invariant under T.\nGoal:\nThe dimension of U is even.",
+    "formal_statement": "theorem subspace_dim_even {V : Type*} [AddCommGroup V] [Module ℝ V] (T : V →ₗ[ℝ] V) (h_no_eigen : ∀ (λ : ℝ), ¬∃ (v : V), v ≠ 0 ∧ T v = λ • v) (U : Submodule ℝ V) (h_inv : ∀ u ∈ U, T u ∈ U) : Even (FiniteDimensional.finrank ℝ U) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet z be an element of ℂ.\nAssume z * conjugate(z) = 1.\nGoal:\n|1 + z|² + |1 - z|² = 4.",
+    "formal_statement": "theorem norm_sq_sum_diff_eq_four (z : ℂ) (hz : z * Complex.conj z = 1) : |1 + z|^2 + |1 - z|^2 = 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Complex.conj'\nfailed to synthesize instance\n  Lattice ℂ\nfailed to synthesize instance\n  Lattice ℂ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be in ℕ.\nDefine a : {1, ..., n} → ℝ.\nDefine b : {1, ..., n} → ℝ.\nGoal:\n(Sum from j=1 to n of a(j) * b(j))^2 ≤ (Sum from j=1 to n of j * a(j)^2) * (Sum from j=1 to n of b(j)^2 / j).",
+    "formal_statement": "theorem cauchy_schwarz_special_case (n : ℕ) (a : Fin n → ℝ) (b : Fin n → ℝ) : (∑ j, a j * b j)^2 ≤ (∑ j, (↑j + 1) * a j^2) * (∑ j, b j^2 / (↑j + 1)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem does not accurately capture the mathematical intent of the natural language statement. The natural language statement defines the functions a and b on the set {1, ..., n}, which corresponds to Fin n in Lean, but the sums in the Lean theorem start from j=0 to n-1 due to the use of Fin n. Additionally, the Lean theorem uses (↑j + 1) to adjust the index, which is not present in the original statement. The correct formulation should directly use j as in the original statement, without the +1 adjustment."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A be an index set.\nFor each α in A, let X_α be a nonempty topological space.\nDefine P = ∏_{α in A} X_α.\nAssume P is normal.\nGoal:\nFor every α in A, X_α is normal.",
+    "formal_statement": "theorem product_normal_implies_components_normal (A : Type*) (X : A → Type*) [∀ α, TopologicalSpace (X α)] [∀ α, Nonempty (X α)] (hP : Normal (∀ α, X α)) : ∀ α, Normal (X α) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type expected, got\n  (Normal\n  ((α : A) →\n    X\n      α) : (K : Type ?u.27) →\n  [inst : Field ((α : A) → X α)] → [inst_1 : Field K] → [inst : Algebra ((α : A) → X α) K] → Prop)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k = 1.\nLet x be an element of ℝ^k.\nGoal:\nThere does not exist y in ℝ^k such that y ≠ 0 AND x · y = 0.",
+    "formal_statement": "theorem no_nonzero_orthogonal_vector (x : ℝ^1) (h : k = 1) : ¬∃ (y : ℝ^1), y ≠ 0 ∧ x · y = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'k'\nfailed to synthesize instance\n  OfNat (ℝ ^ (1 : (?m.180 : Type ?u.108))) (nat_lit 0)\nfunction expected at\n  x\nterm has type\n  ℝ ^ (1 : (?m.42 : Type ?u.3))\nfailed to synthesize instance\n  HPow Type ℕ Type\nfailed to synthesize instance\n  HPow Type ℕ Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a topological space.\nLet Y be a Hausdorff topological space.\nLet A be a subset of X.\nDefine f : A → Y.\nAssume f is continuous.\nAssume there exists a continuous function g : closure(A) → Y such that for every x in A, g(x) = f(x).\nGoal:\nFor every continuous function h : closure(A) → Y, if for every x in A, h(x) = f(x), then h = g.",
+    "formal_statement": "theorem unique_extension_hausdorff {X : Type*} [TopologicalSpace X] {Y : Type*} [TopologicalSpace Y] [T2Space Y] {A : Set X} (f : A → Y) (hf : Continuous f) (g : closure A → Y) (hg : Continuous g) (heq : ∀ x ∈ A, g ⟨x, subset_closure ‹_›⟩ = f x) (h : closure A → Y) (hh : Continuous h) (heq' : ∀ x ∈ A, h ⟨x, subset_closure ‹_›⟩ = f x) : h = g := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  f x\nargument\n  x\nhas type\n  X : Type u_1\nbut is expected to have type\n  ↑A : Type u_1\napplication type mismatch\n  f x\nargument\n  x\nhas type\n  X : Type u_1\nbut is expected to have type\n  ↑A : Type u_1\ntactic 'assumption' failed\nX : Type u_1\ninst✝² : TopologicalSpace X\nY : Type u_2\ninst✝¹ : TopologicalSpace Y\ninst✝ : T2Space Y\nA : Set X\nf : ↑A → Y\nhf : Continuous f\ng : ↑(closure A) → Y\nhg : Continuous g\nx : X\n⊢ x ∈ A\ntactic 'assumption' failed\nX : Type u_1\ninst✝² : TopologicalSpace X\nY : Type u_2\ninst✝¹ : TopologicalSpace Y\ninst✝ : T2Space Y\nA : Set X\nf : ↑A → Y\nhf : Continuous f\ng : ↑(closure A) → Y\nhg : Continuous g\nheq : ∀ x ∈ A, g (⟨x, ⋯⟩ : { x : X // x ∈ closure A }) = f (sorryAx (↑A) true)\nh : ↑(closure A) → Y\nhh : Continuous h\nx : X\n⊢ x ∈ A",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet q be an element of ℤ.\nAssume q is prime.\nAssume q ≡ 3 mod 4.\nDefine R = ℤ[i] as the ring of Gaussian integers.\nDefine I = (q) as the ideal generated by q in R.\nGoal:\nThe quotient ring R/I is a field with q² elements.",
+    "formal_statement": "theorem quotient_of_gaussian_integers_field (q : ℤ) (hq : Nat.Prime (Int.natAbs q)) (hq_mod : q ≡ 3 [ZMOD 4]) : IsField (GaussianInt.quotient (Ideal.span ({q} : Set GaussianInt))) ∧ Fintype.card (GaussianInt.quotient (Ideal.span ({q} : Set GaussianInt))) = q^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'GaussianInt.quotient'\nunknown constant 'GaussianInt.quotient'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a set.\nLet T be a topology on X.\nAssume (X, T) is a T1 space.\nDefine countable_compactness: For every countable collection U of open sets in T, if union(U) = X, then there exists a finite subset V of U such that union(V) = X.\nDefine limit_point_compactness: For every infinite subset A of X, there exists x in X such that x is a limit point of A.\n\nGoal:\ncountable_compactness ⇔ limit_point_compactness.",
+    "formal_statement": "theorem countable_compactness_iff_limit_point_compactness (X : Type*) (T : TopologicalSpace X) [T1Space X] : \n  (∀ (U : Set (Set X)), U.Countable → (∀ s ∈ U, IsOpen s) → ⋃₀ U = Set.univ → ∃ (V : Finset (Set X)), (∀ s ∈ V, s ∈ U) ∧ ⋃₀ (↑V : Set (Set X)) = Set.univ) ↔ \n  (∀ (A : Set X), Set.Infinite A → ∃ x ∈ Set.univ, ClusterPt x (Filter.principal A)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet K : ℕ → Set(ℝ) be a sequence of sets.\nAssume for every n in ℕ, K(n) is nonempty.\nAssume for every n in ℕ, K(n) is covering compact.\nAssume for every n in ℕ, K(n+1) is a subset of K(n).\nGoal:\nThe intersection of K(n) for all n in ℕ is nonempty.",
+    "formal_statement": "theorem nested_compact_sets_nonempty (K : ℕ → Set ℝ) \n(h_nonempty : ∀ n, Set.Nonempty (K n)) \n(h_compact : ∀ n, IsCompact (K n)) \n(h_nested : ∀ n, K (n + 1) ⊆ K n) : \nSet.Nonempty (⋂ n, K n) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine E as a subset of ℝ.\nDefine f : E → ℝ.\nAssume f is continuous on E.\nGoal:\nThere does not exist a function g : ℝ → ℝ such that g is continuous on ℝ AND for all x in E, g(x) = f(x).",
+    "formal_statement": "theorem no_continuous_extension (E : Set ℝ) (f : E → ℝ) (hf : ContinuousOn f E) : ¬∃ (g : ℝ → ℝ), Continuous g ∧ ∀ x ∈ E, g x = f x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  ContinuousOn f E\nargument\n  E\nhas type\n  Set ℝ : Type\nbut is expected to have type\n  Set ↑E : Type\napplication type mismatch\n  f x\nargument\n  x\nhas type\n  ℝ : Type\nbut is expected to have type\n  ↑E : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a vector space over ℂ.\nAssume dim V ≥ 2.\nDefine L(V) as the set of linear operators on V.\nDefine N as the set of normal operators in L(V).\nGoal:\nN is not a subspace of L(V).",
+    "formal_statement": "theorem normal_operators_not_subspace (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (h : FiniteDimensional.finrank ℂ V ≥ 2) : ¬IsSubmodule (L(V)) (N : Set (L(V))) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '('; expected ')', ',' or ':'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a complex inner-product space.\nDefine T : V → V as a normal operator.\nAssume T is self-adjoint.\nGoal:\nFor every eigenvalue λ of T, λ is in ℝ.\n\nAssumptions:\nLet V be a complex inner-product space.\nDefine T : V → V as a normal operator.\nAssume for every eigenvalue λ of T, λ is in ℝ.\nGoal:\nT is self-adjoint.",
+    "formal_statement": "theorem self_adjoint_of_eigenvalue_real {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] (T : V →ₗ[ℂ] V) (hT : LinearMap.IsNormal T) (hλ_real : ∀ (λ : ℂ), HasEigenvalue T λ → λ ∈ ℝ) : T = LinearMap.adjoint T := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected ')'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nLet α be an element of ℤ⁺.\nLet G be a group.\nAssume the order of G = p^α.\nLet H be a subgroup of G.\nAssume the index of H in G = p.\nGoal:\nH is normal in G.",
+    "formal_statement": "theorem subgroup_of_prime_index_normal {p : ℕ} (hp : Nat.Prime p) {α : ℕ} (G : Type*) [Group G] (hG : Nat.card G = p ^ α) (H : Subgroup G) (hH : Subgroup.index H = p) : Subgroup.Normal H := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the order of G = 351.\nLet p be a prime number.\nAssume p divides 351.\n\nGoal:\nThere exists a Sylow p-subgroup of G that is normal.",
+    "formal_statement": "theorem exists_normal_Sylow_p_subgroup (G : Type*) [Group G] (hG : Nat.card G = 351) (p : ℕ) (hp : Nat.Prime p) (hdiv : p ∣ 351) : ∃ (P : Subgroup G), IsSylow p P ∧ Subgroup.Normal P := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsSylow'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet 𝔽₃₁ be the finite field with 31 elements.\nDefine p : 𝔽₃₁ → 𝔽₃₁ by p(x) = x³ - 9.\nGoal:\np is irreducible over 𝔽₃₁.",
+    "formal_statement": "theorem p_irreducible_over_F31 : Irreducible (Polynomial.map (Int.castRingHom (ZMod 31)) (Polynomial.C (x : ZMod 31) ^ 3 - Polynomial.C 9)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'x'\nfailed to synthesize instance\n  HSub (Polynomial (ZMod (31 : ℕ))) (Polynomial ℕ) (Polynomial ℤ)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a topological space.\nAssume X is regular.\nLet x, y be elements of X.\nAssume x ≠ y.\n\nGoal:\nThere exist open sets U, V such that:\nx is in U,\ny is in V,\nclosure(U) ∩ closure(V) = ∅.",
+    "formal_statement": "theorem exists_disjoint_open_nbhd_closure {X : Type*} [TopologicalSpace X] [RegularSpace X] (x y : X) (hxy : x ≠ y) : ∃ U V : Set X, IsOpen U ∧ IsOpen V ∧ x ∈ U ∧ y ∈ V ∧ closure U ∩ closure V = ∅ := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet F be a field.\nLet R be a subset of F.\nAssume R is a subring of F.\nAssume 1 ∈ R.\nGoal:\nFor all x, y in R, if x ≠ 0 AND y ≠ 0, then x * y ≠ 0.",
+    "formal_statement": "theorem nonzero_product_in_subring {F : Type*} [Field F] (R : Set F) [Subring R] (h1 : (1 : F) ∈ R) (x y : F) (hx : x ∈ R) (hy : y ∈ R) (hx0 : x ≠ 0) (hy0 : y ≠ 0) : x * y ≠ 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Ring ↑R",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a topological space.\nLet A be a subset of X.\nLet C be a subset of X.\nAssume C is connected.\nAssume there exists x in C such that x is in A.\nAssume there exists y in C such that y is in X - A.\nGoal:\nThere exists z in C such that z is in Bd A.",
+    "formal_statement": "theorem exists_boundary_point_in_connected_set (X : Type*) [TopologicalSpace X] (A C : Set X) (hC : IsConnected C) (hx : ∃ x ∈ C, x ∈ A) (hy : ∃ y ∈ C, y ∈ X \\ A) : ∃ z ∈ C, z ∈ frontier A := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  SDiff (Type u_1)\nfailed to synthesize instance\n  Membership X (Type u_1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet x be an element of G.\nAssume there exists n in ℕ such that n > 0 AND |x| = n.\nGoal:\nx⁻¹ = x^(n-1).",
+    "formal_statement": "theorem inv_eq_pow_of_order {G : Type*} [Group G] (x : G) (n : ℕ) (hn : n > 0) (hx : orderOf x = n) : x⁻¹ = x^(n - 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nLet k be a natural number.\nDefine S = {1, 2, ..., p-1}.\nDefine f : S → S by f(x) ≡ x^k mod p.\nGoal:\nIf p-1 does not divide k, then sum_{x in S} f(x) ≡ 0 mod p.\nIf p-1 divides k, then sum_{x in S} f(x) ≡ -1 mod p.",
+    "formal_statement": "theorem sum_pow_mod_p (p : ℕ) (hp : Nat.Prime p) (k : ℕ) (S : Finset ℕ) (hS : S = Finset.Icc 1 (p - 1)) (f : ℕ → ℕ) (hf : ∀ x ∈ S, f x = x ^ k % p) : (¬ (p - 1) ∣ k → Finset.sum S f % p = 0) ∧ ((p - 1) ∣ k → Finset.sum S f % p = p - 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem accurately captures the mathematical intent of the natural language statement. It correctly formalizes the assumptions, including the primality of p, the definition of the set S, and the function f. The theorem also correctly states the two cases for the sum of f(x) modulo p, depending on whether p-1 divides k or not. The types and constraints match the original statement, and the logical implications are correctly represented."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a vector space over a field F.\nLet S be an element of ℒ(V).\nLet T be an element of ℒ(V).\nGoal:\nFor every λ in F, λ is an eigenvalue of ST if and only if λ is an eigenvalue of TS.",
+    "formal_statement": "theorem eigenvalues_conjugate {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] (S T : Module.End F V) (λ : F) : (∃ (v : V), v ≠ 0 ∧ Module.End.toFun (S ∘ₗ T) v = λ • v) ↔ (∃ (w : V), w ≠ 0 ∧ Module.End.toFun (T ∘ₗ S) w = λ • w) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A be a group with operation +_A : A × A → A.\nLet B be a group with operation +_B : B × B → B.\nDefine the product group G = A × B with operation +_G : G × G → G where +_G((a1, b1), (a2, b2)) = (+_A(a1, a2), +_B(b1, b2)).\n\nGoal:\nG is abelian if and only if A is abelian AND B is abelian.",
+    "formal_statement": "theorem product_group_abelian_iff_components_abelian {A : Type*} {B : Type*} [Group A] [Group B] (G : Type*) [Group G] (hG : G = A × B) (add_A : A → A → A) (add_B : B → B → B) (add_G : G → G → G) (hadd : ∀ (a1 a2 : A) (b1 b2 : B), add_G (a1, b1) (a2, b2) = (add_A a1 a2, add_B b1 b2)) : CommGroup G ↔ CommGroup A ∧ CommGroup B := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  A\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Type u_3 : Type (u_3 + 1)\napplication type mismatch\n  add_G (a1, b1)\nargument\n  (a1, b1)\nhas type\n  A × B : Type (max u_1 u_2)\nbut is expected to have type\n  G : Type u_3\ntype mismatch\n  (add_A a1 a2, add_B b1 b2)\nhas type\n  A × B : Type (max u_1 u_2)\nbut is expected to have type\n  G : Type u_3\napplication type mismatch\n  Iff (CommGroup G)\nargument\n  CommGroup G\nhas type\n  Type u_3 : Type (u_3 + 1)\nbut is expected to have type\n  Prop : Type\napplication type mismatch\n  And (CommGroup A)\nargument\n  CommGroup A\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Prop : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℤ[i] be the ring of Gaussian integers.\nLet I be an ideal of ℤ[i].\nAssume I ≠ {0}.\nGoal:\nThere exists z in ℤ such that z ≠ 0 AND z is in I.",
+    "formal_statement": "theorem exists_nonzero_integer_in_ideal (I : Ideal (GaussianInt ℤ)) (hI : I ≠ ⊥) : ∃ (z : ℤ), z ≠ 0 ∧ ↑z ∈ I := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  GaussianInt\nterm has type\n  Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite set.\nLet e be an element of G.\nDefine · : G × G → G.\nAssume (G, ·, e) forms a group.\nAssume the size of G is even.\nGoal:\nThere exists a in G such that a ≠ e AND a · a = e.",
+    "formal_statement": "theorem exists_non_identity_element_of_order_two {G : Type*} [Fintype G] (e : G) (· : G × G → G) [Group G] (hG : Fintype.card G % 2 = 0) : ∃ a : G, a ≠ e ∧ · (a, a) = e := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '·'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℚ → ℚ.\nDefine f(x) = x^3 + 3 * x + 2.\nGoal:\nThe polynomial f is irreducible over ℚ.",
+    "formal_statement": "theorem polynomial_irreducible : Irreducible (Polynomial.C (1 : ℚ) * Polynomial.X ^ 3 + Polynomial.C (3 : ℚ) * Polynomial.X + Polynomial.C (2 : ℚ)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume for every subgroup H of G, H is normal in G.\nLet a be an element of G.\nLet b be an element of G.\nGoal:\nThere exists j in ℤ such that b * a = a^j * b.",
+    "formal_statement": "theorem exists_j_for_conjugate {G : Type*} [Group G] (h : ∀ (H : Subgroup G), Subgroup.Normal H) (a : G) (b : G) : ∃ (j : ℤ), b * a = a^j * b := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet F and K be fields.\nLet φ : F → K be a field homomorphism.\nGoal:\nφ is injective.",
+    "formal_statement": "theorem field_hom_injective {F K : Type*} [Field F] [Field K] (φ : F →+* K) : Function.Injective φ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'φ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the size of G = p * q, where p and q are primes.\nAssume p ≤ q.\nGoal:\nG is not simple.",
+    "formal_statement": "theorem group_of_order_product_primes_not_simple {G : Type*} [Group G] (p q : ℕ) [Nat.Prime p] [Nat.Prime q] (hG : Nat.card G = p * q) (hpq : p ≤ q) : ¬IsSimpleGroup G := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid binder annotation, type is not a class instance\n  p.Prime\nuse the command `set_option checkBinderAnnotations false` to disable the check",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet F be a field.\nAssume the characteristic of F is p.\nAssume p ≠ 0.\nLet m be an element of ℕ.\nDefine m = p^n where n is a positive integer.\nLet a be an element of F.\nLet b be an element of F.\nGoal:\n(a + b)^m = a^m + b^m.",
+    "formal_statement": "theorem frobenius_power {F : Type*} [Field F] (p : ℕ) (hchar : Ring.Char F = p) (hp : p ≠ 0) (n : ℕ) (hn : n > 0) (m : ℕ) (hm : m = p ^ n) (a b : F) : (a + b) ^ m = a ^ m + b ^ m := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Ring.Char'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an element of ℤ.\nLet b be an element of ℤ.\nAssume there exists c in ℤ[i] such that b = a * c in ℤ[i].\nGoal:\nThere exists d in ℤ such that b = a * d in ℤ.",
+    "formal_statement": "theorem exists_int_mul {a b : ℤ} (h : ∃ c : GaussianInt, (b : GaussianInt) = (a : GaussianInt) * c) : ∃ d : ℤ, b = a * d := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is three times differentiable.\nAssume f is continuous.\nAssume for all x in ℝ, f(x) > 0.\nAssume for all x in ℝ, f'(x) > 0.\nAssume for all x in ℝ, f''(x) > 0.\nAssume for all x in ℝ, f'''(x) > 0.\nAssume for all x in ℝ, f'''(x) ≤ f(x).\nGoal:\nFor all x in ℝ, f'(x) < 2 f(x).",
+    "formal_statement": "theorem derivative_bound (f : ℝ → ℝ) (hf : ContDiff ℝ 3 f) (hcont : Continuous f) (hpos : ∀ x, f x > 0) (hpos' : ∀ x, deriv f x > 0) (hpos'' : ∀ x, deriv (deriv f) x > 0) (hpos''' : ∀ x, deriv (deriv (deriv f)) x > 0) (hbound : ∀ x, deriv (deriv (deriv f)) x ≤ f x) : ∀ x, deriv f x < 2 * f x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a set.\nLet I be an index set.\nFor each α in I, define T_α as a topology on X.\nGoal:\nThe union of T_α for α in I is not necessarily a topology on X.",
+    "formal_statement": "theorem union_of_topologies_not_necessarily_topology (X : Type*) (I : Type*) (T : I → TopologicalSpace X) : ¬∀ (s : Set (Set X)), (∀ (α : I), s = T α) → TopologicalSpace X := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  T α\nhas type\n  TopologicalSpace X : Type u_1\nbut is expected to have type\n  Set (Set X) : Type u_1",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a topological space.\nLet Y be a subset of X.\nAssume Y has the subspace topology induced by X.\nLet A be a subset of Y.\nDefine T_Y as the topology on A inherited from Y.\nDefine T_X as the topology on A inherited from X.\nGoal:\nT_Y = T_X.",
+    "formal_statement": "theorem subspace_topology_inheritance {X : Type*} [TopologicalSpace X] (Y : Set X) [TopologicalSpace Y] [TopologicalSpace.Subtype Y] (A : Set Y) : TopologicalSpace.subspace A = TopologicalSpace.subspace (Subtype.val '' A) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'TopologicalSpace.Subtype'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ⁺.\nDefine V₁ = ℝⁿ as a vector space over ℚ.\nDefine V₂ = ℝ as a vector space over ℚ.\nGoal:\nThere exists a bijective linear map f : V₁ → V₂.",
+    "formal_statement": "theorem exists_bijective_linear_map : ∃ (n : ℤ⁺), ∃ (f : (Fin (↑n) → ℝ) →ₗ[ℚ] ℝ), Function.Bijective f := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Lattice Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet n be an element of ℤ with n > 1.\nAssume for all a, b in G, (a * b)^n = a^n * b^n.\nGoal:\nFor all a, b in G, (a * b * a^(-1) * b^(-1))^(n * (n - 1)) = e.",
+    "formal_statement": "theorem comm_power_identity {G : Type*} [Group G] (n : ℤ) (hn : n > 1) (h : ∀ (a b : G), (a * b)^n = a^n * b^n) (a b : G) : (a * b * a⁻¹ * b⁻¹)^(n * (n - 1)) = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet H be a subgroup of G.\nLet K be a subgroup of G.\nAssume H ≤ K.\nAssume H is characteristic in K.\nAssume K is normal in G.\nGoal:\nH is normal in G.",
+    "formal_statement": "theorem characteristic_subgroup_of_normal_is_normal {G : Type*} [Group G] (H K : Subgroup G) (hHK : H ≤ K) (hHchar : Subgroup.Characteristic H K) (hKnorm : Subgroup.Normal K) : Subgroup.Normal H := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  H.Characteristic\nterm has type\n  Prop",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine X as a topological space.\nDefine Y as a topological space.\nDefine p : X → Y as a continuous map.\nDefine f : Y → X as a continuous map.\nAssume for every y in Y, p(f(y)) = y.\nGoal:\np is a quotient map.",
+    "formal_statement": "theorem quotient_map_of_section {X : Type*} {Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] (p : X → Y) (f : Y → X) (hp : Continuous p) (hf : Continuous f) (h : ∀ y, p (f y) = y) : QuotientMap p := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℤ as the ring of integers.\nDefine ℕ as the set of natural numbers.\nDefine R = ℤ[x₁, x₂, x₃, ...].\nDefine I = (x₁x₂, x₃x₄, x₅x₆, ...).\nDefine S = R/I.\nGoal:\nThere exists an infinite set P of minimal prime ideals in S.",
+    "formal_statement": "theorem exists_infinite_minimal_primes (R : Type*) [CommRing R] (I : Ideal R) (S : Type*) [CommRing S] (hS : S = R ⧸ I) : ∃ (P : Set (Ideal S)), Set.Infinite P ∧ ∀ (p ∈ P), Ideal.IsPrime p ∧ ∀ (q : Ideal S), Ideal.IsPrime q → q ≤ p → q = p := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ')'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X be a topological space.\nLet Y be a topological space.\nDefine p : X → Y.\nAssume p is a quotient map.\nAssume for every y in Y, the set p⁻¹({y}) is connected.\nAssume Y is connected.\nGoal:\nX is connected.",
+    "formal_statement": "theorem connected_space_of_quotient_map_with_connected_fibers {X : Type*} [TopologicalSpace X] {Y : Type*} [TopologicalSpace Y] (p : X → Y) (hp : QuotientMap p) (hfib : ∀ y ∈ Y, IsConnected (p⁻¹' {y})) (hY : IsConnected Y) : IsConnected X := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.396 : Sort ?u.395) (Type u_2)\napplication type mismatch\n  IsConnected X\nargument\n  X\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Set (?m.1404 : Type ?u.1403) : Type ?u.1403",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nAssume n > 1.\nAssume n is not a prime number.\nGoal:\nIf n ≠ 4, then (n-1)! ≡ 0 mod n.",
+    "formal_statement": "theorem factorial_mod_non_prime (n : ℕ) (h₁ : n > 1) (h₂ : ¬Nat.Prime n) (h₃ : n ≠ 4) : (n - 1)! ≡ 0 [MOD n] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet a be an element of G.\nLet b be an element of G.\nDefine f : G × G → ℝ as f(x, y) = |x y|.\nGoal:\nf(a, b) = f(b, a).",
+    "formal_statement": "theorem f_comm {G : Type*} [Group G] (a : G) (b : G) (f : G × G → ℝ) (hf : ∀ (x y : G), f (x, y) = |↑(x * y)|) : f (a, b) = f (b, a) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  x * y\nhas type\n  G : outParam (Type u_1)\nbut is expected to have type\n  ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet A be a normal subgroup of G.\nLet b be an element of G.\nAssume the order of b is p, where p is prime.\nAssume b is not in A.\nDefine (b) as the subgroup generated by b.\nGoal:\nA ∩ (b) = {e}.",
+    "formal_statement": "theorem subgroup_intersection_trivial {G : Type*} [Group G] (A : Subgroup G) [hA : Subgroup.Normal A] (b : G) (hb : orderOf b = Nat.Prime.out (Nat.Prime p)) (hbnin : b ∉ A) : Subgroup.comap (Subgroup.subtype A) (Subgroup.closure {b}) = ⊥ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Nat.Prime.out'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℝ.\nAssume for every n in ℕ, a(n) ≥ 0.\nAssume the series sum_{n=1}^∞ a(n) converges.\nGoal:\nThe series sum_{n=1}^∞ (√a(n) / n) converges.",
+    "formal_statement": "theorem sum_sqrt_div_n_converges (a : ℕ → ℝ) (ha_nonneg : ∀ n, a n ≥ 0) (ha_sum : Summable a) : Summable (fun n => Real.sqrt (a n) / (n : ℝ)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume for every x in ℝ, lim_{h → 0} (f(x + h) - f(x - h)) = 0.\nGoal:\nThere exists a function f satisfying the above assumption such that f is not continuous.",
+    "formal_statement": "theorem exists_noncontinuous_function_with_symmetric_limit_zero : ∃ (f : ℝ → ℝ), (∀ (x : ℝ), Tendsto (fun h ↦ f (x + h) - f (x - h)) (𝓝 0) (𝓝 0)) ∧ ¬Continuous f := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite set.\nDefine · : G × G → G as a binary operation.\nAssume (G, ·) forms a group.\nDefine σ : G → G as a function.\nAssume σ is a group automorphism.\nAssume for all g in G, σ(g) = g if and only if g = 1.\nAssume σ ∘ σ is the identity map on G.\nGoal:\nFor all a, b in G, a · b = b · a.",
+    "formal_statement": "theorem comm_group_of_automorphism_condition {G : Type*} [Fintype G] (op : G × G → G) [Group G] (σ : G → G) (hσ : Group.IsAutomorphism σ) (hσ_id : ∀ g : G, σ g = g ↔ g = 1) (hσ_sq : σ ∘ σ = id) : ∀ a b : G, op (a, b) = op (b, a) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Group.IsAutomorphism'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number in ℕ.\nAssume p ≡ 1 mod 4.\nDefine S = {x in ℕ | x^4 ≡ 2 mod p}.\nGoal:\nS is non-empty IF AND ONLY IF there exist A, B in ℕ such that p = A^2 + 64 * B^2.",
+    "formal_statement": "theorem exists_fourth_root_iff_sum_of_squares (p : ℕ) (hp : Nat.Prime p) (hp_mod : p ≡ 1 [MOD 4]) : (∃ x ∈ Finset.range p, (x^4) % p = 2 % p) ↔ ∃ A B : ℕ, p = A^2 + 64 * B^2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a vector space over a field F.\nLet T be an element of L(V).\nAssume for every subspace U of V, if dim U = dim V - 1, then T(U) is a subset of U.\nGoal:\nThere exists a scalar λ in F such that T = λI, where I is the identity operator on V.",
+    "formal_statement": "theorem exists_scalar_for_linear_map_eq_scalar_mul_id {F : Type*} [Field F] {V : Type*} [AddCommGroup V] [Module F V] (T : Module.End F V) (h : ∀ (U : Submodule F V), FiniteDimensional.finrank F U = FiniteDimensional.finrank F V - 1 → U.map T ≤ U) : ∃ (λ : F), T = λ • LinearMap.id := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine X as a metric space.\nDefine f : X → ℝ.\nAssume f is continuous.\nDefine Z(f) = {p in X | f(p) = 0}.\nGoal:\nZ(f) is closed in X.",
+    "formal_statement": "theorem zero_set_closed (X : Type*) [MetricSpace X] (f : X → ℝ) (hf : Continuous f) : IsClosed {p : X | f p = 0} := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet M be a metric space.\nLet U be a subset of M.\nDefine the complement of U as C = M \\ U.\n\nGoal:\nU is open if and only if for every p in U, p is not a limit point of C.",
+    "formal_statement": "theorem open_iff_not_limit_point_complement (M : Type*) [MetricSpace M] (U : Set M) (C : Set M := M \\ U) : IsOpen U ↔ ∀ p ∈ U, ¬IsLimitPoint p C := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  sdiff M\nargument\n  M\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Set M : Type u_1\nunknown identifier 'IsLimitPoint'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet E be a subset of ℝ × ℝ × ... × ℝ (k times).\nAssume E is uncountable.\nDefine P = {x in ℝ^k | For every open neighborhood U containing x, the intersection U ∩ E is uncountable}.\nGoal:\nThe set E \\ P is countable.",
+    "formal_statement": "theorem uncountable_set_diff_perfect_set_countable {k : ℕ} (E : Set (Fin k → ℝ)) (hE : ¬Set.Countable E) (P : Set (Fin k → ℝ) := {x | ∀ U, IsOpen U → x ∈ U → ¬Set.Countable (U ∩ E)}) : Set.Countable (E \\ P) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℚ as the set of rational numbers.\nDefine ℝ as the set of real numbers.\nDefine ℝ² = ℝ × ℝ.\nDefine B = { (a, b) × (c, d) | a ∈ ℚ, b ∈ ℚ, c ∈ ℚ, d ∈ ℚ, a < b, c < d }.\nGoal:\nB is a basis for the standard topology on ℝ².",
+    "formal_statement": "theorem rational_boxes_basis : IsTopologicalBasis {s : Set (ℝ × ℝ) | ∃ (a b c d : ℚ), s = Set.Ioo (↑a) (↑b) ×ˢ Set.Ioo (↑c) (↑d) ∧ (a < b) ∧ (c < d)} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsTopologicalBasis'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite set.\nDefine · : G × G → G as a binary operation.\nAssume (G, ·) forms a group.\nDefine φ : G → G.\nAssume φ is a bijection.\nAssume for all x, y in G, φ(x · y) = φ(x) · φ(y).\nDefine S = {x in G | φ(x) = x⁻¹}.\nAssume |S| > (3/4) · |G|.\nGoal:\nFor all y in G, φ(y) = y⁻¹.\n(G, ·) is abelian.",
+    "formal_statement": "theorem group_bijection_inverse_abelian (G : Type*) [Fintype G] (op : G × G → G) [Group G] (φ : G → G) (hφ : Bijective φ) (hφ_mul : ∀ x y, φ (op x y) = op (φ x) (φ y)) (S : Set G) (hS : S = {x | φ x = (op x (1 : G))⁻¹}) (hS_card : Fintype.card S > (3/4) * Fintype.card G) : (∀ y, φ y = (op y (1 : G))⁻¹) ∧ ∀ x y, op x y = op y x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'φ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet F be an infinite field.\nLet V be a vector space over F.\nLet n be a natural number.\nLet S be a set of subspaces of V with size(S) = n.\nAssume for every W in S, W is a proper subspace of V.\nGoal:\nThe union of all W in S is not equal to V.",
+    "formal_statement": "theorem union_of_proper_subspaces_not_equal_V {F : Type*} [Field F] [Infinite F] {V : Type*} [AddCommGroup V] [Module F V] (n : ℕ) (S : Finset (Submodule F V)) (hS : Finset.card S = n) (hproper : ∀ W ∈ S, W ≠ ⊤) : ⋃₀ (Submodule.toAddSubgroup '' (S : Set (Submodule F V))) ≠ ⊤ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  ⋃₀ ((?m.2734 : (?m.1703 : Type ?u.1702) → (?m.1704 : Type ?u.1701)) '' ↑S) : Class\n  \n  ⋃₀ ((?m.7864 : (?m.6832 : Type ?u.6831) → (?m.6833 : Type ?u.6830)) '' ↑S) : Set (?m.6828 : Type ?u.6827)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet U be a subset of ℝ.\nAssume U is open.\nDefine a relation ~ on U × U as: x ~ y if and only if the closed interval [min(x,y), max(x,y)] is a subset of U.\nAssume ~ is an equivalence relation.\nFor each equivalence class C under ~, define I_C as the union of all intervals [a,b] where a,b ∈ C.\nGoal:\nU is equal to the union of {I_C | C is an equivalence class of U/~}, and the collection {I_C} is at most countable and pairwise disjoint.",
+    "formal_statement": "theorem open_set_decomposition (U : Set ℝ) (hU : IsOpen U) (~ : U × U → Prop) \n  (h~ : ∀ (x y : U), x ~ y ↔ Set.Icc (min (x.val) (y.val)) (max (x.val) (y.val)) ⊆ U) \n  (equiv_rel : Equivalence ~) :\n  let classes := Quotient (Setoid.mk ~ equiv_rel);\n  let I_C := fun (C : classes) => ⋃ (x : U) (hx : Quotient.mk' x = C), \n    Set.Icc (Subtype.val x) (Subtype.val x);\n  U = ⋃ (C : classes), I_C C ∧ \n  (Set.Countable (Set.range I_C) ∧ ∀ (C₁ C₂ : classes), C₁ ≠ C₂ → Disjoint (I_C C₁) (I_C C₂)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected token",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a ring.\nLet a be an element of R.\nAssume a^2 = 0.\nLet x be an element of R.\nDefine b = ax + xa.\nGoal:\nb commutes with a.",
+    "formal_statement": "theorem commutes_with_a {R : Type*} [Ring R] (a : R) (ha : a^2 = 0) (x : R) : let b := a * x + x * a; b * a = a * b := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine z ∈ ℂ as z = (-1 + sqrt(3) * i) / 2.\nGoal:\nz^3 = 1.",
+    "formal_statement": "theorem cube_root_of_unity (z : ℂ) (hz : z = (-1 + Real.sqrt 3 * Complex.I) / 2) : z ^ 3 = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the size of G = 2907.\nDefine p1 = 3.\nDefine p2 = 17.\nDefine p3 = 19.\nNote that 2907 = p1^2 * p2 * p3.\nGoal:\nG is not simple.",
+    "formal_statement": "theorem group_not_simple {G : Type*} [Group G] (hG : Nat.card G = 2907) : ¬IsSimpleGroup G := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet Ω be an open subset of ℂ.\nDefine f : Ω → ℂ.\nAssume f is holomorphic on Ω.\nAssume there exists c in ℝ such that for all z in Ω, Im(f(z)) = c.\nGoal:\nf is constant on Ω.",
+    "formal_statement": "theorem holomorphic_with_constant_imaginary_part_is_constant (Ω : Set ℂ) (hΩ : IsOpen Ω) (f : Ω → ℂ) (hf : DifferentiableOn ℂ f Ω) (c : ℝ) (hc : ∀ z ∈ Ω, Complex.im (f z) = c) : ∃ C : ℂ, ∀ z ∈ Ω, f z = C := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  DifferentiableOn ℂ f Ω\nargument\n  Ω\nhas type\n  Set ℂ : Type\nbut is expected to have type\n  Set ↑Ω : Type\nfailed to synthesize instance\n  NormedAddCommGroup ↑Ω\napplication type mismatch\n  f z\nargument\n  z\nhas type\n  ℂ : Type\nbut is expected to have type\n  ↑Ω : Type\napplication type mismatch\n  f z\nargument\n  z\nhas type\n  ℂ : Type\nbut is expected to have type\n  ↑Ω : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the order of G = 224.\nDefine n_7 as the number of Sylow 7-subgroups of G.\nGoal:\nG is not simple.",
+    "formal_statement": "theorem not_simple_group_of_order_224 (G : Type*) [Group G] (hG : Nat.card G = 224) (n₇ : ℕ) (hn₇ : Sylow.normalizerCondition G → n₇ = Nat.card (Sylow G 7)) : ¬IsSimpleGroup G := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Sylow.normalizerCondition'\napplication type mismatch\n  Sylow G\nargument\n  G\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  ℕ : Type\nfailed to synthesize instance\n  OfNat (Type ?u.43) (nat_lit 7)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet (X, d) be a metric space.\nAssume X is compact.\nDefine f : X → X.\nAssume for all x, y in X, d(f(x), f(y)) = d(x, y).\nGoal:\nf is bijective AND f is a homeomorphism.",
+    "formal_statement": "theorem isometry_on_compact_is_bijective_homeomorphism {X : Type*} [MetricSpace X] (hX : IsCompact (univ : Set X)) (f : X → X) (hf : ∀ x y, dist (f x) (f y) = dist x y) : Function.Bijective f ∧ Homeomorph f := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  Homeomorph f\nargument\n  f\nhas type\n  X → X : Type u_1\nbut is expected to have type\n  Type ?u.3018 : Type (?u.3018 + 1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℙ be the set of prime numbers.\nAssume there exists a finite subset S of ℙ such that for every p in S, p ≡ -1 mod 4.\nDefine n = (product of p in S) * 4 - 1.\nGoal:\nn ≡ -1 mod 4 AND there exists a prime factor q of n such that q ≡ -1 mod 4 AND q is not in S.",
+    "formal_statement": "theorem exists_prime_factor_not_in_S (S : Finset ℕ) (hS : ∀ p ∈ S, Nat.Prime p ∧ p ≡ 3 [MOD 4]) (hS_fin : S.Finite) : \n    let n := (∏ p in S, p) * 4 - 1;\n    n ≡ 3 [MOD 4] ∧ ∃ q : ℕ, Nat.Prime q ∧ q ∣ n ∧ q ≡ 3 [MOD 4] ∧ q ∉ S := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'Finite', the environment does not contain 'Finset.Finite'\n  S\nhas type\n  Finset ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p ∈ ℝ.\nAssume p > 1.\nDefine f : ℕ → ℝ where f(k) = 1 / (k * (log(k))^p) for all k ≥ 2.\nGoal:\nThe series sum from k=2 to ∞ of f(k) converges.",
+    "formal_statement": "theorem series_convergence (p : ℝ) (hp : p > 1) (f : ℕ → ℝ) (hf : ∀ k ≥ 2, f k = 1 / (k * (Real.log ↑k)^p)) : Summable f := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is infinitely differentiable.\nAssume f(0) = 0.\nAssume f(1) = 1.\nAssume for all x in ℝ, f(x) ≥ 0.\nGoal:\nThere exist n in ℕ AND x in ℝ such that f^(n)(x) < 0.",
+    "formal_statement": "theorem exists_derivative_negative (f : ℝ → ℝ) (hDiff : ∀ n, ContDiff ℝ n f) (h0 : f 0 = 0) (h1 : f 1 = 1) (hNonNeg : ∀ x, f x ≥ 0) : ∃ (n : ℕ) (x : ℝ), iteratedDeriv n f x < 0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a ring.\nLet u be an element of R.\nAssume u is a unit in R.\nGoal:\n-u is a unit in R.",
+    "formal_statement": "theorem neg_unit_is_unit {R : Type*} [Ring R] (u : R) (hu : IsUnit u) : IsUnit (-u) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet x be an element of G.\nDefine ord(x) as the smallest n in ℕ such that x^n = e.\nGoal:\nord(x) = ord(x^{-1}).",
+    "formal_statement": "theorem order_of_inv_eq_order_of {G : Type*} [Group G] (x : G) : orderOf x = orderOf (x⁻¹) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be a complex inner-product space.\nDefine ℒ(V) as the set of linear operators on V.\nLet T be an element of ℒ(V).\nAssume T is normal.\nGoal:\nThere exists S in ℒ(V) such that S² = T.",
+    "formal_statement": "theorem exists_square_root_of_normal_operator (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (T : V →ₗ[ℂ] V) (hT : LinearMap.IsNormal T) : ∃ (S : V →ₗ[ℂ] V), S ∘ S = T := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field notation, type is not of the form (C ...) where C is a constant\n  LinearMap\nhas type\n  ((?m.1100 : Type ?u.1096) →+* (?m.1101 : Type ?u.1097)) →\n    (M : Type ?u.1098) →\n      (M₂ : Type ?u.1099) →\n        [inst : AddCommMonoid M] →\n          [inst_1 : AddCommMonoid M₂] →\n            [inst : Module (?m.1100 : Type ?u.1096) M] →\n              [inst : Module (?m.1101 : Type ?u.1097) M₂] → Type (max ?u.1098 ?u.1099)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℂ be the field of complex numbers.\nAssume there exists an order relation < on ℂ such that (ℂ, <) is an ordered field.\nGoal:\nThere exists z in ℂ such that z ≠ 0 AND z^2 < 0.",
+    "formal_statement": "theorem exists_nonzero_complex_square_negative (ℂ : Type*) [Field ℂ] [OrderedField ℂ] : ∃ z : ℂ, z ≠ 0 ∧ z^2 < 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'ℂ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nDefine x : ℕ → ℝ.\nDefine x(0) = 1.\nDefine x(1) = a.\nDefine x(2) = a.\nFor all n ≥ 2, define x(n + 1) = 2 * x(n) * x(n - 1) - x(n - 2).\nAssume there exists n in ℕ such that x(n) = 0.\nGoal:\nThe sequence x is periodic.",
+    "formal_statement": "theorem sequence_periodic (a : ℝ) (x : ℕ → ℝ) (hx0 : x 0 = 1) (hx1 : x 1 = a) (hx2 : x 2 = a) (hrec : ∀ n ≥ 2, x (n + 1) = 2 * x n * x (n - 1) - x (n - 2)) (hex : ∃ n, x n = 0) : Periodic x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Periodic'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be in ℕ.\nDefine ℤ/nℤ = {[a] | a is in ℤ}, where [a] = {b in ℤ | b ≡ a mod n}.\nDefine multiplication on ℤ/nℤ as [a] * [b] = [a * b].\nGoal:\nFor all [a], [b], [c] in ℤ/nℤ, ([a] * [b]) * [c] = [a] * ([b] * [c]).",
+    "formal_statement": "theorem mul_assoc_ZnZ (n : ℕ) (a b c : ℤ) : (Quotient.mk (Int.instModEqRel n) a * Quotient.mk (Int.instModEqRel n) b) * Quotient.mk (Int.instModEqRel n) c = Quotient.mk (Int.instModEqRel n) a * (Quotient.mk (Int.instModEqRel n) b * Quotient.mk (Int.instModEqRel n) c) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Int.instModEqRel'\nunknown constant 'Int.instModEqRel'\nunknown constant 'Int.instModEqRel'\nunknown constant 'Int.instModEqRel'\nunknown constant 'Int.instModEqRel'\nunknown constant 'Int.instModEqRel'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine X as a topological space.\nDefine Y as a topological space.\nDefine p : X → Y.\nAssume p is continuous.\nAssume p is surjective.\nAssume p is closed.\nAssume for every y in Y, p⁻¹({y}) is compact.\nAssume Y is compact.\nGoal:\nX is compact.",
+    "formal_statement": "theorem compact_space_of_proper_surjective_continuous_closed_map {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] (p : X → Y) (hcont : Continuous p) (hsurj : Function.Surjective p) (hclosed : IsClosedMap p) (hproper : ∀ y ∈ Y, IsCompact (p⁻¹' {y})) (hY : IsCompact Y) : IsCompact X := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.766 : Sort ?u.765) (Type u_2)\napplication type mismatch\n  IsCompact X\nargument\n  X\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  Set (?m.1774 : Type ?u.1773) : Type ?u.1773",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet H be a finite subgroup of G.\nLet K be a finite subgroup of G.\nAssume gcd(|H|, |K|) = 1.\nGoal:\nH ∩ K = {e}, where e is the identity element of G.",
+    "formal_statement": "theorem finite_subgroups_with_coprime_orders_intersect_trivially {G : Type*} [Group G] (H : Subgroup G) [Finite ↥H] (K : Subgroup G) [Finite ↥K] (hcoprime : Nat.gcd (Nat.card ↥H) (Nat.card ↥K) = 1) : H ⊓ K = ⊥ := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nAssume the size of G = 462.\nDefine p : ℕ → ℕ as p(n) = the number of Sylow n-subgroups of G.\nGoal:\nG is not simple.",
+    "formal_statement": "theorem not_simple_group_of_order_462 {G : Type*} [Group G] (hG : Nat.card G = 462) : ¬IsSimpleGroup G := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ with n ≥ 2.\nDefine H : ℕ → ℚ such that H(k) = sum from i=2 to k of (1 / i).\nGoal:\nH(n) is not an element of ℤ.",
+    "formal_statement": "theorem H_not_integer (n : ℕ) (hn : n ≥ 2) : ¬(H n ∈ ℤ) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'H'\nfailed to synthesize instance\n  Membership (?m.37 : outParam (Type ?u.36)) Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet M be a metric space.\nLet A be a compact subset of M.\nLet B be a compact subset of M.\nAssume A ∩ B = ∅.\nAssume A ≠ ∅.\nAssume B ≠ ∅.\nGoal:\nThere exist a0 in A and b0 in B such that for all a in A and b in B, d(a0, b0) ≤ d(a, b).",
+    "formal_statement": "theorem exists_min_distance_between_compact_sets {M : Type*} [MetricSpace M] (A B : Set M) (hA : IsCompact A) (hB : IsCompact B) (hDisj : Disjoint A B) (hA_nonempty : Set.Nonempty A) (hB_nonempty : Set.Nonempty B) : ∃ a0 ∈ A, ∃ b0 ∈ B, ∀ a ∈ A, ∀ b ∈ B, dist a0 b0 ≤ dist a b := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume for all x, y in ℝ, |f(x) - f(y)| ≤ (x - y)^2.\nGoal:\nf is a constant function.",
+    "formal_statement": "theorem constant_function (f : ℝ → ℝ) (h : ∀ x y : ℝ, |f x - f y| ≤ (x - y)^2) : ∃ c : ℝ, ∀ x : ℝ, f x = c := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet R be a ring.\nDefine p : ℕ → R.\nAssume p is a polynomial with coefficients in R.\nDefine n ∈ ℕ.\nAssume p(k) = a_k for all k ∈ {0, ..., n}, where each a_k ∈ R.\nAssume a_n ≠ 0.\nGoal:\nThere exists b ∈ R such that b ≠ 0 AND for all x ∈ ℕ, b * p(x) = 0.",
+    "formal_statement": "theorem exists_nonzero_annihilator (R : Type*) [Ring R] (p : ℕ → R) (hp : ∃ (n : ℕ) (a : ℕ → R), (∀ k ≤ n, p k = a k) ∧ a n ≠ 0) : ∃ b ∈ R, b ≠ 0 ∧ ∀ x : ℕ, b * p x = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.425 : Sort ?u.424) (Type u_1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nAssume p ≡ 1 mod 4.\nDefine t ∈ ℕ such that p = 4t + 1.\nLet a ∈ ℤ.\nAssume gcd(a, p) = 1.\nGoal:\na is a primitive root modulo p if and only if -a is a primitive root modulo p.",
+    "formal_statement": "theorem primitive_root_iff_neg_primitive_root (p : ℕ) (hp : Nat.Prime p) (hp_mod : p ≡ 1 [MOD 4]) (t : ℕ) (ht : p = 4 * t + 1) (a : ℤ) (ha : Int.gcd a p = 1) : IsPrimitiveRoot (a : ZMod p) p ↔ IsPrimitiveRoot (-a : ZMod p) p := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet P be a subgroup of G.\nAssume P is a Sylow p-subgroup of G.\nAssume P is normal in G.\nLet H be a subgroup of G.\nGoal:\nP ∩ H is the unique Sylow p-subgroup of H.",
+    "formal_statement": "theorem sylow_intersection_unique {G : Type*} [Group G] (P : Subgroup G) [hP : Sylow P] [Normal P] (H : Subgroup G) : IsSylow (Subgroup.carrier P ∩ Subgroup.carrier H) ∧ ∀ (Q : Subgroup H), IsSylow Q → Q = Subgroup.carrier P ∩ Subgroup.carrier H := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  Sylow P\nargument\n  P\nhas type\n  Subgroup G : Type u_1\nbut is expected to have type\n  ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ+ → ℝ.\nAssume f is differentiable on ℝ+.\nAssume lim_{x → +∞} f'(x) = 0.\nDefine g : ℝ+ → ℝ by g(x) = f(x + 1) - f(x).\nGoal:\nlim_{x → +∞} g(x) = 0.",
+    "formal_statement": "theorem limit_of_difference_quotient (f : ℝ → ℝ) (hf : DifferentiableOn ℝ f (Set.Ioi 0)) (hlim : Tendsto (fun x ↦ deriv f x) atTop (𝓝 0)) (g : ℝ → ℝ) (hg : ∀ x > 0, g x = f (x + 1) - f x) : Tendsto g atTop (𝓝 0) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately represents the assumptions: the function f is differentiable on the positive reals, the limit of its derivative as x approaches infinity is 0, and the function g is defined as the difference f(x + 1) - f(x). The conclusion that the limit of g(x) as x approaches infinity is 0 is also correctly stated. The types and constraints match the original problem, and the logical implication flows correctly from the hypotheses to the conclusion."
+  }
+]

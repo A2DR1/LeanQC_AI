@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "Assumptions:\nDefine w : ℤ × ℤ → ℤ as follows:\nFor all a, b in ℤ:\nIf |a| ≤ 2 AND |b| ≤ 2:\n- w(-2, -2) = -1\n- w(-2, -1) = -2\n- w(-2, 0) = 2\n- w(-2, 1) = -2\n- w(-2, 2) = -1\n- w(-1, -2) = -2\n- w(-1, -1) = 4\n- w(-1, 0) = -4\n- w(-1, 1) = 4\n- w(-1, 2) = -2\n- w(0, -2) = 2\n- w(0, -1) = -4\n- w(0, 0) = 12\n- w(0, 1) = -4\n- w(0, 2) = 2\n- w(1, -2) = -2\n- w(1, -1) = 4\n- w(1, 0) = -4\n- w(1, 1) = 4\n- w(1, 2) = -2\n- w(2, -2) = -1\n- w(2, -1) = -2\n- w(2, 0) = 2\n- w(2, 1) = -2\n- w(2, 2) = -1\nElse:\nw(a, b) = 0.\n\nLet S be a finite nonempty subset of ℤ × ℤ.\nDefine A(S) = sum over (s, s') in S × S of w(s - s').\n\nGoal:\nA(S) > 0.",
+    "formal_statement": "theorem A_positive (S : Finset (ℤ × ℤ)) (hS : S.Nonempty) : 0 < A S := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'A'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nLet a be an element of ℝ such that a < 1/4.\nFor each i in {1, ..., n}, let A_i be an event.\nFor each i in {1, ..., n}, assume the probability of A_i ≥ 1 - a.\nFor all i, j in {1, ..., n}, if |i - j| > 1, then A_i and A_j are mutually independent.\nDefine u : ℕ → ℝ as follows:\nu(0) = 1.\nu(1) = 1 - a.\nFor all k in ℕ, u(k + 1) = u(k) - a * u(k - 1).\nAssume for all k in {0, ..., n}, u(k) > 0.\nGoal:\nThe probability of the intersection of A_1, ..., A_n ≥ u(n).",
+    "formal_statement": "theorem probability_intersection_bound (n : ℕ) (a : ℝ) (ha : a < 1/4) (A : ℕ → Set ℝ) \n(hprob : ∀ i ∈ Finset.range n, ProbabilityTheory.ProbMeasure.prob (A (i + 1)) ≥ 1 - a) \n(hindep : ∀ i j ∈ Finset.range n, |(i + 1 : ℤ) - (j + 1)| > 1 → ProbabilityTheory.Indep (A (i + 1)) (A (j + 1))) \n(u : ℕ → ℝ) (hu0 : u 0 = 1) (hu1 : u 1 = 1 - a) \n(hurec : ∀ k : ℕ, u (k + 2) = u (k + 1) - a * u k) \n(hupos : ∀ k ≤ n, u k > 0) : \nProbabilityTheory.ProbMeasure.prob (⋂ i ∈ Finset.range n, A (i + 1)) ≥ u n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet g : ℝ → ℝ.\nAssume g is continuous on the closed interval [0,1].\nAssume g is twice differentiable on the open interval (0,1).\nLet r be a real number.\nAssume r > 1.\nAssume lim_{x → 0^+} (g(x) / x^r) = 0.\nGoal:\nEither lim_{x → 0^+} g'(x) = 0 OR limsup_{x → 0^+} (x^r * |g''(x)|) = ∞.",
+    "formal_statement": "theorem lim_or_limsup (g : ℝ → ℝ) (hcont : ContinuousOn g (Icc 0 1)) (hdiff : ∀ᶠ x in 𝓝[>] (0 : ℝ), DifferentiableAt ℝ g x) (hdiff2 : ∀ᶠ x in 𝓝[>] (0 : ℝ), DifferentiableAt ℝ (deriv g) x) (r : ℝ) (hr : r > 1) (hlim : Tendsto (fun x ↦ g x / x^r) (𝓝[>] 0) (𝓝 0)) : (Tendsto (deriv g) (𝓝[>] 0) (𝓝 0)) ∨ (Tendsto (fun x ↦ x^r * abs (deriv (deriv g) x)) (𝓝[>] 0) atTop) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The generated Lean theorem does not accurately capture the mathematical intent of the natural language statement. The natural language statement specifies that g is twice differentiable on the open interval (0,1), whereas the Lean theorem uses `DifferentiableAt` filters which do not precisely match the open interval condition. Additionally, the natural language statement uses `limsup` in the conclusion, but the Lean theorem uses `Tendsto` to `atTop`, which is not equivalent to `limsup` being infinity."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x : ℕ → ℤ.\nFor all k in ℕ where 1 ≤ k ≤ 2006, x(k) = k.\nFor all k in ℕ where k ≥ 2006, x(k+1) = x(k) + x(k-2005).\nGoal:\nThere exists n in ℕ such that for all m in ℕ where n ≤ m ≤ n+2004, 2006 divides x(m).",
+    "formal_statement": "theorem exists_periodic_divisibility : ∃ (n : ℕ), ∀ (m : ℕ), n ≤ m → m ≤ n + 2004 → 2006 ∣ x m := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'x'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a subset of ℝ.\nAssume S is closed under multiplication.\nLet T and U be subsets of S.\nAssume T ∩ U = ∅.\nAssume T ∪ U = S.\nAssume for every a, b, c in T, the product a * b * c is in T.\nAssume for every a, b, c in U, the product a * b * c is in U.\nGoal:\nEither T is closed under multiplication OR U is closed under multiplication.",
+    "formal_statement": "theorem subset_closed_under_mult_or {S : Set ℝ} (hS_mul : ∀ a b ∈ S, a * b ∈ S) (T U : Set S) \n(h_disj : Disjoint T U) (h_union : T ∪ U = S) \n(hT : ∀ a b c ∈ T, (a : ℝ) * b * c ∈ T) (hU : ∀ a b c ∈ U, (a : ℝ) * b * c ∈ U) : \n(∀ a b ∈ T, (a : ℝ) * b ∈ T) ∨ (∀ a b ∈ U, (a : ℝ) * b ∈ U) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is continuous on [0, 1].\nAssume f is increasing on [0, 1].\nAssume f is convex on [0, 1].\nAssume f(x) ≥ 0 for all x in [0, 1].\nDefine S_t = {f satisfying the above conditions AND f(1) - 2f(2/3) + f(1/3) ≥ t(f(2/3) - 2f(1/3) + f(0))}.\nGoal:\nS_t is closed under multiplication if and only if t ≤ 1.",
+    "formal_statement": "theorem S_t_closed_under_multiplication_iff_t_le_one (t : ℝ) :\n    (∀ (f g : ℝ → ℝ), ContinuousOn f (Set.Icc 0 1) → StrictMonoOn f (Set.Icc 0 1) → ConvexOn ℝ (Set.Icc 0 1) f →\n    (∀ x ∈ Set.Icc 0 1, 0 ≤ f x) → f 1 - 2 * f (2/3) + f (1/3) ≥ t * (f (2/3) - 2 * f (1/3) + f 0) →\n    ContinuousOn g (Set.Icc 0 1) → StrictMonoOn g (Set.Icc 0 1) → ConvexOn ℝ (Set.Icc 0 1) g →\n    (∀ x ∈ Set.Icc 0 1, 0 ≤ g x) → g 1 - 2 * g (2/3) + g (1/3) ≥ t * (g (2/3) - 2 * g (1/3) + g 0) →\n    ContinuousOn (f * g) (Set.Icc 0 1) ∧ StrictMonoOn (f * g) (Set.Icc 0 1) ∧ ConvexOn ℝ (Set.Icc 0 1) (f * g) ∧\n    (∀ x ∈ Set.Icc 0 1, 0 ≤ (f * g) x) ∧ (f * g) 1 - 2 * (f * g) (2/3) + (f * g) (1/3) ≥ t * ((f * g) (2/3) - 2 * (f * g) (1/3) + (f * g) 0)) ↔ t ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine A : {1, ..., n} × {1, ..., n} → ℝ.\nDefine B : {1, ..., n} × {1, ..., n} → ℝ.\nAssume A ≠ B.\nAssume for all i, j in {1, ..., n}, (A^3)(i,j) = (B^3)(i,j).\nAssume for all i, j in {1, ..., n}, (A^2 B)(i,j) = (B^2 A)(i,j).\nGoal:\nThe matrix A^2 + B^2 is not invertible.",
+    "formal_statement": "theorem matrix_non_invertible (n : ℕ) (A B : Matrix (Fin n) (Fin n) ℝ) (h_ne : A ≠ B) \n(h_cube_eq : ∀ i j, (A ^ 3) i j = (B ^ 3) i j) (h_comm : ∀ i j, (A ^ 2 * B) i j = (B ^ 2 * A) i j) : \n¬IsUnit (A ^ 2 + B ^ 2) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  A ^ (3 : (?m.8713 : Type ?u.8692))\nterm has type\n  (?m.8714 : outParam (Type ?u.8691))\nfunction expected at\n  B ^ (3 : (?m.9077 : Type ?u.9032))\nterm has type\n  (?m.9078 : outParam (Type ?u.9031))\nfunction expected at\n  A ^ (2 : (?m.9497 : Type ?u.9423)) * B\nterm has type\n  (?m.9529 : outParam (Type ?u.9419))\nfunction expected at\n  B ^ (2 : (?m.10017 : Type ?u.9905)) * A\nterm has type\n  (?m.10049 : outParam (Type ?u.9901))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet h be an element of ℕ.\nLet k be an element of ℕ.\nLet ε be an element of ℝ+.\nGoal:\nThere exist m in ℕ and n in ℕ such that ε < |h × √m - k × √n| AND |h × √m - k × √n| < 2 × ε.",
+    "formal_statement": "theorem exists_close_diophantine_approx (h k : ℕ) (ε : ℝ) (hε : ε > 0) : \n  ∃ m n : ℕ, ε < |(h : ℝ) * Real.sqrt ↑m - (k : ℝ) * Real.sqrt ↑n| ∧ \n  |(h : ℝ) * Real.sqrt ↑m - (k : ℝ) * Real.sqrt ↑n| < 2 * ε := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine u : ℕ → ℤ.\nDefine u(0) = 1.\nDefine u(1) = 1.\nDefine u(2) = 1.\nFor all n in ℕ, det([[u(n), u(n+1)], [u(n+2), u(n+3)]]) = factorial(n).\nGoal:\nFor all n in ℕ, u(n) is in ℤ.",
+    "formal_statement": "theorem u_in_Z (u : ℕ → ℤ) (h0 : u 0 = 1) (h1 : u 1 = 1) (h2 : u 2 = 1) (hdet : ∀ n : ℕ, Matrix.det (!![u n, u (n + 1); u (n + 2), u (n + 3)]) = Nat.factorial n) : ∀ n : ℕ, u n ∈ ℤ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership ℤ Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nLet r be an element of ℕ.\nDefine G as a subset of ℝ^(n×n).\nAssume the size of G = r.\nAssume for every M in G, M is invertible.\nAssume for every M1, M2 in G, matrix_product(M1, M2) is in G.\nAssume sum for i from 1 to r of trace(M_i) = 0.\nGoal:\nsum for i from 1 to r of M_i = zero_matrix(n).",
+    "formal_statement": "theorem matrix_sum_trace_zero_implies_zero_matrix (n r : ℕ) (G : Set (Matrix (Fin n) (Fin n) ℝ)) (hG_card : Nat.card G = r) (hG_inv : ∀ M ∈ G, IsUnit M) (hG_mul : ∀ M1 M2 ∈ G, M1 * M2 ∈ G) (h_trace_sum : ∑ i in Finset.range r, (trace (Nat.cast r ▸ (Nat.rec (fun _ => 0) (fun k rec => if k ∈ G then rec k + k else rec k) r))) = 0) : ∑ i in Finset.range r, (Nat.cast r ▸ (Nat.rec (fun _ => 0) (fun k rec => if k ∈ G then rec k + k else rec k) r)) = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a subset of ℝ × ℝ.\nAssume S is closed.\nAssume for every (x, y) in S, a < x < b where a, b are real numbers.\nDefine proj_y(S) = {y in ℝ | There exists x in ℝ such that (x, y) in S}.\nGoal:\nproj_y(S) is closed.",
+    "formal_statement": "theorem proj_y_closed (S : Set (ℝ × ℝ)) (hS_closed : IsClosed S) (a b : ℝ) (hS_bounded : ∀ (p : ℝ × ℝ), p ∈ S → a < p.1 ∧ p.1 < b) : IsClosed {y : ℝ | ∃ x, (x, y) ∈ S} := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet b be an element of ℕ with b ≥ 2.\nDefine a 3-digit palindrome in base b as a number n ∈ ℕ such that:\nn = d0 × b² + d1 × b + d0 where d0 ∈ {1, ..., b-1} and d1 ∈ {0, ..., b-1}.\nGoal:\nThere exists n ∈ ℕ such that for at least 2002 distinct values of b, n is a 3-digit palindrome in base b.",
+    "formal_statement": "theorem exists_palindrome_with_many_bases : ∃ n : ℕ, ∃ (B : Finset ℕ), B.card ≥ 2002 ∧ ∀ b ∈ B, b ≥ 2 ∧ ∃ (d0 d1 : ℕ), d0 ∈ Finset.Icc 1 (b - 1) ∧ d1 ∈ Finset.Icc 0 (b - 1) ∧ n = d0 * b^2 + d1 * b + d0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c be real numbers.\nDefine the cost function C : ℝ × ℝ → ℝ where C(a, b) = b³ - a b² for all a, b with b > a.\nDefine a jump sequence as a finite ordered set {x₀, x₁, ..., xₙ} where x₀ = 0, xₙ = 1, and for all i in {1, ..., n}, x_i > x_{i-1}.\nDefine the total cost of a jump sequence as the sum from i=1 to n of C(x_{i-1}, x_i).\nGoal:\nThe real number c satisfies 1/3 < c ≤ 1 AND there exists a jump sequence with total cost equal to c.",
+    "formal_statement": "theorem exists_jump_sequence_with_cost (c : ℝ) : (1/3 < c ∧ c ≤ 1) ↔ ∃ (n : ℕ) (xs : Fin (n + 1) → ℝ), (∀ (i : Fin n), xs (Fin.castSucc i) < xs (Fin.succ i)) ∧ xs 0 = 0 ∧ xs (Fin.last n) = 1 ∧ (∑ i : Fin n, (xs (Fin.succ i))^3 - xs (Fin.castSucc i) * (xs (Fin.succ i))^2) = c := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'i'\nunknown identifier 'i'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S = {1, 2, 3, 4, 5, 6, 7, 8, 9}.\nLet π be a partition of S.\nLet π' be a partition of S.\nFor every x in S, define π(x) as the size of the part in π containing x.\nFor every x in S, define π'(x) as the size of the part in π' containing x.\nGoal:\nThere exist x, y in S such that x ≠ y AND π(x) = π(y) AND π'(x) = π'(y).",
+    "formal_statement": "theorem exists_shared_part_sizes (S : Finset ℕ) (hS : S = {1, 2, 3, 4, 5, 6, 7, 8, 9}) (π π' : Setoid (↑S)) : ∃ (x y : ↑S), x ≠ y ∧ Setoid.Class.card (Setoid.mkClasses π h) x = Setoid.Class.card (Setoid.mkClasses π h) y ∧ Setoid.Class.card (Setoid.mkClasses π' h') x = Setoid.Class.card (Setoid.mkClasses π' h') y := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'π'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℕ.\nAssume for all n in ℕ, a(n) < a(n+1).\nDefine b : ℕ → ℕ.\nFor all n in ℕ, define b(n) = lcm(a(1), a(2), ..., a(n)).\nGoal:\nThe sum from n=1 to ∞ of (1 / b(n)) converges.",
+    "formal_statement": "theorem sum_one_div_b_converges (a : ℕ → ℕ) (ha : ∀ n, a n < a (n + 1)) (b : ℕ → ℕ) (hb : ∀ n, b n = Finset.lcm (Finset.range (n + 1)) (a ∘ Nat.succ)) : Summable fun n => (1 : ℝ) / b n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines sequences `a` and `b` with the specified properties and correctly states the goal that the sum of `1 / b(n)` converges. The types and constraints are appropriately matched, and the logical implication flows correctly from the assumptions to the conclusion."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be in ℕ.\nLet n be in ℕ.\nDefine the grid as G = {1, ..., m} × {1, ..., n}.\nFor each (i,j) in G, define c(i,j) as a random variable in {0,1}, where 0 represents black and 1 represents red.\nAssume for each (i,j) in G, P(c(i,j) = 0) = 1/2 and P(c(i,j) = 1) = 1/2, independently.\nDefine R as the set of all connected monochromatic regions in G.\nGoal:\nThe expected value of the size of R is greater than (m * n) / 8.",
+    "formal_statement": "theorem expected_connected_regions_size (m n : ℕ) :\n  let G := Finset.product (Finset.range m) (Finset.range n);\n  ∀ (c : ℕ × ℕ → ℕ), (∀ (i j : ℕ), (i, j) ∈ G → c (i, j) ∈ {0, 1}) →\n  (∀ (i j : ℕ), (i, j) ∈ G → ProbabilityTheory.ℙ (c (i, j) = 0) = 1/2 ∧ ProbabilityTheory.ℙ (c (i, j) = 1) = 1/2) →\n  ProbabilityTheory.ProbabilityMeasure.indepFun (Prod.fst ∘ c) (Prod.snd ∘ c) →\n  let R := {S : Set (ℕ × ℕ) | ∃ (color : ℕ), (∀ p ∈ S, c p = color) ∧ IsConnected S};\n  (∑ r in R, Finset.card r) > (m * n) / 8 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'ProbabilityTheory.ℙ'\nunknown identifier 'ProbabilityTheory.ℙ'\nunknown identifier 'ProbabilityTheory.ProbabilityMeasure.indepFun'\nfailed to synthesize instance\n  Fintype ↑R",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is continuously differentiable.\nAssume for all x in ℝ, (f(x))^2 = integral from 0 to x of [(f(t))^2 + (f'(t))^2] dt + 1990.\n\nGoal:\nf(x) = √1990 * e^x OR f(x) = -√1990 * e^x.",
+    "formal_statement": "theorem diff_eq_solution (f : ℝ → ℝ) (hf : ContDiff ℝ 1 f) (h : ∀ x, f x ^ 2 = ∫ t in 0..x, (f t ^ 2 + (deriv f t) ^ 2) + 1990) : ∀ x, f x = Real.sqrt 1990 * Real.exp x ∨ f x = -Real.sqrt 1990 * Real.exp x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'x', the environment does not contain 'Float.x'\n  0.\nhas type\n  Float",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c, d be elements of ℤ.\nDefine S = {a, b, c, d}.\nAssume min(S) is arbitrarily large.\nGoal:\na² + b² + c² + d² = a*b*c + a*b*d + a*c*d + b*c*d.",
+    "formal_statement": "theorem sum_of_squares_eq_sum_of_products (a b c d : ℤ) (S : Finset ℤ) (hS : S = {a, b, c, d}) (hmin : ∀ N : ℤ, ∃ x ∈ S, x ≥ N) : a^2 + b^2 + c^2 + d^2 = a*b*c + a*b*d + a*c*d + b*c*d := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes the assumptions that a, b, c, d are integers and defines the set S as {a, b, c, d}. The condition 'min(S) is arbitrarily large' is formalized as '∀ N : ℤ, ∃ x ∈ S, x ≥ N', which means that for any integer N, there exists an element in S that is at least N, effectively making the minimum element of S arbitrarily large. The goal, which is the equation a² + b² + c² + d² = a*b*c + a*b*d + a*c*d + b*c*d, is correctly stated in the theorem."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet v1, ..., v12 be elements of ℝ × ℝ × ℝ.\nAssume for every i in {1, ..., 12}, norm(vi) = 1.\nAssume the set {v1, ..., v12} forms the vertices of a regular icosahedron centered at the origin.\nLet v be an element of ℝ × ℝ × ℝ.\nLet ε be a real number with ε > 0.\nGoal:\nThere exist integers a1, ..., a12 in ℤ such that norm(a1*v1 + ... + a12*v12 - v) < ε.",
+    "formal_statement": "theorem exists_integer_combination_approximation (v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 : ℝ × ℝ × ℝ) (hv1 : ∀ i ∈ ({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12} : Set (ℝ × ℝ × ℝ)), norm i = 1) (hico : IsIcosahedronSet {v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12}) (v : ℝ × ℝ × ℝ) (ε : ℝ) (hε : ε > 0) : ∃ (a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 : ℤ), norm (a1 • v1 + a2 • v2 + a3 • v3 + a4 • v4 + a5 • v5 + a6 • v6 + a7 • v7 + a8 • v8 + a9 • v9 + a10 • v10 + a11 • v11 + a12 • v12 - v) < ε := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsIcosahedronSet'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine A as a matrix in ℤ^(2×2) where A = [[3, 2], [4, 3]].\nDefine I as the identity matrix in ℤ^(2×2) where I = [[1, 0], [0, 1]].\nDefine d_n as the greatest common divisor of all entries in (A^n - I).\nGoal:\nThe limit of d_n as n approaches infinity is infinity.",
+    "formal_statement": "theorem limit_of_gcd_diverges (n : ℕ) (A : Matrix (Fin 2) (Fin 2) ℤ) (hA : A = !![3, 2; 4, 3]) (I : Matrix (Fin 2) (Fin 2) ℤ) (hI : I = !![1, 0; 0, 1]) (dₙ : ℕ) (hdₙ : dₙ = Nat.gcd ((A ^ n - I) 0 0) ((A ^ n - I) 0 1)) : Filter.Tendsto (fun n => ↑dₙ) Filter.atTop Filter.atTop := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  Nat.gcd ((A ^ n - I) (0 : Fin (2 : ℕ)) (0 : Fin (2 : ℕ)))\nargument\n  (A ^ n - I) (0 : Fin (2 : ℕ)) (0 : Fin (2 : ℕ))\nhas type\n  ℤ : Type\nbut is expected to have type\n  ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p : ℝ → ℝ.\nAssume p is a polynomial of degree 4.\nAssume for all x in [-1, 1], p(x) is in [0, 1].\nGoal:\np(x) = 4x^4 - 4x^2 + 1.",
+    "formal_statement": "theorem polynomial_identity (p : ℝ → ℝ) (hp : Polynomial.degree (Polynomial.ofFinsupp (Polynomial.toFinsupp p)) = 4) (h : ∀ x ∈ Set.Icc (-1 : ℝ) 1, p x ∈ Set.Icc 0 1) : ∀ x, p x = 4 * x^4 - 4 * x^2 + 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "typeclass instance problem is stuck, it is often due to metavariables\n  Semiring (?m.134 : Type ?u.133)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be an element of ℕ.\nLet n be an element of ℕ.\nAssume n ≥ m ≥ 1.\nDefine d = gcd(m, n).\nView d as a real number.\nGoal:\n(d / n) * binomial(n, m) is an element of ℕ.",
+    "formal_statement": "theorem binomial_gcd_div_n_nat (m n : ℕ) (h : n ≥ m ∧ m ≥ 1) : ↑(Nat.gcd m n) / ↑n * ↑(Nat.choose n m) ∈ ℕ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.45 : outParam (Type ?u.44)) Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine A : {1, ..., n} × {1, ..., n} → ℚ such that for all i, j in {1, ..., n}, A(i, j) = 1 / min(i, j).\nGoal:\ndet(A) = (-1)^(n-1) / (factorial(n-1) * factorial(n)).",
+    "formal_statement": "theorem determinant_special_matrix (n : ℕ) : Matrix.det (fun (i j : Fin n) => (1 : ℚ) / min (↑i + 1) (↑j + 1)) = (-1 : ℚ)^(n - 1) / (Nat.factorial (n - 1) * Nat.factorial n) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HAdd (Fin n) ℕ ℚ\nfailed to synthesize instance\n  HAdd (Fin n) ℕ ℚ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℕ be the set of natural numbers.\nLet ℤ be the set of integers.\nDefine A = {n ∈ ℕ | 1 ≤ n ≤ 2021 AND gcd(n, 2021) = 1}.\nFor every j ∈ ℕ ∪ {0}, define S(j) = sum_{n ∈ A} n^j.\nDefine p = 43.\nDefine q = 47.\nAssume 2021 = p × q.\nGoal:\nS(j) ≡ 0 mod 2021 if and only if j ≢ 0 mod 42 AND j ≢ 0 mod 46.",
+    "formal_statement": "theorem sum_powers_mod_condition (j : ℕ) :\n  let A := {n : ℕ | 1 ≤ n ∧ n ≤ 2021 ∧ Nat.gcd n 2021 = 1};\n  let S := fun j => ∑ n in A, n ^ j;\n  let p := 43;\n  let q := 47;\n  p * q = 2021 →\n  (S j ≡ 0 [MOD 2021] ↔ j % 42 ≠ 0 ∧ j % 46 ≠ 0) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑A",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ.\nAssume n ≥ 2.\nDefine S as the set of all sequences s : {1, ..., n-1} → {-1, 1}.\nFor each s in S, define f(s) as follows:\nLet P be the set of all permutations of {1, ..., n}.\nFor each p in P, view p as a function p : {1, ..., n} → ℕ.\nDefine f(s) = count of p in P such that for all i in {1, ..., n-1}, s(i) * (p(i+1) - p(i)) > 0.\n\nGoal:\nFor all s in S, f(s) ≤ f(s*) where s* is defined by either:\n1. For all i in {1, ..., n-1}, s*(i) = (-1)^(i+1), OR\n2. For all i in {1, ..., n-1}, s*(i) = (-1)^i.\nMoreover, f(s) = f(s*) if and only if s equals s* under one of these two definitions.",
+    "formal_statement": "theorem sequence_count_bound (n : ℤ) (hn : n ≥ 2) :\n  let S := {s : Fin (Int.toNat (n - 1)) → ℤ | ∀ i, s i = 1 ∨ s i = -1};\n  let P := Equiv.Perm (Fin (Int.toNat n));\n  let f (s : Fin (Int.toNat (n - 1)) → ℤ) := Fintype.card {p : P | ∀ i, s i * (↑(p (Fin.succ i)) - ↑(p i)) > 0};\n  let s_star1 (i : Fin (Int.toNat (n - 1))) := (-1 : ℤ) ^ (↑i + 1);\n  let s_star2 (i : Fin (Int.toNat (n - 1))) := (-1 : ℤ) ^ (↑i);\n  ∀ s ∈ S, f s ≤ f s_star1 ∧ f s ≤ f s_star2 ∧ (f s = f s_star1 ∨ f s = f s_star2 ↔ s = s_star1 ∨ s = s_star2) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  p i.succ\nargument\n  i.succ\nhas type\n  Fin (n - (1 : ℤ)).toNat.succ : Type\nbut is expected to have type\n  Fin n.toNat : Type\napplication type mismatch\n  p i\nargument\n  i\nhas type\n  Fin (n - (1 : ℤ)).toNat : Type\nbut is expected to have type\n  Fin n.toNat : Type\nfailed to synthesize instance\n  HPow ℤ (Fin (n - (1 : ℤ)).toNat) ℤ\nfailed to synthesize instance\n  OfNat (Fin (n - (1 : ℤ)).toNat) (nat_lit 1)\nfailed to synthesize instance\n  HPow ℤ (Fin (n - (1 : ℤ)).toNat) ℤ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as an element of ℕ.\nDefine x as an element of ℝⁿ.\nFor each i in {1, ..., n}, define f_i : ℝⁿ → ℝ.\nAssume for each i, j in {1, ..., n}, the second-order partial derivatives of f_i exist and are continuous.\nDefine c as a matrix in ℝ^(n×n).\nAssume for all i, j in {1, ..., n}, ∂f_i/∂x_j - ∂f_j/∂x_i = c_{i,j}.\nGoal:\nThere exists a function g : ℝⁿ → ℝ such that for all i in {1, ..., n}, f_i + ∂g/∂x_i is linear.",
+    "formal_statement": "theorem exists_potential_function (n : ℕ) (x : Fin n → ℝ) (f : Fin n → (Fin n → ℝ) → ℝ) \n  (hf : ∀ i j, ContDiff ℝ 2 (f i)) (c : Matrix (Fin n) (Fin n) ℝ) \n  (hc : ∀ i j, (fun x => fderiv ℝ (f i) x (Pi.single j 1)) - (fun x => fderiv ℝ (f j) x (Pi.single i 1)) = fun _ => c i j) :\n  ∃ g : (Fin n → ℝ) → ℝ, ∀ i, (fun x => f i x + fderiv ℝ g x (Pi.single i 1)) ∈ LinearMap.module ℝ ℝ ℝ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  LinearMap.module\nterm has type\n  Module (?m.2747 : Type ?u.2742)\n    ((?m.2748 : Type ?u.2743) →ₛₗ[(?m.2756 : (?m.2745 : Type ?u.2740) →+* (?m.2746 : Type ?u.2741))]\n      (?m.2749 : Type ?u.2744))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x, y, z as real numbers.\nDefine r = sqrt(x^2 + y^2).\nDefine the region R = {(x, y, z) ∈ ℝ × ℝ × ℝ | (x^2 + y^2 + z^2 + 8)^2 ≤ 36(x^2 + y^2)}.\nGoal:\nThe volume of R = 6π^2.",
+    "formal_statement": "theorem volume_calculation (x y z : ℝ) (r := Real.sqrt (x^2 + y^2)) (R : Set (ℝ × ℝ × ℝ) := {p : ℝ × ℝ × ℝ | (p.1^2 + p.2.1^2 + p.2.2^2 + 8)^2 ≤ 36 * (p.1^2 + p.2.1^2)}) : volume R = 6 * Real.pi^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'volume'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet r be a real number in ℝ⁺.\nDefine G : ℝ⁺ → ℝ as follows:\nFor each r in ℝ⁺, define G(r) = min{|r - √(m² + 2n²)| | m ∈ ℤ, n ∈ ℤ}.\nGoal:\nThe limit as r approaches infinity of G(r) exists and equals 0.",
+    "formal_statement": "theorem limit_G_zero : ∃ (G : ℝ≥0 → ℝ), (∀ (r : ℝ≥0), G r = Inf {|(r : ℝ) - Real.sqrt (↑(m^2) + 2 * ↑(n^2))| | (m : ℤ) (n : ℤ)}) ∧ Filter.Tendsto G Filter.atTop (nhds 0) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  LE Type\nfailed to synthesize instance\n  LE Type\nfailed to synthesize instance\n  OfNat Type (nat_lit 0)\nfailed to synthesize instance\n  OfNat Type (nat_lit 0)\nfailed to synthesize instance\n  HPow ℤ ℕ ℝ\nfailed to synthesize instance\n  HPow ℤ ℕ ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet N be a natural number.\nAssume N is divisible by 2020.\nAssume the number of decimal digits of N ≤ 2020.\nAssume there exist natural numbers k, m such that:\n- The first k digits of N are 1.\n- The remaining m digits of N are 0.\n- k + m ≤ 2020.\nDefine f(k, m) = (10^k - 1)/9 * 10^m.\nGoal:\nThe number of pairs (k, m) such that f(k, m) ≡ 0 mod 2020 AND k + m ≤ 2020 is 508536.",
+    "formal_statement": "theorem count_special_pairs : ∃ N : ℕ, (2020 ∣ N) ∧ (Nat.log10 N + 1 ≤ 2020) ∧ \n  (∃ k m : ℕ, (Nat.digits 10 N).take k = List.replicate k 1 ∧ \n              (Nat.digits 10 N).drop k = List.replicate m 0 ∧ \n              k + m ≤ 2020) ∧ \n  Finset.card (Finset.filter (fun (k, m) => (Nat.div (10^k - 1) 9 * 10^m) % 2020 = 0 ∧ k + m ≤ 2020) \n    (Finset.product (Finset.range 2021) (Finset.range 2021))) = 508536 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Nat.log10'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet C₀ : ℝ⁺ → {red, blue} be a function.\nDefine D₀ = {d ∈ ℝ⁺ | ∃x, y ∈ ℝ⁺ such that C₀(x) = C₀(y) AND distance(x, y) = d}.\nDefine C₁ : ℝ⁺ → {red, blue} such that for all z ∈ ℝ⁺, C₁(z) = red if z ∈ D₀, else C₁(z) = blue.\nFor n ∈ ℕ, recursively define Dₙ = {d ∈ ℝ⁺ | ∃x, y ∈ ℝ⁺ such that Cₙ(x) = Cₙ(y) AND distance(x, y) = d}.\nDefine Cₙ₊₁ : ℝ⁺ → {red, blue} such that for all z ∈ ℝ⁺, Cₙ₊₁(z) = red if z ∈ Dₙ, else Cₙ₊₁(z) = blue.\nGoal:\nThere exists N ∈ ℕ such that for all z ∈ ℝ⁺, C_N(z) = red.",
+    "formal_statement": "theorem color_stabilizes (C₀ : ℝ⁺ → Fin 2) :\n  ∃ (N : ℕ), ∀ (z : ℝ⁺), (Nat.rec (fun n Cₙ => fun z => if ∃ (x y : ℝ⁺), Cₙ x = Cₙ y ∧ dist x y = z then 0 else 1) C₀ N) z = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Lattice Type\nfailed to synthesize instance\n  Lattice Type\nfailed to elaborate eliminator, expected type is not available",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ → ℝ as a polynomial function.\nDefine Q : ℝ → ℝ by Q(x) = (x² + 1) * P(x) * P'(x) + x * (P(x)² + P'(x)²).\nAssume P has n distinct real roots r₁, ..., rₙ where for all i ∈ {1, ..., n}, rᵢ > 1.\nGoal:\nQ has at least 2n - 1 distinct real roots.",
+    "formal_statement": "theorem polynomial_roots_count (P : ℝ → ℝ) [Polynomial P] (Q : ℝ → ℝ) (hQ : ∀ x, Q x = (x^2 + 1) * P x * Polynomial.derivative P x + x * (P x^2 + (Polynomial.derivative P x)^2)) (n : ℕ) (roots : Finset ℝ) (hroots : ∀ r ∈ roots, P r = 0 ∧ r > 1) (hdistinct : Function.Injective (fun r : roots => (r : ℝ))) (hcard : Finset.card roots = n) : ∃ (s : Finset ℝ), (∀ q ∈ s, Q q = 0) ∧ Function.Injective (fun q : s => (q : ℝ)) ∧ Finset.card s ≥ 2 * n - 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  @Polynomial P\nargument\n  P\nhas type\n  ℝ → ℝ : Type\nbut is expected to have type\n  Type ?u.6 : Type (?u.6 + 1)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number with n ≥ 1995.\nDefine M as a 3 × n matrix where each column is a permutation of (1, 2, 3) chosen uniformly at random.\nDefine a, b, c as the row sums of M.\nAssume a ≤ b ≤ c after rearrangement.\nGoal:\nThe probability that (b = a + 1 AND c = a + 2) is at least 4 times the probability that (a = b = c).",
+    "formal_statement": "theorem probability_bound (n : ℕ) (hn : n ≥ 1995) :\n  let M := Matrix (Fin 3) (Fin n) ℕ\n  let perm := {f : Fin 3 → Fin 3 | Function.Bijective f}\n  let μ := ProbabilityTheory.measureOfProbabilitySpace (Fin n → perm)\n  let a b c : ℕ := (Finset.sum Finset.univ fun j => M 0 j, Finset.sum Finset.univ fun j => M 1 j, Finset.sum Finset.univ fun j => M 2 j)\n  let sorted := List.sort (· ≤ ·) [a, b, c]\n  let a' := sorted.get 0\n  let b' := sorted.get 1\n  let c' := sorted.get 2\n  μ {M | b' = a' + 1 ∧ c' = a' + 2} ≥ 4 * μ {M | a' = b' ∧ b' = c'} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'ProbabilityTheory.measureOfProbabilitySpace'\nfunction expected at\n  M\nterm has type\n  Type\nfunction expected at\n  M\nterm has type\n  Type\nfunction expected at\n  M\nterm has type\n  Type\nunknown constant 'List.sort'\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  sorted\nhas type\n  (?m.7340 :\n    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n    let μ :\n      (?m.7337 :\n        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n        Sort ?u.76) :=\n      sorryAx\n        (?m.7337 :\n          let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n          let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n          Sort ?u.76)\n        true;\n    let a :\n      (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79)) →\n        (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b →\n          ℕ :=\n      fun\n        (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79))\n        (c :\n          (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b) =>\n      sorryAx ℕ true;\n    Sort ?u.6600)\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  sorted\nhas type\n  (?m.7340 :\n    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n    let μ :\n      (?m.7337 :\n        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n        Sort ?u.76) :=\n      sorryAx\n        (?m.7337 :\n          let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n          let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n          Sort ?u.76)\n        true;\n    let a :\n      (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79)) →\n        (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b →\n          ℕ :=\n      fun\n        (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79))\n        (c :\n          (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b) =>\n      sorryAx ℕ true;\n    Sort ?u.6600)\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  sorted\nhas type\n  (?m.7340 :\n    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n    let μ :\n      (?m.7337 :\n        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n        Sort ?u.76) :=\n      sorryAx\n        (?m.7337 :\n          let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n          let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n          Sort ?u.76)\n        true;\n    let a :\n      (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79)) →\n        (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b →\n          ℕ :=\n      fun\n        (b :\n          (?m.7338 :\n            let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n            let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n            let μ :\n              (?m.7337 :\n                let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                Sort ?u.76) :=\n              sorryAx\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76)\n                true;\n            Sort ?u.79))\n        (c :\n          (?m.7339 :\n              let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n              let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n              let μ :\n                (?m.7337 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  Sort ?u.76) :=\n                sorryAx\n                  (?m.7337 :\n                    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                      {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                    Sort ?u.76)\n                  true;\n              (?m.7338 :\n                  let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                  let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                  let μ :\n                    (?m.7337 :\n                      let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                      let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                        {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                      Sort ?u.76) :=\n                    sorryAx\n                      (?m.7337 :\n                        let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n                        let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) :=\n                          {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n                        Sort ?u.76)\n                      true;\n                  Sort ?u.79) →\n                Sort ?u.82)\n            b) =>\n      sorryAx ℕ true;\n    Sort ?u.6600)\nfunction expected at\n  μ\nterm has type\n  (?m.7337 :\n    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n    Sort ?u.76)\nfunction expected at\n  μ\nterm has type\n  (?m.7337 :\n    let M : Type := Matrix (Fin (3 : ℕ)) (Fin n) ℕ;\n    let perm : Set (Fin (3 : ℕ) → Fin (3 : ℕ)) := {f : Fin (3 : ℕ) → Fin (3 : ℕ) | Function.Bijective f};\n    Sort ?u.76)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a sequence P : ℕ → ℚ as follows:\nFor each n ≥ 2, define P(n) = ∏_{k=2}^n ((k^3 - 1)/(k^3 + 1)).\n\nGoal:\nThe limit of P(n) as n approaches infinity = 2/3.",
+    "formal_statement": "theorem limit_of_product_sequence : Filter.Tendsto (fun n : ℕ ↦ ∏ k in Finset.range (n + 1 - 2), ((↑(k + 2) : ℚ)^3 - 1) / ((↑(k + 2) : ℚ)^3 + 1)) Filter.atTop (nhds (2/3 : ℚ)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines a sequence P(n) as a product from k=2 to n of ((k^3 - 1)/(k^3 + 1)) and states that the limit of P(n) as n approaches infinity is 2/3. The theorem uses the correct types (ℕ → ℚ) and correctly formalizes the product and limit concepts. The adaptation from the natural language 'for each n ≥ 2' to the Lean code using Finset.range (n + 1 - 2) and adjusting the index by +2 is a correct and necessary adaptation to match Lean's indexing conventions."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is integrable on [0,1].\nAssume for all i in {0, ..., n-1}, the integral from 0 to 1 of (x^i * f(x)) dx = 0.\nAssume the integral from 0 to 1 of (x^n * f(x)) dx = 1.\nGoal:\nThere exists a subset S of [0,1] with positive measure such that for all x in S, |f(x)| ≥ 2^n * (n+1).",
+    "formal_statement": "theorem exists_subset_with_lower_bound (f : ℝ → ℝ) (hf : MeasureTheory.IntegrableOn f (Set.Icc 0 1)) \n  (h_zero : ∀ (i : ℕ), i < n → ∫ x in 0..1, x^i * f x = 0) \n  (h_one : ∫ x in 0..1, x^n * f x = 1) : \n  ∃ (S : Set ℝ), MeasurableSet S ∧ ↑(MeasureTheory.volume S) > 0 ∧ ∀ x ∈ S, |f x| ≥ 2^n * (n + 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'n'\nunknown identifier 'n'\nunknown identifier 'n'\nunknown identifier 'n'\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\n(kernel) declaration has metavariables 'exists_subset_with_lower_bound'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine S as a subset of ℝ × ℝ × ℝ.\nAssume the size of S = n.\nAssume for every p in S, p = (x, y, z) where x² + y² + z² = 1.\nGoal:\nThe sum over all pairs (p, q) in S × S where p ≠ q of distance(p, q)² ≤ n².",
+    "formal_statement": "theorem sum_dist_sq_le_n_sq (n : ℕ) (S : Set (ℝ × ℝ × ℝ)) (hS : Nat.card S = n) \n  (hS_sphere : ∀ p ∈ S, ∃ x y z, p = (x, y, z) ∧ x^2 + y^2 + z^2 = 1) : \n  ∑ p in S.toFinset, ∑ q in S.toFinset, if p ≠ q then dist p q ^ 2 else 0 ≤ n^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑S\nfailed to synthesize instance\n  Fintype ↑S\nfailed to synthesize instance\n  AddCommMonoid Prop\nfailed to synthesize instance\n  AddCommMonoid Prop\nfailed to synthesize instance\n  HPow ℝ ℕ Prop",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine c : {1, ..., n} → ℕ where c is uniformly distributed.\nDefine d : {1, ..., n} → ℕ where d is uniformly distributed.\nDefine p_n as the probability that c + d is a perfect square.\nGoal:\nThe limit as n approaches infinity of p_n * sqrt(n) = (4/3) * (sqrt(2) - 1).",
+    "formal_statement": "theorem limit_prob_sum_uniform_perfect_square (n : ℕ) (c d : Fin n → ℕ) [UniformDistrib c] [UniformDistrib d] : \n    Tendsto (fun n ↦ (probability (fun x ↦ ∃ k, c x + d x = k ^ 2) * Real.sqrt ↑n)) atTop (nhds ((4/3) * (Real.sqrt 2 - 1))) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'UniformDistrib'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine S = {(r, s) ∈ ℕ × ℕ | r ≥ 0 AND s ≥ 0}.\nFor each (r, s) in S, define a(r, s) = 2^r * 3^s.\nGoal:\nThere exists a subset T of S such that:\n1. Sum over (r, s) in T of a(r, s) = n.\n2. For all (r1, s1), (r2, s2) in T, if (r1, s1) ≠ (r2, s2), then a(r1, s1) does not divide a(r2, s2).",
+    "formal_statement": "theorem exists_subset_sum_with_non_divisible_elements (n : ℕ) :\n  ∃ T ⊆ {p : ℕ × ℕ | p.1 ≥ 0 ∧ p.2 ≥ 0},\n    (∑ p in T, 2^p.1 * 3^p.2 = n) ∧\n    (∀ (p₁ p₂ : ℕ × ℕ), p₁ ∈ T → p₂ ∈ T → p₁ ≠ p₂ → ¬(2^p₁.1 * 3^p₁.2 ∣ 2^p₂.1 * 3^p₂.2)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑T\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  p\nhas type\n  (?m.2699 : Set (ℕ × ℕ) → Type ?u.94) T\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  p\nhas type\n  (?m.2699 : Set (ℕ × ℕ) → Type ?u.94) T",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c, d be elements of ℕ.\nAssume a + c ≤ 1982.\nAssume a / b + c / d < 1.\nGoal:\n1 - (a / b) - (c / d) > 1 / (1983^3).",
+    "formal_statement": "theorem nat_frac_inequality (a b c d : ℕ) (h₁ : a + c ≤ 1982) (h₂ : ↑a / ↑b + ↑c / ↑d < (1 : ℝ)) : 1 - ↑a / ↑b - ↑c / ↑d > 1 / (1983 ^ 3) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a natural number with m ≥ 3.\nDefine N = binomial(m, 3).\nDefine a : {(i,j,k) ∈ ℕ³ | 1 ≤ i < j < k ≤ m} → ℝ.\nAssume for all points A₁, ..., Aₘ in ℝ², the sum over all 1 ≤ i < j < k ≤ m of a(i,j,k) · Area(ΔAᵢAⱼAₖ) ≥ 0.\nGoal:\nFor all points B₁, ..., Bₘ in ℝ³, the sum over all 1 ≤ i < j < k ≤ m of a(i,j,k) · Area(ΔBᵢBⱼBₖ) ≥ 0.",
+    "formal_statement": "theorem area_sum_nonnegative (m : ℕ) (hm : m ≥ 3) (N : ℕ := Nat.choose m 3) (a : {p : ℕ × ℕ × ℕ // 1 ≤ p.1 ∧ p.1 < p.2 ∧ p.2 < p.3 ∧ p.3 ≤ m} → ℝ) (ha : ∀ (A : Fin m → ℝ × ℝ), ∑ (p : {p : ℕ × ℕ × ℕ // 1 ≤ p.1 ∧ p.1 < p.2 ∧ p.2 < p.3 ∧ p.3 ≤ m}), a p • EuclideanGeometry.area (A ⟨p.1.1, sorry⟩) (A ⟨p.1.2, sorry⟩) (A ⟨p.1.3, sorry⟩) ≥ 0) : ∀ (B : Fin m → ℝ × ℝ × ℝ), ∑ (p : {p : ℕ × ℕ × ℕ // 1 ≤ p.1 ∧ p.1 < p.2 ∧ p.2 < p.3 ∧ p.3 ≤ m}), a p • EuclideanGeometry.area (B ⟨p.1.1, sorry⟩) (B ⟨p.1.2, sorry⟩) (B ⟨p.1.3, sorry⟩) ≥ 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\nunknown identifier 'EuclideanGeometry.area'\ninvalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  p\nhas type\n  ℕ × ℕ × ℕ\nunknown identifier 'EuclideanGeometry.area'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is differentiable on [0,1].\nAssume f' is continuous on [0,1].\nAssume ∫₀¹ f(x) dx = 0.\nLet α be an element of (0,1).\nDefine M = max{|f'(x)| | x ∈ [0,1]}.\nGoal:\n|∫₀ᵅ f(x) dx| ≤ (1/8) * M.",
+    "formal_statement": "theorem integral_bound (f : ℝ → ℝ) (hdiff : DifferentiableOn ℝ f (Set.Icc 0 1)) (hcont : ContinuousOn (deriv f) (Set.Icc 0 1)) (hint : ∫ x in 0..1, f x = 0) (α : ℝ) (hα : α ∈ Set.Ioo 0 1) : |∫ x in 0..α, f x| ≤ (1/8) * Real.sSup (Set.image (fun x => |deriv f x|) (Set.Icc 0 1)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Real.sSup'\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ninvalid field 'α', the environment does not contain 'Float.α'\n  0.\nhas type\n  Float\n(kernel) declaration has metavariables 'integral_bound'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a natural number.\nDefine X as the set {1, 2, ..., n}.\nLet k be an element of X.\nDefine f as a function from X to X.\nFor every x in X, there exists a natural number j such that f^(j)(x) ≤ k, where f^(0)(x) = x and f^(j+1)(x) = f(f^(j)(x)).\nGoal:\nThe number of such functions f is equal to k multiplied by n raised to the power (n - 1).",
+    "formal_statement": "theorem count_functions_with_iterate_condition (n : ℕ) (X : Finset ℕ := Finset.range n) (k : ℕ) (hk : k ∈ X) (f : ℕ → ℕ) :\n  (∀ x ∈ X, ∃ j : ℕ, (Nat.iterate f j x) ≤ k) → Fintype.card {f : ℕ → ℕ | ∀ x ∈ X, ∃ j : ℕ, (Nat.iterate f j x) ≤ k} = k * n^(n - 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑{f : ℕ → ℕ | ∀ x ∈ X, ∃ (j : ℕ), f^[j] x ≤ k}",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℝ+.\nFor all n in ℕ, assume 0 < a(n) ≤ a(2n) + a(2n+1).\nGoal:\nThe sum from n=1 to ∞ of a(n) diverges.",
+    "formal_statement": "theorem sum_diverges (a : ℕ → ℝ≥0) (h : ∀ n : ℕ, 0 < a n ∧ a n ≤ a (2 * n) + a (2 * n + 1)) : ¬Summable a := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  LE Type\nfailed to synthesize instance\n  OfNat Type (nat_lit 0)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a group.\nLet A be an element of G.\nLet B be an element of G.\nAssume ABA = BA²B.\nAssume A³ = 1.\nLet n be an element of ℕ.\nAssume B^(2n-1) = 1.\nGoal:\nB = 1.",
+    "formal_statement": "theorem group_identity {G : Type*} [Group G] (A B : G) (h1 : A * B * A = B * A^2 * B) (h2 : A^3 = 1) (n : ℕ) (h3 : B^(2 * n - 1) = 1) : B = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A, B, C, D be distinct elements of ℝ × ℝ.\nAssume no three of A, B, C, D are colinear.\nDefine d : (ℝ × ℝ) × (ℝ × ℝ) → ℝ as the Euclidean distance function.\nAssume d(A, B)² is in ℚ.\nAssume d(A, C)² is in ℚ.\nAssume d(A, D)² is in ℚ.\nAssume d(B, C)² is in ℚ.\nAssume d(B, D)² is in ℚ.\nAssume d(C, D)² is in ℚ.\nGoal:\n(area(△ABC) / area(△ABD)) is in ℚ.",
+    "formal_statement": "theorem ratio_of_areas_rational (A B C D : ℝ × ℝ) (h_distinct : A ≠ B ∧ A ≠ C ∧ A ≠ D ∧ B ≠ C ∧ B ≠ D ∧ C ≠ D) (h_colinear : ∀ S : Finset (ℝ × ℝ), S ⊆ {A, B, C, D} → S.card = 3 → ¬Collinear S) (d : (ℝ × ℝ) × (ℝ × ℝ) → ℝ) (h_d : ∀ p q, d p q = Real.dist p.1 p.2 q.1 q.2) (h_AB : (d (A, B))^2 ∈ Rat) (h_AC : (d (A, C))^2 ∈ Rat) (h_AD : (d (A, D))^2 ∈ Rat) (h_BC : (d (B, C))^2 ∈ Rat) (h_BD : (d (B, D))^2 ∈ Rat) (h_CD : (d (C, D))^2 ∈ Rat) : (EuclideanGeometry.area (⟨A, B, C⟩ : EuclideanGeometry.Triangle (ℝ × ℝ))) / EuclideanGeometry.area (⟨A, B, D⟩ : EuclideanGeometry.Triangle (ℝ × ℝ)) ∈ Rat := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  DivisionRing { x : ℝ × ℝ // x ∈ S }\nfunction expected at\n  d p\nterm has type\n  ℝ\nunknown constant 'Real.dist'\nfailed to synthesize instance\n  Membership (?m.2092 : outParam (Type ?u.2091)) Type\nfailed to synthesize instance\n  Membership (?m.2223 : outParam (Type ?u.2222)) Type\nfailed to synthesize instance\n  Membership (?m.2380 : outParam (Type ?u.2379)) Type\nfailed to synthesize instance\n  Membership (?m.2558 : outParam (Type ?u.2557)) Type\nfailed to synthesize instance\n  Membership (?m.2757 : outParam (Type ?u.2756)) Type\nfailed to synthesize instance\n  Membership (?m.2977 : outParam (Type ?u.2976)) Type\nunknown identifier 'EuclideanGeometry.area'\nunknown identifier 'EuclideanGeometry.area'\nfailed to synthesize instance\n  Membership (?m.3218 : outParam (Type ?u.3217)) Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ϵ be a real number.\nAssume 0 < ϵ < 1.\nLet x, y be real numbers.\nLet n be an integer.\nGoal:\nThere exists N in ℕ such that for all n ≥ N, the expression (x + y)^n (x^2 - (2 + ϵ)xy + y^2) is a polynomial in x and y with all coefficients positive.",
+    "formal_statement": "theorem exists_N_for_positive_coefficients (ε : ℝ) (hε : 0 < ε ∧ ε < 1) (x y : ℝ) (n : ℤ) : ∃ N : ℕ, ∀ (n : ℕ), ↑n ≥ ↑N → ∀ (k : ℕ), k ≤ 2 * n + 2 → 0 < Polynomial.coeff (Polynomial.mul (Polynomial.expand ℝ (↑n + 1) (Polynomial.X + Polynomial.Y)) (Polynomial.C (x^2 - (2 + ε) * x * y + y^2))) k := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Polynomial.mul'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℕ.\nDefine a(1) = 3.\nFor all i in ℕ, define a(i+1) = 3^a(i).\nDefine S = {n in ℕ | 0 ≤ n ≤ 99}.\nGoal:\nThere exists exactly one n in S such that for infinitely many i in ℕ, a(i) ≡ n mod 100.\nThe integer n is 87.",
+    "formal_statement": "theorem exists_unique_n_in_S_with_infinite_congruent_iterates : ∃! n ∈ {n : ℕ | 0 ≤ n ∧ n ≤ 99}, (∃ᶠ i in Filter.atTop, (fun i => a i) i ≡ n [MOD 100]) ∧ n = 87 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'a'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine f_n : ℂ → ℂ.\nFor every z in ℂ, define f_n(z) = sum from k=0 to n-1 of (n - k) * z^k.\nGoal:\nFor every z in ℂ, if |z| ≤ 1 then f_n(z) ≠ 0.",
+    "formal_statement": "theorem f_n_nonzero (n : ℕ) (f_n : ℂ → ℂ) (h_def : ∀ z : ℂ, f_n z = ∑ k in Finset.range n, (↑n - ↑k) * z ^ k) (z : ℂ) (h_z : Complex.abs z ≤ 1) : f_n z ≠ 0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine E : ℕ → ℤ.\nFor all n in ℕ, define E(n) as the greatest integer k such that 5^k divides the product from i=1 to n of i^i.\nGoal:\nThe limit as n approaches infinity of E(n) / n^2 = 1/8.",
+    "formal_statement": "theorem limit_of_E_over_n_squared (E : ℕ → ℤ) (hE : ∀ n, E n = Int.greatest (fun k => (5^k) ∣ ∏ i in Finset.range (n + 1), i^i)) : Filter.Tendsto (fun n => (E n : ℝ) / (n : ℝ)^2) Filter.atTop (𝓝 (1/8)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Int.greatest'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine T : ℕ → ℕ.\nDefine T(0) = 2.\nDefine T(1) = 3.\nDefine T(2) = 6.\nFor all n ≥ 3, define T(n) = (n + 4) * T(n - 1) - 4 * n * T(n - 2) + (4 * n - 8) * T(n - 3).\n\nDefine A : ℕ → ℕ.\nFor all n, define A(n) = n!.\n\nDefine B : ℕ → ℕ.\nFor all n, define B(n) = 2^n.\n\nGoal:\nFor all n, T(n) = A(n) + B(n).",
+    "formal_statement": "theorem goal (n : ℕ) : T n = A n + B n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'T'\nunknown identifier 'A'\nunknown identifier 'B'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℙ be the set of prime numbers.\nDefine S = {(p, q, r) ∈ ℙ × ℙ × ℙ | ∃x ∈ ℚ such that p·x² + q·x + r = 0}.\nFor each prime p, define count(p) = size of {(q, r) ∈ ℙ × ℙ | (p, q, r) ∈ S}.\nGoal:\nThe set {p ∈ ℙ | count(p) ≥ 7} = {2, 5}.",
+    "formal_statement": "theorem primes_with_count_ge_seven : {p ∈ Nat.Prime | let S := {(p, q, r) ∈ Nat.Prime × Nat.Prime × Nat.Prime | ∃ (x : ℚ), p * x^2 + q * x + r = 0}; let count := fun p ↦ Finset.card {(q, r) ∈ Nat.Prime × Nat.Prime | (p, q, r) ∈ S}; count p ≥ 7} = {2, 5} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership (?m.4 : Type ?u.3) (ℕ → Prop)\ninvalid pattern, constructor or constant marked with '[match_pattern]' expected\ninvalid pattern, constructor or constant marked with '[match_pattern]' expected",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet the circle be centered at the origin in ℝ × ℝ.\nDefine r ∈ ℝ+.\nLet A, B, C, D, E, F be distinct points in ℝ × ℝ.\nAssume for all P ∈ {A, B, C, D, E, F}, distance(P, origin) = r.\nAssume AB = CD = EF = r.\nDefine M as the midpoint of BC.\nDefine N as the midpoint of DE.\nDefine O as the midpoint of FA.\nGoal:\nThe triangle MNO is equilateral.",
+    "formal_statement": "theorem equilateral_triangle_condition (r : ℝ) (hr : r > 0) (A B C D E F : ℝ × ℝ) (hdistinct : Pairwise (Ne on ![A, B, C, D, E, F])) (hon_circle : ∀ P ∈ ({A, B, C, D, E, F} : Set (ℝ × ℝ)), dist P (0, 0) = r) (hAB : dist A B = r) (hCD : dist C D = r) (hEF : dist E F = r) (M : ℝ × ℝ) (hM : M = midpoint ℝ B C) (N : ℝ × ℝ) (hN : N = midpoint ℝ D E) (O : ℝ × ℝ) (hO : O = midpoint ℝ F A) : ∃ s : ℝ, dist M N = s ∧ dist N O = s ∧ dist O M = s := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes all the necessary assumptions: the points are distinct, lie on a circle centered at the origin with radius r, the distances AB, CD, EF are each equal to r, and M, N, O are defined as midpoints of BC, DE, FA respectively. The conclusion correctly states that the triangle MNO is equilateral by asserting that all sides are equal in length."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A, B, C be points in ℝ² forming a triangle.\nDefine angle_CAB ∈ ℝ.\nDefine angle_BCA ∈ ℝ.\nDefine angle_ABC ∈ ℝ.\nAssume angle_CAB < angle_BCA < π/2 < angle_ABC.\nDefine P as the intersection point of the external angle bisector at A with line BC.\nDefine Q as the intersection point of the external angle bisector at B with line CA.\nAssume distance(A, P) = distance(B, Q) = distance(A, B).\nGoal:\nangle_CAB = π/15.",
+    "formal_statement": "theorem angle_condition (A B C : ℝ × ℝ) (angle_CAB angle_BCA angle_ABC : ℝ) (h_triangle : List.Nodup [A, B, C]) (h_angles : angle_CAB < angle_BCA ∧ angle_BCA < Real.pi / 2 ∧ Real.pi / 2 < angle_ABC) (P : ℝ × ℝ) (hP : P ∈ AffineSegment ℝ B C ∧ P ≠ B ∧ P ≠ C ∧ ∃ (l : Line ℝ (ℝ × ℝ)), l = Line.externalAngleBisector A B C ∧ P ∈ l ∧ P ∈ Line ℝ B C) (Q : ℝ × ℝ) (hQ : Q ∈ AffineSegment ℝ C A ∧ Q ≠ C ∧ Q ≠ A ∧ ∃ (l : Line ℝ (ℝ × ℝ)), l = Line.externalAngleBisector B C A ∧ Q ∈ l ∧ Q ∈ Line ℝ C A) (h_dist : dist A P = dist B Q ∧ dist B Q = dist A B) : angle_CAB = Real.pi / 15 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'AffineSegment'\nunknown identifier 'Line'\nunknown identifier 'Line.externalAngleBisector'\nunknown identifier 'Line'\nunknown identifier 'AffineSegment'\nunknown identifier 'Line'\nunknown identifier 'Line.externalAngleBisector'\nunknown identifier 'Line'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nDefine x : ℕ → ℝ.\nDefine x(0) = 1.\nDefine x(1) = a.\nDefine x(2) = a.\nFor all n in ℕ where n ≥ 2, define x(n + 1) = 2 * x(n) * x(n - 1) - x(n - 2).\nAssume there exists n in ℕ such that x(n) = 0.\nGoal:\nThe sequence x is periodic.",
+    "formal_statement": "theorem sequence_periodic (a : ℝ) (x : ℕ → ℝ) (hx0 : x 0 = 1) (hx1 : x 1 = a) (hx2 : x 2 = a) \n  (hrec : ∀ n ≥ 2, x (n + 1) = 2 * x n * x (n - 1) - x (n - 2)) (hex : ∃ n, x n = 0) : \n  ∃ p > 0, ∀ n, x (n + p) = x n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be an element of {3, 5, 7, 11, ...}.\nAssume p is a prime number.\nDefine F : ℤ → ℤ by F(n) = sum from k=1 to p-1 of (k * n^(k-1)).\nLet a, b be elements of {0, 1, 2, ..., p-1}.\nAssume a ≠ b.\nGoal:\nF(a) - F(b) ≢ 0 mod p.",
+    "formal_statement": "theorem prime_sum_diff_not_cong {p : ℕ} (hp : p ∈ {3, 5, 7, 11}) (hprime : Nat.Prime p) (F : ℤ → ℤ) (hF : ∀ n : ℤ, F n = ∑ k in Finset.Icc 1 (p - 1), k * n^(k - 1)) (a b : ℤ) (ha : a ∈ Set.Icc (0 : ℤ) (p - 1)) (hb : b ∈ Set.Icc (0 : ℤ) (p - 1)) (hne : a ≠ b) : ¬(F a - F b ≡ 0 [ZMOD p]) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "typeclass instance problem is stuck, it is often due to metavariables\n  Membership ℕ (?m.174 : Type ?u.170)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m ∈ ℕ.\nAssume m > 1.\nAssume m is odd.\nDefine n = 2m.\nDefine θ ∈ ℂ such that θ = e^(2πi/n).\nGoal:\n(1 - θ)^(-1) = 0 + θ + 0 + θ^3 + ... + 0 + θ^(m-2).",
+    "formal_statement": "theorem power_series_expansion (m : ℕ) (h₁ : m > 1) (h₂ : Odd m) (n := 2 * m) (θ : ℂ) (hθ : θ = Complex.exp (2 * π * Complex.I / ↑n)) : (1 - θ)⁻¹ = ∑ k in Finset.range m, if Even k then 0 else θ ^ k := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is continuous on [0,1].\nGoal:\nThe integral from 0 to 1 of the integral from 0 to 1 of |f(x) + f(y)| dx dy ≥ the integral from 0 to 1 of |f(x)| dx.",
+    "formal_statement": "theorem integral_inequality (f : ℝ → ℝ) (hf : ContinuousOn f (Set.Icc 0 1)) : \n(∫ x in 0..1, ∫ y in 0..1, |f x + f y|) ≥ (∫ x in 0..1, |f x|) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = ln(x + 1) / (x² + 1).\nDefine I = ∫ from 0 to 1 of f(x) dx.\nGoal:\nI = (π / 8) * ln(2).",
+    "formal_statement": "theorem integral_ln_over_quadratic : \n  let f : ℝ → ℝ := fun x => Real.log (x + 1) / (x^2 + 1); \n  let I := ∫ x in (0:ℝ)..1, f x; \n  I = (Real.pi / 8) * Real.log 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℕ → ℕ.\nFor every n in ℕ, define f(n) as the count of distinct representations of n as a sum of powers of 2 where each power appears at most 3 times.\nDefine [u] : ℝ → ℤ as the floor function.\nGoal:\nThere exists a polynomial p : ℝ → ℝ such that for every n in ℕ, f(n) = [p(n)].",
+    "formal_statement": "theorem exists_poly_floor_eq_f : ∃ (p : ℝ → ℝ), ∀ (n : ℕ), f n = Int.floor (p ↑n) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nAssume x = 2207 - (1 / x).\nGoal:\nx^(1/8) = (3 + 1 * sqrt(5)) / 2.",
+    "formal_statement": "theorem fixed_point_equation (x : ℝ) (hx : x = 2207 - (1 / x)) : x ^ (1 / 8) = (3 + 1 * Real.sqrt 5) / 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℕ be the set of natural numbers.\nLet ℤ be the set of integers.\nDefine the usual base 10 expansion of N ∈ ℕ as:\nN = sum from i=0 to k of (d_i * 10^i) where d_i ∈ {0,1,...,9} and d_k ≠ 0.\nDefine an over-expansion of N ∈ ℕ as:\nN = sum from i=0 to k of (d_i * 10^i) where d_i ∈ {0,1,...,10} and d_k ≠ 0.\nDefine S = {N ∈ ℕ | N has exactly one over-expansion}.\nDefine T = {N ∈ ℕ | In the usual base 10 expansion of N, all d_i ≠ 0}.\n\nGoal:\nS = T.",
+    "formal_statement": "theorem S_eq_T : {N : ℕ | ∃ (k : ℕ) (d : ℕ → ℕ), (∀ i, d i ∈ Finset.Icc 0 10) ∧ d k ≠ 0 ∧ N = ∑ i in Finset.range (k + 1), d i * 10 ^ i ∧ ∀ (k' : ℕ) (d' : ℕ → ℕ), (∀ i, d' i ∈ Finset.Icc 0 10) → d' k' ≠ 0 → N = ∑ i in Finset.range (k' + 1), d' i * 10 ^ i → k = k' ∧ ∀ i, d i = d' i} = {N : ℕ | ∃ (k : ℕ) (d : ℕ → ℕ), (∀ i, d i ∈ Finset.Icc 0 9) ∧ d k ≠ 0 ∧ N = ∑ i in Finset.range (k + 1), d i * 10 ^ i ∧ ∀ i, d i ≠ 0} := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nDefine S = {1, 2, ..., n}.\nDefine total_sum = n(n + 1) / 2.\nDefine k_max = ceiling(n / 2).\n\nGoal:\nThe largest k such that S can be partitioned into k subsets with equal sums is k_max.",
+    "formal_statement": "theorem largest_partition_equal_sums (n : ℕ) (hn : n > 0) : \n  ∃ (S : Finset ℕ) (total_sum k_max : ℕ), S = Finset.range n ∧ \n  total_sum = n * (n + 1) / 2 ∧ k_max = Nat.ceil (↑n / (2 : ℝ)) ∧ \n  (∀ k, k ≤ k_max → ∃ (P : Finset (Finset ℕ)), P.pairwiseDisjoint id ∧ \n  P.sup id = S ∧ ∀ t ∈ P, Finset.sum t id = total_sum / k) ∧ \n  (∀ k, k > k_max → ¬∃ (P : Finset (Finset ℕ)), P.pairwiseDisjoint id ∧ \n  P.sup id = S ∧ ∀ t ∈ P, Finset.sum t id = total_sum / k) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'pairwiseDisjoint', the environment does not contain 'Finset.pairwiseDisjoint'\n  P\nhas type\n  Finset (Finset ℕ)\ninvalid field 'pairwiseDisjoint', the environment does not contain 'Finset.pairwiseDisjoint'\n  P\nhas type\n  Finset (Finset ℕ)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as an element of ℕ with n ≥ 2.\nDefine D_n as the determinant of an (n-1) × (n-1) matrix M where:\nFor all i, j in {1, ..., n-1}:\n- M[i][j] = i + 2 if i = j.\n- M[i][j] = 1 otherwise.\nDefine the sequence S : ℕ → ℚ by S(n) = D_n / factorial(n).\nGoal:\nThe set {S(n) | n ∈ ℕ, n ≥ 2} is not bounded.",
+    "formal_statement": "theorem determinant_sequence_unbounded : ¬BddAbove {S n | (n : ℕ) (hn : n ≥ 2)} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'S'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a subset of ℤ × ℤ × ℤ.\nAssume the size of S = 9.\nGoal:\nThere exist p1, p2 in S such that p1 ≠ p2 AND there exists q in ℤ × ℤ × ℤ such that q lies strictly between p1 and p2 on the line segment joining p1 and p2.",
+    "formal_statement": "theorem exists_distinct_points_with_midpoint (S : Set (ℤ × ℤ × ℤ)) (hS : Nat.card S = 9) : ∃ p1 ∈ S, ∃ p2 ∈ S, p1 ≠ p2 ∧ ∃ q : ℤ × ℤ × ℤ, ∃ t : ℚ, 0 < t ∧ t < 1 ∧ q = (1 - t) • p1 + t • p2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HSMul ℚ (ℤ × ℤ × ℤ) (?m.399 : outParam (Type ?u.289))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ × ℝ → ℝ.\nAssume for all (x,y) in ℝ × ℝ, if x² + y² ≤ 1 then f is differentiable at (x,y).\nAssume for all (x,y) in ℝ × ℝ, if x² + y² ≤ 1 then |f(x,y)| ≤ 1.\nGoal:\nThere exists (x₀,y₀) in ℝ × ℝ such that x₀² + y₀² < 1 AND (∂f/∂x(x₀,y₀))² + (∂f/∂y(x₀,y₀))² ≤ 16.",
+    "formal_statement": "theorem exists_point_with_gradient_bound (f : ℝ × ℝ → ℝ) (h_diff : ∀ (p : ℝ × ℝ), p.1^2 + p.2^2 ≤ 1 → DifferentiableAt ℝ f p) (h_bound : ∀ (p : ℝ × ℝ), p.1^2 + p.2^2 ≤ 1 → |f p| ≤ 1) : ∃ (p : ℝ × ℝ), p.1^2 + p.2^2 < 1 ∧ (deriv (fun x => f (x, p.2)) p.1)^2 + (deriv (fun y => f (p.1, y)) p.2)^2 ≤ 16 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine α as a real number.\nDefine f : ℝ → ℝ as f(x) = α * x^2 + α * x + (1 / 24).\nDefine g : ℝ → ℝ as g(y) = α * y^2 + α * y + (1 / 24).\nGoal:\nThe curves y = f(x) and x = g(y) are tangent to each other.\nThe set of α satisfying the goal is {2/3, 3/2, (13 + √601)/12, (13 - √601)/12}.",
+    "formal_statement": "theorem tangent_condition (α : ℝ) (f : ℝ → ℝ) (hf : ∀ x, f x = α * x^2 + α * x + (1 / 24)) (g : ℝ → ℝ) (hg : ∀ y, g y = α * y^2 + α * y + (1 / 24)) : (∃ x y, f x = y ∧ g y = x ∧ (Function.HasDerivAt f (2 * α * x + α) x ∧ Function.HasDerivAt g (2 * α * y + α) y ∧ (2 * α * x + α) * (2 * α * y + α) = 1)) ↔ α ∈ ({2/3, 3/2, (13 + Real.sqrt 601)/12, (13 - Real.sqrt 601)/12} : Set ℝ) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Function.HasDerivAt'\nunknown identifier 'Function.HasDerivAt'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m as a natural number.\nDefine n as a natural number.\nDefine a : ℕ × ℕ → ℤ such that a(m, n) is the coefficient of x^n in (1 + x + x^2)^m.\nDefine k as a natural number with k ≥ 0.\nDefine S = {i ∈ ℕ | 0 ≤ i ≤ floor(2k / 3)}.\nGoal:\n0 ≤ sum for i in S of (-1)^i * a(k - i, i) ≤ 1.",
+    "formal_statement": "theorem sum_bound (m n k : ℕ) (a : ℕ × ℕ → ℤ) (ha : ∀ m n, a (m, n) = Polynomial.coeff ℤ ((1 + Polynomial.X + Polynomial.X ^ 2) ^ m) n) (hk : k ≥ 0) : \nlet S := {i : ℕ | 0 ≤ i ∧ i ≤ Nat.floor (2 * k / 3)};\n0 ≤ ∑ i in S, (-1 : ℤ) ^ i * a (k - i, i) ∧ ∑ i in S, (-1 : ℤ) ^ i * a (k - i, i) ≤ 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  (?m.519 : Polynomial (?m.29 : Type ?u.28)).coeff\n    (((1 : (?m.2268 : Type ?u.528)) + Polynomial.X + Polynomial.X ^ (2 : (?m.2281 : Type ?u.662))) ^ m)\nterm has type\n  (?m.29 : Type ?u.28)\nfailed to synthesize instance\n  Fintype ↑S\nfailed to synthesize instance\n  Fintype ↑S\napplication type mismatch\n  Polynomial.coeff ℤ\nargument\n  ℤ\nhas type\n  Type : Type 1\nbut is expected to have type\n  Polynomial (?m.29 : Type ?u.28) : Type ?u.28",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be an element of ℕ.\nAssume k is the smallest positive integer such that:\nThere exist distinct m1, m2, m3, m4, m5 in ℤ where:\nDefine p : ℤ → ℤ by p(x) = (x - m1)(x - m2)(x - m3)(x - m4)(x - m5).\nThe number of nonzero coefficients of p is exactly k.\n\nDefine S = {-2, -1, 0, 1, 2}.\nDefine q : ℤ → ℤ by q(x) = (x + 2)(x + 1)(x)(x - 1)(x - 2).\nGoal:\nThe number of nonzero coefficients of q is 3 AND k = 3.",
+    "formal_statement": "theorem formalized (k : ℕ) (hk : ∀ (l : ℕ), 0 < l → (∃ (m1 m2 m3 m4 m5 : ℤ), Distinct (m1 :: m2 :: m3 :: m4 :: m5 :: []) ∧ (∀ (x : ℤ), (fun x => (x - m1) * (x - m2) * (x - m3) * (x - m4) * (x - m5)) x = (fun x => (x - m1) * (x - m2) * (x - m3) * (x - m4) * (x - m5)) x) ∧ (Finset.card (Finset.filter (fun c => c ≠ 0) (Finset.range (k + 1)).toFinset) = k)) → k ≤ l) : (Finset.card (Finset.filter (fun c => c ≠ 0) (Finset.range (6)).toFinset) = 3) ∧ k = 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Distinct'\ninvalid field 'toFinset', the environment does not contain 'Finset.toFinset'\n  Finset.range (k + (1 : ℕ))\nhas type\n  Finset ℕ\ninvalid field 'toFinset', the environment does not contain 'Finset.toFinset'\n  Finset.range (6 : ℕ)\nhas type\n  Finset ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c be real numbers.\nAssume 0 < a < b < c.\nDefine S = {(x, y, z) ∈ ℝ³ : x^b + y^b + z^b = 1 AND x ≥ 0 AND y ≥ 0 AND z ≥ 0}.\nDefine f : ℝ³ → ℝ by f(x, y, z) = x^a + y^b + z^c.\nDefine x0 = (a / b)^(1 / (b - a)).\nDefine z0 = (b / c)^(1 / (c - b)).\nGoal:\nThe maximum of f on S is attained at (x0, (1 - x0^b)^(1/b), 0).\nThe minimum of f on S is attained at (0, (1 - z0^b)^(1/b), z0).",
+    "formal_statement": "theorem optimization_on_S (a b c : ℝ) (ha : 0 < a) (hab : a < b) (hbc : b < c) :\n  let S := {p : ℝ × ℝ × ℝ | p.1^b + p.2.1^b + p.2.2^b = 1 ∧ p.1 ≥ 0 ∧ p.2.1 ≥ 0 ∧ p.2.2 ≥ 0};\n  let f : ℝ × ℝ × ℝ → ℝ := fun (x, y, z) => x^a + y^b + z^c;\n  let x0 := (a / b)^(1 / (b - a));\n  let z0 := (b / c)^(1 / (c - b));\n  IsMaxOn f S (x0, (1 - x0^b)^(1/b), 0) ∧ IsMinOn f S (0, (1 - z0^b)^(1/b), z0) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet B be a subset of ℕ.\nLet G be a subset of ℕ.\nDefine D ⊆ B × G as the dancing relation.\nAssume for every b in B, there exists g in G such that (b, g) ∉ D.\nAssume for every g in G, there exists b in B such that (b, g) ∈ D.\nGoal:\nThere exist g, h in G and b, c in B such that (b, g) ∈ D AND (c, h) ∈ D AND (b, h) ∉ D AND (c, g) ∉ D.",
+    "formal_statement": "theorem dancing_relation_condition (B G : Set ℕ) (D : Set (ℕ × ℕ)) (hD : D ⊆ B ×ˢ G) \n  (hB : ∀ b ∈ B, ∃ g ∈ G, (b, g) ∉ D) (hG : ∀ g ∈ G, ∃ b ∈ B, (b, g) ∈ D) : \n  ∃ g h ∈ G, ∃ b c ∈ B, (b, g) ∈ D ∧ (c, h) ∈ D ∧ (b, h) ∉ D ∧ (c, g) ∉ D := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nDefine a : ℕ → ℝ as a(n) = (1 / n^4) * product from i = 1 to 2n of (n^2 + i^2)^(1/n).\nGoal:\nThe limit as n approaches infinity of a(n) = e^(2 * log(5) - 4 + 2 * arctan(2)).",
+    "formal_statement": "theorem limit_sequence_a (a : ℕ → ℝ) (h : ∀ n, a n = (1 / (n : ℝ)^4) * ∏ i in Finset.range (2 * n), (n^2 + i^2 : ℝ)^(1 / (n : ℝ))) : Filter.Tendsto a Filter.atTop (nhds (Real.exp (2 * Real.log 5 - 4 + 2 * Real.arctan 2))) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℝ⁺.\nDefine b : ℕ → ℝ⁺.\nAssume a(1) = 1.\nAssume b(1) = 1.\nAssume for all n in ℕ with n ≥ 2, b(n) = b(n-1) * a(n) - 2.\nAssume there exists M in ℝ such that for all j in ℕ, b(j) ≤ M.\nDefine S = sum from n=1 to ∞ of (1 / product from k=1 to n of a(k)).\nGoal:\nS converges AND S = 3/2.",
+    "formal_statement": "theorem sum_converges_and_equals (a : ℕ → ℝ≥0) (b : ℕ → ℝ≥0) (ha1 : a 1 = 1) (hb1 : b 1 = 1) \n  (hrec : ∀ n ≥ 2, b n = b (n - 1) * a n - 2) (hbounded : ∃ M : ℝ, ∀ j : ℕ, ↑(b j) ≤ M) :\n  Summable (fun n ↦ 1 / ∏ k in Finset.range (n + 1), ↑(a k)) ∧ \n  ∑' n, 1 / ∏ k in Finset.range (n + 1), ↑(a k) = 3/2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  LE Type\nfailed to synthesize instance\n  LE Type\nfailed to synthesize instance\n  OfNat Type (nat_lit 0)\nfailed to synthesize instance\n  OfNat Type (nat_lit 0)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet L1 and L2 be subsets of ℝ × ℝ.\nAssume L1 is a line.\nAssume L2 is a line.\nAssume L1 ≠ L2.\nLet λ be a real number.\nAssume λ ≠ 0.\nLet P be an element of ℝ × ℝ.\nAssume P ∉ L1.\nAssume P ∉ L2.\n\nGoal (First Direction):\nIf L1 ∩ L2 ≠ ∅, then for all λ ∈ ℝ with λ ≠ 0, there exist A1 ∈ L1 and A2 ∈ L2 such that vector_from_to(P, A2) = λ · vector_from_to(P, A1).\n\nGoal (Second Direction):\nIf for all λ ∈ ℝ with λ ≠ 0, there exist A1 ∈ L1 and A2 ∈ L2 such that vector_from_to(P, A2) = λ · vector_from_to(P, A1), then L1 ∩ L2 ≠ ∅.",
+    "formal_statement": "theorem line_intersection_condition (L1 L2 : Set (ℝ × ℝ)) (hL1 : ∃ a b c, a ≠ 0 ∨ b ≠ 0 ∧ L1 = {p | a * p.1 + b * p.2 + c = 0}) (hL2 : ∃ a b c, a ≠ 0 ∨ b ≠ 0 ∧ L2 = {p | a * p.1 + b * p.2 + c = 0}) (hL1_ne_L2 : L1 ≠ L2) (P : ℝ × ℝ) (hP1 : P ∉ L1) (hP2 : P ∉ L2) : \n(L1 ∩ L2 ≠ ∅) ↔ (∀ λ ∈ ℝ, λ ≠ 0 → ∃ A1 ∈ L1, ∃ A2 ∈ L2, (A2.1 - P.1, A2.2 - P.2) = λ • (A1.1 - P.1, A1.2 - P.2)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected '(', '[', '_', '{', '⦃' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is infinitely differentiable.\nAssume f(0) = 0.\nAssume f(1) = 1.\nAssume for all x in ℝ, f(x) ≥ 0.\nGoal:\nThere exist n in ℕ and x in ℝ such that n > 0 AND the nth derivative of f at x is less than 0.",
+    "formal_statement": "theorem exists_derivative_negative (f : ℝ → ℝ) (hf : ContDiff ℝ ⊤ f) (h0 : f 0 = 0) (h1 : f 1 = 1) (hpos : ∀ x, f x ≥ 0) : ∃ (n : ℕ) (x : ℝ), n > 0 ∧ (iteratedDeriv n f x < 0) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ → ℝ as a polynomial function.\nAssume the degree of P = 3.\nAssume there exists r in [0, 1] such that P(r) = 0.\nDefine M = max_{x ∈ [0, 1]} |P(x)|.\nGoal:\nThe smallest constant C such that ∫_{0}^{1} |P(x)| dx ≤ C * M is C = 5/6.",
+    "formal_statement": "theorem smallest_constant_for_cubic_polynomial_integral (P : ℝ → ℝ) (hP : Polynomial P) (degP : Polynomial.natDegree P = 3) (∃ r ∈ Set.Icc 0 1, P r = 0) : \n    ∃! C, (∀ P, (Polynomial P ∧ Polynomial.natDegree P = 3 ∧ ∃ r ∈ Set.Icc 0 1, P r = 0) → \n    let M := sSup (Set.image (fun x => |P x|) (Set.Icc 0 1)) in \n    ∫ x in 0..1, |P x| ≤ C * M) ∧ \n    C = 5/6 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∃'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ × ℝ → ℝ × ℝ.\nDefine f(x1, x2) = (f1(x1, x2), f2(x1, x2)).\nAssume for all i in {1,2} and j in {1,2}, the partial derivative ∂f_i/∂x_j exists and is continuous.\nAssume for all i in {1,2} and j in {1,2}, ∂f_i/∂x_j > 0 everywhere.\nAssume for all (x1, x2) in ℝ × ℝ, (∂f1/∂x1)(∂f2/∂x2) - (1/4)(∂f1/∂x2 + ∂f2/∂x1)^2 > 0.\nGoal:\nFor all a, b in ℝ × ℝ, if f(a) = f(b) then a = b.",
+    "formal_statement": "theorem injective_f {f : ℝ × ℝ → ℝ × ℝ} (f1 : ℝ × ℝ → ℝ) (f2 : ℝ × ℝ → ℝ) \n(hf : ∀ p : ℝ × ℝ, f p = (f1 p, f2 p))\n(hdiff : ∀ (i j : Fin 2), ContDiff ℝ 1 (fun p : ℝ × ℝ → ![f1 p, f2 p] i j))\n(hpos : ∀ (i j : Fin 2) (p : ℝ × ℝ), HasDerivAt (fun x : ℝ → ![f1 (Function.update p i x), f2 (Function.update p i x)] j) (∂f_i/∂x_j p) (p i))\n(hcond : ∀ p : ℝ × ℝ, (∂f1/∂x1 p) * (∂f2/∂x2 p) - (1/4) * (∂f1/∂x2 p + ∂f2/∂x1 p)^2 > 0) :\n∀ a b : ℝ × ℝ, f a = f b → a = b := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ')'; expected '↦', '=>'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be an element of ℕ.\nDefine f : ℝ \\ {x | x^k = 1} → ℝ by f(x) = 1 / (x^k - 1).\nFor every n in ℕ, define P_n : ℝ → ℝ such that the n-th derivative of f satisfies d^n f / dx^n = P_n(x) / (x^k - 1)^(n + 1).\n\nGoal:\nFor every n in ℕ, P_n(1) = (-k)^n * factorial(n).",
+    "formal_statement": "theorem derivative_polynomial_at_one (k : ℕ) (f : ℝ → ℝ) (hf : ∀ x, x ≠ 1 ∨ k = 0 → f x = 1 / (x^k - 1)) (P : ℕ → ℝ → ℝ) (hP : ∀ n, ∀ x, x ≠ 1 ∨ k = 0 → deriv^[n] f x = P n x / (x^k - 1)^(n + 1)) : ∀ n, P n 1 = (-k)^n * Nat.factorial n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The generated Lean theorem does not accurately capture the mathematical intent of the natural language statement. The natural language statement specifies that the function f is defined on ℝ \\ {x | x^k = 1}, but the Lean theorem incorrectly defines f on ℝ with a condition that x ≠ 1 ∨ k = 0, which does not correctly exclude all roots of unity. Additionally, the natural language statement implies that P_n is defined for all x in ℝ, but the Lean theorem restricts the domain of P_n with the same incorrect condition. The logical implication in the Lean theorem also incorrectly includes k = 0 as a condition, which is not part of the original assumptions."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet V be in ℕ.\nLet E be in ℕ.\nAssume 4E ≤ V².\nGoal:\nThere exists a graph G = (V', E') such that:\nThe size of V' = V.\nThe size of E' = E.\nFor all distinct u, v, w in V', the edges (u,v), (v,w), (u,w) are not all in E'.",
+    "formal_statement": "theorem exists_graph_without_triangle {V E : ℕ} (h : 4 * E ≤ V ^ 2) : ∃ (G : SimpleGraph (Fin V)), card (SimpleGraph.edgeFinset G) = E ∧ ∀ (u v w : Fin V), u ≠ v → v ≠ w → u ≠ w → ¬(SimpleGraph.Adj G u v ∧ SimpleGraph.Adj G v w ∧ SimpleGraph.Adj G u w) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑G.edgeSet",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nDefine g : ℝ → ℝ.\nDefine h : ℝ → ℝ.\nAssume f, g, h are differentiable on an open interval containing 0.\nDefine f' = 2 * f(x)^2 * g(x) * h(x) + (1 / (g(x) * h(x))).\nDefine g' = f(x) * g(x)^2 * h(x) + (4 / (f(x) * h(x))).\nDefine h' = 3 * f(x) * g(x) * h(x)^2 + (1 / (f(x) * g(x))).\nAssume f(0) = 1.\nAssume g(0) = 1.\nAssume h(0) = 1.\nGoal:\nf(x) = 2^(-1/12) * ((sin(6x + π/4) / (cos(6x + π/4)^2)))^(1/6).",
+    "formal_statement": "theorem diff_eq_solution (f g h : ℝ → ℝ) (hf : DifferentiableOn ℝ f (Set.Ioo (-1) 1)) (hg : DifferentiableOn ℝ g (Set.Ioo (-1) 1)) (hh : DifferentiableOn ℝ h (Set.Ioo (-1) 1)) (f' : ∀ x, f' x = 2 * f x ^ 2 * g x * h x + (1 / (g x * h x))) (g' : ∀ x, g' x = f x * g x ^ 2 * h x + (4 / (f x * h x))) (h' : ∀ x, h' x = 3 * f x * g x * h x ^ 2 + (1 / (f x * g x))) (f0 : f 0 = 1) (g0 : g 0 = 1) (h0 : h 0 = 1) : ∀ x, f x = 2 ^ (-1/12) * ((Real.sin (6 * x + Real.pi / 4) / (Real.cos (6 * x + Real.pi / 4) ^ 2)) ^ (1/6)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f''\nunknown identifier 'g''\nunknown identifier 'h''\nfailed to synthesize instance\n  Neg ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℕ = {1, 2, 3, ...}.\nDefine r ∈ ℝ.\nDefine g : ℕ → ℕ.\nAssume for all n ∈ ℕ, g(n+1) - g(n) ≥ (g(g(n)))^r.\nGoal:\nr = 1/4.",
+    "formal_statement": "theorem growth_condition_implies_r_eq_one_fourth (r : ℝ) (g : ℕ → ℕ) (h : ∀ n : ℕ, g (n + 1) - g n ≥ (g (g n)) ^ r) : r = 1 / 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℕ ℝ (?m.127 : outParam (Type ?u.83))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A = {1, 2, 3}.\nDefine B = {1, 2, ..., 2024}.\nDefine C = {1, 2, ..., 6072}.\nLet S be the set of bijections T : A × B → C.\nAssume for all j in B, T(1, j) < T(2, j) < T(3, j).\nAssume for all i in A and for all j in {1, 2, ..., 2023}, T(i, j) < T(i, j + 1).\nGoal:\nThere exist a, c in A and b, d in B such that:\nThe fraction of T in S where T(a, b) < T(c, d) is at least 1/3 and at most 2/3.",
+    "formal_statement": "theorem exists_fraction_condition : \n  let A := {1, 2, 3}; \n  let B := {1, 2, ..., 2024}; \n  let C := {1, 2, ..., 6072}; \n  let S := {T : A × B → C | Function.Bijective T ∧ \n    (∀ j ∈ B, T (1, j) < T (2, j) < T (3, j)) ∧ \n    (∀ i ∈ A, ∀ j ∈ {1, 2, ..., 2023}, T (i, j) < T (i, j + 1))} in \n  ∃ a c ∈ A, ∃ b d ∈ B, \n    (1/3 : ℝ) ≤ (Nat.card {T ∈ S | T (a, b) < T (c, d)}) / Nat.card S ∧ \n    (Nat.card {T ∈ S | T (a, b) < T (c, d)}) / Nat.card S ≤ (2/3 : ℝ) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '...'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ × ℝ → ℝ as P(x, y) = x² * y + x * y².\nDefine Q : ℝ × ℝ → ℝ as Q(x, y) = x² + x * y + y².\nDefine F : ℕ × ℝ × ℝ → ℝ as F(n, x, y) = (x + y)ⁿ - xⁿ - yⁿ.\nDefine G : ℕ × ℝ × ℝ → ℝ as G(n, x, y) = (x + y)ⁿ + xⁿ + yⁿ.\nGoal:\nFor all n in ℕ, there exists a polynomial H : ℝ × ℝ → ℝ with integer coefficients such that H(P, Q) = F(n, x, y) OR H(P, Q) = G(n, x, y).",
+    "formal_statement": "theorem polynomial_existence (n : ℕ) : ∃ (H : Polynomial (ℝ × ℝ → ℝ)), (∀ (x y : ℝ), H.eval (P x y, Q x y) = F n x y) ∨ (∀ (x y : ℝ), H.eval (P x y, Q x y) = G n x y) := sorry\nwhere\n  P (x y : ℝ) := x^2 * y + x * y^2\n  Q (x y : ℝ) := x^2 + x * y + y^2\n  F (n : ℕ) (x y : ℝ) := (x + y)^n - x^n - y^n\n  G (n : ℕ) (x y : ℝ) := (x + y)^n + x^n + y^n",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'P'\nunknown identifier 'Q'\nunknown identifier 'F'\nunknown identifier 'P'\nunknown identifier 'Q'\nunknown identifier 'G'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℝ as the set of real numbers.\nDefine ℕ as the set of natural numbers.\nDefine ℤ as the set of integers.\nDefine ℂ as the set of complex numbers.\nDefine ℝ[x, y] as the ring of polynomials in x, y with coefficients in ℝ.\nDefine degree(p) as the total degree of polynomial p in ℝ[x, y].\nDefine V as the subset of ℝ[x, y] such that for every p in V, degree(p) ≤ 2009 AND for every r in ℝ+, the average value of p on the circle centered at origin with radius r is 0.\nAssume V is a vector space over ℝ.\nGoal:\nThe dimension of V = 2020050.",
+    "formal_statement": "theorem dimension_of_V : ∃ (V : Set (Polynomial ℝ (Fin 2 → ℝ))), (∀ p ∈ V, Polynomial.totalDegree p ≤ 2009) ∧ (∀ p ∈ V, ∀ r ∈ ℝ⁺, (∫ θ in (0)..(2 * π), (Polynomial.eval (fun _ => r * Real.cos θ) p + Polynomial.eval (fun _ => r * Real.sin θ) p) / (2 * π)) = 0) ∧ Submodule ℝ (Subtype.val '' V) ∧ FiniteDimensional.finrank ℝ (Subtype.val '' V) = 2020050 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  Polynomial ℝ\nterm has type\n  Type\nunknown constant 'Polynomial.totalDegree'\nfailed to synthesize instance\n  Lattice Type\nfailed to synthesize instance\n  Membership (?m.518 : Sort ?u.517) Type\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\napplication type mismatch\n  And (Submodule ℝ ↑(Subtype.val '' (?m.30554 : Set (?m.30355 : Type ?u.30354))))\nargument\n  Submodule ℝ ↑(Subtype.val '' (?m.30554 : Set (?m.30355 : Type ?u.30354)))\nhas type\n  Type ?u.30353 : Type (?u.30353 + 1)\nbut is expected to have type\n  Prop : Type\nfailed to synthesize instance\n  NormedSpace ℝ ((?m.49772 : Sort ?u.1496) → ℝ)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be an element of ℕ.\nDefine S = {0, ..., k}.\nDefine f : S → ℕ where f(j) = 2^(k-j) * binomial(k+j, j).\nGoal:\nSum for j in S of f(j) = 4^k.",
+    "formal_statement": "theorem sum_powers_binomial (k : ℕ) : ∑ j in Finset.range (k + 1), 2^(k - j) * Nat.choose (k + j) j = 4^k := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m, n as elements of ℕ.\nDefine S as the double sum over m from 1 to ∞ and n from 1 to ∞ of (m² × n) / (3^m × (n × 3^m + m × 3^n)).\nGoal:\nS = 9 / 32.",
+    "formal_statement": "theorem double_sum_identity (m n : ℕ) : \n    ∑' (m : ℕ), ∑' (n : ℕ), (m^2 * n) / (3^m * (n * 3^m + m * 3^n)) = (9 : ℝ) / 32 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HDiv ℕ ℕ ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine b : ℕ → ℤ.\nDefine b(0) = 0.\nFor all n in ℕ, define b(n+1) = 2 * b(n)² + b(n) + 1.\nLet k be an element of ℕ with k ≥ 1.\nGoal:\n( b(2^(k+1)) - 2 * b(2^k) ) ≡ 0 mod 2^(2k+2).\nNOT ( b(2^(k+1)) - 2 * b(2^k) ) ≡ 0 mod 2^(2k+3).",
+    "formal_statement": "theorem congruence_property (b : ℕ → ℤ) (h0 : b 0 = 0) (hrec : ∀ n, b (n + 1) = 2 * (b n)^2 + b n + 1) (k : ℕ) (hk : k ≥ 1) : (b (2^(k + 1)) - 2 * b (2^k)) ≡ 0 [ZMOD 2^(2 * k + 2)] ∧ ¬(b (2^(k + 1)) - 2 * b (2^k)) ≡ 0 [ZMOD 2^(2 * k + 3)] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet I be an interval of ℝ.\nDefine f : I → ℝ as a continuous function.\nDefine y1 : I → ℝ and y2 : I → ℝ as functions.\nAssume for all x in I, y1''(x) = f(x) * y1(x).\nAssume for all x in I, y2''(x) = f(x) * y2(x).\nAssume y1 and y2 are linearly independent.\nAssume for all x in I, y1(x) > 0.\nAssume for all x in I, y2(x) > 0.\nDefine c as a positive real number.\nDefine z : I → ℝ as z(x) = c * sqrt(y1(x) * y2(x)).\nGoal:\nThere exists c > 0 such that for all x in I, z''(x) + 1 / (z(x)^3) = f(x) * z(x).",
+    "formal_statement": "theorem exists_c_satisfying_condition (I : Set ℝ) [Interval I] (f : I → ℝ) (hf : ContinuousOn f I) (y1 y2 : I → ℝ) \n(hy1'' : ∀ x ∈ I, HasDerivAt (fun x => HasDerivAt y1 (y1' x) x) (f x * y1 x) x) \n(hy2'' : ∀ x ∈ I, HasDerivAt (fun x => HasDerivAt y2 (y2' x) x) (f x * y2 x) x) \n(lindep : LinearIndependent ℝ ![y1, y2]) \n(hy1pos : ∀ x ∈ I, y1 x > 0) \n(hy2pos : ∀ x ∈ I, y2 x > 0) \n(c : ℝ) (hc : c > 0) \n(z : I → ℝ) (hz : ∀ x ∈ I, z x = c * Real.sqrt (y1 x * y2 x)) : \n∃ c > 0, ∀ x ∈ I, HasDerivAt (fun x => HasDerivAt z (z' x) x) (f x * z x - 1 / (z x)^3) x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid binder annotation, type is not a class instance\n  Interval ↑I\nuse the command `set_option checkBinderAnnotations false` to disable the check",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℕ be the set of positive integers.\nDefine A = 10^40.\nDefine B = 20^30.\nDefine S = {n ∈ ℕ | n divides A OR n divides B}.\nGoal:\nThe size of S = 2301.",
+    "formal_statement": "theorem size_of_S : Finset.card (Finset.filter (fun (n : ℕ) => n ∣ 10^40 ∨ n ∣ 20^30) (Finset.Icc 1 (max (10^40) (20^30)))) = 2301 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet b be a real number.\nLet c be a real number.\nDefine f : ℂ → ℂ by f(z) = z^2 + b * z + c.\nAssume z1 and z2 are roots of f(z) = 0.\nAssume |z1| < 1.\nAssume |z2| < 1.\nGoal:\nThe ordered pair (b, c) lies strictly inside the triangle with vertices (0, -1), (2, 1), and (-2, 1).",
+    "formal_statement": "theorem roots_in_unit_disk_implies_parameters_in_triangle (b c : ℝ) (f : ℂ → ℂ) (hf : ∀ z, f z = z^2 + b * z + c) (z1 z2 : ℂ) (h1 : f z1 = 0) (h2 : f z2 = 0) (h1_norm : Complex.abs z1 < 1) (h2_norm : Complex.abs z2 < 1) : (b, c) ∈ Set.Ioo (0, -1) (2, 1) ∪ Set.Ioo (0, -1) (-2, 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes all the necessary assumptions (b and c being real numbers, f defined as a quadratic function with roots z1 and z2 inside the unit disk) and correctly states the goal that the ordered pair (b, c) lies strictly inside the specified triangle. The use of `Set.Ioo` for open intervals and the union of two intervals to describe the triangle's interior is a correct formalization of the problem."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet ℕ = {1, 2, 3, ...}.\nLet ℤ be the set of integers.\nDefine T : ℕ → ℕ such that T(n) = n(n + 1) div 2.\nDefine the set of triangular numbers as {T(n) | n ∈ ℕ}.\nGoal:\nThere exist infinitely many (a, b) ∈ ℤ × ℤ such that for all t ∈ ℕ:\nT(n) = t for some n ∈ ℕ if and only if T(m) = a*t + b for some m ∈ ℕ.",
+    "formal_statement": "theorem exists_infinitely_many_pairs_triangular_numbers : ∃ (f : ℕ → ℤ × ℤ), Infinite (Set.range f) ∧ ∀ (n : ℕ), let T := fun (n : ℕ) => Nat.div (n * (n + 1)) 2; ∀ (t : ℕ), (∃ (k : ℕ), T k = t) ↔ (∃ (m : ℕ), T m = (f n).1 * ↑t + (f n).2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a finite subset of ℝ × ℝ.\nFor every A, B, C in S, the area of triangle ABC ≤ 1.\nGoal:\nThere exists a triangle T with area(T) = 4 such that for every p in S, p is inside or on the boundary of T.",
+    "formal_statement": "theorem exists_large_triangle_containing_points (S : Finset (ℝ × ℝ)) (hS : ∀ (A B C : ℝ × ℝ), A ∈ S → B ∈ S → C ∈ S → |(Vec.det (Vec.cons (B.1 - A.1, B.2 - A.2) (Vec.cons (C.1 - A.1, C.2 - A.2) Vec.nil))) / 2| ≤ 1) : ∃ (T : ℝ × ℝ × ℝ × ℝ × ℝ × ℝ), |(Vec.det (Vec.cons (T.2.1 - T.1.1, T.2.2 - T.1.2) (Vec.cons (T.3.1 - T.1.1, T.3.2 - T.1.2) Vec.nil))) / 2| = 4 ∧ ∀ (p : ℝ × ℝ), p ∈ S → pointInTriangle p (T.1, T.2, T.3) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Vec.det'\nunknown identifier 'Vec.det'\nunknown identifier 'pointInTriangle'\nfailed to synthesize instance\n  AddGroup ℕ\nfailed to synthesize instance\n  AddGroup ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be an element of ℕ.\nAssume k > 1.\nLet a₀ be an element of ℝ.\nAssume a₀ > 0.\nDefine a : ℕ → ℝ such that:\nFor all n in ℕ, a(n+1) = a(n) + (a(n))^(-1/k).\n\nGoal:\nThe limit as n approaches infinity of (a(n)^(k+1)) / (n^k) = ((k+1)/k)^k.",
+    "formal_statement": "theorem limit_sequence_ratio (k : ℕ) (hk : k > 1) (a₀ : ℝ) (ha₀ : a₀ > 0) (a : ℕ → ℝ) (ha : ∀ n : ℕ, a (n + 1) = a n + (a n) ^ (-(1 / ↑k))) : Filter.Tendsto (fun n => (a n) ^ (↑k + 1) / (↑n) ^ k) Filter.atTop (nhds (((↑k + 1) / ↑k) ^ k)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Neg ℕ\nfailed to synthesize instance\n  HPow ℕ ℕ ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet X : Ω → ℤ be a random variable.\nLet Y : Ω → ℤ be a random variable.\nAssume the range of X is finite.\nAssume the range of Y is finite.\nDefine p1 = probability(X = k).\nDefine p2 = probability(Y = k).\nDefine p3 = probability(max(X, Y) = k).\nGoal:\nprobability(min(X, Y) = k) = p1 + p2 - p3.",
+    "formal_statement": "theorem probability_min_eq (Ω : Type*) [MeasureSpace Ω] (X Y : Ω → ℤ) [IsProbabilityMeasure (ℙ : Measure Ω)] (hX : Finite (Set.range X)) (hY : Finite (Set.range Y)) (k : ℤ) : ℙ {ω | min (X ω) (Y ω) = k} = ℙ {ω | X ω = k} + ℙ {ω | Y ω = k} - ℙ {ω | max (X ω) (Y ω) = k} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'MeasureSpace'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nAssume 24 divides (n + 1).\n\nGoal:\nThe sum of all divisors of n is divisible by 24.",
+    "formal_statement": "theorem sum_divisors_divisible_by_24 (n : ℕ) (h : 24 ∣ (n + 1)) : 24 ∣ (∑ d in Nat.divisors n, d) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a subset of ℕ.\nAssume S is countably infinite.\nDefine C as a collection of subsets of S.\nAssume for every A in C, the size of A ≥ 1.\nGoal:\nThere exists C such that:\n- The size of C > ℵ₀.\n- For every A, B in C where A ≠ B, the size of (A ∩ B) < ℵ₀.",
+    "formal_statement": "theorem exists_large_almost_disjoint_family (S : Set ℕ) (hS : Set.Countable S ∧ Set.Infinite S) (C : Set (Set S)) (hC : ∀ A ∈ C, Nat.card (Subtype.val '' A) ≥ 1) : ∃ C : Set (Set S), Nat.card C > Cardinal.aleph0 ∧ ∀ A ∈ C, ∀ B ∈ C, A ≠ B → Nat.card (Subtype.val '' (A ∩ B)) < Cardinal.aleph0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes the assumptions that S is a subset of ℕ, S is countably infinite, C is a collection of subsets of S, and each A in C has size at least 1. The goal is to show the existence of a C with size greater than ℵ₀ and pairwise intersections of size less than ℵ₀. The Lean theorem accurately reflects these conditions and constraints."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a set of 2 × 2 matrices with entries in ℤ.\nFor every M in S, define M = [[a, b], [c, d]] where a, b, c, d are in ℤ.\nAssume for every M in S, there exist w, x, y, z in ℤ such that a = w², b = x², c = y², d = z².\nAssume for every M in S, a ≤ 200 AND b ≤ 200 AND c ≤ 200 AND d ≤ 200.\nAssume the size of S > 50387.\nGoal:\nThere exist M1, M2 in S such that M1 ≠ M2 AND M1 × M2 = M2 × M1.",
+    "formal_statement": "theorem matrix_commutative_pair_exists (S : Set (Matrix (Fin 2) (Fin 2) ℤ)) (hS : ∀ M ∈ S, ∃ a b c d : ℤ, M = !![a, b; c, d] ∧ (∃ w x y z : ℤ, a = w^2 ∧ b = x^2 ∧ c = y^2 ∧ d = z^2)) (hB : ∀ M ∈ S, ∃ a b c d : ℤ, M = !![a, b; c, d] ∧ a ≤ 200 ∧ b ≤ 200 ∧ c ≤ 200 ∧ d ≤ 200) (hCard : Nat.card S > 50387) : ∃ M₁ M₂ ∈ S, M₁ ≠ M₂ ∧ M₁ * M₂ = M₂ * M₁ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is twice continuously differentiable.\nAssume for all x in ℝ, |f(x)| ≤ 1.\nAssume (f(0))² + (f'(0))² = 4.\nGoal:\nThere exists y in ℝ such that f(y) + f''(y) = 0.",
+    "formal_statement": "theorem exists_point_with_zero_sum {f : ℝ → ℝ} (hf : ContDiff ℝ 2 f) (hbounded : ∀ x, |f x| ≤ 1) (hinit : f 0 ^ 2 + (deriv f 0) ^ 2 = 4) : ∃ y, f y + deriv (deriv f) y = 0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nAssume p > 2.\nDefine S = {0, 1, ..., p-1}.\nDefine f : S → ℤ as f(n) = sum for k from 0 to p-1 of (k! * n^k).\nGoal:\nThe size of {n in S | f(n) ≢ 0 mod p} is at least (p + 1) div 2.",
+    "formal_statement": "theorem size_nonzero_f_mod_p (p : ℕ) (hp : Nat.Prime p) (hpgt2 : p > 2) :\n  let S := Finset.Icc 0 (p - 1);\n  let f := fun (n : ℕ) => ∑ k in Finset.Icc 0 (p - 1), (Nat.factorial k * n ^ k);\n  Finset.card {n ∈ S | ¬(f n ≡ 0 [ZMod p])} ≥ (p + 1) / 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ')'; expected '[MOD', '[PMOD', '[SMOD' or '[ZMOD'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine H1 = {(x, y) ∈ ℝ × ℝ | x * y = 1}.\nDefine H2 = {(x, y) ∈ ℝ × ℝ | x * y = -1}.\nLet S be a convex subset of ℝ × ℝ.\nAssume S ∩ H1 ≠ ∅ AND S ∩ H2 ≠ ∅.\nGoal:\nThe infimum of the area of S is 4.",
+    "formal_statement": "theorem inf_area_convex_set_intersecting_hyperbolas (S : Set (ℝ × ℝ)) (hS : Convex ℝ S) \n  (H1 : Set (ℝ × ℝ) := {p | p.1 * p.2 = 1}) (H2 : Set (ℝ × ℝ) := {p | p.1 * p.2 = -1})\n  (h1 : S ∩ H1 ≠ ∅) (h2 : S ∩ H2 ≠ ∅) : \n  sInf (area '' {T | Convex ℝ T ∧ T ⊆ S}) = 4 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'area'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet t be a real number in ℝ⁺.\nDefine I = ∫₀^∞ t^(-1/2) e^(-1985(t + t⁻¹)) dt.\nAssume ∫₋∞^∞ e^(-x²) dx = √π.\n\nGoal:\nI = √(π/1985) e^(-3970).",
+    "formal_statement": "theorem integral_goal (t : ℝ) (ht : t > 0) : \n  (∫₀^∞ (fun t => t^(-1/2) * Real.exp (-1985 * (t + t⁻¹))) t) = Real.sqrt (π / 1985) * Real.exp (-3970) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected token",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ.\nDefine P(n) ≡ (there exist a, b in ℤ such that n = a² + b²).\nGoal:\nThere exist infinitely many n in ℤ such that P(n) AND P(n+1) AND P(n+2).",
+    "formal_statement": "theorem infinitely_many_consecutive_sums_of_two_squares : ∃ (f : ℕ → ℤ), Function.Injective f ∧ ∀ (k : ℕ), (∃ (a b : ℤ), f k = a^2 + b^2) ∧ (∃ (c d : ℤ), f k + 1 = c^2 + d^2) ∧ (∃ (e g : ℤ), f k + 2 = e^2 + g^2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  }
+]

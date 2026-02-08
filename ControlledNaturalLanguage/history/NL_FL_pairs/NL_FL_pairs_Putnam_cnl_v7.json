@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℝ.\nDefine b : ℝ.\nDefine c : ℝ.\nDefine d : ℝ.\nAssume a > 0.\nAssume b > 0.\nAssume c > 0.\nAssume d > 0.\nDefine S : ℝ by S = √(a * b * c * d).\nAssume there exists a circle that is tangent to all four sides of the quadrilateral with side lengths a, b, c, d.\nAssume the area of the quadrilateral is S.\nGoal:\nThe quadrilateral with side lengths a, b, c, d is cyclic.",
+    "formal_statement": "theorem quadrilateral_cyclic (a b c d : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hd : d > 0) (S : ℝ) (hS_def : S = Real.sqrt (a * b * c * d)) (h_tangent : ∃ (circle : Set ℝ × ℝ), ∀ (side : ℝ), side ∈ ({a, b, c, d} : Set ℝ) → ∃ (tangent_point : ℝ), tangent_point ∈ circle.1 ∧ tangent_point = side) (h_area : let quadrilateral_area := S in quadrilateral_area = S) : ∃ (A B C D : ℝ × ℝ), let side_lengths : ℝ × ℝ × ℝ × ℝ := (a, b, c, d) in ∀ (P : ℝ × ℝ), P ∈ ({A, B, C, D} : Set (ℝ × ℝ)) → ∃ (Q : ℝ × ℝ), Q ∈ ({A, B, C, D} : Set (ℝ × ℝ)) ∧ dist P Q ∈ ({a, b, c, d} : Set ℝ) ∧ ∃ (center : ℝ × ℝ) (radius : ℝ), ∀ (vertex : ℝ × ℝ), vertex ∈ ({A, B, C, D} : Set (ℝ × ℝ)) → dist vertex center = radius := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 1010.\nDefine N = (3^n) - 1.\nDefine f : ℕ → ℕ.\nFor every natural number k, define f(k) as the number of digits equal to 1 in the base-3 representation of k.\nDefine S : ℂ → ℂ by S(z) = (sum for k in the set {0, ..., N} of ((-2)^(f(k))) * ((z + k)^(2023))).\nGoal:\nThe set {z in ℂ | S(z) = 0} = {(-(N)) / 2, (-(N)) / 2 + ((sqrt((9^n) - 1)) / 4) * i, (-(N)) / 2 - ((sqrt((9^n) - 1)) / 4) * i}.",
+    "formal_statement": "theorem digit_sum_roots (n : ℕ) (hn : n = 1010) (N : ℕ) (hN : N = 3^n - 1) (f : ℕ → ℕ) (hf : ∀ k, f k = ((Nat.digits 3 k).filter (· = 1)).length) (S : ℂ → ℂ) (hS : ∀ z, S z = ∑ k in Finset.range (N + 1), ((-2 : ℂ) ^ (f k)) * (z + (k : ℂ)) ^ 2023) :\n    {z : ℂ | S z = 0} = {(-(N : ℂ)) / 2, (-(N : ℂ)) / 2 + (Real.sqrt ((9 : ℂ)^n - 1)) / 4 * Complex.I, (-(N : ℂ)) / 2 - (Real.sqrt ((9 : ℂ)^n - 1)) / 4 * Complex.I} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  (9 : ℂ) ^ n - (1 : ℂ)\nhas type\n  ℂ : outParam Type\nbut is expected to have type\n  ℝ : Type\ntype mismatch\n  (9 : ℂ) ^ n - (1 : ℂ)\nhas type\n  ℂ : outParam Type\nbut is expected to have type\n  ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the set of points in the plane as ℝ × ℝ.\nDefine a punch operation: For any point C in ℝ × ℝ, the punch removes the set {P in ℝ × ℝ | The distance from P to C is an irrational number}.\nLet n be a natural number.\nAssume there exists a set of n points {C_1, ..., C_n} in ℝ × ℝ such that the union of the removed sets for C_1, ..., C_n equals ℝ × ℝ.\nGoal:\nn ≥ 3.\n\nAssumptions:\nDefine three points A, B, C in ℝ × ℝ.\nAssume A, B, C are not collinear.\nGoal:\nThe union of the removed sets for A, B, C equals ℝ × ℝ.",
+    "formal_statement": "theorem noncollinear_triple_punch_union_covers_plane (A B C : ℝ × ℝ) (h_noncollinear : ¬Collinear ℝ ({A, B, C} : Set (ℝ × ℝ))) : ⋃ (X ∈ ({A, B, C} : Finset (ℝ × ℝ))), {P : ℝ × ℝ | Irrational (dist P X)} = Set.univ := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement has two separate parts: (1) A general implication that if n points exist whose punch operations cover the plane, then n ≥ 3, and (2) A specific case showing that three non-collinear points achieve this covering. The Lean theorem only formalizes the second part as a direct statement, missing the logical implication structure of the first part and failing to connect the existence of such a covering to the conclusion that n ≥ 3."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine G as a finite group.\nDefine A as a subset of G.\nAssume the size of the set A > (1/2) * (the size of the set G).\nGoal:\nFor every element g in the set G, there exist elements a and b in the set A such that g = (a * b).",
+    "formal_statement": "theorem subset_product_covers_group (G : Type*) [Group G] [Fintype G] (A : Set G) (hA : Fintype.card A > (1/2 : ℚ) * Fintype.card G) : ∀ g : G, ∃ a b : G, a ∈ A ∧ b ∈ A ∧ g = a * b := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑A",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nLet r be a natural number.\nAssume r + 3 ≤ n.\nDefine C : ℕ × ℕ → ℚ by C(k, m) = (k!)/((m!)*((k - m)!)) for every natural number k and every natural number m with m ≤ k.\nAssume there exists a rational number d such that:\n(C(n, r+1) - C(n, r)) = d.\n(C(n, r+2) - C(n, r+1)) = d.\n(C(n, r+3) - C(n, r+2)) = d.\n\nGoal:\nThe size of the set { (n, r) in ℕ × ℕ | r + 3 ≤ n and (C(n, r), C(n, r+1), C(n, r+2), C(n, r+3)) are in arithmetic progression } = 0.",
+    "formal_statement": "theorem size_of_arithmetic_progression_set_zero : Finset.card (Finset.filter (λ (p : ℕ × ℕ) => let (n, r) := p in r + 3 ≤ n ∧ ∃ (d : ℚ), (C n (r + 1) - C n r = d) ∧ (C n (r + 2) - C n (r + 1) = d) ∧ (C n (r + 3) - C n (r + 2) = d)) (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (Finset.Ico 0 (Finset.sup (F",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nAssume there exists an integer k such that (n + 1) = 24 * k.\n\nDefine the set S = {d in ℕ | d divides n}.\nDefine the function σ : ℕ → ℕ by σ(n) = (the sum over d in S of d).\n\nGoal:\nThere exists an integer m such that σ(n) = 24 * m.",
+    "formal_statement": "theorem exists_sum_of_divisors_multiple_of_24 (n : ℕ) (hn_pos : n > 0) (h_exists_k : ∃ k : ℤ, (n : ℤ) + 1 = 24 * k) : ∃ m : ℤ, (∑ d in (Nat.divisors n), d) = 24 * m := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℚ.\nDefine a(1) = 1.\nDefine a(2) = 2.\nDefine a(3) = 24.\nFor every natural number n ≥ 4, define a(n) = ((6 * (a(n-1))^2 * a(n-3)) - (8 * a(n-1) * (a(n-2))^2)) / (a(n-2) * a(n-3)).\nGoal:\nFor every natural number n, there exists an integer k such that a(n) = n * k.",
+    "formal_statement": "theorem rational_sequence_has_integer_factor (a : ℕ → ℚ) (h1 : a 1 = 1) (h2 : a 2 = 2) (h3 : a 3 = 24) (hrec : ∀ n ≥ 4, a n = ((6 * (a (n - 1)) ^ 2 * a (n - 3)) - (8 * a (n - 1) * (a (n - 2)) ^ 2)) / (a (n - 2) * a (n - 3))) : ∀ n, ∃ k : ℤ, a n = (n : ℚ) * (k : ℚ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It includes all assumptions: a function a from ℕ to ℚ, base cases a(1)=1, a(2)=2, a(3)=24, and the recurrence relation for n≥4. The conclusion correctly states that for every natural n, there exists an integer k such that a(n) = n * k, with appropriate type conversions (n:ℚ and k:ℚ) to match the rational arithmetic. The logical structure matches the English statement exactly."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine B as a real number.\nDefine f : ℝ → ℝ by f(x) = sin(x) * sin(x^2).\nGoal:\nThe limit as B approaches infinity of the integral from 0 to B of f(x) dx exists and is a real number.",
+    "formal_statement": "theorem limit_of_integral_exists (f : ℝ → ℝ) (h : ∀ x, f x = Real.sin x * Real.sin (x ^ 2)) :\n    ∃ (L : ℝ), Tendsto (λ (B : ℝ) ↦ ∫ x in (0 : ℝ)..B, f x) atTop (𝓝 L) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it defines f as a real function with the given formula, and states that the limit of the integral from 0 to B exists as B approaches infinity, which is exactly what the English statement requires. The theorem properly handles the real number context and the limit existence condition."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine G as a finite group.  \nDefine g as an element of G.  \nDefine h as an element of G.  \nAssume G is generated by the set {g, h}.  \nDefine ord(g) as the order of g.  \nAssume ord(g) is an odd natural number.  \n\nGoal:  \nFor every element x in G, there exists a natural number r such that (1 ≤ r) and (r ≤ |G|) and there exist integers m_1, n_1, m_2, n_2, ..., m_r, n_r in the set {-1, 1} such that x = (g^(m_1) * h^(n_1) * g^(m_2) * h^(n_2) * ... * g^(m_r) * h^(n_r)).",
+    "formal_statement": "theorem finite_group_generated_by_two_elements_odd_order_representation (G : Type*) [Group G] [Fintype G] (g h : G) (h_gen : Subgroup.closure {g, h} = ⊤) (h_odd_order : ∃ (n : ℕ), orderOf g = 2 * n + 1) : ∀ (x : G), ∃ (r : ℕ) (hr1 : 1 ≤ r) (hr2 : r ≤ Fintype.card G) (m n : Fin r → ℤ) (hm_range : ∀ i, m i = -1 ∨ m i = 1) (hn_range : ∀ i, n i = -1 ∨ n i = 1), x = ∏ i : Fin r, (g ^ (m i) * h ^ (n i)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  CommMonoid G",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 64.\nDefine N = 2017.\nDefine S = {1, 2, ..., N}.\nLet (x_0, x_1, ..., x_{63}) be an ordered 64-tuple.\nAssume for every integer i with 0 ≤ i ≤ 63, x_i is an element of S.\nAssume for all integers i, j with 0 ≤ i < j ≤ 63, x_i ≠ x_j.\nDefine T = x_0 + x_1 + (2*x_2) + (3*x_3) + ... + (63*x_63).\nThere exists an integer k such that T = N * k.\n\nGoal:\nThe size of the set { (x_0, x_1, ..., x_{63}) | (for every integer i with 0 ≤ i ≤ 63, x_i is an element of S) AND (for all integers i, j with 0 ≤ i < j ≤ 63, x_i ≠ x_j) AND (there exists an integer k such that T = N * k) } = ((2016!) / (1953!)) - ((63!) * 2016).",
+    "formal_statement": "theorem count_special_tuples : \n    let n : ℕ := 64\n    let N : ℕ := 2017\n    let S : Set ℕ := {x | 1 ≤ x ∧ x ≤ N}\n    let T (x : Fin n → ℕ) : ℕ := x 0 + x 1 + ∑ i : Fin (n - 2), (i.1 + 2) * x ⟨i.1 + 2, by omega⟩\n    in Finset.card {x : Fin n → ℕ | (∀ i, x i ∈ S) ∧ (∀ i j, i < j → x i ≠ x j) ∧ ∃ k : ℤ, (T x : ℤ) = (N : ℤ) * k} = \n       ((Nat.factorial 2016) / (Nat.factorial 1953)) - ((Nat.factorial 63) * 2016) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine r as a real number.\nAssume r > 0.\nDefine f : ℝ → ℝ by f(x) = x^r * sin(x).\nDefine g : ℝ → ℝ by g(x) = x^r * cos(x).\nDefine I_f : ℝ → ℝ by I_f(r) = ∫ from 0 to (π/2) of f(x) dx.\nDefine I_g : ℝ → ℝ by I_g(r) = ∫ from 0 to (π/2) of g(x) dx.\nDefine c as a real number.\nDefine L as a positive real number.\nGoal:\nThere exists a real number c and there exists a positive real number L such that lim as r → ∞ of ((r^c) * I_f(r)) / I_g(r) = L.\nGoal:\nc = -1.\nGoal:\nL = 2/π.",
+    "formal_statement": "theorem specific_L_value : Tendsto (λ (r : ℝ) => ((r ^ (-1 : ℝ)) * (∫ x in (0 : ℝ)..(π/2), (x ^ r) * Real.sin x)) / (∫ x in (0 : ℝ)..(π/2), (x ^ r) * Real.cos x)) atTop (𝓝 (2/π)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nDefine A = 10^(10^(10^n)) + 10^(10^n) + (10^n) - 1.\nGoal:\nA is not prime.",
+    "formal_statement": "theorem not_prime_for_positive_n (n : ℕ) (hn : n > 0) : ¬ Nat.Prime ((10 : ℕ) ^ ((10 : ℕ) ^ ((10 : ℕ) ^ n)) + (10 : ℕ) ^ ((10 : ℕ) ^ n) + (10 : ℕ) ^ n - 1) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures the mathematical intent: it assumes n is a positive natural number (n : ℕ, hn : n > 0) and concludes that A = 10^(10^(10^n)) + 10^(10^n) + 10^n - 1 is not prime (¬ Nat.Prime A). The types match (ℕ for integers), the positivity constraint is explicit, and the logical structure preserves the original statement."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine p as a prime number.  \nLet a be an integer.  \nLet b be an integer.  \nLet c be an integer.  \nLet d be an integer.  \nAssume a is in the set {0, 1, ..., (p - 1)}.  \nAssume b is in the set {0, 1, ..., (p - 1)}.  \nAssume c is in the set {0, 1, ..., (p - 1)}.  \nAssume d is in the set {0, 1, ..., (p - 1)}.  \nAssume (a + d) ≡ 1 mod p.  \nAssume (a*d - b*c) ≡ 0 mod p.  \n\nGoal:  \nThe size of the set {(a, b, c, d) in ℤ^4 | (a in {0,...,p-1}) ∧ (b in {0,...,p-1}) ∧ (c in {0,...,p-1}) ∧ (d in {0,...,p-1}) ∧ ((a + d) ≡ 1 mod p) ∧ ((a*d - b*c) ≡ 0 mod p)} = (p^2 + p).",
+    "formal_statement": "theorem size_of_set_condition (p : ℕ) (hp : Nat.Prime p) : \n    Finset.card (Finset.filter (λ (x : ℤ × ℤ × ℤ × ℤ) => \n      let ⟨a, b, c, d⟩ := x in\n      a ≥ 0 ∧ a < (p : ℤ) ∧ b ≥ 0 ∧ b < (p : ℤ) ∧ c ≥ 0 ∧ c < (p : ℤ) ∧ d ≥ 0 ∧ d < (p : ℤ) ∧\n      (a + d) % (p : ℤ) = 1 % (p : ℤ) ∧ (a * d - b * c) % (p : ℤ) = 0 % (p : ℤ))\n      (Finset.Ico 0 (p : ℤ) ×ˢ Finset.Ico 0 (p : ℤ) ×ˢ Finset.Ico 0 (p : ℤ) ×ˢ Finset.Ico 0 (p : ℤ))) = \n    (p ^ 2 + p) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a natural number.\nAssume n ≥ 1.\nDefine the set S = {0, 1, 2}.\nDefine the initial string as a function s₀ : {1, ..., n} → S.\nAssume for every integer k in the set {1, ..., n}, s₀(k) = 0.\nDefine the set of all possible strings as P = {f : {1, ..., n} → S}.\nDefine the set of visited strings as V.\nDefine V initially as {s₀}.\nDefine a legal move.\nLet s be a string in P.\nLet s' be a string in P.\nAssume s' is a legal move from s if and only if:\nThere exists an integer i in the set {1, ..., n} such that:\nFor every integer j in the set {1, ..., n} such that j ≠ i, s'(j) = s(j).\nAnd (s'(i) = (s(i) + 1)) or (s'(i) = (s(i) - 1)).\nAnd s' is in S.\nAnd s' is not in V.\nDefine the game state.\nLet the current player be Alice or Bob.\nAssume Alice moves first.\nAssume the players alternate moves.\nAssume if a player has no legal move, that player loses.\nGoal:\nFor every natural number n ≥ 1, Bob has a winning strategy.",
+    "formal_statement": "theorem bob_winning_strategy : ∀ (n : ℕ) (hn : n ≥ 1), ∃ (strategy : (P : Set (Fin n → Fin 3)) → (V : Set (Fin n → Fin 3)) → (current_player : Bool) → (current_string : Fin n → Fin 3) → Option (Fin n → Fin 3)), ∀ (s₀ : Fin n → Fin 3) (h_s₀_zero : ∀ k, s₀ k = 0), let P : Set (Fin n → Fin 3) := Set.univ; V : Set (Fin n → Fin 3) := {s₀} in ∀ (current_player : Bool) (current_string : Fin n → Fin 3) (h_current_in_V : current_string ∈ V), (∃ (next_string : Fin n → Fin 3), legal_move current_string next_string V ∧ strategy P V current_player current_string = some next_string) ∨ (current_player = false ∧ ∀ (next_string : Fin n → Fin 3), ¬legal_move current_string next_string V) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ':'; expected ':=', 'where' or '|'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the function a : ℕ → ℝ.\nAssume for every natural number n, a(n) > 0.\nAssume the series sum_{n=1}^{∞} a(n) converges.\nGoal:\nThe series sum_{n=1}^{∞} (a(n))^(n/(n+1)) converges.",
+    "formal_statement": "theorem series_convergence_of_power_transform (a : ℕ → ℝ) (ha_pos : ∀ n, a n > 0) (h_converges : Summable a) : Summable (λ n => (a n) ^ ((n : ℝ) / ((n : ℝ) + 1))) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N = 2022.\nDefine the set of squares as {1, 2, ..., N}.\nDefine a tile as an unordered pair (i, i+1) for some integer i with 1 ≤ i ≤ N-1.\nDefine a placement as a set of tiles such that no two tiles share a square.\nDefine a game state as a subset of {1, 2, ..., N} representing covered squares.\nDefine a move as adding a tile to the placement, updating the game state.\nDefine the turn order: Alice moves first, then Bob, alternating.\nDefine the end condition: The game ends when no tile (i, i+1) exists with both i and i+1 uncovered.\nDefine Alice's objective: Maximize the number of uncovered squares at the end.\nDefine Bob's objective: Minimize the number of uncovered squares at the end.\nDefine a strategy for Alice as a function from game states to moves.\nDefine a strategy for Bob as a function from game states to moves.\nDefine the outcome of a strategy pair as the number of uncovered squares at the end.\nDefine the guaranteed outcome for Alice as the maximum value V such that there exists a strategy for Alice ensuring that, for every strategy of Bob, the outcome is at least V.\nGoal:\nV = 290.",
+    "formal_statement": "theorem guaranteed_outcome : ∃ (V : ℕ), V = 290 ∧\n    (∃ (alice_strategy : (Set ℕ) → (ℕ × ℕ)) (bob_strategy : (Set ℕ) → (ℕ × ℕ)),\n      ∀ (initial_state : Set ℕ), initial_state = {x | 1 ≤ x ∧ x ≤ 2022} →\n      let N := 2022 in\n      let squares := {x | 1 ≤ x ∧ x ≤ N} in\n      let tile (i : ℕ) : ℕ × ℕ := (i, i + 1) in\n      let valid_tile (i : ℕ) : Prop := 1 ≤ i ∧ i ≤ N - 1 in\n      let placement := ∅ : Set (ℕ × ℕ) in\n      let game_state := initial_state in\n      let move (p : Set (ℕ × ℕ)) (s : Set ℕ) (t : ℕ × ℕ) : Set (ℕ × ℕ) × Set ℕ :=\n        (p ∪ {t}, s \\ ({t.1} ∪ {t.2})) in\n      let end_condition (s : Set ℕ) : Prop :=\n        ¬∃ (i : ℕ), valid_tile i ∧ i ∈ s ∧ (i + 1) ∈ s in\n      let alice_turn : Bool := true in\n      let rec play (p : Set (ℕ × ℕ)) (s : Set ℕ) (turn : Bool) : ℕ :=\n        if end_condition s then Finset.card (s.filter (λ x => x ∈ squares)).toFinset\n        else\n          let chosen_tile := if turn then alice_strategy s else bob_strategy s in\n          let (new_p, new_s) := move p s chosen_tile in\n          play new_p new_s (¬turn) in\n      let outcome := play placement game_state alice_turn in\n      outcome ≥ V) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nLet c be a real number.\nDefine the sequence x : ℕ → ℝ.\nDefine x(0) = 0.\nDefine x(1) = 1.\nFor every integer k ≥ 0, define x(k+2) = ((c * x(k+1)) - ((n - k) * x(k))) / (k+1).\nAssume c is the largest real number such that x(n+1) = 0.\n\nGoal:\nFor every integer k in the set {1, ..., n}, x(k) = binomial(n-1, k-1).",
+    "formal_statement": "theorem sequence_condition (n : ℕ) (hn : n > 0) (c : ℝ) (x : ℕ → ℝ) (hx0 : x 0 = 0) (hx1 : x 1 = 1) (hrec : ∀ k : ℕ, x (k + 2) = ((c * x (k + 1)) - ((n : ℝ) - (k : ℝ)) * x k) / ((k : ℝ) + 1)) (hc_max : IsGreatest {c' : ℝ | ∀ x' : ℕ → ℝ, x' 0 = 0 → x' 1 = 1 → (∀ k, x' (k + 2) = ((c' * x' (k + 1)) - ((n : ℝ) - (k : ℝ)) * x' k) / ((k : ℝ) + 1)) → x' (n + 1) = 0} c) : ∀ k, k ∈ Finset.Icc 1 n → x k = (Nat.choose (n - 1) (k - 1) : ℝ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature accurately captures all mathematical elements from the English statement: positive integer n, real c, sequence x with initial conditions, recurrence relation, maximality condition for c, and the conclusion about binomial coefficients for k from 1 to n. All types match, constraints are preserved, and the logical structure is correct."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the function Arccot : ℝ → ℝ.\nFor every real number t ≥ 0, define Arccot(t) as the unique real number θ such that 0 < θ ≤ (π/2) and cot(θ) = t.\nDefine the constant π.\nDefine the sum S = Σ_{n=0}^{∞} Arccot(n^2 + n + 1).\nGoal:\nS = (π/2).",
+    "formal_statement": "theorem sum_arccot_eq_pi_div_two : \n    let π := Real.pi\n    let Arccot : ℝ → ℝ := fun t => if h : 0 ≤ t then Classical.choose (exists_unique_arccot t h) else 0\n    have hArccot_prop : ∀ (t : ℝ) (ht : 0 ≤ t), 0 < Arccot t ∧ Arccot t ≤ π / 2 ∧ Real.cot (Arccot t) = t := by\n      intro t ht\n      exact Classical.choose_spec (exists_unique_arccot t ht)\n    have exists_unique_arccot : ∀ (t : ℝ) (ht : 0 ≤ t), ∃! θ : ℝ, 0 < θ ∧ θ ≤ π / 2 ∧ Real.cot θ = t := by\n      sorry\n    have summable_arccot : Summable fun n : ℕ => Arccot ((n : ℝ) ^ 2 + (n : ℝ) + 1) := by\n      sorry\n    ∑' n : ℕ, Arccot ((n : ℝ) ^ 2 + (n : ℝ) + 1) = π / 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid pattern variable, must be atomic",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nDefine g : ℝ → ℝ.\nDefine h : ℝ → ℝ.\nAssume for every real number x, f(x) = ((h((x + 1)) + h((x - 1))) / 2).\nAssume for every real number x, g(x) = ((h((x + 4)) + h((x - 4))) / 2).\nGoal:\nFor every real number x, h(x) = ((((g(x) - f((x - 3))) + f((x - 1))) + f((x + 1))) - f((x + 3))).",
+    "formal_statement": "theorem function_identity (f g h : ℝ → ℝ) (h_f : ∀ x : ℝ, f x = (h (x + 1) + h (x - 1)) / 2) (h_g : ∀ x : ℝ, g x = (h (x + 4) + h (x - 4)) / 2) : ∀ x : ℝ, h x = ((g x - f (x - 3)) + f (x - 1) + f (x + 1)) - f (x + 3) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nDefine the set S = {-1, 0, 1}.\nGoal:\nThere exists an integer N.\nThere exist rational numbers c_1, ..., c_N.\nFor every i in the set {1, ..., N}, there exist numbers a_i1, a_i2, ..., a_in in the set S.\nFor all real numbers x_1, x_2, ..., x_n, the following holds:\n(x_1 * x_2 * ... * x_n) = (sum from i=1 to N of (c_i * ((a_i1 * x_1) + (a_i2 * x_2) + ... + (a_in * x_n))^n)).",
+    "formal_statement": "theorem exists_linear_combination_of_product (n : ℕ) (hn : n > 0) : \n    ∃ (N : ℕ) (c : Fin N → ℚ) (a : Fin N → Fin n → ℤ) (ha : ∀ i j, a i j ∈ ({-1, 0, 1} : Set ℤ)), \n    ∀ (x : Fin n → ℝ), ∏ j, x j = ∑ i, (c i : ℝ) * (∑ j, (a i j : ℝ) * x j) ^ n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it asserts the existence of N, rational coefficients c_i, integer matrices a_ij with entries in {-1,0,1}, such that for all real vectors x, the product of x_j equals the sum over i of c_i times (the linear combination of a_ij * x_j) raised to the nth power. All types match (ℕ for n, ℚ for c, ℤ for a with constraint, ℝ for x), and the logical structure preserves the original statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nAssume n > 0.\nDefine V_n as the set of integer tuples (s_0, s_1, ..., s_{2n-1}, s_{2n}) such that:\n- s_0 = 0.\n- s_{2n} = 0.\n- For every integer j in the set {1, 2, ..., 2n}, |s_j - s_{j-1}| = 1.\nDefine q : V_n → ℚ by q(𝐯) = 1 + (sum for j in the set {1, 2, ..., 2n-1} of (3^(s_j))).\nDefine M : ℕ → ℚ such that for every natural number n, M(n) = ( (sum for 𝐯 in the set V_n of (1 / q(𝐯))) ) / ( (size of the set V_n) ).\nDefine n_0 = 2020.\n\nGoal:\nM(n_0) = 1 / 4040.",
+    "formal_statement": "theorem goal_theorem : M n₀ = 1 / 4040 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'M'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine u : ℕ → ℚ.  \nDefine u(0) = 1.  \nDefine u(1) = 1.  \nDefine u(2) = 1.  \nFor every natural number n ≥ 0, define det(n) = (u(n) * u(n+3)) - (u(n+1) * u(n+2)).  \nAssume for every natural number n ≥ 0, det(n) = n!.  \n\nGoal:  \nFor every natural number n, u(n) is an integer.",
+    "formal_statement": "theorem integer_sequence : ∀ (u : ℕ → ℚ) (h0 : u 0 = 1) (h1 : u 1 = 1) (h2 : u 2 = 1) (det_eq : ∀ n, ((u n) * (u (n + 3))) - ((u (n + 1)) * (u (n + 2))) = (Nat.factorial n : ℚ)), ∀ n, ∃ (k : ℤ), u n = (k : ℚ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly quantifies over all sequences u satisfying the conditions, making it a statement about existence of such sequences rather than about a specific given sequence. The English statement assumes a specific sequence u is given with those properties, then concludes that for this specific u, all values are integers. The Lean theorem should have u as a fixed parameter, not universally quantified."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine ℕ as the set of natural numbers.  \nDefine ℝ as the set of real numbers.  \nDefine ℚ as the set of rational numbers.  \nDefine ℤ as the set of integers.  \n\nDefine the function square : ℕ → ℕ by square(k) = k^2.  \n\nDefine the function nearest_square_distance : ℕ → ℕ as follows:  \nFor every natural number n,  \nLet a be a natural number such that a^2 ≤ n < (a+1)^2.  \nDefine d1 = n - a^2.  \nDefine d2 = (a+1)^2 - n.  \nIf d1 ≤ d2, define nearest_square_distance(n) = d1.  \nIf d2 < d1, define nearest_square_distance(n) = d2.  \n\nDefine the predicate is_perfect_square : ℕ → {True, False} as follows:  \nFor every natural number m,  \nis_perfect_square(m) is True if and only if there exists a natural number k such that m = k^2.  \n\nDefine the predicate is_squarish : ℕ → {True, False} as follows:  \nFor every natural number n,  \nis_squarish(n) is True if and only if (is_perfect_square(n) is True) OR (is_perfect_square(nearest_square_distance(n)) is True).  \n\nDefine the function S : ℕ → ℕ as follows:  \nFor every natural number N,  \nS(N) = the size of the set { n in ℕ | (1 ≤ n ≤ N) AND (is_squarish(n) is True) }.  \n\nGoal:  \nThere exist positive real numbers α and β such that  \nlim_{N → ∞} ( S(N) / (N^α) ) = β.  \n\nAdditional claim:  \nFor α = 3/4, the limit exists and equals β = 4/3.",
+    "formal_statement": "theorem specific_alpha_beta_limit : Filter.Tendsto (λ (N : ℕ) => (Real.ofNat (S N)) / ((Real.ofNat N) ^ ((3 : ℝ)/4))) Filter.atTop (𝓝 ((4 : ℝ)/3)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Real.ofNat'\nunknown constant 'Real.ofNat'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x ∈ ℝ.\nAssume 0 < x < 1.\nDefine S : ℝ → ℝ by S(x) = Σ_{n=0}^{∞} ( (x^(2^n)) / (1 - x^(2^(n+1))) ).\nGoal:\nS(x) = x / (1 - x).",
+    "formal_statement": "theorem sum_series_eq_ratio (x : ℝ) (hx_pos : 0 < x) (hx_lt_one : x < 1) : \n    (∑' n : ℕ, (x ^ (2 ^ n)) / (1 - x ^ (2 ^ (n + 1)))) = x / (1 - x) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a sequence a : ℕ → ℕ.\nAssume for every natural number n, a(n) > 0.\nAssume the sum over n in the set {1, 2, 3, ...} of (1 / a(n)) converges.\nDefine a function b : ℕ → ℕ.\nFor every natural number n, define b(n) = the size of the set {k in ℕ | a(k) ≤ n}.\nGoal:\nThe limit as n approaches infinity of (b(n) / n) = 0.",
+    "formal_statement": "theorem limit_ratio_zero (a : ℕ → ℕ) (hpos : ∀ n, a n > 0) (hconv : Summable fun n : ℕ => (1 : ℝ) / (a n : ℝ)) (b : ℕ → ℕ) (hb_def : ∀ n, b n = Finset.card (Finset.filter (fun k => a k ≤ n) Finset.univ)) : Filter.Tendsto (fun n : ℕ => (b n : ℝ) / (n : ℝ)) Filter.atTop (𝓝 0) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℕ.\nAssume for every natural number n, a(n) > 0.\nAssume for every natural number n, a(n) < a(n+1).\nDefine b : ℕ → ℕ.\nFor every natural number n, define b(n) = lcm( a(1), a(2), ..., a(n) ).\nGoal:\nThe sum from n=1 to infinity of (1 / b(n)) converges.",
+    "formal_statement": "theorem sum_one_div_lcm_converges (a : ℕ → ℕ) (ha_pos : ∀ n, a n > 0) (ha_strictMono : ∀ n, a n < a (n + 1)) : \n    ∃ L : ℝ, HasSum (λ n : ℕ => 1 / (Nat.lcm (Finset.sup (Finset.Icc 1 (n + 1)) a) : ℝ)) L := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  ((Finset.Icc (1 : ℕ) (n + (1 : ℕ))).sup a).lcm\nhas type\n  ℕ → ℕ : Type\nbut is expected to have type\n  ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a set of positive integers.\nAssume S is nonempty.\nAssume for every natural number n, if n is in S, then for every positive integer d, if d divides ((2025^n) - (15^n)), then d is in S.\n\nGoal:\nFor every positive integer k, k is in S.",
+    "formal_statement": "theorem set_S_contains_all_positive_integers (S : Set ℕ) (hS_nonempty : S.Nonempty) (hS_condition : ∀ n, n ∈ S → ∀ d, 0 < d → (d ∣ (2025 ^ n - 15 ^ n)) → d ∈ S) : ∀ k, 0 < k → k ∈ S := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures all mathematical assumptions and the goal: S is a nonempty set of positive integers (ℕ with positivity condition), the divisibility condition is properly formalized with the correct types and constraints, and the conclusion correctly states that all positive integers k are in S."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S as a subset of ℚ.\nAssume for every rational number a in S and for every rational number b in S, (a + b) is in S.\nAssume for every rational number a in S and for every rational number b in S, (a * b) is in S.\nAssume for every rational number r, exactly one of the following is true: (r is in S) OR ((-r) is in S) OR (r = 0).\nGoal:\nFor every rational number q, (q is in S) if and only if (q > 0).",
+    "formal_statement": "theorem rational_subset_positive_iff (S : Set ℚ) (h_add : ∀ a b ∈ S, a + b ∈ S) (h_mul : ∀ a b ∈ S, a * b ∈ S) (h_trich : ∀ r : ℚ, (r ∈ S ∧ (-r) ∉ S) ∨ ((-r) ∈ S ∧ r ∉ S) ∨ r = 0) : ∀ q : ℚ, q ∈ S ↔ q > 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S as a set.\nDefine a binary operation * : S × S → S.\nAssume for all elements a, b, c, d in S, ((a * b) * (c * d)) = (a * d).\n\nGoal (1):\nAssume a, b, c are elements in S.\nAssume (a * b) = c.\nGoal: (c * c) = c.\n\nGoal (2):\nAssume a, b, c are elements in S.\nAssume (a * b) = c.\nGoal: For all elements d in S, (a * d) = (c * d).\n\nAdditional Assumptions for Example:\nAssume for all elements a in S, (a * a) = a.\nThere exist elements a, b in S such that (a * b) = a and a ≠ b.\nThere exist elements a, b in S such that (a * b) ≠ a.\n\nGoal for Example:\nFind a set S and a binary operation * satisfying all assumptions.",
+    "formal_statement": "example : ∃ (S : Type) (op : S → S → S), (∀ (a b c d : S), op (op a b) (op c d) = op a d) ∧ (∀ (a : S), op a a = a) ∧ (∃ (a b : S), op a b = a ∧ a ≠ b) ∧ (∃ (a b : S), op a b ≠ a) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem only captures the existence of a set and operation satisfying the structural assumptions, but completely omits the two specific goals about consequences of (a * b) = c. It proves a different mathematical fact - existence of a structure with certain properties rather than proving consequences from those properties."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a finite set.\nLet ℕ be the set of natural numbers.\nDefine n = |S|.\nDefine the power set of S as the set of all subsets of S.\nDefine P as a set of subsets of S.\nAssume for every A in P and for every B in P, if A ≠ B, then the size of the set {x in S | x is in A and x is in B} ≥ 1.\nAssume there does not exist a set Q of subsets of S such that P is a proper subset of Q and for every A in Q and for every B in Q, if A ≠ B, then the size of the set {x in S | x is in A and x is in B} ≥ 1.\nGoal:\nThe size of the set P = (2^(n-1)).",
+    "formal_statement": "theorem size_of_maximal_intersecting_family (S : Finset α) (P : Finset (Finset α)) (hS_finite : S.Finite := by exact Finset.finite_toSet S) :\n    (∀ A ∈ P, A ⊆ S) ∧\n    (∀ A ∈ P, ∀ B ∈ P, A ≠ B → (A ∩ B).Nonempty) ∧\n    (¬∃ Q : Finset (Finset α), P ⊂ Q ∧ (∀ A ∈ Q, A ⊆ S) ∧ (∀ A ∈ Q, ∀ B ∈ Q, A ≠ B → (A ∩ B).Nonempty)) →\n    Finset.card P = 2 ^ (Finset.card S - 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'α'\nunknown identifier 'α'\ninvalid auto tactic, identifier is not allowed",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine π = 3.14159...\nFor every natural number n ≥ 1, define r_n as a real number.\nAssume for every natural number n ≥ 1, tan(r_n) = r_n.\nAssume for every natural number n ≥ 1, r_n > 0.\nAssume for every natural number n ≥ 1, r_n is the n-th smallest positive real number such that tan(r_n) = r_n.\nGoal:\nFor every natural number n ≥ 1, (0 < (r_{n+1} - r_n - π)) AND ((r_{n+1} - r_n - π) < (1 / ((n^2 + n) * π))).",
+    "formal_statement": "theorem tan_roots_difference_estimate (π : ℝ) (hπ : π = Real.pi) (r : ℕ → ℝ) (hpos : ∀ n, 0 < r n) (htan_eq : ∀ n, Real.tan (r n) = r n) (horder : ∀ n, r n = Nat.find (fun x : ℝ => Real.tan x = x ∧ 0 < x) (by\n    have := exists_pos_tan_eq_self (n := n)\n    exact this)) : ∀ (n : ℕ) (hn : n ≥ 1), 0 < r (n + 1) - r n - π ∧ r (n + 1) - r n - π < 1 / (((n : ℝ) ^ 2 + n) * π) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'π'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of positive integers.\nLet n be a composite natural number.\nThere exist natural numbers a and b such that n = a * b.\nAssume a ≥ 2.\nAssume b ≥ 2.\n\nGoal:\nThere exist natural numbers x, y, and z such that n = (x*y) + (x*z) + (y*z) + 1.",
+    "formal_statement": "theorem sum_of_products_plus_one (n : ℕ) (hcomp : ¬ Nat.Prime n) (hpos : n > 1) : \n    ∃ (x y z : ℕ), n = (x * y) + (x * z) + (y * z) + 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the assumptions. The English statement explicitly defines n as composite (with a, b ≥ 2), but the Lean theorem uses ¬Nat.Prime n which includes n=0 and n=1 as non-prime. The English requires n > 1 and composite, while the Lean theorem's hcomp: ¬Nat.Prime n includes n=0 and n=1, which are not composite numbers in the English definition. Additionally, the English explicitly states the existence of a and b with n = a*b and a,b ≥ 2, which is a stronger condition than just 'not prime'."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 1999.\nLet p be a polynomial.\nAssume the degree of p is n.\nDefine the function I : ℝ → ℝ by I(p) = ∫ from -1 to 1 of |p(x)| dx.\nGoal:\nThere exists a real number C such that for every polynomial p of degree n, |p(0)| ≤ C * I(p).",
+    "formal_statement": "theorem exists_constant_bound_for_polynomial_at_zero : ∃ (C : ℝ), ∀ (p : Polynomial ℝ) (hdeg : p.natDegree = 1999), |p.eval 0| ≤ C * (∫ x in (-1 : ℝ)..(1 : ℝ), |p.eval x|) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it asserts the existence of a real constant C such that for every real polynomial p of degree 1999, the absolute value at 0 is bounded by C times the integral of |p(x)| from -1 to 1. The types match (ℝ for C, Polynomial ℝ for p), the degree constraint is explicitly stated, and the logical structure (∃C ∀p, inequality) matches the English statement."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine ℕ as the set of natural numbers.  \nDefine ℝ as the set of real numbers.  \nDefine ℝ² as the set of points in the plane.  \nDefine a closed disc as a set of points in ℝ² whose distance from a given center is less than or equal to a given radius.  \nDefine a line as a set of points in ℝ² satisfying a linear equation.  \n\nDefine a sequence of closed discs (D(n)) for n in ℕ.  \nDefine a sequence of centers (c(n)) for n in ℕ, where each c(n) is in ℝ².  \nDefine a sequence of radii (r(n)) for n in ℕ, where each r(n) is a positive real number.  \nFor every natural number n, define D(n) = {x in ℝ² : distance(x, c(n)) ≤ r(n)}.  \n\nAssume the sequence (c(n)) has no limit point in ℝ².  \nAssume the sum over n in ℕ of (π * (r(n))²) is finite.  \nAssume for every line L in ℝ², there exists a natural number n such that L ∩ D(n) is nonempty.  \n\nGoal:  \nThere exists a sequence of closed discs (D(n)) satisfying the above assumptions.",
+    "formal_statement": "theorem exists_sequence_of_closed_discs : ∃ (c : ℕ → ℝ × ℝ) (r : ℕ → ℝ) (D : ℕ → Set (ℝ × ℝ)),\n  (∀ n, r n > 0) ∧\n  (∀ n, D n = {x : ℝ × ℝ | Real.dist x (c n) ≤ r n}) ∧\n  (¬∃ (p : ℝ × ℝ), Filter.Tendsto c Filter.atTop (nhds p)) ∧\n  (Summable fun n : ℕ => π * (r n) ^ 2) ∧\n  (∀ (L : Set (ℝ × ℝ)), (∃ (a b : ℝ), (a, b) ≠ (0, 0) ∧ L = {x : ℝ × ℝ | a * x.1 + b * x.2 = 0}) → ∃ n, Set.Nonempty (L ∩ D n)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Real.dist'\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the set S = {(x, y) in ℝ² | (0 ≤ x) ∧ (x ≤ 1) ∧ (0 ≤ y) ∧ (y ≤ 1)}.\nDefine f : S → ℝ.\nAssume for every point (a, b) in S, f is continuous at (a, b).\nDefine g : ℝ → ℝ by g(y) = ∫₀¹ f(x, y) dx for every real number y with 0 ≤ y ≤ 1.\nDefine h : ℝ → ℝ by h(x) = ∫₀¹ f(x, y) dy for every real number x with 0 ≤ x ≤ 1.\nGoal:\n(∫₀¹ (g(y))² dy) + (∫₀¹ (h(x))² dx) ≤ (∫₀¹ ∫₀¹ f(x, y) dx dy)² + (∫₀¹ ∫₀¹ (f(x, y))² dx dy).",
+    "formal_statement": "theorem integral_inequality :\n    let S : Set (ℝ × ℝ) := {p | 0 ≤ p.1 ∧ p.1 ≤ 1 ∧ 0 ≤ p.2 ∧ p.2 ≤ 1} in\n    ∀ (f : S → ℝ) (hf : ∀ p : S, ContinuousAt f p),\n    let g : ℝ → ℝ := λ y => if hy : (0 : ℝ) ≤ y ∧ y ≤ 1 then ∫ x in (0:ℝ)..1, f (⟨(x, y), by\n        intro h\n        rcases h with ⟨hx_left, hx_right, hy_left, hy_right⟩\n        exact ⟨by linarith, by linarith, by linarith, by linarith⟩⟩) else 0 in\n    let h : ℝ → ℝ := λ x => if hx : (0 : ℝ) ≤ x ∧ x ≤ 1 then ∫ y in (0:ℝ)..1, f (⟨(x, y), by\n        intro h\n        rcases h with ⟨hx_left, hx_right, hy_left, hy_right⟩\n        exact ⟨by linarith, by linarith, by linarith, by linarith⟩⟩) else 0 in\n    (∫ y in (0:ℝ)..1, (g y) ^ 2) + (∫ x in (0:ℝ)..1, (h x) ^ 2) ≤ (∫ y in (0:ℝ)..1, ∫ x in (0:ℝ)..1, f (⟨(x, y), by\n        intro h\n        rcases h with ⟨hx_left, hx_right, hy_left, hy_right⟩\n        exact ⟨by linarith, by linarith, by linarith, by linarith⟩⟩)) ^ 2 + (∫ y in (0:ℝ)..1, ∫ x in (0:ℝ)..1, (f (⟨(x, y), by\n        intro h\n        rcases h with ⟨hx_left, hx_right, hy_left, hy_right⟩\n        exact ⟨by linarith, by linarith, by linarith, by linarith⟩⟩)) ^ 2) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of natural numbers including 0.\nDefine ℝ as the set of real numbers.\nDefine ℤ as the set of integers.\nDefine ℚ as the set of rational numbers.\nDefine a sequence a : ℕ → ℝ \\ {0}.\nFor every natural number n, define p_n : ℝ → ℝ by p_n(x) = Σ_{k=0}^{n} (a(k) * (x^k)).\nGoal:\nThere exists a sequence a : ℕ → ℝ \\ {0} such that for every natural number n ≥ 1, the polynomial p_n has exactly n distinct real roots.",
+    "formal_statement": "theorem exists_sequence_with_polynomials_having_distinct_real_roots : ∃ (a : ℕ → ℝ) (h : ∀ n, a n ≠ 0), ∀ (n : ℕ) (hn : n ≥ 1), ∃ (roots : Finset ℝ) (hroots : roots.card = n), ∀ (x : ℝ), (∑ k in Finset.range (n + 1), a k * x ^ k) = 0 ↔ x ∈ roots := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly requires the same sequence 'a' to work for all n simultaneously, while the English statement allows a different sequence 'a' for each n. The English says 'for every natural number n ≥ 1, the polynomial p_n has exactly n distinct real roots' where p_n is defined using the same sequence a, but the Lean theorem quantifies ∃ a at the beginning, making it apply to all n, which is a stronger requirement than intended."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet r be a natural number.\nLet s be a natural number.\nAssume r > 0.\nAssume s > 0.\nDefine L = (3^r) * (7^s).\nDefine the set S = {(a, b, c, d) | a is a positive integer, b is a positive integer, c is a positive integer, d is a positive integer, and lcm(a, b, c) = L, and lcm(a, b, d) = L, and lcm(a, c, d) = L, and lcm(b, c, d) = L}.\nGoal:\nThe size of the set S = ((1 + (4 * r) + (6 * (r^2))) * (1 + (4 * s) + (6 * (s^2)))).",
+    "formal_statement": "theorem set_size_formula (r s : ℕ) (hr : r > 0) (hs : s > 0) : \n    let L := (3 : ℕ) ^ r * (7 : ℕ) ^ s\n    let S : Set (ℕ × ℕ × ℕ × ℕ) := {x | ∃ (a b c d : ℕ), x = (a, b, c, d) ∧ a > 0 ∧ b > 0 ∧ c > 0 ∧ d > 0 ∧ Nat.lcm (Nat.lcm a b) c = L ∧ Nat.lcm (Nat.lcm a b) d = L ∧ Nat.lcm (Nat.lcm a c) d = L ∧ Nat.lcm (Nat.lcm b c) d = L}\n    in Finset.card (S.toFinset) = ((1 + 4 * r + 6 * (r ^ 2)) * (1 + 4 * s + 6 * (s ^ 2))) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine S : ℝ → ℝ by S(x) = ∑_{k=0}^{∞} ( (3 * log_base(e, (4*k + 2))) / (4*k + 2) - (log_base(e, (4*k + 3))) / (4*k + 3) - (log_base(e, (4*k + 4))) / (4*k + 4) - (log_base(e, (4*k + 5))) / (4*k + 5) ).  \nAssume the series S converges.  \nLet k be a natural number.  \nDefine a function f : ℕ → ℝ by f(k) = (3 * log_base(e, (4*k + 2))) / (4*k + 2) - (log_base(e, (4*k + 3))) / (4*k + 3) - (log_base(e, (4*k + 4))) / (4*k + 4) - (log_base(e, (4*k + 5))) / (4*k + 5).  \nGoal:  \nS = (log_base(e, 2))^2.",
+    "formal_statement": "theorem series_equality : S = (Real.log 2) ^ 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'S'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the function G : ℝ × ℝ → ℝ³ by G(x, y) = ((-y) / ((x^2) + (4 * (y^2))), x / ((x^2) + (4 * (y^2))), 0).\nAssume for all real numbers x and y with ((x^2) + (4 * (y^2))) ≠ 0, the partial derivatives of the components of G are continuous.\n\nGoal:\nThere does not exist a function F : ℝ³ \\ {(0,0,0)} → ℝ³ such that:\n1. Define F(x, y, z) = (M(x, y, z), N(x, y, z), P(x, y, z)).\n2. For all real numbers x, y, z with (x, y, z) ≠ (0, 0, 0), the partial derivatives of M, N, P are continuous.\n3. For all real numbers x, y, z with (x, y, z) ≠ (0, 0, 0), the curl of F is the zero vector.\n4. For all real numbers x, y with ((x^2) + (4 * (y^2))) ≠ 0, F(x, y, 0) = G(x, y).",
+    "formal_statement": "theorem no_potential_for_G : ¬∃ (F : ℝ × ℝ × ℝ \\ {(0,0,0)} → ℝ × ℝ × ℝ) (M N P : ℝ × ℝ × ℝ → ℝ),\n    (∀ (x y z : ℝ), (x, y, z) ≠ (0, 0, 0) → F (x, y, z) = (M (x, y, z), N (x, y, z), P (x, y, z))) ∧\n    (∀ (x y z : ℝ), (x, y, z) ≠ (0, 0, 0) → ContinuousAt (fun x' => M (x', y, z)) x ∧\n      ContinuousAt (fun y' => M (x, y', z)) y ∧\n      ContinuousAt (fun z' => M (x, y, z')) z ∧\n      ContinuousAt (fun x' => N (x', y, z)) x ∧\n      ContinuousAt (fun y' => N (x, y', z)) y ∧\n      ContinuousAt (fun z' => N (x, y, z')) z ∧\n      ContinuousAt (fun x' => P (x', y, z)) x ∧\n      ContinuousAt (fun y' => P (x, y', z)) y ∧\n      ContinuousAt (fun z' => P (x, y, z')) z) ∧\n    (∀ (x y z : ℝ), (x, y, z) ≠ (0, 0, 0) →\n      (fun (x' : ℝ) => ∂/∂x' (N (x', y, z)) - ∂/∂y' (M (x, y', z)) |_{x'=x, y'=y} = 0) ∧\n      (fun (y' : ℝ) => ∂/∂y' (P (x, y', z)) - ∂/∂z' (N (x, y, z')) |_{y'=y, z'=z} = 0) ∧\n      (fun (z' : ℝ) => ∂/∂z' (M (x, y, z')) - ∂/∂x' (P (x', y, z)) |_{z'=z, x'=x} = 0)) ∧\n    (∀ (x y : ℝ), (x^2 + 4 * y^2) ≠ 0 → F (x, y, 0) = ((-y) / (x^2 + 4 * y^2), x / (x^2 + 4 * y^2), 0)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∂'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine L as a positive real number.\nAssume the target is a square region in the plane with side length L.\nDefine the center of the square as the point (0,0).\nAssume the vertices of the square are at ((-L/2), (-L/2)), ((-L/2), (L/2)), ((L/2), (L/2)), and ((L/2), (-L/2)).\nDefine a point (x,y) in the square.\nAssume for every point (x,y) in the square, the distance to the center is sqrt((x^2) + (y^2)).\nAssume for every point (x,y) in the square, the distance to the nearest edge is min(( (L/2) - |x| ), ( (L/2) - |y| )).\nGoal:\nThe probability that a randomly chosen point (x,y) in the square satisfies sqrt((x^2) + (y^2)) < min(( (L/2) - |x| ), ( (L/2) - |y| )) is equal to ((4 * sqrt(2)) - 5) / 3.",
+    "formal_statement": "theorem probability_condition_square (L : ℝ) (hL : L > 0) : \n    let square : Set (ℝ × ℝ) := {p | -L/2 ≤ p.1 ∧ p.1 ≤ L/2 ∧ -L/2 ≤ p.2 ∧ p.2 ≤ L/2} in\n    let center_distance (p : ℝ × ℝ) : ℝ := Real.sqrt (p.1^2 + p.2^2) in\n    let nearest_edge_distance (p : ℝ × ℝ) : ℝ := min (L/2 - |p.1|) (L/2 - |p.2|) in\n    let condition_set : Set (ℝ × ℝ) := {p | p ∈ square ∧ center_distance p < nearest_edge_distance p} in\n    let total_area : ℝ := L^2 in\n    let condition_area : ℝ := ((4 * Real.sqrt 2) - 5) / 3 * L^2 in\n    condition_area / total_area = ((4 * Real.sqrt 2) - 5) / 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet L1 be a line in the plane.\nLet L2 be a line in the plane.\nAssume L1 ≠ L2.\nLet λ be a real number.\nAssume λ ≠ 0.\nLet P be a point in the plane.\nAssume P is not on L1.\nAssume P is not on L2.\nGoal:\n(L1 and L2 intersect) if and only if (for every real number λ ≠ 0 and for every point P not on L1 or L2, there exist points A1 on L1 and A2 on L2 such that (vector from P to A2) = λ * (vector from P to A1)).",
+    "formal_statement": "theorem line_intersection_condition (L1 L2 : Set (ℝ × ℝ)) (hL1 : IsAffineSubspace ℝ L1) (hL2 : IsAffineSubspace ℝ L2) (h_dim1 : finrank ℝ (Submodule.span ℝ L1) = 1) (h_dim2 : finrank ℝ (Submodule.span ℝ L2) = 1) (h_ne : L1 ≠ L2) : \n    (∃ p, p ∈ L1 ∧ p ∈ L2) ↔ \n    (∀ (λ : ℝ) (hλ : λ ≠ 0) (P : ℝ × ℝ) (hP1 : P ∉ L1) (hP2 : P ∉ L2), \n      ∃ (A1 : ℝ × ℝ) (A2 : ℝ × ℝ), A1 ∈ L1 ∧ A2 ∈ L2 ∧ (A2.1 - P.1, A2.2 - P.2) = λ • (A1.1 - P.1, A1.2 - P.2)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'λ'; expected '_' or identifier",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nAssume n > 1.\nGoal:\nNOT (There exists an integer k such that (2^n - 1) = n * k).",
+    "formal_statement": "theorem no_integer_factor_of_Mersenne_minus_one (n : ℤ) (hn : n > 1) : ¬∃ (k : ℤ), (2 ^ n - 1) = n * k := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℤ ℤ (?m.145 : outParam (Type ?u.46))",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ × ℝ → ℝ by P(x, y) = (x^2 * y) + (x * y^2).\nDefine Q : ℝ × ℝ → ℝ by Q(x, y) = (x^2) + (x * y) + (y^2).\nLet n be a positive integer.\nDefine F_n : ℝ × ℝ → ℝ by F_n(x, y) = ((x + y)^n) - (x^n) - (y^n).\nDefine G_n : ℝ × ℝ → ℝ by G_n(x, y) = ((x + y)^n) + (x^n) + (y^n).\n\nGoal:\nThere exists a polynomial H with integer coefficients such that (for all real numbers x, y, H(P(x, y), Q(x, y)) = F_n(x, y)) OR (for all real numbers x, y, H(P(x, y), Q(x, y)) = G_n(x, y)).",
+    "formal_statement": "theorem exists_polynomial_H (n : ℕ) (hn : n > 0) : ∃ (H : Polynomial ℤ), (∀ (x y : ℝ), Polynomial.eval₂ (algebraMap ℤ ℝ) (P x y, Q x y) H = F_n x y) ∨ (∀ (x y : ℝ), Polynomial.eval₂ (algebraMap ℤ ℝ) (P x y, Q x y) H = G_n x y) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'P'\nunknown identifier 'Q'\nunknown identifier 'F_n'\nunknown identifier 'P'\nunknown identifier 'Q'\nunknown identifier 'G_n'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a positive integer.\nLet n be a positive integer.\nAssume gcd(m, n) = 1.\nDefine a : {1, ..., n} → ℤ.\nFor every integer k in the set {1, ..., n}, define a(k) = floor((m * k) / n) - floor((m * (k - 1)) / n).\nLet G be a group.\nLet g be an element of G.\nLet h be an element of G.\nAssume (g * (h ^ a(1))) * (g * (h ^ a(2))) * ... * (g * (h ^ a(n))) = e.\nGoal:\ng * h = h * g.",
+    "formal_statement": "theorem group_commutativity_condition (m n : ℕ) (hm : m > 0) (hn : n > 0) (hcoprime : Nat.Coprime m n) (G : Type*) [Group G] (g h : G) :\n    (let a : ℕ → ℤ := fun k => (Int.floor ((m : ℤ) * (k : ℤ) / (n : ℤ))) - (Int.floor ((m : ℤ) * ((k : ℤ) - 1) / (n : ℤ))) in\n    (Finset.prod (Finset.Icc 1 n) fun k => g * (h ^ (a k))) = 1) → g * h = h * g := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine F : ℝ² → ℝ.\nDefine g : ℝ → ℝ.\nAssume for every real number u, F(u, u) = 0.\nAssume for every real number x, g(x) > 0.\nAssume for every real number x, (x²) * g(x) ≤ 1.\nAssume for every real number u and for every real number v, the gradient ∇F(u, v) is either the zero vector or parallel to the vector ⟨g(u), -g(v)⟩.\nAssume F is twice continuously differentiable.\nAssume g is twice continuously differentiable.\nLet n be a natural number.\nAssume n ≥ 2.\nLet x₁ be a real number.\nLet x₂ be a real number.\n...\nLet xₙ₊₁ be a real number.\nGoal:\nThere exists a real number C such that min_{i ≠ j} |F(x_i, x_j)| ≤ C / n.",
+    "formal_statement": "theorem exists_bound_on_min_pairwise_F (F : ℝ × ℝ → ℝ) (g : ℝ → ℝ) (hF_zero_diag : ∀ (u : ℝ), F (u, u) = 0) (hg_pos : ∀ (x : ℝ), g x > 0) (hg_bound : ∀ (x : ℝ), (x ^ 2) * g x ≤ 1) (hgrad_parallel : ∀ (u v : ℝ), ∇ F (u, v) = 0 ∨ ∃ (λ : ℝ), ∇ F (u, v) = λ • (g u, -g v)) (hF_smooth : ContDiff ℝ 2 F) (hg_smooth : ContDiff ℝ 2 g) (n : ℕ) (hn : n ≥ 2) (x : ℕ → ℝ) : ∃ (C : ℝ), (Finset.inf' (Finset.filter (λ (ij : ℕ × ℕ) => ij.1 ≠ ij.2) (Finset.range (n + 1) ×ˢ Finset.range (n + 1))) (by simp) (λ (ij : ℕ × ℕ) => |F (x ij.1, x ij.2)|)) ≤ C / n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected token",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine L = 4/7.\nDefine the floor function: For every real number z, floor(z) is the greatest integer less than or equal to z.\nDefine f : ℝ → ℝ as follows: For every real number x, define f(x) = Σ_{n ∈ S_x} (1 / (2^n)), where S_x is the set of natural numbers n such that n ≥ 1 and floor(n * x) is even.\nAssume x is a real number.\nAssume 0 ≤ x < 1.\nGoal:\nFor every real number x in [0,1), f(x) ≥ L.",
+    "formal_statement": "theorem f_lower_bound : ∀ (x : ℝ), 0 ≤ x ∧ x < 1 → (let L : ℝ := 4/7; let f : ℝ → ℝ := λ x => ∑' (n : ℕ), if 1 ≤ n ∧ Int.even (⌊(n : ℝ) * x⌋.toInt) then (1 : ℝ) / ((2 : ℝ) ^ n) else 0; f x ≥ L) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Int.even'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A(1) = 0.\nDefine A(2) = 1.\nFor every natural number n ≥ 3, define A(n) as the concatenation of the decimal expansions of A(n-1) and A(n-2).\nDefine f : ℕ → ℕ by f(n) = A(n).\nAssume for every natural number n ≥ 3, A(n) = (A(n-1) * (10^(d(n-2)))) + A(n-2), where d(m) is the number of decimal digits of A(m).\nDefine d : ℕ → ℕ by d(m) = floor(log_base(10, A(m))) + 1 for A(m) > 0, and d(1) = 1.\nLet n be a natural number.\nLet k be an integer.\nGoal:\nThe set {n in ℕ | There exists an integer q such that A(n) = 11 * q} = {n in ℕ | There exists an integer k such that n = (6*k) + 1}.",
+    "formal_statement": "theorem set_equality : {n : ℕ | ∃ (q : ℤ), f n = 11 * q} = {n : ℕ | ∃ (k : ℤ), n = 6 * k + 1} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ → ℝ as a polynomial function.\nAssume P is nonconstant.\nDefine f : ℝ → ℝ by f(x) = ∫ from 0 to x of P(t) * sin(t) dt.\nDefine g : ℝ → ℝ by g(x) = ∫ from 0 to x of P(t) * cos(t) dt.\nGoal:\nThe set { x in ℝ | (f(x) = 0) AND (g(x) = 0) } is finite.",
+    "formal_statement": "theorem finite_common_zeros_of_integrals (P : ℝ → ℝ) (hP : Polynomial P) (hP_nonconst : ¬ Polynomial.constant P) :\n    Set.Finite {x : ℝ | (fun x : ℝ => ∫ t in (0 : ℝ)..x, P t * Real.sin t) x = 0 ∧ (fun x : ℝ => ∫ t in (0 : ℝ)..x, P t * Real.cos t) x = 0} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  @Polynomial P\nargument\n  P\nhas type\n  ℝ → ℝ : Type\nbut is expected to have type\n  Type ?u.6 : Type (?u.6 + 1)\nunknown constant 'Polynomial.constant'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine m as a real number.\nAssume m > 1.\nDefine n as a real number.\nAssume (1/m) + (1/n) = 1.\nDefine u as a real number.\nDefine v as a real number.\nAssume u ≥ 0.\nAssume v ≥ 0.\nDefine the function f : ℝ → ℝ by f(x) = x^m.\nDefine the function g : ℝ → ℝ by g(y) = y^m.\nDefine the curve C as the set {(x, y) in ℝ² | (x^m) + (y^m) = 1}.\nDefine the line L as the set {(x, y) in ℝ² | (u*x) + (v*y) = 1}.\nAssume L is tangent to C at a point (a, b) in ℝ².\nAssume a ≥ 0.\nAssume b ≥ 0.\nAssume (a^m) + (b^m) = 1.\nAssume (u*a) + (v*b) = 1.\nDefine the function h : ℝ → ℝ by h(x) = ((1 - (u*x)) / v) for all real numbers x such that v ≠ 0.\nAssume v ≠ 0.\nDefine the function F : ℝ → ℝ by F(x) = (x^m) + (h(x))^m.\nAssume F(a) = 1.\nAssume the derivative F'(a) = 0.\n\nGoal:\n(u^n) + (v^n) = 1.",
+    "formal_statement": "theorem tangent_line_condition (m n u v a b : ℝ) (hm : m > 1) (hn : (1 / m) + (1 / n) = 1) (hu : u ≥ 0) (hv : v ≥ 0) (hv_ne_zero : v ≠ 0) (ha_nonneg : a ≥ 0) (hb_nonneg : b ≥ 0) (h_curve_eq : a ^ m + b ^ m = 1) (h_line_eq : u * a + v * b = 1) (h_tangent : ∀ (x y : ℝ), (x ^ m + y ^ m = 1) → (u * x + v * y = 1) → (x = a ∧ y = b)) : u ^ n + v ^ n = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the tangent condition. The English statement says L is tangent to C at point (a,b), which implies the line touches the curve at exactly that point and has the same slope there. The Lean theorem uses `h_tangent : ∀ (x y : ℝ), (x ^ m + y ^ m = 1) → (u * x + v * y = 1) → (x = a ∧ y = b))`, which incorrectly states that (a,b) is the ONLY intersection point between the curve C and line L. This is a stronger condition than tangency - it implies the line intersects the curve at exactly one point, which is not equivalent to being tangent at (a,b). A proper tangency condition would involve derivatives or gradients being proportional."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine i as a natural number.\nAssume i is in the set {1, 2, 3, 4}.\nDefine a_i as a real number.\nDefine b_i as a real number.\nDefine x_i as a real number.\nAssume (a_1 * b_2 - a_2 * b_1) ≠ 0.\nAssume (a_1 * x_1 + a_2 * x_2 + a_3 * x_3 + a_4 * x_4) = 0.\nAssume (b_1 * x_1 + b_2 * x_2 + b_3 * x_3 + b_4 * x_4) = 0.\nAssume for every i in the set {1, 2, 3, 4}, x_i ≠ 0.\nDefine S as the set of all 4-tuples (x_1, x_2, x_3, x_4) satisfying the above assumptions.\nDefine T as the set of all 4-tuples (sgn(x_1), sgn(x_2), sgn(x_3), sgn(x_4)) for (x_1, x_2, x_3, x_4) in S.\nGoal:\nThe size of the set T = 8.",
+    "formal_statement": "theorem sign_patterns_cardinality : \n    let i : ℕ := 0 in\n    let indices : Finset ℕ := {1, 2, 3, 4} in\n    let a : ℕ → ℝ := λ _ => 0 in\n    let b : ℕ → ℝ := λ _ => 0 in\n    let x : ℕ → ℝ := λ _ => 0 in\n    let S : Set (ℕ → ℝ) := {x | \n      (a 1 * b 2 - a 2 * b 1) ≠ 0 ∧\n      (a 1 * x 1 + a 2 * x 2 + a 3 * x 3 + a 4 * x 4) = 0 ∧\n      (b 1 * x 1 + b 2 * x 2 + b 3 * x 3 + b 4 * x 4) = 0 ∧\n      ∀ i ∈ indices, x i ≠ 0} in\n    let T : Set (ℕ → ℤ) := {s | ∃ x ∈ S, ∀ i ∈ indices, s i = Int.sign (x i)} in\n    Finset.card (T.toFinset) = 8 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine a = -100.  \nDefine b = -10.  \nDefine c = 1/101.  \nDefine d = 1/11.  \nDefine e = 101/100.  \nDefine f = 11/10.  \nDefine g : ℝ → ℝ by g(x) = (x^2 - x) / (x^3 - 3*x + 1).  \nDefine h : ℝ → ℝ by h(x) = (g(x))^2.  \nAssume the integrals exist.  \n\nGoal:  \n(∫ from a to b of h(x) dx) + (∫ from c to d of h(x) dx) + (∫ from e to f of h(x) dx) is a rational number.",
+    "formal_statement": "theorem rational_integral_sum : ∃ (r : ℚ), (∫ x in (-100 : ℝ)..(-10 : ℝ), ((fun (x : ℝ) => ((x ^ 2 - x) / (x ^ 3 - 3 * x + 1)) ^ 2) x)) + (∫ x in ((1/101 : ℝ))..((1/11 : ℝ)), ((fun (x : ℝ) => ((x ^ 2 - x) / (x ^ 3 - 3 * x + 1)) ^ 2) x)) + (∫ x in ((101/100 : ℝ))..((11/10 : ℝ)), ((fun (x : ℝ) => ((x ^ 2 - x) / (x ^ 3 - 3 * x + 1)) ^ 2) x)) = (r : ℝ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem states that the sum of integrals equals some rational number r (as a real), which correctly captures the mathematical intent that the sum is rational. The theorem uses the correct bounds and function definitions, with proper type annotations for ℝ. The existential quantifier over ℚ appropriately expresses that the sum equals some rational number."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a natural number.\nLet k be a natural number.\nAssume n > 0.\nAssume k > 0.\nDefine S = {1, 2, ..., n}.\nDefine a permutation σ of S.\nDefine the property: For every i in S, |σ(i) - i| ≤ k.\nGoal:\nThe size of the set {σ | σ is a permutation of S and for every i in S, |σ(i) - i| ≤ k} is odd if and only if (n ≡ 0 mod (2*k + 1)) OR (n ≡ 1 mod (2*k + 1)).",
+    "formal_statement": "theorem permutation_count_mod_condition (n k : ℕ) (hn_pos : n > 0) (hk_pos : k > 0) :\n    let S : Finset ℕ := Finset.Icc 1 n\n    let permutations_set : Finset (ℕ → ℕ) :=\n      Finset.filter (fun σ : ℕ → ℕ => ∀ i, i ∈ S → |σ i - i| ≤ k)\n        (Finset.filter (Function.Bijective (fun i : S => σ i)) Finset.univ)\n    in (permutations_set.card % 2 = 1) ↔ (n % (2 * k + 1) = 0 ∨ n % (2 * k + 1) = 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet s be an arc of the unit circle.\nAssume s lies entirely in the first quadrant.\nDefine the unit circle as the set {(x, y) in ℝ^2 | (x^2) + (y^2) = 1}.\nLet A be a real number.\nAssume A is the area of the region {(x, y) in ℝ^2 | (x, y) is below s and above the x-axis}.\nLet B be a real number.\nAssume B is the area of the region {(x, y) in ℝ^2 | (x, y) is to the right of the y-axis and to the left of s}.\nLet L be a real number.\nAssume L is the arc length of s.\n\nGoal:\n(A + B) = (π/4) - (L/2).",
+    "formal_statement": "theorem area_sum_arc_length_relation (s : Set (ℝ × ℝ)) (h_arc : IsArc s) (h_quadrant : s ⊆ {p | 0 ≤ p.1 ∧ 0 ≤ p.2 ∧ p.1^2 + p.2^2 = 1}) (A B L : ℝ) \n    (hA : A = volume {p : ℝ × ℝ | (p.1, p.2) ∈ s ∧ p.2 ≥ 0 ∧ p.2 ≤ Real.sqrt (1 - p.1^2)})\n    (hB : B = volume {p : ℝ × ℝ | (p.1, p.2) ∈ s ∧ p.1 ≥ 0 ∧ p.1 ≤ Real.sqrt (1 - p.2^2)})\n    (hL : L = arcLength s) : A + B = π/4 - L/2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'IsArc'\nunknown identifier 'volume'\nunknown identifier 'volume'\nunknown identifier 'arcLength'\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n be a natural number.\nDefine p : ℂ → ℂ by p(z) = a_n * z^n + a_{n-1} * z^{n-1} + ... + a_1 * z + a_0, where a_n ≠ 0.\nAssume for every complex number z, if p(z) = 0, then |z| = 1.\nDefine g : ℂ → ℂ by g(z) = p(z) / (z^(n/2)).\nGoal:\nFor every complex number z, if g'(z) = 0, then |z| = 1.",
+    "formal_statement": "theorem derivative_condition : ∀ (n : ℕ) (a : ℕ → ℂ) (h : a n ≠ 0) (p : ℂ → ℂ) (hp : ∀ z, p z = ∑ k in Finset.range (n + 1), a k * z ^ k) (hroot : ∀ z : ℂ, p z = 0 → Complex.abs z = 1) (g : ℂ → ℂ) (hg : ∀ z, g z = p z / (z ^ (n / 2))) (g' : ℂ → ℂ) (hg' : ∀ z, g' z = deriv g z), ∀ z : ℂ, g' z = 0 → Complex.abs z = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement defines p as a polynomial of degree n with leading coefficient a_n ≠ 0, but the Lean code represents p as any function satisfying p(z) = Σ a_k * z^k for k=0 to n, which doesn't enforce that a_n ≠ 0 (the condition h: a n ≠ 0 is given but not connected to the polynomial representation). More critically, the English defines g(z) = p(z)/(z^(n/2)) for all z, but the Lean code makes this an assumption (hg) rather than a definition, and similarly for g' as the derivative. This changes the logical structure: the English asks to prove that if g'(z)=0 then |z|=1 given the definitions, while the Lean code assumes g and g' satisfy certain equations and then proves the implication. The types and basic structure are correct, but the logical formulation differs significantly."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine the domain interval I = [0, 1].  \nDefine K : ℝ × ℝ → ℝ such that for every real number x in I and every real number y in I, K(x, y) > 0 and K is continuous on I × I.  \nDefine f : ℝ → ℝ such that for every real number x in I, f(x) > 0 and f is continuous on I.  \nDefine g : ℝ → ℝ such that for every real number x in I, g(x) > 0 and g is continuous on I.  \nAssume for every real number x in I, ∫ from y=0 to y=1 of (f(y) * K(x, y)) dy = g(x).  \nAssume for every real number x in I, ∫ from y=0 to y=1 of (g(y) * K(x, y)) dy = f(x).  \n\nGoal:  \nFor every real number x in I, f(x) = g(x).",
+    "formal_statement": "theorem equality_of_functions_on_interval : \n    ∀ (x : ℝ), x ∈ Set.Icc (0 : ℝ) 1 → f x = g x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'\nunknown identifier 'g'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 5.\nLet p_1, p_2, p_3, p_4, p_5 be points on the unit circle.\nDefine the set S = {p_1, p_2, p_3, p_4, p_5}.\nDefine d : ℝ² × ℝ² → ℝ by d(x, y) = √((x₁ - y₁)² + (x₂ - y₂)²).\nDefine Σ : ℝ → ℝ by Σ = ∑_{i in the set {1, ..., n}} ∑_{j in the set {i+1, ..., n}} d(p_i, p_j).\nGoal:\nFor every configuration of points in S, Σ is maximized when the points are vertices of a regular pentagon.",
+    "formal_statement": "theorem sum_of_distances_maximized_by_regular_pentagon : \n    let n : ℕ := 5 in\n    let S : Set (ℝ × ℝ) := {p₁, p₂, p₃, p₄, p₅} in\n    let points : Fin n → ℝ × ℝ := λ i => match i with\n      | 0 => p₁ | 1 => p₂ | 2 => p₃ | 3 => p₄ | 4 => p₅ in\n    let d : (ℝ × ℝ) → (ℝ × ℝ) → ℝ := λ x y => Real.sqrt (((x.1 - y.1) ^ 2) + ((x.2 - y.2) ^ 2)) in\n    let Σ : (Fin n → ℝ × ℝ) → ℝ := λ pts => \n      ∑ i : Fin n, ∑ j : Fin n, if i.val < j.val then d (pts i) (pts j) else 0 in\n    ∀ (p₁ p₂ p₃ p₄ p₅ : ℝ × ℝ), \n      (∀ i : Fin n, (points i).1 ^ 2 + (points i).2 ^ 2 = 1) → \n      Σ points ≤ Σ (λ k => (Real.cos (2 * π * (k : ℝ) / n), Real.sin (2 * π * (k : ℝ) / n))) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a positive integer.\nDefine N = 3*(m^2).\nLet x, y, z be integer variables.\nDefine the set S = {(x, y, z) in ℤ^3 | ((x^2) + (y^2) + (z^2)) = N}.\nAssume there exists a regular tetrahedron T.\nAssume the vertices of T are four distinct points in the set S.\nAssume T is inscribed in the sphere defined by ((x^2) + (y^2) + (z^2)) = N.\nGoal:\nThe size of the set {N in ℕ | there exists a positive integer m such that N = 3*(m^2)} is equal to the size of the set {N in ℕ | there exists a regular tetrahedron T with vertices in S}.",
+    "formal_statement": "theorem tetrahedron_count_equality : \n    let positiveIntegers : Set ℕ := {m | 0 < m} in\n    let N_set1 : Set ℕ := {N | ∃ m ∈ positiveIntegers, N = 3 * (m ^ 2)} in\n    let N_set2 : Set ℕ := {N | ∃ (m : ℕ) (h : 0 < m) (S : Set (ℤ × ℤ × ℤ)), \n        S = {(x, y, z) | x^2 + y^2 + z^2 = (3 * (m ^ 2) : ℤ)} ∧\n        ∃ (T : Set (ℤ × ℤ × ℤ)) (hT : T ⊆ S) (hcard : Finset.card (T : Finset (ℤ × ℤ × ℤ)).val = 4) \n            (hdistinct : Set.InjOn (fun p : ℤ × ℤ × ℤ => p) T) \n            (hregular : ∃ (a b : ℤ × ℤ × ℤ) (hab : a ∈ T ∧ b ∈ T ∧ a ≠ b), \n                ∀ (c d : ℤ × ℤ × ℤ), c ∈ T → d ∈ T → c ≠ d → \n                dist (c : ℤ × ℤ × ℤ) d = dist a b), \n        N = 3 * (m ^ 2)} in\n    Set.ncard N_set1 = Set.ncard N_set2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n be a positive integer.\nLet x be a real number.\nDefine f : ℝ → ℝ.\nAssume f is differentiable.\nAssume for all real numbers x and for all positive integers n, f'(x) = ((f(x + n) - f(x)) / n).\n\nGoal:\nThere exist real numbers c and d such that for all real numbers x, f(x) = (c * x + d).",
+    "formal_statement": "theorem exists_linear_function (n : ℕ) (hn : n > 0) (f : ℝ → ℝ) (hf : Differentiable ℝ f) \n    (h : ∀ (x : ℝ) (n : ℕ), n > 0 → deriv f x = ((f (x + (n : ℝ)) - f x) / (n : ℝ))) : \n    ∃ (c d : ℝ), ∀ (x : ℝ), f x = c * x + d := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature correctly captures the mathematical intent. It includes: positive integer n (ℕ with n > 0), real number x (ℝ), differentiable function f, the derivative condition with proper type conversions (n:ℝ), and concludes with existence of real coefficients c,d such that f is linear. All types match, constraints are present, and logical flow is correct."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nAssume n ≥ 2.\nDefine S as the set of all sequences s = (s_1, ..., s_{n-1}) such that for every integer i in the set {1, ..., n-1}, s_i ∈ {-1, 1}.\nFor each sequence s in S, define f(s) as a natural number.\nFor each sequence s in S, define f(s) as the size of the set { permutation (a_1, ..., a_n) of the set {1, ..., n} | for every integer i in the set {1, ..., n-1}, (s_i) * (a_{i+1} - a_i) > 0 }.\nGoal:\nFor every sequence s in S, f(s) ≤ f(s_alt), where s_alt is defined by s_alt_i = (-1)^(i+1) for every integer i in the set {1, ..., n-1}.\nFurthermore, for every sequence s in S, f(s) = f(s_alt) if and only if for every integer i in the set {1, ..., n-1}, s_i = (-1)^(i+1) or for every integer i in the set {1, ..., n-1}, s_i = (-1)^i.",
+    "formal_statement": "theorem sequence_count_bound (n : ℤ) (hn : n ≥ 2) : \n    let S : Set (Fin (n - 1).toNat → ℤ) := {s | ∀ i : Fin (n - 1).toNat, s i = (1 : ℤ) ∨ s i = (-1 : ℤ)} in\n    let f (s : Fin (n - 1).toNat → ℤ) : ℕ := \n      Finset.card (Finset.filter (fun (a : Equiv.Perm (Fin n.toNat)) => \n        ∀ i : Fin (n - 1).toNat, s i * ((a (Fin.succ i) : ℤ) - (a i : ℤ)) > 0) \n        (Finset.univ : Finset (Equiv.Perm (Fin n.toNat)))) in\n    let s_alt (i : Fin (n - 1).toNat) : ℤ := (-1 : ℤ) ^ ((i : ℕ) + 1) in\n    ∀ s ∈ S, f s ≤ f s_alt ∧ (f s = f s_alt ↔ \n      (∀ i : Fin (n - 1).toNat, s i = (-1 : ℤ) ^ ((i : ℕ) + 1)) ∨ \n      (∀ i : Fin (n - 1).toNat, s i = (-1 : ℤ) ^ (i : ℕ))) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine ℕ as the set of natural numbers including 0.  \nDefine ℤ as the set of integers.  \nDefine ℝ as the set of real numbers.  \n\nDefine the set 𝒫 as follows:  \n𝒫 = { (a, b) in ℤ × ℤ | (0 ≤ a) and (a ≤ 2) and (0 ≤ b) and (b ≤ 100) }.  \n\nLet v be an element of 𝒫.  \nDefine v = (v_a, v_b) where v_a is an integer and v_b is an integer.  \nAssume (0 ≤ v_a) and (v_a ≤ 2).  \nAssume (0 ≤ v_b) and (v_b ≤ 100).  \n\nAssume there exists a partition of the set (𝒫 \\ {v}) into two subsets A and B such that:  \n1. A ∩ B = ∅.  \n2. A ∪ B = (𝒫 \\ {v}).  \n3. The size of A = the size of B.  \n4. Define sum_A = Σ_{(x,y) in A} (x + y).  \n   Define sum_B = Σ_{(x,y) in B} (x + y).  \n   Assume sum_A = sum_B.  \n\nGoal:  \n(v_a = 1) and (0 ≤ v_b) and (v_b ≤ 100) and (There exists an integer k such that v_b = 2*k).",
+    "formal_statement": "theorem partition_sum_condition_implies_v_a_eq_one_and_v_b_even (v : ℤ × ℤ) (hv : v ∈ {p : ℤ × ℤ | 0 ≤ p.1 ∧ p.1 ≤ 2 ∧ 0 ≤ p.2 ∧ p.2 ≤ 100}) : \n    ∃ (A B : Set (ℤ × ℤ)) (hA : A ⊆ {p : ℤ × ℤ | 0 ≤ p.1 ∧ p.1 ≤ 2 ∧ 0 ≤ p.2 ∧ p.2 ≤ 100} \\ {v}) \n      (hB : B ⊆ {p : ℤ × ℤ | 0 ≤ p.1 ∧ p.1 ≤ 2 ∧ 0 ≤ p.2 ∧ p.2 ≤ 100} \\ {v}), \n      A ∩ B = ∅ ∧ A ∪ B = {p : ℤ × ℤ | 0 ≤ p.1 ∧ p.1 ≤ 2 ∧ 0 ≤ p.2 ∧ p.2 ≤ 100} \\ {v} ∧ \n      Finset.card (A.toFinset) = Finset.card (B.toFinset) ∧ \n      (∑ x in A.toFinset, (x.1 + x.2)) = (∑ x in B.toFinset, (x.1 + x.2)) → \n      v.1 = 1 ∧ 0 ≤ v.2 ∧ v.2 ≤ 100 ∧ ∃ (k : ℤ), v.2 = 2 * k := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑A\nfailed to synthesize instance\n  Fintype ↑B\nfailed to synthesize instance\n  Fintype ↑A\nfailed to synthesize instance\n  Fintype ↑B",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℝ⁺ as the set of positive real numbers.\nDefine f : ℝ⁺ → ℝ⁺.\nAssume for all real numbers x in ℝ⁺ and for all real numbers y in ℝ⁺, f is continuous at x.\nAssume for all real numbers x in ℝ⁺ and for all real numbers y in ℝ⁺, (f((x) * f(y))) + (f((y) * f(x))) = 1 + (f(x + y)).\nGoal:\nThere exists a real number c such that (c ≥ 0) AND (for all real numbers x in ℝ⁺, f(x) = (1) / (1 + (c * x))).",
+    "formal_statement": "theorem exists_c_such_that_f_has_form : ∃ (c : ℝ), c ≥ 0 ∧ ∀ (x : ℝ), x > 0 → f x = 1 / (1 + c * x) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N as a positive integer.\nAssume N has 1998 decimal digits.\nAssume for every integer i in the set {1, ..., 1998}, the i-th decimal digit of N is 1.\nDefine A = sqrt(N).\nGoal:\nThe thousandth digit after the decimal point of A is 1.",
+    "formal_statement": "theorem thousandth_digit_of_sqrt_is_one : \n    ∃ (N : ℕ) (hpos : N > 0) (hdigits : Nat.log 10 N + 1 = 1998) (hdigits_one : ∀ i : ℕ, 1 ≤ i → i ≤ 1998 → \n      (Nat.digits 10 N).get ⟨i - 1, by omega⟩ = 1), \n    let A := Real.sqrt (N : ℝ) in \n    let fractional_part := A - ⌊A⌋ in\n    let thousandth_digit := ⌊fractional_part * 10 ^ 1000⌋ % 10 in\n    thousandth_digit = 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine T : ℝ.\nAssume T > 0.\nDefine H : ℝ → ℝ.\nAssume H is a polynomial.\nAssume the degree of H is ≤ 3.\nGoal:\n( (1 / (2*T)) * ∫_{x = -T}^{T} H(x) dx ) = ( ( H( -T / √(3) ) + H( T / √(3) ) ) / 2 ).",
+    "formal_statement": "theorem integral_polynomial_approx (T : ℝ) (hT : T > 0) (H : ℝ → ℝ) (hH : Polynomial ℝ H) (hdeg : Polynomial.degree (Polynomial.ofFun H) ≤ 3) :\n    (1 / (2 * T)) * ∫ x in -T..T, H x = ((H (-T / Real.sqrt 3)) + H (T / Real.sqrt 3)) / 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "function expected at\n  Polynomial ℝ\nterm has type\n  Type\nunknown constant 'Polynomial.ofFun'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine k as a natural number.\nAssume k ≥ 1.\nDefine n as a natural number.\nAssume n ≥ k.\nDefine a function s : ℕ × (ℝ^+)ⁿ → ℝ.\nFor every natural number i in the set {1, ..., n}, define a_i as a positive real number.\nFor every natural number m in the set {1, ..., n}, define s(m, (a_1, ..., a_n)) as the sum over all subsets I of the set {1, ..., n} with size m of the product over all indices i in I of a_i.\nGoal:\nThe supremum of the set { (s(k, (a_1, ..., a_n))) / ((s(1, (a_1, ..., a_n)))^k) | n ≥ k, and for every i in {1, ..., n}, a_i > 0 } is equal to (1 / (k!)).",
+    "formal_statement": "theorem supremum_of_s_ratio_eq_one_over_k_factorial : \n    let k : ℕ := 1 in\n    let n : ℕ := k in\n    let s : ℕ × ((Fin n) → ℝ) → ℝ := λ ⟨m, a⟩ => \n      ∑ I : Finset (Fin n) in Finset.powersetCard m Finset.univ, ∏ i in I, a i in\n    let candidate_set : Set ℝ := \n      { x : ℝ | ∃ (n : ℕ) (hn : n ≥ k) (a : Fin n → ℝ) (ha : ∀ i, a i > 0), \n          x = s (k, a) / ((s (1, a)) ^ k) } in\n    sSup candidate_set = 1 / (Nat.factorial k) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a natural number.\nDefine f : ℝ → ℝ.\nAssume f is integrable on the interval [0, 1].\nAssume for every integer i in the set {0, ..., (n - 1)}, the integral from 0 to 1 of (x^i * f(x)) dx = 0.\nAssume the integral from 0 to 1 of (x^n * f(x)) dx = 1.\nGoal:\nThere exists a subset S of [0, 1] with positive measure such that for every x in S, |f(x)| ≥ (2^n * (n + 1)).",
+    "formal_statement": "theorem exists_subset_with_lower_bound (n : ℕ) (f : ℝ → ℝ) (h_int : IntegrableOn f (Set.Icc (0 : ℝ) 1) volume) \n    (h_zero_integrals : ∀ i : ℤ, i ∈ Finset.Icc (0 : ℤ) ((n : ℤ) - 1)) → ∫ x in (0 : ℝ)..1, (x : ℝ) ^ (i : ℕ) * f x ∂volume = 0)\n    (h_one_integral : ∫ x in (0 : ℝ)..1, (x : ℝ) ^ n * f x ∂volume = 1) :\n    ∃ S : Set ℝ, S ⊆ Set.Icc (0 : ℝ) 1 ∧ 0 < volume S ∧ ∀ x ∈ S, |f x| ≥ (2 : ℝ) ^ n * ((n : ℝ) + 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '→'; expected ':'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A be a point in ℤ × ℤ.\nLet B be a point in ℤ × ℤ.\nLet C be a point in ℤ × ℤ.\nAssume A ≠ B.\nAssume B ≠ C.\nAssume A ≠ C.\nDefine d : (ℤ × ℤ) × (ℤ × ℤ) → ℝ by d(X, Y) = √((x₁ - x₂)² + (y₁ - y₂)²) where X = (x₁, y₁) and Y = (x₂, y₂).\nDefine area : (ℤ × ℤ) × (ℤ × ℤ) × (ℤ × ℤ) → ℝ by area(X, Y, Z) = (1/2) * |(x₁*(y₂ - y₃) + x₂*(y₃ - y₁) + x₃*(y₁ - y₂))| where X = (x₁, y₁), Y = (x₂, y₂), Z = (x₃, y₃).\nAssume (d(A, B) + d(B, C))² < (8 * area(A, B, C)) + 1.\n\nGoal:\nThere exists a point D in ℤ × ℤ such that D ≠ A, D ≠ B, D ≠ C, and the set {A, B, C, D} forms the vertices of a square.",
+    "formal_statement": "theorem exists_square_vertex (A B C : ℤ × ℤ) (hAB : A ≠ B) (hBC : B ≠ C) (hAC : A ≠ C) : \n    ∃ (D : ℤ × ℤ), D ≠ A ∧ D ≠ B ∧ D ≠ C ∧ \n    let vertices : Finset (ℤ × ℤ) := {A, B, C, D} in \n    vertices.card = 4 ∧ \n    let d (X Y : ℤ × ℤ) : ℝ := Real.sqrt (((X.1 : ℝ) - (Y.1 : ℝ)) ^ 2 + ((X.2 : ℝ) - (Y.2 : ℝ)) ^ 2) in\n    let area (X Y Z : ℤ × ℤ) : ℝ := (1/2 : ℝ) * |((X.1 : ℝ) * ((Y.2 : ℝ) - (Z.2 : ℝ)) + (Y.1 : ℝ) * ((Z.2 : ℝ) - (X.2 : ℝ)) + (Z.1 : ℝ) * ((X.2 : ℝ) - (Y.2 : ℝ)))| in\n    (d A B + d B C) ^ 2 < 8 * area A B C + 1 → \n    ∃ (perm : Equiv.Perm (ℤ × ℤ)), perm '' vertices = vertices ∧ \n    ∀ (X Y : ℤ × ℤ), X ∈ vertices → Y ∈ vertices → d (perm X) (perm Y) = d X Y ∧ \n    (X ≠ Y → (perm X ≠ perm Y) ∧ (perm (perm X) = X)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine m as a natural number.  \nDefine n as a natural number.  \nDefine a : ℕ × ℕ → ℕ by a(m, n) = the coefficient of x^n in the expansion of ((1 + x + (x^2)))^m.  \nLet k be a natural number.  \nAssume k ≥ 0.  \nDefine S(k) = ∑_{i in the set {0, 1, ..., floor((2*k)/3)}} ((-1)^i * a(k - i, i)).  \n\nGoal:  \n0 ≤ S(k) ≤ 1.",
+    "formal_statement": "theorem coefficient_sum_bound (k : ℕ) (hk : 0 ≤ k) : \n    let a : ℕ × ℕ → ℕ := λ ⟨m, n⟩ ↦ Polynomial.coeff (ℕ) ((1 + Polynomial.X + Polynomial.X ^ 2) ^ m) n\n    let S : ℕ → ℤ := λ k ↦ ∑ i in Finset.Icc 0 (⌊(2 * k : ℝ) / 3⌋.toNat), (-1 : ℤ) ^ i * (a (k - i, i) : ℤ)\n    in (0 : ℤ) ≤ S k ∧ S k ≤ 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine the interval I = (0, 1).  \nLet n be a natural number.  \nAssume n ≥ 1.  \nDefine a sequence of real numbers x_n.  \nAssume for every natural number i and j, if i ≠ j then x_i ≠ x_j.  \nAssume the set {x_n | n is a natural number} is dense in I.  \nAssume for every natural number n, the points x_1, x_2, …, x_{n-1} divide I into n sub-intervals.  \nAssume x_n lies in exactly one of these n sub-intervals.  \nAssume x_n divides that sub-interval into two sub-intervals.  \nDefine a_n as the length of the left sub-interval created by x_n.  \nDefine b_n as the length of the right sub-interval created by x_n.  \n\nGoal:  \nThe sum from n=1 to infinity of (a_n * b_n * (a_n + b_n)) = 1/3.",
+    "formal_statement": "theorem sum_of_interval_products_eq_one_third : \n    let I : Set ℝ := Set.Ioo (0 : ℝ) (1 : ℝ) in\n    ∀ (x : ℕ → ℝ) (hx_inj : ∀ i j : ℕ, i ≠ j → x i ≠ x j) (hx_dense : Dense (x '' Set.univ ∩ I)) \n    (hx_partition : ∀ n : ℕ, n ≥ 1 → \n      let points := Finset.image (fun k : ℕ => x k) (Finset.range n) in\n      let intervals := Finset.powersetCard (n - 1) points in\n      ∀ (interval : Finset ℝ) (hinterval : interval ∈ intervals), \n        ∃! (subinterval : Set ℝ), subinterval ⊆ I ∧ \n          Set.OrdConnected subinterval ∧ \n          x n ∈ subinterval ∧ \n          (∀ y ∈ subinterval, y ∉ points)) \n    (hx_placement : ∀ n : ℕ, n ≥ 1 → \n      ∃ (subinterval : Set ℝ), subinterval ⊆ I ∧ \n        Set.OrdConnected subinterval ∧ \n        x n ∈ subinterval ∧ \n        (∀ y ∈ subinterval, y ∉ Finset.image (fun k : ℕ => x k) (Finset.range n))) \n    (a b : ℕ → ℝ) \n    (ha_def : ∀ n : ℕ, n ≥ 1 → \n      let left_endpoint := sSup {y : ℝ | y < x n ∧ y ∈ I ∧ \n        (∀ k : ℕ, k < n → x k ≠ y)} in\n      a n = x n - left_endpoint) \n    (hb_def : ∀ n : ℕ, n ≥ 1 → \n      let right_endpoint := sInf {y : ℝ | y > x n ∧ y ∈ I ∧ \n        (∀ k : ℕ, k < n → x k ≠ y)} in\n      b n = right_endpoint - x n), \n    ∑' (n : ℕ), (if n ≥ 1 then a n * b n * (a n + b n) else 0) = (1/3 : ℝ) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a positive real number.\nLet b be a positive real number.\nDefine f : ℝ → ℝ by f(x) = e^(a*x) * cos(b*x).\nDefine the power series of f about 0 as: For every natural number n, define c_n = (the n-th derivative of f evaluated at 0) / (n!).\nGoal:\nThe size of the set {n in ℕ | c_n = 0} is either 0 or infinite.",
+    "formal_statement": "theorem power_series_coefficient_zero_set_cardinality (a b : ℝ) (ha : a > 0) (hb : b > 0) :\n    let f : ℝ → ℝ := λ x => Real.exp (a * x) * Real.cos (b * x) in\n    let c : ℕ → ℝ := λ n => (iteratedDeriv n f 0) / (Nat.factorial n : ℝ) in\n    (Finset.card (Finset.filter (λ n => c n = 0) Finset.univ : Finset ℕ) = 0) ∨\n    Set.Infinite {n : ℕ | c n = 0} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet G be a finite set.\nAssume G is a group.\nDefine H1 as a subset of G.\nDefine H2 as a subset of G.\nAssume H1 is a proper subgroup of G.\nAssume H2 is a proper subgroup of G.\nAssume for every element x in G, (x is in H1) OR (x is in H2).\n\nGoal:\nThe size of the set {x in G | (x is not in H1) AND (x is not in H2)} = 0.\n\nAssumptions:\nLet G be a finite set.\nAssume G is a group.\nDefine H1 as a subset of G.\nDefine H2 as a subset of G.\nDefine H3 as a subset of G.\nAssume H1 is a proper subgroup of G.\nAssume H2 is a proper subgroup of G.\nAssume H3 is a proper subgroup of G.\nAssume for every element x in G, (x is in H1) OR (x is in H2) OR (x is in H3).\n\nGoal:\nThere exists a group G such that (G is finite) AND (G is the union of H1, H2, H3) AND (H1 is a proper subgroup of G) AND (H2 is a proper subgroup of G) AND (H3 is a proper subgroup of G).",
+    "formal_statement": "theorem finite_group_union_of_three_proper_subgroups : ∃ (G : Type) [Group G] [Fintype G], ∃ (H1 H2 H3 : Subgroup G), H1 ≠ ⊤ ∧ H2 ≠ ⊤ ∧ H3 ≠ ⊤ ∧ (∀ x : G, x ∈ H1 ∨ x ∈ H2 ∨ x ∈ H3) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '['; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m_0 be a natural number.\nLet n_0 be a natural number.\nAssume m_0 ≠ n_0.\nAssume m_0 > 0.\nAssume n_0 > 0.\nDefine the function m : ℕ → ℕ.\nDefine the function n : ℕ → ℕ.\nFor every natural number k ≥ 1, define m(k) and n(k) to be natural numbers such that (m(k) / n(k)) = ((2*m(k-1) + 1) / (2*n(k-1) + 1)).\nAssume for every natural number k ≥ 1, the greatest common divisor of m(k) and n(k) is 1.\nGoal:\nThere exists a natural number K such that for every natural number k > K, the greatest common divisor of (2*m(k) + 1) and (2*n(k) + 1) is 1.",
+    "formal_statement": "theorem exists_K_such_that_for_all_k_gt_K_gcd_of_2m_plus_one_and_2n_plus_one_is_one (m₀ n₀ : ℕ) (h_m₀_ne_n₀ : m₀ ≠ n₀) (h_m₀_pos : m₀ > 0) (h_n₀_pos : n₀ > 0) (m n : ℕ → ℕ) (h_rec : ∀ k ≥ 1, (m k : ℚ) / (n k : ℚ) = ((2 * m (k - 1) + 1 : ℚ) / (2 * n (k - 1) + 1 : ℚ))) (h_coprime : ∀ k ≥ 1, Nat.gcd (m k) (n k) = 1) : ∃ K : ℕ, ∀ k > K, Nat.gcd (2 * m k + 1) (2 * n k + 1) = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement defines m and n as functions from ℕ to ℕ with specific recursive definitions for k ≥ 1, but the Lean theorem treats m and n as arbitrary functions from ℕ to ℕ with a different recursive condition. Specifically, the English defines m(k) and n(k) for k ≥ 1 in terms of m(k-1) and n(k-1), while the Lean theorem uses a rational number equality that doesn't enforce the intended recursive definition of m and n as natural numbers. Additionally, the base cases m₀ and n₀ are not properly connected to the functions m and n in the Lean theorem."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine base = 10.\nDefine digit_set = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.\nDefine nonzero_digit_set = {1, 2, 3, 4, 5, 6, 7, 8, 9}.\nLet n be a natural number.\nDefine f : ℕ → ℕ by f(n) = n^2.\nLet d be a digit in the set nonzero_digit_set.\nLet L be a natural number.\nDefine S(L, d) = {n in ℕ | The last L digits of f(n) are all equal to d}.\nDefine T(L) = {d in nonzero_digit_set | S(L, d) is nonempty}.\nGoal:\nThe maximum L such that T(L) is nonempty is 3.\nGoal:\nThe smallest n such that n is in S(3, 4) is 38.\nGoal:\nf(38) = 1444.",
+    "formal_statement": "theorem f_of_38 : f 38 = 1444 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an integer.\nAssume n ≥ 2.\nDefine P : ℤ × ℤ × ℤ → ℤ as a polynomial with integer coefficients.\nGoal:\nThere exists a polynomial P with integer coefficients such that for every integer x, x = P(x^n, x^(n+1), x + x^(n+2)).",
+    "formal_statement": "theorem exists_polynomial_with_property (n : ℤ) (hn : n ≥ 2) : ∃ (P : ℤ[X] → ℤ[X] → ℤ[X] → ℤ[X]), ∀ (x : ℤ), x = P (x ^ n) (x ^ (n + 1)) (x + x ^ (n + 2)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'X'\nunknown identifier 'X'\nunknown identifier 'X'\nunknown identifier 'X'\nfailed to synthesize instance\n  HPow ℤ ℤ (?m.1115 : outParam (Type ?u.295))\nfailed to synthesize instance\n  HPow ℤ ℤ (?m.2175 : outParam (Type ?u.1323))\nfailed to synthesize instance\n  HPow ℤ ℤ (?m.3176 : outParam (Type ?u.2347))\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nn : ℤ\nhn : n ≥ (2 : ℤ)\n⊢ (?m.46 : outParam ((?m.42 : Type ?u.41) → (?m.43 : Type ?u.40) → Prop)) ℤ (sorryAx (?m.43 : Type ?u.40) true)\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nn : ℤ\nhn : n ≥ (2 : ℤ)\n⊢ (?m.87 : outParam ((?m.83 : Type ?u.82) → (?m.84 : Type ?u.81) → Prop)) ℤ (sorryAx (?m.84 : Type ?u.81) true)\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nn : ℤ\nhn : n ≥ (2 : ℤ)\n⊢ (?m.146 : outParam ((?m.142 : Type ?u.141) → (?m.143 : Type ?u.140) → Prop)) ℤ (sorryAx (?m.143 : Type ?u.140) true)\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nn : ℤ\nhn : n ≥ (2 : ℤ)\n⊢ (?m.214 : outParam ((?m.210 : Type ?u.209) → (?m.211 : Type ?u.208) → Prop)) ℤ (sorryAx (?m.211 : Type ?u.208) true)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet k be a positive integer.\nLet m be a positive integer.\nLet n be a positive integer.\nDefine f : ℕ → ℕ.\nFor every positive integer n, define f(n) = the size of the set S(n), where S(n) is defined as follows:\nS(n) = { (x_1, ..., x_k, y_1, ..., y_m, z) in ℤ^(k+m+1) | (1 ≤ x_1) ∧ (x_1 ≤ x_2) ∧ ... ∧ (x_(k-1) ≤ x_k) ∧ (x_k ≤ z) ∧ (z ≤ n) ∧ (1 ≤ y_1) ∧ (y_1 ≤ y_2) ∧ ... ∧ (y_(m-1) ≤ y_m) ∧ (y_m ≤ z) ∧ (z ≤ n) }.\n\nGoal:\nThere exists a polynomial P with coefficients in ℕ such that for every positive integer n, f(n) = P(n).",
+    "formal_statement": "theorem exists_polynomial_for_f (k m : ℕ) (hk : k > 0) (hm : m > 0) :\n    ∃ (P : Polynomial ℕ), ∀ (n : ℕ) (hn : n > 0), f k m n = Polynomial.eval n P := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine b : ℕ → ℤ.\nDefine b(0) = 0.\nFor every natural number n ≥ 0, define b(n+1) = (2 * (b(n))^2) + b(n) + 1.\nLet k be a natural number.\nAssume k ≥ 1.\nGoal:\nThere exists an integer m such that (b(2^(k+1)) - (2 * b(2^k))) = (2^(2*k+2)) * m.\nGoal:\nThere exists an integer m such that (b(2^(k+1)) - (2 * b(2^k))) = (2^(2*k+2)) * m AND there does NOT exist an integer m' such that (b(2^(k+1)) - (2 * b(2^k))) = (2^(2*k+3)) * m'.",
+    "formal_statement": "theorem exists_int_m_and_not_exists_m_prime (b : ℕ → ℤ) (h0 : b 0 = 0) (hrec : ∀ n : ℕ, b (n + 1) = 2 * (b n) ^ 2 + b n + 1) (k : ℕ) (hk : k ≥ 1) : \n    (∃ m : ℤ, b (2 ^ (k + 1)) - 2 * b (2 ^ k) = (2 : ℤ) ^ (2 * k + 2) * m) ∧ \n    ¬∃ m' : ℤ, b (2 ^ (k + 1)) - 2 * b (2 ^ k) = (2 : ℤ) ^ (2 * k + 3) * m' := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures all mathematical elements: (1) b is defined as ℕ → ℤ with base case b(0)=0 and recurrence relation, (2) k is a natural number with constraint k ≥ 1, (3) the goal correctly states the existence of integer m satisfying the first equation AND the non-existence of integer m' satisfying the second equation with exponent 2*k+3. All types match (ℕ, ℤ, exponents as natural numbers), constraints are preserved, and the logical structure matches the English statement."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a positive integer.\nDefine S as a subset of the set {1, 2, ..., n}.\nDefine the property: For every integer a in S and for every integer b in S, if ((a + b) / 2) is an integer, then ((a + b) / 2) is in S.\nDefine a subset S of {1, 2, ..., n} as mediocre if it satisfies the property.\nDefine A : ℕ → ℕ by: For every natural number m, define A(m) as the size of the set {S ⊆ {1, 2, ..., m} | S is mediocre}.\nAssume A(3) = 7.\nGoal:\nFind all positive integers n such that (A(n+2) - (2 * A(n+1)) + A(n)) = 1.\nShow that for every positive integer n, if (A(n+2) - (2 * A(n+1)) + A(n)) = 1, then there exists an integer k such that n = (2^k) - 1.",
+    "formal_statement": "theorem mediocre_subset_property (n : ℕ) (hn : n > 0) : \n    ∀ (S : Set ℕ) (hS : S ⊆ Finset.Icc 1 n), \n    (∀ a ∈ S, ∀ b ∈ S, (a + b) % 2 = 0 → ((a + b) / 2) ∈ S) → \n    let A : ℕ → ℕ := λ m => Fintype.card {S : Finset ℕ // S ⊆ Finset.Icc 1 m ∧ ∀ a ∈ S, ∀ b ∈ S, (a + b) % 2 = 0 → ((a + b) / 2) ∈ S}\n    in A 3 = 7 → \n    (∀ n' : ℕ, n' > 0 → (A (n' + 2) - 2 * A (n' + 1) + A n' = 1) → \n    ∃ k : ℕ, n' = 2 ^ k - 1) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is twice-differentiable.\nDefine g : ℝ → ℝ.\nAssume for every real number x, g(x) ≥ 0.\nAssume for every real number x, (f(x) + f''(x)) = ((-x) * g(x) * f'(x)).\nGoal:\nThere exists a real number M such that for every real number x, |f(x)| ≤ M.",
+    "formal_statement": "theorem exists_bound_on_f (f : ℝ → ℝ) (hf : Differentiable ℝ f) (hf' : Differentiable ℝ (deriv f)) (g : ℝ → ℝ) (hg_nonneg : ∀ x, 0 ≤ g x) (h_eq : ∀ x, f x + deriv (deriv f) x = (-x) * g x * deriv f x) : ∃ M : ℝ, ∀ x, |f x| ≤ M := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement requires f to be twice-differentiable, but the Lean signature uses `Differentiable ℝ f` and `Differentiable ℝ (deriv f)`, which is not equivalent to twice-differentiability. Additionally, the English statement uses f''(x) notation for the second derivative, while the Lean code uses `deriv (deriv f) x`, which is not the standard second derivative notation in Lean 4 (should be `iteratedDeriv 2 f x` or similar). The logical structure and variable types are otherwise correct."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a positive integer.\nDefine a_1, a_2, ..., a_n as real numbers.\nDefine f : ℝ → ℝ by f(x) = (a_1 * sin(x)) + (a_2 * sin(2*x)) + ... + (a_n * sin(n*x)).\nAssume for all real numbers x, |f(x)| ≤ |sin(x)|.\n\nGoal:\n|a_1| + (2 * |a_2|) + ... + (n * |a_n|) ≤ 1.",
+    "formal_statement": "theorem sum_weighted_abs_coeffs_le_one (n : ℕ) (hn : n > 0) (a : ℕ → ℝ) (f : ℝ → ℝ) (h_def : ∀ x : ℝ, f x = ∑ k in Finset.range n, a (k + 1) * Real.sin ((k + 1 : ℝ) * x)) (h_bound : ∀ x : ℝ, |f x| ≤ |Real.sin x|) : ∑ k in Finset.range n, (k + 1) * |a (k + 1)| ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem accurately captures the mathematical intent: it assumes n is a positive integer, defines coefficients a_k as real numbers (via ℕ → ℝ), defines f as the weighted sum of sine terms, assumes the bound |f(x)| ≤ |sin(x)| for all real x, and concludes the weighted sum of absolute coefficients ≤ 1. All types match, constraints are present, and the logical implication flows correctly."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine S as the set of all positive integers that are not perfect squares.  \nDefine f : S → ℤ.  \nFor every natural number n in S, define f(n) as follows:  \nLet r be a natural number.  \nLet a₁, a₂, …, aᵣ be integers.  \nAssume n < a₁ < a₂ < … < aᵣ.  \nAssume (n * a₁ * a₂ * … * aᵣ) is a perfect square.  \nDefine f(n) = min aᵣ over all such choices of r and a₁, a₂, …, aᵣ.  \n\nGoal:  \nFor every natural number m in S and for every natural number n in S, if f(m) = f(n), then m = n.",
+    "formal_statement": "theorem injectivity_of_f : ∀ (m n : ℕ), m ∈ S → n ∈ S → f m = f n → m = n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'S'\nunknown identifier 'S'\nunknown identifier 'f'\nunknown identifier 'f'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nLet n be a natural number.  \nAssume n ≥ 2.  \nDefine S = {1, 2, ..., n}.  \nLet x_1, x_2, ..., x_n be natural numbers.  \nAssume {x_1, x_2, ..., x_n} = S.  \nDefine f : {1, 2, ..., n} → ℕ by f(i) = x_i.  \nAssume f is a bijection.  \nDefine T = (x_1 * x_2) + (x_2 * x_3) + ... + (x_{n-1} * x_n) + (x_n * x_1).  \n\nGoal:  \nThe maximum possible value of T is ((2*(n^3)) + (3*(n^2)) - (11*n) + 18) / 6.",
+    "formal_statement": "theorem max_sum_cyclic_products (n : ℕ) (hn : n ≥ 2) (x : ℕ → ℕ) (hx_range : Set.range x = Finset.Icc 1 n) (hx_inj : Function.Injective x) : \n    ∃ (T : ℕ), T = ∑ i : Finset.Icc 1 n, (x i.val) * (x ((i.val % n) + 1)) ∧ T ≤ ((2 * n^3 + 3 * n^2 - 11 * n + 18) / 6 : ℕ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly formalizes the problem. The English statement defines T as a specific cyclic sum of products of consecutive x_i values (with wrap-around from x_n to x_1), and claims the maximum value is a specific formula. The Lean theorem instead defines T as a sum over a different indexing scheme using modulo arithmetic, which doesn't match the cyclic structure described in English. Additionally, the English statement asserts the maximum value IS a specific formula, while the Lean theorem only states there EXISTS some T that is ≤ that formula, which is a weaker claim."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℚ.\nFor every natural number n, define a(n) = (n / 2) if n is even.\nFor every natural number n, define a(n) = ((n - 1) / 2) if n is odd.\nDefine f : ℕ → ℚ.\nFor every natural number n, define f(n) = (sum for k in the set {1, ..., n} of a(k)).\nLet x be a positive integer.\nLet y be a positive integer.\nAssume x > y.\nGoal:\n(x * y) = (f((x + y)) - f((x - y))).",
+    "formal_statement": "theorem rational_sum_identity (a : ℕ → ℚ) (h_a_even : ∀ n, Even n → a n = (n : ℚ) / 2) (h_a_odd : ∀ n, Odd n → a n = ((n - 1) : ℚ) / 2) (f : ℕ → ℚ) (h_f : ∀ n, f n = ∑ k in Finset.range (n + 1), a k) (x y : ℕ) (hx_pos : x > 0) (hy_pos : y > 0) (h_gt : x > y) : (x : ℚ) * (y : ℚ) = f (x + y) - f (x - y) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature accurately captures all mathematical intent: (1) Defines a as ℕ → ℚ with correct even/odd conditions using Even/Odd predicates, (2) Defines f as the cumulative sum of a up to n (range (n+1) gives {0,...,n}, but a(0) = 0 by definitions, so sum over {1,...,n} is preserved), (3) Includes all constraints: x,y positive naturals with x>y, (4) Converts x,y to ℚ for the multiplication to match f's ℚ output, maintaining the equation (x*y) = f(x+y)-f(x-y)."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet S be a set.\nDefine a binary operation · on S.\nAssume for all x in S and for all y in S, x · (x · y) = y.\nAssume for all x in S and for all y in S, (y · x) · x = y.\n\nGoal:\nFor all a in S and for all b in S, a · b = b · a.\nThere exists a set S and a binary operation · on S such that the assumptions hold and there exist a in S, b in S, c in S such that NOT (a · (b · c) = (a · b) · c).",
+    "formal_statement": "theorem exists_nonassociative_operation : ∃ (S : Type) (op : S → S → S), (∀ (x y : S), op x (op x y) = y) ∧ (∀ (x y : S), op (op y x) x = y) ∧ (∀ (a b : S), op a b = op b a) ∧ ∃ (a b c : S), ¬(op a (op b c) = op (op a b) c) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly includes the commutativity condition (∀ (a b : S), op a b = op b a) as an assumption rather than as a conclusion to be proved from the given assumptions. The English statement asks to prove commutativity from the given assumptions, but the Lean theorem treats it as an additional assumption. Additionally, the English statement asks to find a set S and operation where the assumptions hold AND there exist elements where associativity fails, but the Lean theorem incorrectly includes commutativity as part of the existence condition rather than as a consequence."
+  },
+  {
+    "informal_statement": "Assumptions:  \nLet n be a natural number.  \nFor every integer i in the set {1, ..., n}, let z_i be a complex number.  \nDefine S = (z_1^2 + z_2^2 + ... + z_n^2).  \nDefine w = S^(1/2).  \n\nGoal:  \n|Re(w)| ≤ |Re(z_1)| + |Re(z_2)| + ... + |Re(z_n)|.",
+    "formal_statement": "theorem complex_sum_sqrt_real_part_inequality (n : ℕ) (z : Fin n → ℂ) :\n    let S := ∑ i : Fin n, (z i) ^ 2\n    let w := Complex.csqrt S\n    |Complex.re w| ≤ ∑ i : Fin n, |Complex.re (z i)| := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Complex.csqrt'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N = 1994.\nDefine N as a natural number.\nLet (r_n)_{n ≥ 0} be a sequence of positive real numbers.\nAssume for every natural number n, r_n > 0.\nAssume lim_{n → ∞} r_n = 0.\nDefine S as the set { x in ℝ | There exist natural numbers i_1, i_2, ..., i_N such that (i_1 < i_2 < ... < i_N) AND (x = r_{i_1} + r_{i_2} + ... + r_{i_N}) }.\nLet a be a real number.\nLet b be a real number.\nAssume a < b.\nGoal:\nThere exist real numbers c and d such that (a < c < d < b) AND (The intersection of the interval (c, d) with S is empty).",
+    "formal_statement": "theorem exists_interval_disjoint_from_sum_set (N : ℕ) (hN : N = 1994) (r : ℕ → ℝ) (hpos : ∀ n, r n > 0) (hlim : Filter.Tendsto r Filter.atTop (nhds 0)) (a b : ℝ) (hab : a < b) : ∃ c d : ℝ, a < c ∧ c < d ∧ d < b ∧ ((Set.Ioo c d) ∩ {x : ℝ | ∃ (indices : Finset ℕ) (hcard : indices.card = N) (hsorted : ∀ i ∈ indices, ∀ j ∈ indices, i < j → i.val < j.val), x = ∑ i in indices, r i} = ∅) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'val', the environment does not contain 'Nat.val'\n  i\nhas type\n  ℕ\ninvalid field 'val', the environment does not contain 'Nat.val'\n  j\nhas type\n  ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an integer.\nLet b be an integer.\nDefine n as an integer.\nAssume n = ((a^2 + a) / 2) + ((b^2 + b) / 2).\n\nGoal:\nThere exist integers x and y such that ((4 * n) + 1) = (x^2 + y^2) and (x = (a + b + 1)) and (y = (a - b)).\n\nAssumptions:\nLet x be an integer.\nLet y be an integer.\nDefine n as an integer.\nAssume ((4 * n) + 1) = (x^2 + y^2).\n\nGoal:\nThere exist integers a and b such that n = ((a^2 + a) / 2) + ((b^2 + b) / 2).",
+    "formal_statement": "theorem exists_ab_from_xy (x y n : ℤ) (hn : 4 * n + 1 = x ^ 2 + y ^ 2) : ∃ a b : ℤ, n = ((a ^ 2 + a) / 2) + ((b ^ 2 + b) / 2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The generated Lean theorem only captures the second part of the input statement (from x,y,n to a,b) but ignores the first part (from a,b,n to x,y). The input describes a bidirectional equivalence, but the Lean theorem only formalizes one direction."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine f : ℝ → ℝ.  \nAssume f is twice continuously differentiable.  \nAssume for every real number x, |f(x)| ≤ 1.  \nAssume (f(0))^2 + (f'(0))^2 = 4.  \n\nGoal:  \nThere exists a real number y such that f(y) + f''(y) = 0.",
+    "formal_statement": "theorem exists_y_with_sum_zero : ∃ (y : ℝ), f y + f'' y = 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'\nunknown identifier 'f'''",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of natural numbers.\nDefine ℤ as the set of integers.\nDefine 2016 as an integer.\nDefine j as a natural number.\nAssume j > 0.\nDefine P as the set of all polynomials with integer coefficients.\nFor every polynomial p in P, define p : ℝ → ℝ.\nFor every polynomial p in P and for every natural number n, define p^(n) : ℝ → ℝ as the n-th derivative of p.\nFor every polynomial p in P, for every integer k, and for every natural number n, define p^(n)(k) as an integer.\nAssume for every polynomial p in P and for every integer k, there exists an integer m such that p^(j)(k) = 2016 * m.\nGoal:\nj = 8.",
+    "formal_statement": "theorem derivative_condition_implies_j_eq_eight : ∀ (j : ℕ) (hpos : j > 0), (∀ (p : ℤ[X]) (k : ℤ), ∃ (m : ℤ), Polynomial.eval (k : ℝ) ((Polynomial.derivative ^ j) p) = (2016 : ℝ) * (m : ℝ)) → j = 8 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'X'\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nj : ℕ\nhpos : j > (0 : ℕ)\n⊢ (?m.3471 :\n      (j : ℕ) → (hpos : j > (0 : ℕ)) → outParam (Type → (?m.3470 : (j : ℕ) → j > (0 : ℕ) → Type ?u.42) j hpos → Prop))\n    j hpos ℤ (sorryAx ((?m.3470 : (j : ℕ) → j > (0 : ℕ) → Type ?u.42) j hpos) true)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine ℕ as the set of natural numbers.  \nDefine ℤ as the set of integers.  \nDefine ℝ as the set of real numbers.  \n\nDefine the Fibonacci function F : ℕ → ℕ by:  \nDefine F(1) = 1.  \nDefine F(2) = 1.  \nFor every natural number k ≥ 1, define F(k+2) = F(k+1) + F(k).  \n\nLet n be a natural number.  \nDefine a(n) as the size of the set { S ⊆ ℕ | (for every k in S, k is a positive integer) AND (∑_{k in S} F(k) = n) }.  \n\nGoal:  \nThere exists a natural number n such that (a(n) = 2020) AND (for every natural number m > n, a(m) ≠ 2020).",
+    "formal_statement": "theorem exists_max_n_with_a_eq_2020 : ∃ n : ℕ, a n = 2020 ∧ ∀ m : ℕ, n < m → a m ≠ 2020 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'a'\nunknown identifier 'a'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine c : ℝ.\nAssume c > 0.\nLet G be a finite group.\nAssume G is nontrivial.\nDefine n = |G|.\nAssume n > 1.\nGoal:\nThere exists a sequence S of elements of G.\nAssume the length of S ≤ (c * (log_base(2, n))).\nAssume for every element g in G, there exists a subsequence T of S such that the product of the elements in T = g.",
+    "formal_statement": "theorem exists_short_generating_sequence (c : ℝ) (hc : c > 0) (G : Type*) [Group G] [Fintype G] (hG : Nontrivial G) : \n    let n := Fintype.card G in\n    n > 1 → ∃ (S : List G), List.length S ≤ ⌈c * Real.logb 2 (n : ℝ)⌉₊ ∧ ∀ (g : G), ∃ (T : List G), T.Sublist S ∧ T.prod = g := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 1000000.\nLet x be an integer.\nLet f be a monic polynomial with integer coefficients.\nDefine k(n) as the minimal natural number d such that there exists a monic polynomial f of degree d with integer coefficients and for every integer x, there exists an integer m such that f(x) = n * m.\nGoal:\nk(n) = 25.",
+    "formal_statement": "theorem k_n_eq_25 : k 1000000 = 25 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'k'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℕ as the set of natural numbers.\nDefine ℝ as the set of real numbers.\nDefine ℝ⁺ as the set of positive real numbers.\nLet (a_n) be a sequence of positive real numbers.\nDefine S : ℕ → ℝ⁺ by S(n) = a_1 + a_2 + ... + a_n.\nGoal:\nThere exists a real number k such that for every sequence (a_n) of positive real numbers, the following inequality holds:\n(∑_{n=1}^{∞} (n / S(n))) ≤ (k * (∑_{n=1}^{∞} (1 / a_n))).",
+    "formal_statement": "theorem exists_constant_for_sum_inequality : ∃ (k : ℝ), ∀ (a : ℕ → ℝ) (ha : ∀ n, 0 < a n), \n    (∑' n : ℕ, (n : ℝ) / (∑ i in Finset.range (n + 1), a i)) ≤ k * (∑' n : ℕ, 1 / a n) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem has several issues: 1) It uses `a : ℕ → ℝ` instead of `ℕ → ℝ⁺` (positive reals), though the `ha` condition partially addresses this. 2) The denominator `(∑ i in Finset.range (n + 1), a i)` incorrectly sums from 0 to n (giving n+1 terms), while S(n) should sum from 1 to n (n terms). 3) The infinite sum notation `∑' n : ℕ` includes n=0, but the problem's sums start at n=1. 4) The inequality direction is reversed - the problem states the left side ≤ k * right side, but Lean has the opposite. These change the mathematical meaning."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A, B, C, D as points in ℝ³.\nAssume A, B, C, D are not coplanar.\nAssume ∠ABC = ∠CDA.\nAssume ∠BCD = ∠DAB.\nGoal:\n(AB = CD) AND (AD = BC).",
+    "formal_statement": "theorem quadrilateral_side_equality (A B C D : ℝ × ℝ × ℝ) (h_non_coplanar : ¬ Coplanar ℝ {A, B, C, D}) (h_angle_ABC_eq_CDA : ∠ A B C = ∠ C D A) (h_angle_BCD_eq_DAB : ∠ B C D = ∠ D A B) : (dist A B = dist C D) ∧ (dist A D = dist B C) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected token",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℝ as the set of real numbers.\nDefine ℂ as the set of complex numbers.\nDefine the polynomial P : ℂ → ℂ by P(z) = (z^2) + (b * z) + c.\nLet b be a real number.\nLet c be a real number.\nAssume there exists a complex number z1 such that P(z1) = 0.\nAssume there exists a complex number z2 such that P(z2) = 0.\nAssume for every complex number z, if P(z) = 0, then (|z| < 1).\n\nGoal:\nThe ordered pair (b, c) is in the set {(x, y) in ℝ × ℝ | (y > (-1)) AND (y < (1 + x)) AND (y < (1 - x))}.",
+    "formal_statement": "theorem polynomial_roots_condition (b c : ℝ) (P : ℂ → ℂ) (hP_def : ∀ z, P z = z ^ 2 + (b : ℂ) * z + (c : ℂ)) (h_root1 : ∃ z1 : ℂ, P z1 = 0) (h_root2 : ∃ z2 : ℂ, P z2 = 0) (h_roots_bound : ∀ z : ℂ, P z = 0 → Complex.abs z < 1) : (b, c) ∈ {p : ℝ × ℝ | p.2 > -1 ∧ p.2 < 1 + p.1 ∧ p.2 < 1 - p.1} := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem signature accurately captures all mathematical elements from the English statement: real parameters b and c, polynomial definition P(z)=z^2+b*z+c, existence of two roots, bound on root magnitudes, and the conclusion about (b,c) belonging to the specified set. All types match (ℝ for b,c, ℂ for polynomial domain/codomain), constraints are preserved, and logical flow is correct."
+  },
+  {
+    "informal_statement": "Assumptions:  \nDefine n as a natural number.  \nDefine a as a real number.  \nAssume a < (1/4).  \nDefine A as a function from ℕ to events.  \nFor every natural number i with 1 ≤ i ≤ n, define P(A(i)) ≥ (1 - a).  \nFor every natural number i and every natural number j, if |i - j| > 1, then A(i) and A(j) are independent.  \nDefine u : ℕ → ℝ.  \nDefine u(0) = 1.  \nDefine u(1) = (1 - a).  \nFor every natural number k ≥ 1, define u(k+1) = (u(k) - (a * u(k-1))).  \nAssume for every natural number k, u(k) > 0.  \n\nGoal:  \nP(⋂_{i=1}^{n} A(i)) ≥ u(n).",
+    "formal_statement": "theorem probability_intersection_lower_bound (n : ℕ) (a : ℝ) (h_a : a < 1/4) (A : ℕ → Set Ω) (h_prob : ∀ i, 1 ≤ i ∧ i ≤ n → ℙ (A i) ≥ 1 - a) (h_indep : ∀ i j, |(i : ℤ) - (j : ℤ)| > 1 → Indep (A i) (A j)) (u : ℕ → ℝ) (h_u0 : u 0 = 1) (h_u1 : u 1 = 1 - a) (h_u_rec : ∀ k ≥ 1, u (k + 1) = u k - a * u (k - 1)) (h_u_pos : ∀ k, u k > 0) : ℙ (⋂ i ∈ Finset.Icc 1 n, A i) ≥ u n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Ω'\nunknown identifier 'ℙ'\nunknown identifier 'Indep'\nunknown identifier 'ℙ'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine ℝ as the set of real numbers.\nDefine ℕ as the set of natural numbers.\nDefine the Cartesian plane as ℝ × ℝ.\nDefine the absolute value function |·| : ℝ → ℝ by |a| = a if a ≥ 0, and |a| = -a if a < 0.\nDefine the region R as the set {(x, y) in ℝ × ℝ such that (|x| - |y| ≤ 1) AND (|y| ≤ 1)}.\nGoal:\nThe area of R = 6.",
+    "formal_statement": "theorem area_of_region_R : volume (Set.mk (fun (p : ℝ × ℝ) => |p.1| - |p.2| ≤ 1 ∧ |p.2| ≤ 1) (by intro p; exact And.intro)) = 6 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'volume'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(r) = ((x + 1)^(r + 1) - x^(r + 1))^(1 / r).\nLet x be a positive real number.\nDefine g : ℝ⁺ → ℝ by g(x) = lim_{r → 0} f(r).\nGoal:\nlim_{x → ∞} (g(x) / x) = e.",
+    "formal_statement": "theorem limit_ratio_equals_e : Filter.Tendsto (λ (x : ℝ) => (limUnder (nhds (0 : ℝ)) (λ (r : ℝ) => (((x + 1) ^ (r + 1) - x ^ (r + 1)) ^ (1 / r))) / x)) atTop (nhds (Real.exp 1)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem signature does not accurately capture the mathematical intent. The English statement defines g(x) as the limit as r→0 of f(r) for fixed x, then asks for the limit as x→∞ of g(x)/x = e. The Lean theorem incorrectly combines both limits into a single limit expression where x varies in the inner function, losing the proper nesting of limits. Additionally, the English specifies x is positive (ℝ⁺ for g), but the Lean theorem uses ℝ for x without positivity constraint in the inner expression."
+  },
+  {
+    "informal_statement": "Assumptions:  \nLet n be a natural number.  \nAssume n > 0.  \nThere exist natural numbers a, b, c.  \nAssume a > 0.  \nAssume b > 0.  \nAssume c > 0.  \nAssume (2 * (a^n)) + (3 * (b^n)) = 4 * (c^n).  \n\nGoal:  \nn = 1.",
+    "formal_statement": "theorem existence_of_natural_numbers_implies_n_eq_one (n : ℕ) (hn_pos : n > 0) : \n    (∃ (a b c : ℕ), a > 0 ∧ b > 0 ∧ c > 0 ∧ 2 * (a ^ n) + 3 * (b ^ n) = 4 * (c ^ n)) → n = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n be a natural number.\nLet T be the set of teams.\nAssume the size of T = (2 * n).\nDefine D be the set of days.\nAssume the size of D = ((2 * n) - 1).\nDefine f : D → (T × T) be a function.\nAssume for every day d in D, f(d) is a set of n ordered pairs (a, b) such that a and b are in T, a ≠ b, and for every team t in T, there exists exactly one pair in f(d) where t appears as the first or second element.\nAssume for every ordered pair (a, b) in f(d), a is the winner and b is the loser on day d.\nDefine g : (T × T) → D be a function.\nAssume for every pair of distinct teams (x, y) in (T × T), there exists exactly one day d in D such that either (x, y) is in f(d) or (y, x) is in f(d).\n\nGoal:\nThere exists a function h : D → T such that for every day d in D, h(d) is a team that is the winner in f(d), and for every pair of distinct days d1 and d2 in D, h(d1) ≠ h(d2).",
+    "formal_statement": "theorem tournament_schedule_exists (n : ℕ) (T : Set ℕ) (hT_card : Finset.card (Finset.filter (λ t => t ∈ T) Finset.univ) = 2 * n) (D : Set ℕ) (hD_card : Finset.card (Finset.filter (λ d => d ∈ D) Finset.univ) = 2 * n - 1) (f : ℕ → Set (ℕ × ℕ)) (hf_domain : ∀ d, d ∈ D → f d ⊆ T ×ˢ T) (hf_injective_pairs : ∀ d, d ∈ D → ∀ (p : ℕ × ℕ), p ∈ f d → p.1 ≠ p.2) (hf_team_coverage : ∀ d, d ∈ D → ∀ t ∈ T, ∃! (p : ℕ × ℕ), p ∈ f d ∧ (p.1 = t ∨ p.2 = t)) (g : ℕ × ℕ → ℕ) (hg_inverse : ∀ (x y : ℕ), x ∈ T → y ∈ T → x ≠ y → ∃! d, d ∈ D ∧ ((x, y) ∈ f d ∨ (y, x) ∈ f d)) : ∃ (h : ℕ → ℕ), (∀ d, d ∈ D → h d ∈ T) ∧ (∀ d, d ∈ D → ∃ (p : ℕ × ℕ), p ∈ f d ∧ p.1 = h d) ∧ (∀ d₁ d₂, d₁ ∈ D → d₂ ∈ D → d₁ ≠ d₂ → h d₁ ≠ h d₂) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ℕ\nfailed to synthesize instance\n  DecidablePred fun (t : ℕ) => t ∈ T\nfailed to synthesize instance\n  Fintype ℕ\nfailed to synthesize instance\n  DecidablePred fun (d : ℕ) => d ∈ D",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n as a positive integer.\nDefine the function dist : ℝ → ℝ by dist(x) = the distance between x and the nearest integer.\nDefine the function F : ℕ → ℝ by F(n) = sum_{m in the set {1, ..., (6*n - 1)}} of min(dist(m/(6*n)), dist(m/(3*n))).\nGoal:\nF(n) = n.",
+    "formal_statement": "theorem F_eq_n (n : ℕ) (hn : n > 0) : \n    let dist : ℝ → ℝ := λ x => |x - round x|\n    let F : ℕ → ℝ := λ n => ∑ m in Finset.Icc 1 (6*n - 1), min (dist (m / (6*n : ℝ))) (dist (m / (3*n : ℝ)))\n    in F n = n := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token 'in'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℝ → ℝ.\nAssume for every real number x, P(x^2 + 1) = (P(x))^2 + 1.\nAssume P(0) = 0.\nGoal:\nFor every real number x, P(x) = x.",
+    "formal_statement": "theorem functional_equation_identity : ∀ (P : ℝ → ℝ), (∀ (x : ℝ), P (x ^ 2 + 1) = (P x) ^ 2 + 1) → P 0 = 0 → ∀ (x : ℝ), P x = x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct. The Lean theorem signature exactly captures the mathematical intent: it quantifies over all functions P from ℝ to ℝ, assumes the functional equation P(x^2+1) = (P x)^2 + 1 for all real x, assumes P(0) = 0, and concludes P x = x for all real x. All types match (ℝ → ℝ, ℝ), constraints are present, and logical implication flows correctly from hypotheses to conclusion."
+  }
+]

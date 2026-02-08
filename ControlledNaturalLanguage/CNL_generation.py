@@ -5,26 +5,35 @@ from openai import OpenAI
 import importlib
 import json
 from read_file.handle_miniF2F import miniF2FHandler
+from config import models
+import re
 
 # Initialize the client using DeepSeek's base URL
 # Ensure you have set your API key in your environment variables:
 # export DEEPSEEK_API_KEY="sk-..."
 
-print("Loading environment variables...")
-
-load_dotenv()
-api_key = os.getenv("DEEPSEEK_API_KEY")
-
-client = OpenAI(
-    api_key=api_key,  # Replace with your key string if not using env vars
-    base_url="https://api.deepseek.com"
-)
-
 
 class CNL_generator:
-    def __init__(self, benchmark_name="miniF2F", cnl_rules_path="cnl_rules.json"):
+    def __init__(self, benchmark_name="miniF2F", cnl_rules_path="cnl_rules.json", model_name="deepseek-prover-v2"):
+        print(f"Initializing CNL_generator for benchmark '{benchmark_name}' using model '{model_name}'...")
         self.benchmark_name = benchmark_name
         self.cnl_rules_path = cnl_rules_path
+
+        self.model = models.get(model_name, None)
+        if self.model is None:
+            print(f"❌ Error: Model '{self.model_name}' not found in config.py.")
+            sys.exit(1)
+
+        try:
+            self.client = OpenAI(
+                api_key=self.model.get("api_key"),  # Replace with your key string if not using env vars
+                base_url=self.model.get("base_url", "")
+            )
+        except Exception as e:
+            print(f"❌ Error initializing OpenAI client: {e}")
+            print(f"Current api_key: {self.model.get('api_key')}")
+            print(f"Current base_url: {self.model.get('base_url', '')}")
+            sys.exit(1)
 
         # from read_file.handle_miniF2F import readFolder_miniF2F
         handlerPath = "read_file.handle_" + benchmark_name
@@ -89,7 +98,7 @@ class CNL_generator:
         based on a specific set of rules.
         """
 
-        print("Generating Controlled Natural Language...")
+        # print("Generating Controlled Natural Language...")
 
         # Default rules for a simple CNL (e.g., Simplified English)
         if cnl_rules is None:
@@ -118,8 +127,8 @@ class CNL_generator:
         """
 
         try:
-            response = client.chat.completions.create(
-                model="deepseek-chat",
+            response = self.client.chat.completions.create(
+                model=self.model.get("model_name"),
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": input_text},
@@ -128,15 +137,25 @@ class CNL_generator:
                 stream=False
             )
             
-            return response.choices[0].message.content.strip()
+            return self.strip_cnl_extras(response.choices[0].message.content.strip())
 
         except Exception as e:
             return f"Error generating CNL: {e}"
+            
+    def strip_cnl_extras(self, cnl_text):
+        """
+        Strips any extraneous explanations or comments from the CNL text,
+        returning only the core CNL statement.
+        """
+        # For this example, we assume the CNL text is clean.
+        # Implement any specific stripping logic if needed.
+        cnl_text = re.sub(r'<think>.*?</think>', '', cnl_text, flags=re.DOTALL)
+        return cnl_text.strip()
 
 # --- Example Usage ---
 if __name__ == "__main__":
-    miniF2F_cnl_gen = CNL_generator(benchmark_name="miniF2F")
-    cnl_statements = miniF2F_cnl_gen.generate_cnl_list("testbench/miniF2F/test", 5, version=4)
-    miniF2F_cnl_gen.write_cnl_to_file(cnl_statements, filename="test_cnl_statements_v4.json")
+    miniF2F_cnl_gen = CNL_generator(benchmark_name="Putnam", cnl_rules_path="cnl_rules.json", model_name="deepseek-prover-v2")
+    cnl_statements = miniF2F_cnl_gen.generate_cnl_list("testbench/Putnam/putnam.json", 5, version=8)
+    miniF2F_cnl_gen.write_cnl_to_file(cnl_statements, filename="test_cnl_statements_v8.json")
 
     

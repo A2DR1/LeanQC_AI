@@ -1,0 +1,802 @@
+[
+  {
+    "informal_statement": "Assumptions:\nLet A, M, C be elements of ℕ.\nAssume A + M + C = 12.\nGoal:\nThe maximum value of (A · M · C) + (A · M) + (M · C) + (A · C) is 112.",
+    "formal_statement": "theorem max_value_expr (A M C : ℕ) (h : A + M + C = 12) : (A * M * C) + (A * M) + (M * C) + (A * C) ≤ 112 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine S = (1/2) + (1/3) + (1/7) + (1/n).\nAssume S is an element of ℤ.\n\nGoal:\nThe statement \"n > 84\" is not true.",
+    "formal_statement": "theorem not_n_gt_84 (n : ℕ) (hS : (1/2 : ℚ) + (1/3) + (1/7) + (1/n) ∈ ℤ) : ¬(n > 84) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Membership ℚ Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A as the subset of ℂ such that for every z in A, z^3 - 8 = 0.\nDefine B as the subset of ℂ such that for every z in B, z^3 - 8z^2 - 8z + 64 = 0.\nGoal:\nThe maximum distance between any a in A and any b in B is 2 * sqrt(21).",
+    "formal_statement": "theorem max_distance_A_B : \n  ∃ a ∈ A, ∃ b ∈ B, ∀ a' ∈ A, ∀ b' ∈ B, Complex.dist a' b' ≤ Complex.dist a b ∧ Complex.dist a b = 2 * Real.sqrt 21 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'A'\nunknown identifier 'B'\nunknown identifier 'A'\nunknown identifier 'B'\nunknown constant 'Complex.dist'\nunknown constant 'Complex.dist'\nunknown constant 'Complex.dist'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ as f(x) = 4^x + 6^x + 9^x.\nLet m be an element of ℕ.\nLet n be an element of ℕ.\nAssume m ≤ n.\nView m as a real number.\nView n as a real number.\nGoal:\nf(2^m) divides f(2^n).",
+    "formal_statement": "theorem f_divisibility (f : ℝ → ℝ) (h : ∀ x, f x = 4^x + 6^x + 9^x) (m n : ℕ) (hmn : m ≤ n) : ↑(f (2^m)) ∣ ↑(f (2^n)) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nLet c be a real number.\nAssume 3a + b + c = -3.\nAssume a + 3b + c = 9.\nAssume a + b + 3c = 19.\nGoal:\nabc = -56.",
+    "formal_statement": "theorem abc_eq_neg_56 (a b c : ℝ) (h1 : 3 * a + b + c = -3) (h2 : a + 3 * b + c = 9) (h3 : a + b + 3 * c = 19) : a * b * c = -56 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nLet y be a real number.\nAssume x + y = 25.\nAssume x - y = 11.\nGoal:\nx = 18.",
+    "formal_statement": "theorem solve_for_x (x : ℝ) (y : ℝ) (h₁ : x + y = 25) (h₂ : x - y = 11) : x = 18 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ as f(x) = x^2.\nDefine g : ℝ → ℝ as g(x) = 1 - x.\nDefine S = {(x, y) in ℝ × ℝ | y = f(x) AND y = g(x)}.\nGoal:\nLet (x1, y1) and (x2, y2) be the two elements of S.\ndistance((x1, y1), (x2, y2)) = √10.",
+    "formal_statement": "theorem distance_between_intersection_points (f : ℝ → ℝ) (hf : ∀ x, f x = x^2) (g : ℝ → ℝ) (hg : ∀ x, g x = 1 - x) (S : Set (ℝ × ℝ)) (hS : ∀ p, p ∈ S ↔ p.2 = f p.1 ∧ p.2 = g p.1) (x1 y1 x2 y2 : ℝ) (h1 : (x1, y1) ∈ S) (h2 : (x2, y2) ∈ S) (h_ne : (x1, y1) ≠ (x2, y2)) : dist (x1, y1) (x2, y2) = Real.sqrt 10 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine θ as a real number in the interval (0, 2π].\nDefine f : ℝ → ℝ as f(θ) = 1 - 3 * sin(θ) + 5 * cos(3 * θ).\nGoal:\nThe number of θ in (0, 2π] such that f(θ) = 0 is 6.",
+    "formal_statement": "theorem number_of_zeros (θ : ℝ) (hθ : θ ∈ Set.Ioc 0 (2 * Real.pi)) (f : ℝ → ℝ) (hf : ∀ θ, f θ = 1 - 3 * Real.sin θ + 5 * Real.cos (3 * θ)) : Nat.card {θ ∈ Set.Ioc 0 (2 * Real.pi) | f θ = 0} = 6 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet N be an element of ℕ.\nLet x be an element of ℕ.\nDefine charge : ℕ → ℕ where charge(h) = N + x * h.\nAssume charge(1) = 97.\nAssume charge(5) = 265.\nGoal:\ncharge(2) = 139.",
+    "formal_statement": "theorem charge_property (N x : ℕ) (charge : ℕ → ℕ := fun h => N + x * h) (h1 : charge 1 = 97) (h5 : charge 5 = 265) : charge 2 = 139 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number in ℝ+.\nDefine term1 = sqrt(60 * x).\nDefine term2 = sqrt(12 * x).\nDefine term3 = sqrt(63 * x).\nGoal:\nterm1 * term2 * term3 = 36 * x * sqrt(35 * x).",
+    "formal_statement": "theorem product_of_sqrt_terms (x : ℝ) (hx : x > 0) : \n  Real.sqrt (60 * x) * Real.sqrt (12 * x) * Real.sqrt (63 * x) = 36 * x * Real.sqrt (35 * x) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine d : ℕ → ℕ such that for all n in ℕ, d(n) = the number of positive divisors of n.\nDefine f : ℕ → ℚ such that for all n in ℕ, f(n) = d(n) / (n^(1/3)).\nAssume there exists a unique N in ℕ such that for all n in ℕ with n ≠ N, f(N) > f(n).\nGoal:\nThe sum of the digits of N = 9.",
+    "formal_statement": "theorem sum_digits_N_eq_9 (h : ∃! N : ℕ, ∀ n : ℕ, n ≠ N → f N > f n) : Nat.sumDigits 10 (Classical.choose h) = 9 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'f'\nunknown identifier 'f'\nunknown constant 'Nat.sumDigits'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nDefine f : ℝ → ℝ as f(x) = (4 * x^2) / (1 - sqrt(2 * x + 1))^2.\nDefine g : ℝ → ℝ as g(x) = 2 * x + 9.\nAssume 2 * x + 1 ≥ 0.\nAssume 1 - sqrt(2 * x + 1) ≠ 0.\nGoal:\nf(x) < g(x).",
+    "formal_statement": "theorem f_lt_g (x : ℝ) (f : ℝ → ℝ := fun x => (4 * x^2) / (1 - Real.sqrt (2 * x + 1))^2) (g : ℝ → ℝ := fun x => 2 * x + 9) (h₁ : 2 * x + 1 ≥ 0) (h₂ : 1 - Real.sqrt (2 * x + 1) ≠ 0) : f x < g x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ.\nAssume there exists k in ℤ such that n = 3 * k.\nDefine S = (n + 4) + (n + 6) + (n + 8).\nGoal:\nS ≡ 0 mod 9.",
+    "formal_statement": "theorem sum_mod_nine (n : ℤ) (h : ∃ k, n = 3 * k) : (n + 4) + (n + 6) + (n + 8) ≡ 0 [ZMOD 9] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n = 1529.\nLet m = 6.\nGoal:\nn ≡ 5 mod m.",
+    "formal_statement": "theorem mod_goal : 1529 ≡ 5 [MOD 6] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a natural number.\nLet b be a natural number.\nDefine a = 120.\nDefine gcd(a, b) = 8.\nDefine lcm(a, b) = 3720.\nGoal:\nb = 248.",
+    "formal_statement": "theorem solve_b (a b : ℕ) (ha : a = 120) (hgcd : Nat.gcd a b = 8) (hlcm : Nat.lcm a b = 3720) : b = 248 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x, y, z as elements of ℤ.\nDefine equation1: 3x + y = 17.\nDefine equation2: 5y + z = 14.\nDefine equation3: 3x + 5z = 41.\nGoal:\nx + y + z = 12.",
+    "formal_statement": "theorem sum_of_solutions (x y z : ℤ) (equation1 : 3 * x + y = 17) (equation2 : 5 * y + z = 14) (equation3 : 3 * x + 5 * z = 41) : x + y + z = 12 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine S = {k ∈ ℕ | 0 ≤ k ≤ n}.\nDefine a(k) = binomial(2n + 1, 2k + 1) * (2^3)^k for each k in S.\nDefine X = sum_{k ∈ S} a(k).\nGoal:\nFor all n in ℕ, X mod 5 ≠ 0.",
+    "formal_statement": "theorem binomial_sum_mod_5_ne_zero (n : ℕ) : \n  let S := Finset.Icc 0 n;\n  let a := fun k ↦ Nat.choose (2 * n + 1) (2 * k + 1) * (2^3)^k;\n  let X := Finset.sum S a;\n  X % 5 ≠ 0 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ.\nAssume 2n ≡ 15 mod 47.\nGoal:\nn ≡ 31 mod 47.",
+    "formal_statement": "theorem mod_congruence (n : ℤ) (h : 2 * n ≡ 15 [ZMOD 47]) : n ≡ 31 [ZMOD 47] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet p be a prime number.\nAssume p ≥ 7.\nDefine S = {1, 2, ..., p-1}.\nFor each k in S, define k⁻¹ as the multiplicative inverse of k modulo p (i.e., k · k⁻¹ ≡ 1 mod p).\nGoal:\n(Sum from k=1 to p-2 of (k⁻¹ · (k+1)⁻¹)) ≡ 2 mod p.",
+    "formal_statement": "theorem sum_inverse_product_mod_p (p : ℕ) (hp : Nat.Prime p) (hge : p ≥ 7) : \n(∑ k in Finset.Icc 1 (p - 2), (Nat.modInv k p * Nat.modInv (k + 1) p) % p) ≡ 2 [MOD p] := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Nat.modInv'\nunknown constant 'Nat.modInv'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nLet b be a real number.\nAssume a² + b² = 1.\nGoal:\na * b + (a - b) ≤ 1.",
+    "formal_statement": "theorem inequality_for_ab (a : ℝ) (b : ℝ) (h : a^2 + b^2 = 1) : a * b + (a - b) ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c be elements of ℝ+.\nAssume a × (b + c) = 152.\nAssume b × (c + a) = 162.\nAssume c × (a + b) = 170.\nGoal:\na × b × c = 720.",
+    "formal_statement": "theorem product_abc (a b c : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (h1 : a * (b + c) = 152) (h2 : b * (c + a) = 162) (h3 : c * (a + b) = 170) : a * b * c = 720 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine numerator = 21 * n + 4.\nDefine denominator = 14 * n + 3.\nGoal:\ngcd(numerator, denominator) = 1.",
+    "formal_statement": "theorem gcd_condition (n : ℕ) : Nat.gcd (21 * n + 4) (14 * n + 3) = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an element of ℤ.\nAssume |x| < 3π.\nGoal:\nThe number of possible values of x = 19.",
+    "formal_statement": "theorem number_of_possible_values (x : ℤ) (h : |↑x| < 3 * Real.pi) : Fintype.card {y : ℤ | |↑y| < 3 * Real.pi} = 19 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑{y : ℤ | |↑y| < (3 : ℝ) * π}",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine y as an element of ℤ.\nDefine a : ℕ → ℤ as a(1) = y + 6, a(2) = 12, a(3) = y.\nAssume for all n in ℕ, a(n+1) - a(n) = a(n+2) - a(n+1).\nGoal:\ny = 9.",
+    "formal_statement": "theorem recurrence_solution (y : ℤ) (a : ℕ → ℤ) (h1 : a 1 = y + 6) (h2 : a 2 = 12) (h3 : a 3 = y) (hrec : ∀ n : ℕ, a (n + 1) - a n = a (n + 2) - a (n + 1)) : y = 9 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be a positive integer.\nDefine a = log₄(log₄ n).\nDefine b = log₂(log₁₆ n).\nAssume b = a.\nGoal:\nn = 65536.\nSum of digits of n = 13.",
+    "formal_statement": "theorem log_identity_implies_n_eq_65536 (n : ℕ) (hn : n > 0) (a : ℝ := Real.logb 4 (Real.logb 4 ↑n)) (b : ℝ := Real.logb 2 (Real.logb 16 ↑n)) (h : b = a) : n = 65536 ∧ Nat.sumOfDigits 10 n = 13 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Nat.sumOfDigits'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine original_length = 3491.\nDefine original_width = 3491.\nDefine new_length = original_length - 60.\nDefine new_width = original_width + 60.\nDefine original_area = original_length * original_width.\nDefine new_area = new_length * new_width.\nGoal:\nnew_area - original_area = 3600.",
+    "formal_statement": "theorem area_change (original_length original_width : ℕ) (h₁ : original_length = 3491) (h₂ : original_width = 3491) : \n  let new_length := original_length - 60;\n  let new_width := original_width + 60;\n  let original_area := original_length * original_width;\n  let new_area := new_length * new_width;\n  new_area - original_area = 3600 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine k as an element of ℕ.\nDefine S = {1, 2, ..., 35}.\nDefine f : ℕ → ℝ as f(k) = sin(5k degrees).\nGoal:\nsum_{k in S} f(k) = tan(m/n degrees) AND gcd(m, n) = 1 AND m/n < 90 AND m + n = 177.",
+    "formal_statement": "theorem sum_sin_eq_tan_condition (k : ℕ) (S : Finset ℕ := Finset.Icc 1 35) (f : ℕ → ℝ := fun k => Real.sin (↑(5 * k) * (π / 180))) : ∃ (m n : ℕ), (∑ k in S, f k) = Real.tan (↑m / ↑n * (π / 180)) ∧ Nat.gcd m n = 1 ∧ ↑m / ↑n < 90 ∧ m + n = 177 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet f be a real number.\nLet z be a real number.\nAssume f + 3 * z = 11.\nAssume 3 * (f - 1) - 5 * z = -68.\nGoal:\nf = -10 AND z = 7.",
+    "formal_statement": "theorem solve_equations (f z : ℝ) (h1 : f + 3 * z = 11) (h2 : 3 * (f - 1) - 5 * z = -68) : f = -10 ∧ z = 7 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 5^30.\nGoal:\nn ≡ 1 mod 7.",
+    "formal_statement": "theorem pow_five_thirty_mod_seven : (5 : ℤ) ^ 30 ≡ 1 [ZMOD 7] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine y = x^2 - 10x.\nDefine f : ℝ → ℝ as f(y) = 1/(y - 29) + 1/(y - 45) - 2/(y - 69).\nGoal:\nThe smallest positive real solution x to f(y) = 0 is x = 13.",
+    "formal_statement": "theorem smallest_positive_solution (x : ℝ) (y : ℝ) (hy : y = x^2 - 10 * x) (f : ℝ → ℝ) (hf : ∀ y, f y = 1 / (y - 29) + 1 / (y - 45) - 2 / (y - 69)) : (∃ x₀, x₀ > 0 ∧ f y = 0 ∧ ∀ x', x' > 0 → f (x'^2 - 10 * x') = 0 → x₀ ≤ x') → x = 13 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes the definitions of y and f, and it states the goal of finding the smallest positive real solution x to f(y) = 0, which is x = 13. The theorem signature accurately reflects the assumptions and the goal, with correct types and logical flow."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a ⋆ b : ℚ × ℚ → ℚ as follows:\nView a as a real number.\nView b as a real number.\nDefine a ⋆ b = ((1 / b) - (1 / a)) / (a - b).\n\nGoal:\n3 ⋆ 11 = 1 / 33.",
+    "formal_statement": "theorem star_example : star (3, 11) = 1 / 33 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x : {1, ..., 7} → ℝ.\nAssume sum_{k=1}^7 (k^2 * x(k)) = 1.\nAssume sum_{k=1}^7 ((k+1)^2 * x(k)) = 12.\nAssume sum_{k=1}^7 ((k+2)^2 * x(k)) = 123.\nGoal:\nsum_{k=1}^7 ((k+3)^2 * x(k)) = 334.",
+    "formal_statement": "theorem sum_goal (x : Fin 7 → ℝ) (h1 : ∑ k : Fin 7, (↑k + 1)^2 * x k = 1) (h2 : ∑ k : Fin 7, (↑k + 2)^2 * x k = 12) (h3 : ∑ k : Fin 7, (↑k + 3)^2 * x k = 123) : ∑ k : Fin 7, (↑k + 4)^2 * x k = 334 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem incorrectly maps the natural language assumptions and goal. The natural language specifies sums from k=1 to 7, but the Lean theorem uses `Fin 7` which starts indexing from 0. Additionally, the coefficients in the sums are misaligned: the natural language uses `k^2`, `(k+1)^2`, etc., while the Lean theorem uses `(↑k + 1)^2`, `(↑k + 2)^2`, etc., which shifts the indexing and coefficients incorrectly."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nDefine sec : ℝ → ℝ as sec(x) = 1 / cos(x).\nDefine tan : ℝ → ℝ as tan(x) = sin(x) / cos(x).\nDefine csc : ℝ → ℝ as csc(x) = 1 / sin(x).\nDefine cot : ℝ → ℝ as cot(x) = cos(x) / sin(x).\nAssume sec(x) + tan(x) = 22 / 7.\nDefine m as an integer.\nDefine n as a natural number.\nAssume gcd(m, n) = 1.\nAssume csc(x) + cot(x) = m / n.\nGoal:\nm + n = 44.",
+    "formal_statement": "theorem goal (x : ℝ) (sec tan csc cot : ℝ → ℝ) (hsec : ∀ x, sec x = 1 / Real.cos x) (htan : ∀ x, tan x = Real.sin x / Real.cos x) (hcsc : ∀ x, csc x = 1 / Real.sin x) (hcot : ∀ x, cot x = Real.cos x / Real.sin x) (h1 : sec x + tan x = 22 / 7) (m : ℤ) (n : ℕ) (hgcd : Int.gcd m ↑n = 1) (h2 : csc x + cot x = ↑m / ↑n) : ↑m + ↑n = 44 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HAdd ℤ ℕ (?m.738 : Sort ?u.702)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 90.\nDefine b = 1.\nGoal:\n91^2 = (a + b)^2 = a^2 + 2 * a * b + b^2 = 8100 + 180 + 1 = 8281.",
+    "formal_statement": "theorem binomial_expansion : (90 + 1)^2 = 90^2 + 2 * 90 * 1 + 1^2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x = log₃27.\nGoal:\nx = 3.",
+    "formal_statement": "theorem log_27_base_3_eq_3 : Real.log 27 / Real.log 3 = 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nAssume |x - 1| + |x| + |x + 1| = x + 2.\nGoal:\n0 ≤ x ≤ 1.",
+    "formal_statement": "theorem abs_condition_implies_range (x : ℝ) (h : |x - 1| + |x| + |x + 1| = x + 2) : 0 ≤ x ∧ x ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a, b, c, d be elements of ℕ.\nDefine P = a × b × c × d = 40320.\nDefine E1 = a × b + a + b = 524.\nDefine E2 = b × c + b + c = 146.\nDefine E3 = c × d + c + d = 104.\nGoal:\na - d = 10.",
+    "formal_statement": "theorem goal (a b c d : ℕ) (P : a * b * c * d = 40320) (E1 : a * b + a + b = 524) (E2 : b * c + b + c = 146) (E3 : c * d + c + d = 104) : a - d = 10 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet t be a real number.\nDefine A = (1 + sin(t)) * (1 + cos(t)).\nAssume A = 5 / 4.\nDefine B = (1 - sin(t)) * (1 - cos(t)).\nAssume there exist positive integers k, m, n such that gcd(m, n) = 1 AND B = m / n - sqrt(k).\nGoal:\nk + m + n = 27.",
+    "formal_statement": "theorem sum_condition (t : ℝ) (A : ℝ := (1 + Real.sin t) * (1 + Real.cos t)) (hA : A = 5 / 4) \n  (B : ℝ := (1 - Real.sin t) * (1 - Real.cos t)) (k m n : ℕ) (hk : k > 0) (hm : m > 0) (hn : n > 0) \n  (hgcd : Nat.gcd m n = 1) (hB : B = ↑m / ↑n - Real.sqrt ↑k) : k + m + n = 27 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number in ℝ+.\nLet b be a real number in ℝ+.\nAssume a ≠ b.\nAssume a - (1 / a) = 1.\nAssume b - (1 / b) = 1.\nGoal:\na + b = √5.",
+    "formal_statement": "theorem sum_of_special_reals (a : ℝ) (b : ℝ) (ha : a > 0) (hb : b > 0) (hne : a ≠ b) (ha_eq : a - (1 / a) = 1) (hb_eq : b - (1 / b) = 1) : a + b = Real.sqrt 5 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nDefine f(x) = a * x^4 - b * x^2 + x + 5, where a ∈ ℝ, b ∈ ℝ.\nAssume f(-3) = 2.\nGoal:\nf(3) = 8.",
+    "formal_statement": "theorem f_value_at_3 (a b : ℝ) (f : ℝ → ℝ) (hf : ∀ x, f x = a * x^4 - b * x^2 + x + 5) (hneg3 : f (-3) = 2) : f 3 = 8 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nAssume f is invertible.\nDefine f⁻¹ as the inverse function of f.\nAssume f(2) = 4.\nAssume f⁻¹(2) = 4.\nGoal:\nf(f(2)) = 2.",
+    "formal_statement": "theorem inverse_function_property (f : ℝ → ℝ) (hf : Function.Bijective f) (f_inv : ℝ → ℝ) (h_inv : Function.RightInverse f_inv f ∧ Function.LeftInverse f_inv f) (h1 : f 2 = 4) (h2 : f_inv 2 = 4) : f (f 2) = 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine seq1 : ℕ → ℝ+.\nDefine seq1(1) = 6.\nDefine seq1(2) = a.\nDefine seq1(3) = b.\nAssume for all n in ℕ, seq1(n+1) = seq1(n) * r where r is the common ratio.\n\nDefine seq2 : ℕ → ℝ+.\nDefine seq2(1) = 1 / b.\nDefine seq2(2) = a.\nDefine seq2(3) = 54.\nAssume for all n in ℕ, seq2(n+1) = seq2(n) * s where s is the common ratio.\n\nGoal:\na = 3 * √2.",
+    "formal_statement": "theorem geometric_sequences_goal (a b : ℝ+) (seq1 : ℕ → ℝ+) (seq2 : ℕ → ℝ+) (r s : ℝ+) \n  (hseq1_1 : seq1 1 = 6) (hseq1_2 : seq1 2 = a) (hseq1_3 : seq1 3 = b) \n  (hseq1_rec : ∀ n : ℕ, seq1 (n + 1) = seq1 n * r) \n  (hseq2_1 : seq2 1 = 1 / b) (hseq2_2 : seq2 2 = a) (hseq2_3 : seq2 3 = 54) \n  (hseq2_rec : ∀ n : ℕ, seq2 (n + 1) = seq2 n * s) : \n  a = 3 * Real.sqrt 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ')'; expected term",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nDefine h : ℝ → ℝ.\nAssume h is the inverse function of f.\nAssume h(2) = 10.\nAssume h(10) = 1.\nAssume h(1) = 2.\nGoal:\nf(f(10)) = 1.",
+    "formal_statement": "theorem inverse_function_property (f h : ℝ → ℝ) (hinv : Function.RightInverse h f) (h2 : h 2 = 10) (h10 : h 10 = 1) (h1 : h 1 = 2) : f (f 10) = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = {k ∈ ℕ | 0 < k < 50 AND k ≡ 0 mod 3}.\nDefine f : ℕ → ℕ where f(n) = n mod 10.\nGoal:\nSum over k in S of f(k) = 78.",
+    "formal_statement": "theorem sum_mod_condition : (∑ k in {k : ℕ | 0 < k ∧ k < 50 ∧ k % 3 = 0}, k % 10) = 78 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑{k : ℕ | (0 : ℕ) < k ∧ k < (50 : ℕ) ∧ k % (3 : ℕ) = (0 : ℕ)}",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p as a real number.\nAssume 0 < p < 15.\nDefine f : ℝ → ℝ.\nDefine f(x) = |x - p| + |x - 15| + |x - p - 15|.\nGoal:\nFor all x in [p, 15], the minimum value of f(x) = 15.",
+    "formal_statement": "theorem min_value_of_f (p : ℝ) (hp : 0 < p ∧ p < 15) (f : ℝ → ℝ) (hf : ∀ x, f x = |x - p| + |x - 15| + |x - p - 15|) : ∀ x ∈ Set.Icc p 15, ∃ x₀ ∈ Set.Icc p 15, ∀ x ∈ Set.Icc p 15, f x₀ ≤ f x ∧ f x₀ = 15 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines `p` as a real number with the constraint `0 < p < 15`, defines the function `f` as specified, and states that for all `x` in the interval `[p, 15]`, there exists a minimum value `x₀` in the same interval where `f x₀` is less than or equal to `f x` for all `x` in the interval and `f x₀ = 15`. This matches the goal stated in the natural language."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine k = 123456.\nDefine m = 101.\nGoal:\nk ≡ n mod m AND n ∈ ℤ AND 0 ≤ n < m AND n = 34.",
+    "formal_statement": "theorem mod_problem : ∃ n : ℤ, 123456 ≡ n [ZMOD 101] ∧ 0 ≤ n ∧ n < 101 ∧ n = 34 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an element of ℤ.\nAssume 24x ≡ 15 mod 1199.\nGoal:\nx = -449.",
+    "formal_statement": "theorem congruence_solution (x : ℤ) (h : 24 * x ≡ 15 [ZMOD 1199]) : x = -449 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine A, M, C as elements of {0, 1, ..., 9}.\nDefine AMC10 = 10000 * A + 1000 * M + 100 * C + 10.\nDefine AMC12 = 10000 * A + 1000 * M + 100 * C + 12.\nAssume AMC10 + AMC12 = 123422.\nGoal:\nA + M + C = 14.",
+    "formal_statement": "theorem amc_sum (A M C : Fin 10) (AMC10 : ℕ := 10000 * ↑A + 1000 * ↑M + 100 * ↑C + 10) (AMC12 : ℕ := 10000 * ↑A + 1000 * ↑M + 100 * ↑C + 12) (h : AMC10 + AMC12 = 123422) : ↑A + ↑M + ↑C = 14 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nDefine term1 = (x + 1)^2.\nDefine term2 = x.\nGoal:\nterm1 * term2 = x^3 + 2 * x^2 + x.",
+    "formal_statement": "theorem term_expansion (x : ℝ) (term1 := (x + 1)^2) (term2 := x) : term1 * term2 = x^3 + 2 * x^2 + x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an element of ℝ+.\nDefine f : ℝ → ℝ.\nAssume for every x in ℝ, f(x + a) = (1 / 2) + √(f(x) - f(x)²).\nGoal:\nThere exists b in ℝ+ such that for every x in ℝ, f(x + b) = f(x).",
+    "formal_statement": "theorem exists_periodic_solution (a : ℝ) (ha : a > 0) (f : ℝ → ℝ) (hf : ∀ x : ℝ, f (x + a) = 1 / 2 + Real.sqrt (f x - f x ^ 2)) : ∃ b : ℝ, b > 0 ∧ ∀ x : ℝ, f (x + b) = f x := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet c be a real number.\nDefine calories_in_tin = 40.\nDefine percentage_of_daily = 2 / 100.\nAssume calories_in_tin = percentage_of_daily * c.\nGoal:\nc = 2000.",
+    "formal_statement": "theorem daily_calories_calculation (c : ℝ) (calories_in_tin : ℝ := 40) (percentage_of_daily : ℝ := 2 / 100) (h : calories_in_tin = percentage_of_daily * c) : c = 2000 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a : ℕ → ℤ.\nDefine d in ℤ.\nAssume for all n in ℕ, a(n + 1) = a(n) + d.\nAssume a(7) = 30.\nAssume a(11) = 60.\nGoal:\na(21) = 135.",
+    "formal_statement": "theorem arithmetic_sequence_problem (a : ℕ → ℤ) (d : ℤ) (h_rec : ∀ n : ℕ, a (n + 1) = a n + d) (h7 : a 7 = 30) (h11 : a 11 = 60) : a 21 = 135 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p : ℕ → ℤ as p(n) = n^2 - n + 41.\nGoal:\nThe smallest positive integer n such that gcd(p(n), p(n + 1)) > 1 is 41.",
+    "formal_statement": "theorem smallest_n_with_gcd_condition : \n  Nat.find (fun n => Nat.gcd (↑(n^2 - n + 41)) (↑((n + 1)^2 - (n + 1) + 41)) > 1) = 41 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  Nat.find fun (n : (?m.225 : Type ?u.120)) =>\n    (n ^ (2 : (?m.549 : (?m.225 : Type ?u.120) → Type ?u.16) n) - n +\n            (41 : (?m.545 : (?m.225 : Type ?u.120) → Type ?u.10) n)).gcd\n        ((n + (1 : (?m.562 : (?m.225 : Type ?u.120) → Type ?u.93) n)) ^\n              (2 : (?m.560 : (?m.225 : Type ?u.120) → Type ?u.90) n) -\n            (n + (1 : (?m.566 : (?m.225 : Type ?u.120) → Type ?u.119) n)) +\n          (41 : (?m.554 : (?m.225 : Type ?u.120) → Type ?u.84) n)) >\n      (1 : ℕ)\nargument\n  fun (n : (?m.225 : Type ?u.120)) =>\n    (n ^ (2 : (?m.549 : (?m.225 : Type ?u.120) → Type ?u.16) n) - n +\n            (41 : (?m.545 : (?m.225 : Type ?u.120) → Type ?u.10) n)).gcd\n        ((n + (1 : (?m.562 : (?m.225 : Type ?u.120) → Type ?u.93) n)) ^\n              (2 : (?m.560 : (?m.225 : Type ?u.120) → Type ?u.90) n) -\n            (n + (1 : (?m.566 : (?m.225 : Type ?u.120) → Type ?u.119) n)) +\n          (41 : (?m.554 : (?m.225 : Type ?u.120) → Type ?u.84) n)) >\n      (1 : ℕ)\nhas type\n  (?m.225 : Type ?u.120) → Prop : Type ?u.120\nbut is expected to have type\n  ∃ (n : ℕ), (?m.3 : ℕ → Prop) n : Prop",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ as f(x) = x^4.\nDefine g : ℝ → ℝ as g(x) = 5x^2 - 6.\nDefine S = {x in ℝ | f(x) = g(x)}.\nAssume the size of S = 4.\nAssume there exist m, n in ℝ such that m > n AND S = {√m, -√m, √n, -√n}.\nGoal:\nm - n = 1.",
+    "formal_statement": "theorem goal (f g : ℝ → ℝ) (h_f : ∀ x, f x = x^4) (h_g : ∀ x, g x = 5 * x^2 - 6) (S : Set ℝ) (h_S : S = {x | f x = g x}) (h_card : Nat.card S = 4) (m n : ℝ) (h_mn : m > n) (h_S_eq : S = {Real.sqrt m, -Real.sqrt m, Real.sqrt n, -Real.sqrt n}) : m - n = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine P : ℂ → ℂ as P(z) = z^6 - 10z^5 + A z^4 + B z^3 + C z^2 + D z + 16.\nAssume all roots of P are in ℕ.\nLet r1, r2, r3, r4, r5, r6 be the roots of P.\nDefine S = {r1, r2, r3, r4, r5, r6}.\nAssume sum_{k in S} k = 10.\nAssume product_{k in S} k = 16.\nGoal:\nB = -88.",
+    "formal_statement": "theorem goal_B_value (P : ℂ → ℂ) (A B C D : ℂ) (r1 r2 r3 r4 r5 r6 : ℕ) (hP : ∀ z, P z = z^6 - 10 * z^5 + A * z^4 + B * z^3 + C * z^2 + D * z + 16) (hroots : ∀ z, P z = 0 ↔ z ∈ ({r1, r2, r3, r4, r5, r6} : Set ℂ)) (hsum : ∑ k in ({r1, r2, r3, r4, r5, r6} : Finset ℂ), k = 10) (hprod : ∏ k in ({r1, r2, r3, r4, r5, r6} : Finset ℂ), k = 16) : B = -88 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "overloaded, errors \n  failed to synthesize instance\n    Singleton ℕ (Set ℂ)\n  \n  invalid {...} notation, expected type is not of the form (C ...)\n    Set ℂ\noverloaded, errors \n  failed to synthesize instance\n    Singleton ℕ (Finset ℂ)\n  \n  17:229 'r1' is not a field of structure 'Finset'\noverloaded, errors \n  failed to synthesize instance\n    Singleton ℕ (Finset ℂ)\n  \n  17:292 'r1' is not a field of structure 'Finset'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet K, L, M, N be elements of ℕ.\nAssume K > L > M > N.\nAssume K * M + L * N = (K + L - M + N) * (-K + L + M + N).\nGoal:\nK * L + M * N is not a prime number.",
+    "formal_statement": "theorem not_prime_of_condition (K L M N : ℕ) (h₁ : K > L) (h₂ : L > M) (h₃ : M > N) (h₄ : K * M + L * N = (K + L - M + N) * (-K + L + M + N)) : ¬ Nat.Prime (K * L + M * N) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Neg ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a ∈ ℝ.\nDefine the equation: sqrt(4 + sqrt(16 + 16 * a)) + sqrt(1 + sqrt(1 + a)) = 6.\nGoal:\na = 8.",
+    "formal_statement": "theorem sqrt_equation_implies_a_eq_8 (a : ℝ) (h : Real.sqrt (4 + Real.sqrt (16 + 16 * a)) + Real.sqrt (1 + Real.sqrt (1 + a)) = 6) : a = 8 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = 8.\nGoal:\n(16 * (a^(1/3))^2)^(1/3) = 4.",
+    "formal_statement": "theorem goal (a : ℝ) (ha : a = 8) : (16 * (a^(1/3))^2)^(1/3) = 4 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine s as a real number.\nDefine t as a real number.\nDefine line1 : ℝ → ℝ where line1(t) = 9 - 2 * t.\nDefine line2 : ℝ → ℝ where line2(s) = 3 * s + 1.\nGoal:\nThere exists (s, t) in ℝ × ℝ such that t = line1(s) AND t = line2(s) AND (s, t) = (1, 4).",
+    "formal_statement": "theorem exists_intersection_point : ∃ (s t : ℝ), t = (fun t => 9 - 2 * t) s ∧ t = (fun s => 3 * s + 1) s ∧ (s, t) = (1, 4) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately represents the assumptions and the goal, including the definitions of line1 and line2, and the existence of a specific intersection point (1, 4). The types and constraints are correctly formalized, and the logical implication flows as intended."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine S1 = sum from k=0 to n-1 of k^3.\nDefine S2 = sum from k=0 to n-1 of k.\nGoal:\nS1 = S2^2.",
+    "formal_statement": "theorem sum_cubes_eq_square_sum (n : ℕ) : \n(∑ k in Finset.range n, (k : ℝ)^3) = (∑ k in Finset.range n, (k : ℝ))^2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The generated Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately represents the sums S1 and S2 as specified, with the correct types and constraints. The theorem also correctly states the goal that S1 equals the square of S2. The use of ℝ for the sums is acceptable here, as it does not contradict the natural language statement which does not specify the type of the sums."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine b = 11^(1/4) as a real number.\nDefine x as a real number.\nAssume b^(3 * x - 3) = 1 / 5.\nGoal:\nb^(6 * x + 2) = 121 / 25.",
+    "formal_statement": "theorem power_relation (b : ℝ) (hb : b = 11^(1/4)) (x : ℝ) (h : b^(3 * x - 3) = 1 / 5) : b^(6 * x + 2) = 121 / 25 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nDefine equation : (x + 3)^2 = 121.\n\nGoal:\nThe sum of all x satisfying equation = -6.",
+    "formal_statement": "theorem sum_of_solutions (x : ℝ) (equation : (x + 3)^2 = 121) : ∃ (x1 x2 : ℝ), x1 + x2 = -6 ∧ (x1 + 3)^2 = 121 ∧ (x2 + 3)^2 = 121 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines x as a real number, states the equation (x + 3)^2 = 121, and asserts the existence of two real numbers x1 and x2 that satisfy the equation and whose sum is -6. This matches the goal of finding the sum of all x satisfying the equation."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine V as the list [343, 216, 125, 64, 27, 8, 1].\nAssume for all i in {1, ..., 6}, V[i] > V[i+1].\nDefine side_length : ℕ → ℝ as side_length(n) = n^(1/3).\nDefine surface_area : ℕ → ℝ as surface_area(n) = 6 * (side_length(n))^2.\nDefine exposed_area : ℕ → ℝ as exposed_area(n) = if n = 1 then surface_area(V[1]) else surface_area(V[n]) - 2 * (side_length(V[n]))^2 + exposed_area(n-1).\nGoal:\nexposed_area(7) = 658.",
+    "formal_statement": "theorem exposed_area_property : exposed_area 7 = 658 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'exposed_area'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine P(n) = product for k from 1 to n of (1 + 1/k^3).\nGoal:\nP(n) ≤ 3 - 1/n.",
+    "formal_statement": "theorem product_bound (n : ℕ) : ∏ k in Finset.Icc 1 n, (1 + 1 / (k : ℝ)^3) ≤ 3 - 1 / (n : ℝ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nAssume gcd(n, 40) = 10.\nAssume lcm(n, 40) = 280.\nGoal:\nn = 70.",
+    "formal_statement": "theorem n_eq_70 (n : ℕ) (h₁ : Nat.gcd n 40 = 10) (h₂ : Nat.lcm n 40 = 280) : n = 70 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine S = {0, 1, ..., 100}.\nDefine f : S → ℕ where f(n) = 2^n.\nDefine total = sum_{k in S} f(k).\nGoal:\ntotal mod 7 ≡ 3.",
+    "formal_statement": "theorem total_mod_7_eq_3 : (∑ k in Finset.range 101, 2^k) % 7 = 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ as f(x) = c * x^3 - 9 * x + 3.\nAssume f(2) = 9.\nGoal:\nc = 3.",
+    "formal_statement": "theorem solve_for_c (f : ℝ → ℝ) (h : ∀ x, f x = c * x^3 - 9 * x + 3) (h2 : f 2 = 9) : c = 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'c'\nunknown identifier 'c'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℕ → ℕ.\nAssume for all n in ℕ, f(n + 1) > f(f(n)).\nGoal:\nFor all n in ℕ, f(n) = n.",
+    "formal_statement": "theorem f_eq_id (f : ℕ → ℕ) (h : ∀ n, f (n + 1) > f (f n)) : ∀ n, f n = n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℚ+ → ℚ.\nAssume for all a, b in ℚ+, f(a · b) = f(a) + f(b).\nAssume for every prime p in ℕ, f(p) = p.\nDefine x_A = 17 / 32.\nDefine x_B = 11 / 16.\nDefine x_C = 7 / 9.\nDefine x_D = 7 / 6.\nDefine x_E = 25 / 11.\nGoal:\nf(x_E) < 0.",
+    "formal_statement": "theorem f_goal (f : ℚ → ℚ) (h_mul : ∀ a b ∈ ℚ, f (a * b) = f a + f b) (h_prime : ∀ p : ℕ, Nat.Prime p → f ↑p = ↑p) : f (25 / 11) < 0 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine n = 5^100.\nGoal:\nLet d2, d1, d0 be the digits of n in base 10 such that n = ... + d2 * 10^2 + d1 * 10^1 + d0 * 10^0.\nThen d2 + d1 + d0 = 13.",
+    "formal_statement": "theorem sum_of_last_three_digits : \n  let n := 5^100;\n  let digits := Nat.digits 10 n;\n  let d0 := digits.get! 0;\n  let d1 := digits.get! 1;\n  let d2 := digits.get! 2;\n  d2 + d1 + d0 = 13 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as an element of {0, 1, ..., 9}.\nDefine n = 2007 + 10 * x.\nGoal:\nn ≡ 0 mod 11 AND x = 5.",
+    "formal_statement": "theorem problem (x : Fin 10) (n : ℕ) (hn : n = 2007 + 10 * ↑x) : n % 11 = 0 ∧ ↑x = 5 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x = 1000000.\nGoal:\nsqrt(x) - cbrt(x) = 900.",
+    "formal_statement": "theorem sqrt_minus_cbrt_eq_900 : Real.sqrt (1000000 : ℝ) - Real.cbrt (1000000 : ℝ) = 900 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Real.cbrt'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number.\nDefine LHS = 2 + (1 / (1 + (1 / (2 + (2 / (3 + x)))))).\nDefine RHS = 144 / 53.\nGoal:\nx = 3 / 4.",
+    "formal_statement": "theorem equation_solution (x : ℝ) (LHS : ℝ := 2 + (1 / (1 + (1 / (2 + (2 / (3 + x))))))) (RHS : ℝ := 144 / 53) : LHS = RHS → x = 3 / 4 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines x as a real number, sets up LHS and RHS as specified, and correctly states that if LHS equals RHS, then x must be 3/4. The logical implication flows correctly from the hypothesis (LHS = RHS) to the conclusion (x = 3/4)."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ by f(x) = sin((π / 2) * cos(x)) - cos((π / 2) * sin(x)).\nDefine the interval I = [0, π].\nGoal:\nThe number of solutions to f(x) = 0 in I is 2.",
+    "formal_statement": "theorem number_of_solutions_in_interval : \n  let f : ℝ → ℝ := fun x => Real.sin ((π / 2) * Real.cos x) - Real.cos ((π / 2) * Real.sin x); \n  let I : Set ℝ := Set.Icc 0 π; \n  Fintype.card (↥{x ∈ I | f x = 0}) = 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\nfailed to synthesize instance\n  Fintype ↑{x : ℝ | x ∈ I ∧ f x = (0 : ℝ)}",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x₁ be a real number.\nDefine x : ℕ → ℝ as follows:\nx(1) = x₁.\nFor all n in ℕ, x(n+1) = x(n) * (x(n) + (1 / n)), where / is real division.\nGoal:\nThere exists exactly one x₁ in ℝ such that for all n in ℕ, 0 < x(n) < x(n+1) < 1.",
+    "formal_statement": "theorem exists_unique_x1 : ∃! x₁ : ℝ, ∀ n : ℕ, let x : ℕ → ℝ := fun k => match k with | 1 => x₁ | (k+1) => x k * (x k + (1 / ↑k)) end in 0 < x n ∧ x n < x (n + 1) ∧ x (n + 1) < 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected ';' or line break\nunexpected token; expected command",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ ∖ {-2} → ℝ.\nDefine f(x) = 1 / (x + 2).\nGoal:\nf(f(1)) = 3 / 7.",
+    "formal_statement": "theorem f_composition (f : ℝ ∖ {-2} → ℝ) (h : ∀ (x : ℝ ∖ {-2}), f x = 1 / (↑x + 2)) : f (f (⟨1, by simp⟩ : ℝ ∖ {-2})) = 3 / 7 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "expected token",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℤ.\nAssume n ≥ 9.\nDefine f(n) = ((n + 2)! - (n + 1)!) / n!.\nGoal:\nf(n) is a perfect square.",
+    "formal_statement": "theorem f_is_perfect_square (n : ℤ) (hn : n ≥ 9) : ∃ k : ℤ, ((↑(n + 2 + 1) * (n + 2).factorial - ↑(n + 1 + 1) * (n + 1).factorial) / ↑n.factorial : ℚ) = k * k := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid field 'factorial', the environment does not contain 'Int.factorial'\n  n + (2 : ℤ)\nhas type\n  ℤ\ninvalid field 'factorial', the environment does not contain 'Int.factorial'\n  n + (1 : ℤ)\nhas type\n  ℤ\ninvalid field 'factorial', the environment does not contain 'Int.factorial'\n  n\nhas type\n  ℤ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number with x > 1.\nLet y be a real number with y > 1.\nLet z be a real number with z > 1.\nLet w be a real number with w > 0.\nAssume log_x w = 24.\nAssume log_y w = 40.\nAssume log_{xyz} w = 12.\nGoal:\nlog_z w = 60.",
+    "formal_statement": "theorem log_property (x y z w : ℝ) (hx : x > 1) (hy : y > 1) (hz : z > 1) (hw : w > 0) (h1 : Real.logb x w = 24) (h2 : Real.logb y w = 40) (h3 : Real.logb (x * y * z) w = 12) : Real.logb z w = 60 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet A be an element of ℤ.\nLet B be an element of ℤ.\nDefine the polynomial f(x) = 10x^2 - x - 24.\nAssume f(x) = (A x - 8)(B x + 3) for all x in ℝ.\nGoal:\nA B + B = 12.",
+    "formal_statement": "theorem polynomial_identity (A B : ℤ) (f : ℝ → ℝ) (hf : ∀ x, f x = 10 * x^2 - x - 24) (h : ∀ x, f x = (A * x - 8) * (B * x + 3)) : A * B + B = 12 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℤ → ℤ.\nFor all n in ℤ:\nIf n ≡ 1 mod 2, then f(n) = n^2.\nIf n ≡ 0 mod 2, then f(n) = n^2 - 4n - 1.\nDefine n0 = 4.\nDefine n1 = f(n0).\nDefine n2 = f(n1).\nDefine n3 = f(n2).\nDefine n4 = f(n3).\nDefine n5 = f(n4).\nGoal:\nn5 = 1.",
+    "formal_statement": "theorem goal_equation (f : ℤ → ℤ) (h_odd : ∀ n : ℤ, n % 2 = 1 → f n = n^2) (h_even : ∀ n : ℤ, n % 2 = 0 → f n = n^2 - 4 * n - 1) : \nlet n0 := (4 : ℤ); \nlet n1 := f n0; \nlet n2 := f n1; \nlet n3 := f n2; \nlet n4 := f n3; \nlet n5 := f n4; \nn5 = 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine f : ℝ → ℝ.\nFor every real number x, f(x) + f(x - 1) = x^2.\nDefine x1 = 19.\nf(x1) = 94.\nGoal:\nf(94) mod 1000 = 561.",
+    "formal_statement": "theorem f_property (f : ℝ → ℝ) (h : ∀ x : ℝ, f x + f (x - 1) = x^2) (x1 : ℝ) (hx1 : x1 = 19) (hf : f x1 = 94) : (Int.mod (Int.floor (f 94)) 1000) = 561 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It includes the function f, the functional equation, the specific value x1 = 19, the condition f(x1) = 94, and the goal f(94) mod 1000 = 561. The types and constraints are accurately represented, and the logical flow from assumptions to conclusion is correct. The adaptation from the natural language question to a Lean theorem is appropriate, including the conversion of the modulo operation to Lean's Int.mod and Int.floor for real numbers."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine N : ℚ = 1 / 3.\nDefine a : ℕ → ℤ where a(n) = floor(10^n * N).\nGoal:\na(1) + a(2) + a(3) + a(4) = 3702.",
+    "formal_statement": "theorem sum_a_1_to_4 : (a 1) + (a 2) + (a 3) + (a 4) = 3702 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'a'\nunknown identifier 'a'\nunknown identifier 'a'\nunknown identifier 'a'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet f be in ℕ.\nLet s be in ℕ.\nDefine f = 5 * s.\nView f as a real number.\nView s as a real number.\nDefine f_prev = f - 3.\nDefine s_prev = s - 3.\nAssume f_prev + s_prev = 30.\nGoal:\ns = 6.",
+    "formal_statement": "theorem s_eq_6 (f s : ℕ) (h : f = 5 * s) (hprev : ↑(f - 3) + ↑(s - 3) = (30 : ℝ)) : ↑s = (6 : ℝ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be a real number.\nGoal:\na * (2 - a) ≤ 1.",
+    "formal_statement": "theorem real_inequality (a : ℝ) : a * (2 - a) ≤ 1 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an element of ℕ.\nLet y be an element of ℕ.\nAssume x > 0.\nAssume y > 0.\nAssume x^(y^2) = y^x.\nGoal:\n(x, y) = (1, 1) OR (x, y) = (16, 2) OR (x, y) = (27, 3).",
+    "formal_statement": "theorem nat_power_eq_condition (x y : ℕ) (hx : x > 0) (hy : y > 0) (h : x ^ (y ^ 2) = y ^ x) : (x = 1 ∧ y = 1) ∨ (x = 16 ∧ y = 2) ∨ (x = 27 ∧ y = 3) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nAssume x ≠ 0.\nDefine expression = (12 / (x * x)) * (x^4 / (14 * x)) * (35 / (3 * x)).\nGoal:\nexpression = 10.",
+    "formal_statement": "theorem expression_eq_10 (x : ℝ) (hx : x ≠ 0) : (12 / (x * x)) * (x^4 / (14 * x)) * (35 / (3 * x)) = 10 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet a be an element of ℤ.\nAssume a ≡ 1 mod 2.\nLet b be an element of ℕ.\nAssume b ≡ 0 mod 4.\nGoal:\na^2 + b^2 ≡ 1 mod 8.",
+    "formal_statement": "theorem mod_sum_squares (a : ℤ) (ha : a ≡ 1 [ZMOD 2]) (b : ℕ) (hb : b ≡ 0 [MOD 4]) : a^2 + (↑b)^2 ≡ 1 [ZMOD 8] := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet i be an element of ℂ such that i² = -1.\nDefine x = (i / 2)², where / denotes real division.\nGoal:\nx = -1/4.",
+    "formal_statement": "theorem complex_example (i : ℂ) (hi : i^2 = -1) : (i / (2 : ℝ))^2 = (-1 : ℝ) / (4 : ℝ) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine k as an element of ℕ.\nDefine S = {k ∈ ℕ | 2 ≤ k ≤ 10000}.\nDefine f : ℕ → ℝ where f(k) = 1 / √k.\nGoal:\nSum for k in S of f(k) < 198.",
+    "formal_statement": "theorem sum_inequality (k : ℕ) (S : Set ℕ := {k | 2 ≤ k ∧ k ≤ 10000}) (f : ℕ → ℝ := fun k => 1 / Real.sqrt ↑k) : ∑ k in Finset.Icc 2 10000, f k < 198 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine numerator = 2^2014 + 2^2012.\nDefine denominator = 2^2014 - 2^2012.\nGoal:\nnumerator / denominator = 5 / 3.",
+    "formal_statement": "theorem numerator_over_denominator_eq_five_thirds : (2^2014 + 2^2012) / (2^2014 - 2^2012) = (5 : ℚ) / 3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be a prime number in ℕ.\nLet n be a prime number in ℕ.\nDefine k, t ∈ ℕ such that k > t.\nAssume x² - m x + n = 0 has solutions x = k and x = t.\nGoal:\nm^n + n^m + k^t + t^k = 20.",
+    "formal_statement": "theorem prime_sum_equation (m n : ℕ) (hm : Nat.Prime m) (hn : Nat.Prime n) (k t : ℕ) (hkt : k > t) (hroot1 : k * k - m * k + n = 0) (hroot2 : t * t - m * t + n = 0) : m ^ n + n ^ m + k ^ t + t ^ k = 20 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine p, q as elements of ℕ.\nAssume gcd(p, q) = 1.\nDefine a = p / q (real division).\nDefine floor : ℝ → ℤ as floor(x) = max{z ∈ ℤ | z ≤ x}.\nDefine fractional : ℝ → [0,1) as fractional(x) = x - floor(x).\nDefine S = {x ∈ ℝ | floor(x) · fractional(x) = a · x²}.\nAssume sum_{x ∈ S} x = 420.\nGoal:\np + q = 929.",
+    "formal_statement": "theorem goal (p q : ℕ) (h_gcd : Nat.gcd p q = 1) (a : ℝ) (h_a : a = ↑p / ↑q) (S : Set ℝ) (h_S : ∀ x ∈ S, Int.floor x * fractional x = a * x ^ 2) (h_sum : ∑ x in S.toFinset, x = 420) : p + q = 929 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'fractional'\nfailed to synthesize instance\n  Fintype ↑S",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be a real number.\nDefine term1 = x + 3.\nDefine term2 = 2x - 6.\nGoal:\nterm1 * term2 = 2 * x^2 - 18.",
+    "formal_statement": "theorem term_product_eq (x : ℝ) (term1 := x + 3) (term2 := 2 * x - 6) : term1 * term2 = 2 * x^2 - 18 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine m = 2n.\nDefine k = m + 2.\nAssume m × k = 288.\nGoal:\nk = 18.",
+    "formal_statement": "theorem k_eq_18 (n : ℕ) (m : ℕ) (h_m : m = 2 * n) (k : ℕ) (h_k : k = m + 2) (h_eq : m * k = 288) : k = 18 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet n be an element of ℕ.\nDefine the three consecutive positive even numbers as:\na = 2n\nb = 2n + 2\nc = 2n + 4\nAssume a² + b² + c² = 12296.\nGoal:\n(a × b × c) div 8 = 32736.",
+    "formal_statement": "theorem consecutive_even_numbers_product_div (n : ℕ) (a := 2 * n) (b := 2 * n + 2) (c := 2 * n + 4) (h : a^2 + b^2 + c^2 = 12296) : (a * b * c) / 8 = 32736 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately defines the variables a, b, and c as consecutive even numbers based on n, includes the assumption that the sum of their squares is 12296, and concludes with the goal that the product of a, b, and c divided by 8 equals 32736. The types and constraints are correctly specified, and the logical implication flows as intended."
+  },
+  {
+    "informal_statement": "Assumptions:\nLet m be an element of ℕ.\nLet n be an element of ℕ.\nDefine the inequality: m * n ≤ m + n.\n\nGoal:\nThere exist infinitely many m in ℕ such that there exists n in ℕ satisfying m * n ≤ m + n.",
+    "formal_statement": "theorem exists_infinitely_many_m_with_n_satisfying_inequality : ∀ k : ℕ, ∃ m ≥ k, ∃ n : ℕ, m * n ≤ m + n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine the equation E : x^2 + 8x + y^2 - 6y = 0 where x, y are real numbers.\nGoal:\nThe radius r of the circle satisfies r = 5.",
+    "formal_statement": "theorem circle_radius_eq_5 (x y : ℝ) (E : x^2 + 8*x + y^2 - 6*y = 0) : ∃ (a b : ℝ), (x - a)^2 + (y - b)^2 = 5^2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It assumes the equation E and concludes that there exist real numbers a and b such that the equation represents a circle with radius 5. The theorem correctly formalizes the goal of finding the radius of the circle implied by the equation."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine x as a real number in the interval [0, 2π].\nDefine f : ℝ → ℝ as f(x) = tan(2x) - cos(x/2).\nGoal:\nThe number of solutions to f(x) = 0 is 5.",
+    "formal_statement": "theorem number_of_solutions (x : ℝ) (hx : x ∈ Set.Icc 0 (2 * Real.pi)) (f : ℝ → ℝ) (hf : ∀ x, f x = Real.tan (2 * x) - Real.cos (x / 2)) : Fintype.card {x : ℝ | x ∈ Set.Icc 0 (2 * Real.pi) ∧ f x = 0} = 5 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑{x : ℝ | x ∈ Set.Icc (0 : ℝ) ((2 : ℝ) * π) ∧ f x = (0 : ℝ)}",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Assumptions:\nDefine a = log₂(80).\nDefine b = log₄₀(2).\nDefine c = log₂(160).\nDefine d = log₂₀(2).\nGoal:\n(a / b) - (c / d) = 2.",
+    "formal_statement": "theorem log_identity : (Real.logb 2 80 / Real.logb 40 2) - (Real.logb 2 160 / Real.logb 20 2) = 2 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Assumptions:\nLet x be an element of ℤ.\nAssume x ≡ 9⁻¹ mod 100.\nGoal:\nx ≡ 89 mod 100.",
+    "formal_statement": "theorem inverse_mod_100 (x : ℤ) (hx : x ≡ 9⁻¹ [ZMOD 100]) : x ≡ 89 [ZMOD 100] := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Inv ℤ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  }
+]

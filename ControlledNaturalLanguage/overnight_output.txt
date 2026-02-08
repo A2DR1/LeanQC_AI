@@ -1,0 +1,78 @@
+Running Tasks Overnight...
+
+
+
+
+==================================================
+Running task: {'FL_model': 'deepseek-prover-v2', 'CNL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'version': 8, 'dataset': 'Putnam', 'limit': 100}
+Generating CNL statements...
+Initializing CNL_generator for benchmark 'Putnam' using model 'deepseek-prover-v2'...
+✅ Saved CNL statements to history/CNL/cnl_statements_Putnam_cnl_v8.json
+Initializing FL_generator with model 'deepseek-prover-v2' for dataset 'Putnam' (isCNL=True, limit=100)...
+📂 Processing: history/CNL/cnl_statements_Putnam_cnl_v8.json
+Initializing CNL_generator for benchmark 'miniF2F' using model 'deepseek-prover-v2'...
+Initializing SemanticEvaluator with model 'deepseek-prover-v2'...
+
+✅ syntactic accuracy: 30.00% (30/100)
+✅ semantic accuracy:  93.33% (28/30)
+⏱️ Total Time Spent: 1073.52 seconds
+
+✅ Saved CNL statements to history/CNL/cnl_statements_Putnam_cnl_v8.json
+✅ Saved CNL autoformalizations to history/Lean_files/Autoformalized_Putnam_cnl_v8.lean
+✅ Saved NL-FL pairs to history/NL_FL_pairs/NL_FL_pairs_Putnam_cnl_v8.json
+
+
+
+==================================================
+Running task: {'FL_model': 'deepseek-prover-v2', 'CNL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'version': 8, 'dataset': 'miniF2F', 'limit': 100}
+Generating CNL statements...
+Initializing CNL_generator for benchmark 'miniF2F' using model 'deepseek-prover-v2'...
+✅ Saved CNL statements to history/CNL/cnl_statements_miniF2F_cnl_v8.json
+Initializing FL_generator with model 'deepseek-prover-v2' for dataset 'miniF2F' (isCNL=True, limit=100)...
+📂 Processing: history/CNL/cnl_statements_miniF2F_cnl_v8.json
+Initializing CNL_generator for benchmark 'miniF2F' using model 'deepseek-prover-v2'...
+Initializing SemanticEvaluator with model 'deepseek-prover-v2'...
+
+✅ syntactic accuracy: 75.00% (75/100)
+✅ semantic accuracy:  98.67% (74/75)
+⏱️ Total Time Spent: 896.73 seconds
+
+✅ Saved CNL statements to history/CNL/cnl_statements_miniF2F_cnl_v8.json
+✅ Saved CNL autoformalizations to history/Lean_files/Autoformalized_miniF2F_cnl_v8.lean
+✅ Saved NL-FL pairs to history/NL_FL_pairs/NL_FL_pairs_miniF2F_cnl_v8.json
+
+
+
+==================================================
+Running task: {'FL_model': 'deepseek-prover-v2', 'CNL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'version': 8, 'dataset': 'ProofNet', 'limit': 100}
+Generating CNL statements...
+Initializing CNL_generator for benchmark 'ProofNet' using model 'deepseek-prover-v2'...
+✅ Saved CNL statements to history/CNL/cnl_statements_ProofNet_cnl_v8.json
+Initializing FL_generator with model 'deepseek-prover-v2' for dataset 'ProofNet' (isCNL=True, limit=100)...
+📂 Processing: history/CNL/cnl_statements_ProofNet_cnl_v8.json
+Initializing CNL_generator for benchmark 'miniF2F' using model 'deepseek-prover-v2'...
+Initializing SemanticEvaluator with model 'deepseek-prover-v2'...
+
+✅ syntactic accuracy: 40.00% (40/100)
+✅ semantic accuracy:  97.50% (39/40)
+⏱️ Total Time Spent: 595.51 seconds
+
+✅ Saved CNL statements to history/CNL/cnl_statements_ProofNet_cnl_v8.json
+✅ Saved CNL autoformalizations to history/Lean_files/Autoformalized_ProofNet_cnl_v8.lean
+✅ Saved NL-FL pairs to history/NL_FL_pairs/NL_FL_pairs_ProofNet_cnl_v8.json
+
+
+
+==================================================
+Running task: {'FL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'dataset': 'miniF2F', 'limit': 100}
+Error running task {'FL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'dataset': 'miniF2F', 'limit': 100}: run_baseline_dataset() got an unexpected keyword argument 'semantic_judge_model'
+
+
+
+==================================================
+Running task: {'FL_model': 'kimina-autoformalizer', 'CNL_model': 'deepseek-prover-v2', 'semantic_judge_model': 'deepseek-prover-v2', 'version': 8, 'dataset': 'Putnam', 'limit': 100}
+Generating CNL statements...
+Initializing CNL_generator for benchmark 'Putnam' using model 'deepseek-prover-v2'...
+✅ Saved CNL statements to history/CNL/cnl_statements_Putnam_cnl_v8.json
+Initializing FL_generator with model 'kimina-autoformalizer' for dataset 'Putnam' (isCNL=True, limit=100)...
+❌ Error: 'kimina-autoformalizer' config not found in config.py.
