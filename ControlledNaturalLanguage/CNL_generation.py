@@ -151,6 +151,24 @@ class CNL_generator:
         # Implement any specific stripping logic if needed.
         cnl_text = re.sub(r'<think>.*?</think>', '', cnl_text, flags=re.DOTALL)
         return cnl_text.strip()
+    
+def strip_cnl_extras(cnl_text):
+        """
+        Strips any extraneous explanations or comments from the CNL text,
+        returning only the core CNL statement.
+        """
+        # For this example, we assume the CNL text is clean.
+        # Implement any specific stripping logic if needed.
+        cnl_text = re.sub(r'<think>.*?</think>', '', cnl_text, flags=re.DOTALL)
+        return cnl_text.strip()
+
+def read_cnl_lst(filename="cnl_statements.json"):
+        """
+        Reads a list of CNL statements from a specified json file.
+        """
+        with open(filename, 'r') as f:
+            cnl_statements = json.load(f)
+        return cnl_statements
 
 # --- Example Usage ---
 if __name__ == "__main__":

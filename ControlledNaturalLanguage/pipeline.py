@@ -4,6 +4,7 @@ from tqdm import tqdm
 from CNL_generation import CNL_generator
 from FL_generation import FL_generator
 from Quality_reducer import qualityReducer
+from eval_semantic import SemanticEvaluator
 
 CNL_PATH = "history/CNL"
 LEAN_FILES_PATH = "history/Lean_files"
@@ -114,12 +115,35 @@ def run_baseline_dataset(dataset_name: str, limit=100, randomize=False, tag="bas
     cnl_generator = CNL_generator() # just for writing raw statements to json, not actually generating CNL
     cnl_generator.write_cnl_to_file(raw_statements, filename=raw_json_path)
 
-    fl_generator.generate_write(
+    _, _, formal_statements = fl_generator.generate_write(
         raw_json_path,
         name=f"{LEAN_FILES_PATH}/Autoformalized_{tag}.lean",
         json_output_path=f"{NL_FL_PAIRS_PATH}/NL_FL_pairs_{tag}.json",
         semantic_judge_model=sematnic_judge_model,
     )
+
+    # compare the semantics between the original raw statements and the formal statements, and print out some stats
+    semantic_evaluator = SemanticEvaluator(model_name=sematnic_judge_model)
+    final_semantic_results = [semantic_evaluator.evaluate_translation(original_statement, formal_statement) for original_statement, formal_statement in zip(original_statements, formal_statements)]
+
+    print(f"\nFinal Semantic Evaluation Results: {final_semantic_results.count(True)}/{len(final_semantic_results)} correct ({final_semantic_results.count(True)/len(final_semantic_results)*100:.2f}%)")
+    # wrtie the final semantic evaluation results to a json file for later analysis
+    # along with the original raw statements and the formal statements for reference
+    semantic_results_path = f"semantic_evaluation_{tag}.json"
+    with open(semantic_results_path, "w", encoding="utf-8") as f:
+        json.dump(
+            [
+                {
+                    "raw_statement": raw,
+                    "formal_statement": formal,
+                    "is_semantically_correct": semantic_result,
+                }
+                for raw, formal, semantic_result in zip(original_statements, formal_statements, final_semantic_results)
+            ],
+            f,
+            indent=4,
+        )
+
 
     print(f"\n✅ Saved raw statements to {raw_json_path}")
     print(f"✅ Saved Lean output to {LEAN_FILES_PATH}/Autoformalized_{tag}.lean")

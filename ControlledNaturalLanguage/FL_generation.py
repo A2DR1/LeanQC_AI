@@ -6,9 +6,10 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 import importlib
-from CNL_generation import CNL_generator # for reading CNL list
+from CNL_generation import CNL_generator, read_cnl_lst # for reading CNL list
 from tqdm import tqdm 
 from lean_interact import LeanREPLConfig, LeanServer, Command, TempRequireProject, LeanRequire
+from read_file.handlerManager import HandlerManager
 import time
 from eval_semantic import SemanticEvaluator
 
@@ -220,7 +221,142 @@ class FL_generator:
         print(f"✅ semantic accuracy:  {semantic_accuracy:.2f}% ({sum(semantic_filtered)}/{len(semantic_filtered)})")
         print(f"⏱️ Total Time Spent: {time.time() - t0:.2f} seconds")
 
-        return syntax_accuracy, semantic_accuracy
+        return syntax_accuracy, semantic_accuracy, formal_statements
+    
+
+def generate_write(
+        input_path, dataset_name="Putnam", name=None, json_output_path=None, 
+        CNL_model=None, semantic_judge_model=None, FL_model=None, limit=100, isCNL=False):
+    """
+    Generate Lean formalizations for a list of statements.
+
+    input_path can be:
+    - a directory of miniF2F json files (readFolder_miniF2F)
+    - a json file containing List[str] (read_cnl_lst)
+    """
+
+    # track the time for the entire process 
+    print(f"📂 Processing: {input_path}")
+    t0 = time.time()
+
+    # ---------- Load NL statements ----------
+    if not isCNL:
+        # treat as dataset folder
+        # use handler to handle the complexity of reading different dataset formats
+        handler_manager = HandlerManager()
+        try:        
+            handlerClass = handler_manager.get_handler(dataset_name)
+        except Exception as e:
+            print(f"❌ Error initializing dataset handler: {e}")
+            sys.exit(1)
+        informal_statements = handlerClass.read(input_path, limit=limit)
+    else:
+        # treat as json file containing List[str]
+        informal_statements = read_cnl_lst(input_path)
+
+    # ---------- Initialize models ----------
+    if not semantic_judge_model:
+        raise ValueError("Semantic judge model must be specified for evaluation.")
+    else:
+        semantic_evaluator = SemanticEvaluator(model_name=semantic_judge_model)
+    
+    if not FL_model:
+        FL_generator_instance = FL_generator()
+    else:
+        FL_generator_instance = FL_generator(model_name=FL_model, dataset_name=dataset_name)
+
+    if not informal_statements:
+        print("❌ No statements found.")
+        return
+
+    syntactic_corrects: list[bool] = []
+    logs: list[str] = []
+    semantic_corrects: list[bool] = []
+    reasons: list[str] = []
+    formal_statements: list[str] = []
+
+    # ---------- Setup Lean server ----------
+    project = TempRequireProject(lean_version="v4.8.0", require="mathlib")
+    config = LeanREPLConfig(verbose=False, project=project)
+    server = LeanServer(config)
+
+    try:
+        for statement in tqdm(informal_statements):
+            lean_statement = FL_generator.generate_lean(statement)
+            formal_statements.append(lean_statement)
+
+            # --- Syntactic check ---
+            resp = server.run(Command(cmd=STANDARD_IMPORTS + "\n\n" + lean_statement))
+
+            # If ANY error message exists → fail
+            error_msgs = [m for m in (resp.messages or []) if getattr(m, "severity", "") == "error"]
+            if error_msgs:
+                is_syntactic_valid = False
+                # join all error messages for debugging
+                log = "\n".join([getattr(m, "data", str(m)) for m in error_msgs])
+            else:
+                is_syntactic_valid = True
+                # include warnings if present
+                if resp.messages:
+                    log = "\n".join([f"{m.severity}: {m.data}" for m in resp.messages])
+                else:
+                    log = "No messages."
+
+            syntactic_corrects.append(is_syntactic_valid)
+            logs.append(log)
+
+            # --- Semantic evaluation (only if syntactically valid) ---
+            if is_syntactic_valid:
+                sem_eval = semantic_evaluator.evaluate_translation(statement, lean_statement)
+                is_correct = bool(sem_eval.get("is_correct", False))
+                reason = sem_eval.get("reason", "No reason provided.")
+            else:
+                is_correct = False
+                reason = "Skipped semantic eval because syntactic check failed."
+
+            semantic_corrects.append(is_correct)
+            reasons.append(reason)
+
+    except Exception as e:
+        print(f"❌ Error during processing: {e}")
+
+    n = len(informal_statements)
+
+    # ---------- Write Lean file ----------
+    if name:
+        with open(name, "w", encoding="utf-8") as f:
+            f.write(STANDARD_IMPORTS.strip() + "\n\n")
+            for st in formal_statements:
+                f.write(st.strip() + "\n\n")
+
+    # ---------- Write JSON file ----------
+    if json_output_path:
+        data = []
+        for i in range(n):
+            data.append({
+                "informal_statement": informal_statements[i],
+                "formal_statement": formal_statements[i],
+                "is_syntactically_correct": syntactic_corrects[i],
+                "syntactic_evaluation_log": logs[i],
+                "is_semantically_correct": semantic_corrects[i],
+                "semantic_evaluation_reason": reasons[i],
+            })
+
+        with open(json_output_path, "w", encoding="utf-8") as jf:
+            json.dump(data, jf, indent=2, ensure_ascii=False)
+
+    # ---------- Summary ----------
+    syntax_accuracy = (sum(syntactic_corrects) / n) * 100 if n else 0.0
+
+    syntactic_pass_idxs = [i for i, ok in enumerate(syntactic_corrects) if ok]
+    semantic_filtered = [semantic_corrects[i] for i in syntactic_pass_idxs]
+    semantic_accuracy = (sum(semantic_filtered) / len(semantic_filtered)) * 100 if semantic_filtered else 0.0
+
+    print(f"\n✅ syntactic accuracy: {syntax_accuracy:.2f}% ({sum(syntactic_corrects)}/{n})")
+    print(f"✅ semantic accuracy:  {semantic_accuracy:.2f}% ({sum(semantic_filtered)}/{len(semantic_filtered)})")
+    print(f"⏱️ Total Time Spent: {time.time() - t0:.2f} seconds")
+
+    return syntax_accuracy, semantic_accuracy
     
 if __name__ == "__main__":
     generator = FL_generator(model_name="kimina_autoformalizer", dataset_name="miniF2F", isCNL=False, limit = 5)

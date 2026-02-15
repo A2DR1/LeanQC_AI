@@ -1,478 +1,478 @@
 [
   {
-    "informal_statement": "So, like, you've got five random points on a flat surface, and no three of them ever line up in a row. Show that you can always pick four of them that make a convex four-sided shape.",
-    "formal_statement": "theorem convex_quadrilateral_from_five_points (P : Finset (ℝ × ℝ)) (hP : P.card = 5) (hNoColinear : ∀ (S : Finset (ℝ × ℝ)), S ⊆ P → S.card = 3 → ¬Collinear S) : ∃ (Q : Finset (ℝ × ℝ)), Q ⊆ P ∧ Q.card = 4 ∧ ConvexHull ℝ (Q : Set (ℝ × ℝ)) = ConvexHull ℝ (Q : Set (ℝ × ℝ)) := sorry",
+    "informal_statement": "So you've got these five points just sitting in a plane, and no three of them line up. You gotta show that if you pick four of them, they'll make a convex quadrilateral.",
+    "formal_statement": "theorem four_of_five_points_form_convex_quadrilateral (P : Finset (ℝ × ℝ)) (hP : P.card = 5) (hNoThreeColinear : ∀ (S : Finset (ℝ × ℝ)), S ⊆ P → S.card = 3 → ¬Collinear (Set.univ : Set (ℝ × ℝ)) (fun x => x) (S : Set (ℝ × ℝ))) : ∀ (Q : Finset (ℝ × ℝ)), Q ⊆ P → Q.card = 4 → ConvexHull ℝ (Q : Set (ℝ × ℝ)) = ↑Q := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  DivisionRing { x : ℝ × ℝ // x ∈ S }\nunknown identifier 'ConvexHull'\nunknown identifier 'ConvexHull'",
+    "syntactic_evaluation_log": "function expected at\n  Collinear ↑Set.univ fun (x : Prop) => x\nterm has type\n  Prop\nunknown identifier 'ConvexHull'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we’ve got this function f, defined on some interval I that starts at 0 on the left, and for any positive x in I, the average of f from 0 to x equals the geometric mean of f(0) and f(x). Show that f(x) = a/(1 - cx)^2, where a > 0, and if c > 0 then it’s for 0 ≤ x < 1/c, and if c ≤ 0 then it’s for 0 ≤ x < ∞.",
-    "formal_statement": "theorem function_with_average_geometric_mean (f : ℝ → ℝ) (I : Set ℝ) (hI : I = Set.Ico 0 (if 0 < c then 1 / c else ∞)) (h0 : f 0 = a) (ha : 0 < a) (h_avg : ∀ x ∈ I, 0 < x → (∫ t in 0..x, f t) / x = Real.sqrt (f 0 * f x)) : ∀ x ∈ I, f x = a / (1 - c * x) ^ 2 := sorry",
+    "informal_statement": "So we’ve got this function f, defined on some interval I that starts at 0 on the left, and for any positive x in I, the average of f from 0 to x equals the geometric mean of f(0) and f(x). Show that f(x) = a/(1 - cx)^2, where a > 0, and if c > 0 then it works for 0 ≤ x < 1/c, and if c ≤ 0 then it works for all x ≥ 0.",
+    "formal_statement": "theorem function_form {I : Set ℝ} (hI : I = Set.Ici 0 ∨ ∃ b, I = Set.Ico 0 b) (f : ℝ → ℝ) (hf : ∀ x ∈ I, x > 0 → (∫ t in 0..x, f t) / x = Real.sqrt (f 0 * f x)) : ∃ (a : ℝ) (c : ℝ), a > 0 ∧ (∀ x ∈ I, f x = a / (1 - c * x)^2) ∧ (c > 0 → ∃ b, I = Set.Ico 0 b ∧ b = 1 / c) ∧ (c ≤ 0 → I = Set.Ici 0) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "expected token",
+    "syntactic_evaluation_log": "invalid field 'x', the environment does not contain 'Float.x'\n  0.\nhas type\n  Float",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have a triangle ABC in the plane, and we pick points P, Q, R on sides BC, CA, and AB so that the ratios AQ/QC, BR/RA, and CP/PB all equal some number k (k > 0). Then, if we look at the smaller triangle UVW that comes from parts of lines AP, BQ, and CR, we need to show that the area of UVW divided by the area of ABC works out to be (k - 1)^2 / (k^2 + k + 1).",
-    "formal_statement": "theorem triangle_area_ratio (ABC : Triangle ℝ (NormedAddCommGroup.toSeminormedAddCommGroup)) (k : ℝ) (hk : k > 0) (P : ℝ × ℝ) (Q : ℝ × ℝ) (R : ℝ × ℝ) (hP : P ∈ segment ℝ (Triangle.points ABC).2 (Triangle.points ABC).3) (hQ : Q ∈ segment ℝ (Triangle.points ABC).3 (Triangle.points ABC).1) (hR : R ∈ segment ℝ (Triangle.points ABC).1 (Triangle.points ABC).2) (hAQ_QC : dist (Triangle.points ABC).1 Q / dist Q (Triangle.points ABC).3 = k) (hBR_RA : dist (Triangle.points ABC).2 R / dist R (Triangle.points ABC).1 = k) (hCP_PB : dist (Triangle.points ABC).3 P / dist P (Triangle.points ABC).2 = k) : ∃ UVW : Triangle ℝ (NormedAddCommGroup.toSeminormedAddCommGroup), (area UVW) / (area ABC) = (k - 1)^2 / (k^2 + k + 1) := sorry",
+    "informal_statement": "So we've got this triangle ABC, and there's points P, Q, R on the sides BC, CA, AB. They're set up so that AQ/QC = BR/RA = CP/PB = k, where k is just some number. Now, if you take the lines AP, BQ, CR, they cross each other and make a smaller triangle inside—call it UVW. The thing to show is that the area of this little triangle UVW compared to the big triangle ABC is (k - 1)^2 / (k^2 + k + 1).",
+    "formal_statement": "theorem ceva_area_ratio (ABC : Affine.Triangle ℝ (EuclideanSpace ℝ (Fin 2))) (k : ℝ) (hk : k ≠ 0 ∧ k ≠ -1) :\n    ∀ (P : {x // x ∈ Affine.Segment ℝ (ABC.points 1) (ABC.points 2)})\n    (Q : {x // x ∈ Affine.Segment ℝ (ABC.points 2) (ABC.points 0)})\n    (R : {x // x ∈ Affine.Segment ℝ (ABC.points 0) (ABC.points 1)}),\n    (‖(↑Q - ABC.points 2)‖ / ‖(ABC.points 0 - ↑Q)‖ = k) →\n    (‖(↑R - ABC.points 0)‖ / ‖(ABC.points 1 - ↑R)‖ = k) →\n    (‖(↑P - ABC.points 1)‖ / ‖(ABC.points 2 - ↑P)‖ = k) →\n    let AP := Affine.Subspace.affineSpan ℝ {ABC.points 0, ↑P};\n    let BQ := Affine.Subspace.affineSpan ℝ {ABC.points 1, ↑Q};\n    let CR := Affine.Subspace.affineSpan ℝ {ABC.points 2, ↑R};\n    let U := Classical.choose (Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le \n      (Affine.Subspace.affineSpan ℝ {ABC.points 1, ↑Q}) (Affine.Subspace.affineSpan ℝ {ABC.points 2, ↑R}));\n    let V := Classical.choose (Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le \n      (Affine.Subspace.affineSpan ℝ {ABC.points 2, ↑R}) (Affine.Subspace.affineSpan ℝ {ABC.points 0, ↑P}));\n    let W := Classical.choose (Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le \n      (Affine.Subspace.affineSpan ℝ {ABC.points 0, ↑P}) (Affine.Subspace.affineSpan ℝ {ABC.points 1, ↑Q}));\n    let UVW : Affine.Triangle ℝ (EuclideanSpace ℝ (Fin 2)) := ⟨![U, V, W]⟩;\n    (Affine.Triangle.area UVW) / (Affine.Triangle.area ABC) = (k - 1)^2 / (k^2 + k + 1) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'Triangle'\noverloaded, errors \n  17:373 unknown identifier 'Triangle.points'\n  \n  17:373 unknown identifier 'Triangle.points'\noverloaded, errors \n  17:405 application type mismatch\n    Nat.dist Q\n  argument\n    Q\n  has type\n    ℝ × ℝ : Type\n  but is expected to have type\n    ℕ : Type\n  \n  17:408 unknown identifier 'Triangle.points'\noverloaded, errors \n  17:452 unknown identifier 'Triangle.points'\n  \n  17:452 unknown identifier 'Triangle.points'\noverloaded, errors \n  17:484 application type mismatch\n    Nat.dist R\n  argument\n    R\n  has type\n    ℝ × ℝ : Type\n  but is expected to have type\n    ℕ : Type\n  \n  17:487 unknown identifier 'Triangle.points'\noverloaded, errors \n  17:531 unknown identifier 'Triangle.points'\n  \n  17:531 unknown identifier 'Triangle.points'\noverloaded, errors \n  17:563 application type mismatch\n    Nat.dist P\n  argument\n    P\n  has type\n    ℝ × ℝ : Type\n  but is expected to have type\n    ℕ : Type\n  \n  17:566 unknown identifier 'Triangle.points'\nunknown identifier 'Triangle'\nunknown identifier 'area'\nunknown identifier 'area'\nunknown identifier 'Triangle.points'\nunknown identifier 'Triangle.points'\nunknown identifier 'Triangle.points'\nunknown identifier 'Triangle.points'\nunknown identifier 'Triangle.points'\nunknown identifier 'Triangle.points'",
+    "syntactic_evaluation_log": "unknown identifier 'Affine.Segment'\nunknown identifier 'Affine.Segment'\nunknown identifier 'Affine.Segment'\nunknown identifier 'Affine.Subspace.affineSpan'\nunknown identifier 'Affine.Subspace.affineSpan'\nunknown identifier 'Affine.Subspace.affineSpan'\nunknown identifier 'Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le'\nunknown identifier 'Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le'\nunknown identifier 'Affine.Subspace.inter_nonempty_of_inter_nonempty_of_sup_le'\ninvalid constructor ⟨...⟩, insufficient number of arguments, constructs 'Affine.Simplex.mk' has #2 explicit fields, but only #1 provided\nunknown constant 'Affine.Triangle.area'\nunknown constant 'Affine.Triangle.area'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have this function f, and whenever x is in some interval that's at least 2 units long, we know |f(x)| ≤ 1 and also |f''(x)| ≤ 1. Show that it works out so that |f'(x)| ≤ 2 on that same interval.",
-    "formal_statement": "theorem derivative_bound (f : ℝ → ℝ) (a b : ℝ) (hab : b - a ≥ 2) (hf : ∀ x ∈ Set.Icc a b, |f x| ≤ 1) (hf'' : ∀ x ∈ Set.Icc a b, |f'' x| ≤ 1) : ∀ x ∈ Set.Icc a b, |f' x| ≤ 2 := sorry",
+    "informal_statement": "Suppose we have this function f, and whenever x is in some interval that's at least 2 units long, we know that |f(x)| ≤ 1 and also |f''(x)| ≤ 1. Show that it works out so that |f'(x)| ≤ 2 on that same interval.",
+    "formal_statement": "theorem derivative_bound {f : ℝ → ℝ} {a b : ℝ} (hab : b - a ≥ 2) (hf_cont : ∀ x ∈ Icc a b, ContinuousAt f x) (hf_diff : ∀ x ∈ Ioo a b, DifferentiableAt ℝ f x) (hf_bound : ∀ x ∈ Icc a b, |f x| ≤ 1) (hf_second_bound : ∀ x ∈ Icc a b, |f'' x| ≤ 1) : ∀ x ∈ Icc a b, |f' x| ≤ 2 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'f'''\nunknown identifier 'f''\nfailed to synthesize instance\n  AddGroup ℕ\nfailed to synthesize instance\n  AddGroup ℕ",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this sum, like sum from k=1 to n of (n choose k) times k squared. Show that it works out to n(n+1)2^(n-2).",
-    "formal_statement": "theorem sum_choose_mul_k_sq_eq (n : ℕ) : ∑ k in Finset.range (n + 1), (Nat.choose n k) * k^2 = n * (n + 1) * 2^(n - 2) := sorry",
+    "informal_statement": "So like, we've got this sum where you take n choose k times k squared, and you add it up from k=1 to n. Show that it works out to be n times (n+1) times 2 to the power of (n-2).",
+    "formal_statement": "theorem sum_choose_mul_k_sq_eq (n : ℕ) : ∑ k in Finset.range (n + 1), Nat.choose n k * k^2 = n * (n + 1) * 2^(n - 2) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately represents the sum of n choose k times k squared from k=1 to n, and equates it to n times (n+1) times 2 to the power of (n-2). The types and constraints match, and the logical implication flows correctly."
   },
   {
-    "informal_statement": "So we've got this set S of rationals, and whenever you take two numbers a and b from S, their sum a+b and product ab are also in S. Also, for any rational r, exactly one of these things happens: either r is in S, or -r is in S, or r is zero. Show that S is basically all the positive rational numbers.",
-    "formal_statement": "theorem positive_rationals_characterization (S : Set ℚ) (h_add : ∀ a b ∈ S, a + b ∈ S) (h_mul : ∀ a b ∈ S, a * b ∈ S) (h_trichotomy : ∀ r : ℚ, (r ∈ S) ∨ (-r ∈ S) ∨ (r = 0)) : S = {q : ℚ | q > 0} := sorry",
+    "informal_statement": "So like, you've got this set S of rational numbers, and whenever you take two numbers a and b from S, their sum a+b and product a*b are also in S. Also, for any rational number r, exactly one of these things is true: r is in S, or -r is in S, or r is just zero. Show that S has to be all the positive rationals.",
+    "formal_statement": "theorem positive_rationals_characterization (S : Set ℚ) (h_add : ∀ a b ∈ S, a + b ∈ S) (h_mul : ∀ a b ∈ S, a * b ∈ S) (h_trich : ∀ r : ℚ, (r ∈ S) ∨ (-r ∈ S) ∨ (r = 0)) (h_zero : (0 : ℚ) ∉ S) : S = {q : ℚ | 0 < q} := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this thing where for any number n, you define x^(n) as x times (x-1) all the way down to (x - n + 1), and when n is zero, it's just 1. Then you're supposed to show that whenever you have (x+y)^(n), it's the same as adding up from k=0 to n of (n choose k) times x^(k) y^(n-k). Like, just check that it works out.",
-    "formal_statement": "theorem falling_factorial_binomial {α : Type*} [CommSemiring α] (x y : α) (n : ℕ) : (x + y)^(n) = ∑ k in Finset.range (n + 1), Nat.choose n k * x^(k) * y^(n - k) := sorry",
+    "informal_statement": "So we've got this thing where x^(n) means you multiply x times (x-1) all the way down to (x - n + 1), and if n is zero, it's just 1. Show that whenever you have (x+y)^(n), it's like the sum from k=0 to n of (n choose k) times x^(k) times y^(n-k).",
+    "formal_statement": "theorem falling_factorial_binomial (x y : ℕ) (n : ℕ) : (x + y) ^ (n) = ∑ k in Finset.range (n + 1), Nat.choose n k * x ^ (k) * y ^ (n - k) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The generated Lean theorem correctly captures the mathematical intent of the natural language statement. It defines the falling factorial binomial theorem for a commutative semiring α, with variables x and y of type α and a natural number n. The theorem states that (x + y)^(n) is equal to the sum from k=0 to n of (n choose k) times x^(k) times y^(n-k), which matches the described mathematical fact."
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It defines the falling factorial power and states the binomial theorem for falling factorial powers, matching the description provided. The types are correct (natural numbers), and the constraints are appropriately included."
   },
   {
-    "informal_statement": "So like, let S be all the collections of natural numbers. We need to show there's some function f from the reals into S where, whenever a is less than b, then f(a) is a part of f(b).",
-    "formal_statement": "theorem exists_increasing_function_from_reals_to_nat_sets : ∃ (f : ℝ → Set ℕ), ∀ (a b : ℝ), a < b → f a ⊆ f b := sorry",
+    "informal_statement": "So we've got this set S that's like all the groups of natural numbers. We need to show there's some function f from the reals to S where, whenever a < b, then f(a) is inside f(b).",
+    "formal_statement": "theorem exists_increasing_function_from_reals_to_set_of_groups : ∃ (S : Set (Set ℕ)) (f : ℝ → Set ℕ), (∀ (a b : ℝ), a < b → f a ⊆ f b) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this convex shape S in the plane, and it's got the origin inside it. Also, any line you shoot out from the origin will eventually leave S at some point. Now, if we assume either the origin is totally inside S (not on the edge) or S is closed (like includes its boundary), then we need to show that S can't go on forever—it's gotta be bounded.",
-    "formal_statement": "theorem convex_set_bounded {S : Set (ℝ × ℝ)} (hConv : Convex ℝ S) (h0 : (0, 0) ∈ S) \n(hRay : ∀ θ : ℝ, ∃ r : ℝ, ∀ t : ℝ, t ≥ r → (t * Real.cos θ, t * Real.sin θ) ∉ S) \n(hIntOrClosed : (interior S).Nonempty ∧ (0, 0) ∈ interior S ∨ IsClosed S) : \nBounded S := sorry",
+    "informal_statement": "So we've got this convex shape S in the plane, and it's got the origin inside it. Also, any line you shoot out from the origin will eventually leave S at some point. Now, if we assume either the origin is totally inside S (not on the edge) or S is closed (like includes its boundary), then we need to show that S can't stretch out to infinity—it's gotta be bounded.",
+    "formal_statement": "theorem convex_set_bounded {S : Set (ℝ × ℝ)} (hconv : Convex ℝ S) (h0 : (0, 0) ∈ S) \n  (hray : ∀ θ : ℝ, ∃ r : ℝ, ∀ t : ℝ, t ≥ r → (t * Real.cos θ, t * Real.sin θ) ∉ S) \n  (h : (∃ ε > 0, Metric.ball (0, 0) ε ⊆ S) ∨ IsClosed S) : Metric.Bounded S := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "type expected, got\n  (Bounded (?m.2502 : (?m.758 : Type ?u.757) → (?m.758 : Type ?u.757) → Prop) : Set (?m.758 : Type ?u.757) → Prop)",
+    "syntactic_evaluation_log": "unknown identifier 'Metric.Bounded'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, take any number n bigger than 1. Then you gotta show that (3n+1)/(2n+2) is less than (1/n)^n + (2/n)^n + ... + (n/n)^n, and that whole sum is also less than 2. Basically, the sum goes between those two numbers.",
-    "formal_statement": "theorem sum_bounds (n : ℕ) (hn : n > 1) : (3 * ↑n + 1) / (2 * ↑n + 2) < ∑ k in Finset.range n, (↑k / ↑n) ^ n ∧ ∑ k in Finset.range n, (↑k / ↑n) ^ n < 2 := sorry",
+    "informal_statement": "So like, take any number n bigger than 1. Show that it works: (3n+1)/(2n+2) is less than (1/n)^n + (2/n)^n + ... + (n/n)^n, and that whole sum is less than 2.",
+    "formal_statement": "theorem sum_inequality (n : ℕ) (hn : n > 1) : (3 * ↑n + 1) / (2 * ↑n + 2) < ∑ k in Finset.range n, (↑k / ↑n) ^ n ∧ ∑ k in Finset.range n, (↑k / ↑n) ^ n < 2 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this function f(x) = sum from k=0 to n of a_k sin(kx) + b_k cos(kx), where a_k and b_k are just constants. Suppose we know that |f(x)| is always ≤ 1 whenever x is between 0 and 2π, and also that |f(x_i)| actually equals 1 at a bunch of points x_1, x_2, ..., x_{2n} that are all in order inside that interval. Show that it works out so f(x) has to be exactly cos(nx + a) for some constant a.",
-    "formal_statement": "theorem fourier_sum_maxima {n : ℕ} {a b : ℕ → ℝ} (f : ℝ → ℝ) (hdef : ∀ x, f x = ∑ k in Finset.range (n + 1), a k * Real.sin (k * x) + b k * Real.cos (k * x)) (hbounded : ∀ x ∈ Set.Icc 0 (2 * Real.pi), |f x| ≤ 1) (x : ℕ → ℝ) (hx : StrictMono x) (hx_range : ∀ i ∈ Finset.range (2 * n + 1), x i ∈ Set.Icc 0 (2 * Real.pi)) (hmax : ∀ i ∈ Finset.range (2 * n + 1), |f (x i)| = 1) : ∃ c, ∀ x, f x = Real.cos (n * x + c) := sorry",
+    "informal_statement": "Suppose we have this function f(x) = sum from k=0 to n of a_k sin kx + b_k cos kx, where a_k and b_k are just constants. Now, if the absolute value of f(x) is always ≤ 1 whenever x is between 0 and 2π, and also we know that |f(x_i)| actually equals 1 at exactly 2n points x_1, x_2, ..., x_{2n} in that same interval (with them in increasing order), then it turns out that f(x) has to be of the form cos(nx + a) for some constant a. Show that it works.",
+    "formal_statement": "theorem trigonometric_sum_form {n : ℕ} {a b : Fin (n + 1) → ℝ} (f : ℝ → ℝ) (hdef : ∀ x, f x = ∑ k in Finset.range (n + 1), (a k * Real.sin (k * x) + b k * Real.cos (k * x))) (hbounded : ∀ x ∈ Set.Icc 0 (2 * Real.pi), |f x| ≤ 1) (hmax : ∃ (x : Fin (2 * n) → ℝ), (∀ i, x i ∈ Set.Icc 0 (2 * Real.pi)) ∧ (∀ i, |f (x i)| = 1) ∧ StrictMono x) : ∃ (α : ℝ), ∀ x, f x = Real.cos (n * x + α) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we've got this function f(n) that's like a sequence of numbers that keeps going up, and f(2) is just 2. Also, whenever m and n don't share any factors, f(mn) equals f(m) times f(n). Show that f(n) is actually just n for any number n.",
+    "formal_statement": "theorem multiplicative_increasing_function_is_identity (f : ℕ → ℕ) (h_mono : StrictMono f) (h_f2 : f 2 = 2) (h_mult : ∀ m n, Nat.Coprime m n → f (m * n) = f m * f n) : ∀ n, f n = n := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we've got this diff eq: (δ(δ-1)(δ-2)...(δ-n+1))y = f(x), where δ is just x d/dx. n is some number, and f is continuous for x≥1. The starting conditions are all zero at x=1: y(1)=y'(1)=...=y^(n-1)(1)=0.\n\nWe need to find an integral formula, like y(x) = ∫ from 1 to x of some z(t) dt, that solves it. Show that it works out to be:\n\ny(x) = ∫ from 1 to x [ (x-t)^(n-1) f(t) / ((n-1)! t^n) ] dt",
+    "formal_statement": "theorem diff_eq_solution (n : ℕ) (f : ℝ → ℝ) (hf : ContinuousOn f (Set.Ici 1)) :\n  ∀ (y : ℝ → ℝ), (∀ k < n, (iteratedDerivWithin k y (Set.Ici 1) 1 = 0)) → \n  (∀ x ≥ 1, (Finset.prod (Finset.range n) (fun k => (x * deriv (fun x => deriv (fun x => y x) x) x - k))) y x = f x) →\n  ∀ x ≥ 1, y x = ∫ t in (1:ℝ)..x, (x - t)^(n - 1) * f t / ((Nat.factorial (n - 1)) * t^n) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'k'\nunknown identifier 'k'",
+    "syntactic_evaluation_log": "function expected at\n  ∏ k ∈ Finset.range n, (x * deriv (fun (x : ℝ) => deriv (fun (x : ℝ) => y x) x) x - ↑k)\nterm has type\n  ℝ",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this sequence f(n) that's always going up and all the f(n) are positive whole numbers. Also, f(2) is just 2. And whenever m and n are coprime (like, they share no common factors except 1), then f(mn) equals f(m) times f(n). Show that for any number n, f(n) just ends up being n itself.",
-    "formal_statement": "theorem multiplicative_increasing_sequence_is_identity (f : ℕ → ℕ) (h_mono : StrictMono f) (h_pos : ∀ n, f n > 0) (h_f2 : f 2 = 2) (h_mul : ∀ m n, Nat.Coprime m n → f (m * n) = f m * f n) : ∀ n, f n = n := sorry",
+    "informal_statement": "So we've got this sequence a_n, all positive numbers. Show that the limsup as n goes to infinity of n * ((1 + a_{n+1})/a_n - 1) is at least 1. And then you gotta show that the 1 on the right side can't be swapped out for anything bigger. (Sometimes they write limsup as lim with a line over it.)",
+    "formal_statement": "theorem limsup_inequality (a : ℕ → ℝ) (ha : ∀ n, a n > 0) : \n  (Filter.limsup (fun n ↦ n * ((1 + a (n + 1)) / a n - 1)) Filter.atTop) ≥ 1 ∧ \n  ∀ c > 1, ¬(Filter.limsup (fun n ↦ n * ((1 + a (n + 1)) / a n - 1)) Filter.atTop) ≥ c := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So like, we've got this differential equation thing: δ(δ - 1)(δ - 2)...(δ - n + 1) y = f(x), where n is just some number. Here δ means x times d/dx. The starting conditions are that at x=1, all the derivatives up to the (n-1)th one are zero, so y(1)=y'(1)=...=y^(n-1)(1)=0. Also, f is continuous whenever x is at least 1.\n\nWe need to find an integral formula for the solution, meaning we want some function z so that y(x) = integral from 1 to x of z(t) dt.\n\nShow that it works, and the actual solution you get is:\n\ny(x) = ∫ from 1 to x of [ (x - t)^(n-1) * f(t) ] / [ (n-1)! * t^n ] dt",
-    "formal_statement": "theorem differential_equation_solution (n : ℕ) (f : ℝ → ℝ) (hf : ContinuousOn f (Set.Ici 1)) :\n  ∀ (y : ℝ → ℝ), (∏ k in Finset.range n, fun δ => δ - k) (fun x => x * deriv y x) = f →\n  (∀ k < n, deriv^[k] y 1 = 0) →\n  y = fun x => ∫ t in (1:ℝ)..x, (x - t)^(n - 1) * f t / (Nat.factorial (n - 1) * t^n) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  (∏ k ∈ Finset.range n, fun (δ : ℕ) => δ - k) fun (x : ℝ) => x * deriv y x\nargument\n  fun (x : ℝ) => x * deriv y x\nhas type\n  ℝ → ℝ : Type\nbut is expected to have type\n  ℕ : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "Suppose we have a sequence a_n of positive numbers. Show that the limsup as n goes to infinity of n * ((1 + a_{n+1}) / a_n - 1) is at least 1. Also, show that the 1 on the right side can't be replaced by any bigger number. (Sometimes limsup is written as lim with a bar over it.)",
-    "formal_statement": "theorem limsup_sequence_bound (a : ℕ → ℝ) (ha : ∀ n, a n > 0) : \n  (Filter.limsup (fun n => n * ((1 + a (n + 1)) / a n - 1)) Filter.atTop) ≥ 1 ∧ \n  ∀ c > 1, ¬(Filter.limsup (fun n => n * ((1 + a (n + 1)) / a n - 1)) Filter.atTop) ≥ c := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "So we've got this ellipse, right? And there's two different points U and V on it. M is just the middle of the chord UV. Now, pick any two other chords that also go through M—call them AB and CD. If you draw line UV and it crosses line AC at some point P, and also crosses line BD at Q, then you gotta show that M is actually the midpoint of PQ.",
-    "formal_statement": "theorem midpoint_property_of_ellipse {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (ell : Set E) (hEll : IsEllipse ell) (U V A B C D M P Q : E) (hU : U ∈ ell) (hV : V ∈ ell) (hM : M = midpoint ℝ U V) (hA : A ∈ ell) (hB : B ∈ ell) (hC : C ∈ ell) (hD : D ∈ ell) (hAB : M ∈ segment ℝ A B) (hCD : M ∈ segment ℝ C D) (hP : P ∈ line ℝ U V ∧ P ∈ line ℝ A C) (hQ : Q ∈ line ℝ U V ∧ Q ∈ line ℝ B D) : M = midpoint ℝ P Q := sorry",
+    "informal_statement": "So we've got this ellipse, right? And there's two points U and V on it, different ones. M is just the middle of the chord UV. Now, pick any two other chords AB and CD that also go through M. If you take the line through U and V and see where it hits line AC, that's P. Where it hits line BD, that's Q. The thing to show is that M is basically right in the middle of P and Q.",
+    "formal_statement": "theorem ellipse_chord_property {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (ell : Set E) (hEll : IsEllipse ℝ ell) (U V : E) (hU : U ∈ ell) (hV : V ∈ ell) (hUV : U ≠ V) (M : E) (hM : M = midpoint ℝ U V) (A B C D : E) (hA : A ∈ ell) (hB : B ∈ ell) (hC : C ∈ ell) (hD : D ∈ ell) (hAB : M ∈ segment ℝ A B) (hCD : M ∈ segment ℝ C D) (P : E) (hP : P ∈ line ℝ U V ∩ line ℝ A C) (Q : E) (hQ : Q ∈ line ℝ U V ∩ line ℝ B D) : M = midpoint ℝ P Q := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'IsEllipse'\nunknown identifier 'line'\nunknown identifier 'line'\nunknown identifier 'line'\nunknown identifier 'line'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we got this thing x^2 - x + a, and we want it to go into x^13 + x + 90 for some integer a. Show that a has to be 2.",
-    "formal_statement": "theorem find_a (x : ℤ) (h : x^2 - x + a = x^13 + x + 90) : a = 2 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'a'\nunknown identifier 'a'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "Okay so we've got this set S with numbers like 2^m * 3^n, where m and n are just any integers, and then P is all the positive reals. The question is, is S dense in P? Like, can you get arbitrarily close to any positive number using stuff from S? Show that it actually is dense.",
-    "formal_statement": "theorem set_S_dense_in_P : Dense {x : ℝ | ∃ m n : ℤ, x = 2^m * 3^n} := sorry",
+    "informal_statement": "So we got this polynomial x^2 - x + a, and we want it to go into x^13 + x + 90 for some integer a. Show that a has to be 2.",
+    "formal_statement": "theorem polynomial_condition (a : ℤ) (h : ∃ (x : ℤ), x^2 - x + a = x^13 + x + 90) : a = 2 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this thing where you need to find all those functions f that you can differentiate twice, and it's like f(x)^2 - f(y)^2 = f(x+y)f(x-y) for any x and y. Show that the only ones that work are basically f(u) = A sinh(ku), or f(u) = A u, or f(u) = A sin(ku), where A and k are just some numbers.",
-    "formal_statement": "theorem diff_func_satisfying_identity (f : ℝ → ℝ) (hf : Differentiable ℝ f) (hf' : Differentiable ℝ (deriv f)) : (∀ x y : ℝ, f x ^ 2 - f y ^ 2 = f (x + y) * f (x - y)) → (∃ (A k : ℝ), (∀ u : ℝ, f u = A * Real.sinh (k * u)) ∨ (∀ u : ℝ, f u = A * u) ∨ (∀ u : ℝ, f u = A * Real.sin (k * u))) := sorry",
+    "informal_statement": "So we got this set S with stuff like 2^m * 3^n, where m and n are just numbers, and P is all positive reals. Is S dense in P? Like, can you get arbitrarily close to any positive real using these 2^m3^n combos? Suppose we have some positive real f. Show that it works—basically, you can find m and n so that 2^m3^n approaches f as close as you want.",
+    "formal_statement": "theorem set_S_dense_in_P (f : ℝ) (hf : f > 0) : ∀ ε > 0, ∃ m n : ℤ, |(2:ℝ)^m * (3:ℝ)^n - f| < ε := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "Suppose we've got this sequence a_n of numbers, and whenever n is less than or equal to k which is less than or equal to 2n, we have 0 ≤ a_k ≤ 100a_n for each n like 1,2,... Also, the sum from n=0 to infinity of a_n goes to some finite value. Show that as n gets huge, n times a_n approaches zero.",
-    "formal_statement": "theorem limit_n_times_a_n_zero (a : ℕ → ℝ) (h₁ : ∀ n k, n ≤ k → k ≤ 2 * n → 0 ≤ a k ∧ a k ≤ 100 * a n) (h₂ : Summable a) : Filter.Tendsto (fun n ↦ ↑n * a n) Filter.atTop (nhds 0) := sorry",
+    "informal_statement": "So we've got this function f, it's real-valued and you can take its derivative twice, and it's defined for all numbers. The thing it needs to satisfy is that for any x and y, (f(x))^2 minus (f(y))^2 equals f(x+y) times f(x-y). Basically, whenever you plug in numbers, that equation holds.\n\nWe're supposed to find all such functions. After working it out, the answer turns out to be like these sets: f(u) could be A*sinh(k*u), or just A*u, or A*sin(k*u), where A and k are just any real numbers. Show that these actually work.",
+    "formal_statement": "theorem satisfies_functional_equation (f : ℝ → ℝ) (hf : ∀ x, DifferentiableAt ℝ f x) (hf' : ∀ x, DifferentiableAt ℝ (deriv f) x) (h : ∀ x y, f x ^ 2 - f y ^ 2 = f (x + y) * f (x - y)) : (∃ (A k : ℝ), ∀ u, f u = A * Real.sinh (k * u)) ∨ (∃ (A : ℝ), ∀ u, f u = A * u) ∨ (∃ (A k : ℝ), ∀ u, f u = A * Real.sin (k * u)) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "Okay so we've got this Euclidean space E, but it's only up to 3D. There's some nonempty subset A of E, and we define S(A) as all the points that are on the closed line segments connecting any two points from A. Then we start with some nonempty set A_0, and we define A_n = S(A_{n-1}) for n=1,2,... The thing to show is that after doing this twice, it stops changing, so A_2 = A_3 = ... (and by the way, a single point counts as a closed segment too).",
-    "formal_statement": "theorem segment_closure_stabilizes {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (h_dim : FiniteDimensional.finrank ℝ E ≤ 3) (A₀ : Set E) (hA₀ : A₀.Nonempty) : let S (A : Set E) := {x : E | ∃ a b ∈ A, x ∈ segment ℝ a b}; let A₁ := S A₀; let A₂ := S A₁; ∀ n ≥ 2, S (A₂) = A₂ := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we got these six points A1 through A6 somewhere on a plane, all different. Let D be the biggest distance you can get between any two of them, and d the smallest distance. Show that D/d is at least sqrt(3).",
-    "formal_statement": "theorem min_max_distance_ratio (A1 A2 A3 A4 A5 A6 : ℝ × ℝ) (h_distinct : Pairwise fun i j => (i ≠ j → (A1, A2, A3, A4, A5, A6).nth i ≠ (A1, A2, A3, A4, A5, A6).nth j)) : ∃ D d, (∀ i j, i ≠ j → dist (A1, A2, A3, A4, A5, A6).nth i (A1, A2, A3, A4, A5, A6).nth j ≤ D) ∧ (∀ i j, i ≠ j → d ≤ dist (A1, A2, A3, A4, A5, A6).nth i (A1, A2, A3, A4, A5, A6).nth j) ∧ D / d ≥ Real.sqrt 3 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "invalid field 'nth', the environment does not contain 'Prod.nth'\n  (A1, A2, A3, A4, A5, A6)\nhas type\n  (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ\ninvalid field 'nth', the environment does not contain 'Prod.nth'\n  (A1, A2, A3, A4, A5, A6)\nhas type\n  (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ\noverloaded, errors \n  17:198 invalid field 'nth', the environment does not contain 'Prod.nth'\n    (A1, A2, A3, A4, A5, A6)\n  has type\n    (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ\n  \n  17:198 invalid field 'nth', the environment does not contain 'Prod.nth'\n    (A1, A2, A3, A4, A5, A6)\n  has type\n    (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ\noverloaded, errors \n  17:292 invalid field 'nth', the environment does not contain 'Prod.nth'\n    (A1, A2, A3, A4, A5, A6)\n  has type\n    (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ\n  \n  17:292 invalid field 'nth', the environment does not contain 'Prod.nth'\n    (A1, A2, A3, A4, A5, A6)\n  has type\n    (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ) × ℝ × ℝ",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got some real number alpha, and we're supposed to find all these continuous functions f from 0 to 1 that give positive outputs, and they have to satisfy these three integral conditions:\n\n1. The integral from 0 to 1 of f(x) dx equals 1.\n2. The integral from 0 to 1 of x f(x) dx equals alpha.\n3. The integral from 0 to 1 of x^2 f(x) dx equals alpha^2.\n\nAnd then we need to show that actually no such function exists.",
-    "formal_statement": "theorem no_continuous_positive_function_with_moments (α : ℝ) : ¬∃ (f : ℝ → ℝ), ContinuousOn f (Set.Icc 0 1) ∧ (∀ x ∈ Set.Icc 0 1, f x > 0) ∧ (∫ x in 0..1, f x = 1) ∧ (∫ x in 0..1, x * f x = α) ∧ (∫ x in 0..1, x^2 * f x = α^2) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got these points x_n all over (0,1), right? Whenever n is at least 1, the first n-1 points split the interval into n pieces. Then x_n lands in one of those pieces, and it cuts that piece into two smaller bits with lengths a_n and b_n. Show that if you sum up a_n * b_n * (a_n + b_n) from n=1 to infinity, it goes to 1/3.",
-    "formal_statement": "theorem sum_a_b_a_plus_b_eq_one_third (x : ℕ → ℝ) (hx : ∀ n, x n ∈ Set.Ioo (0 : ℝ) 1) (hsplit : ∀ n ≥ 1, ∃ (a b : ℝ), a > 0 ∧ b > 0 ∧ a + b = (Finset.range n).sup' (Finset.nonempty_range_succ n) (fun k ↦ x k) - (Finset.range n).inf' (Finset.nonempty_range_succ n) (fun k ↦ x k) ∧ x n ∈ Set.Ioo ((Finset.range n).inf' (Finset.nonempty_range_succ n) (fun k ↦ x k)) ((Finset.range n).sup' (Finset.nonempty_range_succ n) (fun k ↦ x k))) ∧ (∀ n ≥ 1, ∃ (a b : ℝ), a > 0 ∧ b > 0 ∧ a + b = (Finset.range n).sup' (Finset.nonempty_range_succ n) (fun k ↦ x k) - (Finset.range n).inf' (Finset.nonempty_range_succ n) (fun k ↦ x k) ∧ x n ∈ Set.Ioo ((Finset.range n).inf' (Finset.nonempty_range_succ n) (fun k ↦ x k)) ((Finset.range n).sup' (Finset.nonempty_range_succ n) (fun k ↦ x k)))) : HasSum (fun n ↦ let ⟨a, b, _, _, hab, _⟩ := Classical.choose (hsplit (n + 1) (Nat.succ_pos n)); a * b * (a + b)) (1 / 3) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unexpected token '∧'; expected ':'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got this sequence u_n of whole numbers that doesn't blow up, and it follows this rule:\n\nu_n = (u_{n-1} + u_{n-2} + u_{n-3} * u_{n-4}) / (u_{n-1} * u_{n-2} + u_{n-3} + u_{n-4})\n\nShow that eventually it just starts repeating itself after a while.",
-    "formal_statement": "theorem eventually_periodic (u : ℕ → ℕ) (h_bounded : ∃ B, ∀ n, u n ≤ B) (h_rec : ∀ n ≥ 4, u n = (u (n-1) + u (n-2) + u (n-3) * u (n-4)) / (u (n-1) * u (n-2) + u (n-3) + u (n-4))) : ∃ N P, ∀ n ≥ N, u (n + P) = u n := sorry",
+    "informal_statement": "So we've got this sequence a_n of real numbers, and whenever n is less than or equal to k which is less than or equal to 2n, we have 0 ≤ a_k ≤ 100a_n for each n like 1,2,... Suppose the sum from n=0 to infinity of a_n goes to some finite number. Show that it works that n*a_n approaches 0 as n gets really big.",
+    "formal_statement": "theorem limit_n_times_a_n_zero (a : ℕ → ℝ) (h₁ : ∀ n k, n ≤ k ∧ k ≤ 2 * n → 0 ≤ a k ∧ a k ≤ 100 * a n) (h₂ : Summable a) : Filter.Tendsto (fun n => ↑n * a n) Filter.atTop (nhds 0) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So like, we need to show there's some fixed number k where, if you take any bunch of positive numbers a_i, then\n\nsum from n=1 to infinity of (n / (a1 + a2 + ... + an)) is less than or equal to k times the sum from n=1 to infinity of (1 / a_n).\n\nBasically, show that it works for some constant k.",
-    "formal_statement": "theorem exists_uniform_bound_for_series_ratio : ∃ (k : ℝ), ∀ (a : ℕ → ℝ), (∀ n, a n > 0) → (∑' n, (n / (∑ i in Finset.range (n + 1), a i))) ≤ k * (∑' n, 1 / a n) := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "So we got this set S of points all on a line, and it's finite. Let k be the biggest gap between any two points in S. If you take any two points from S that are d apart, where d is less than k, then you can always find another pair in S that are also exactly d apart. Now, if two different pairs of points from S have distances a and b between them, you gotta show that a/b is a rational number.",
-    "formal_statement": "theorem rational_ratio_of_distances (S : Finset ℝ) (hS : ∃ (l : ℝ), ∀ x ∈ S, ∃ t : ℝ, x = l * t) (k : ℝ) (hk : k = sSup (pairwiseDistances S)) (hd : ∀ d < k, ∃ p q ∈ S, dist p q = d) (a b : ℝ) (ha : ∃ p q ∈ S, dist p q = a ∧ p ≠ q) (hb : ∃ r s ∈ S, dist r s = b ∧ r ≠ s) : ∃ m n : ℤ, b ≠ 0 ∧ a / b = Rat.mk m n := sorry",
+    "informal_statement": "Okay so we've got this Euclidean space E, but it's only in like 3D or less. There's some nonempty subset A of it. Define S(A) as all the points you can get by taking any two points from A and drawing the whole line segment between them (including the endpoints). If you just have a single point, that's considered a segment too, I guess.\n\nNow, start with some nonempty set A_0. Then define A_1 = S(A_0), A_2 = S(A_1), and so on. The thing to show is that once you get to A_2, it's basically the same as A_3, A_4, and all the ones after that. So A_2 = A_3 = ...",
+    "formal_statement": "theorem segment_closure_stabilizes {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (h_dim : finrank ℝ E ≤ 3) (A₀ : Set E) (hA₀ : A₀.Nonempty) : \nlet S (A : Set E) := {x : E | ∃ a b ∈ A, x ∈ segment ℝ a b};\nlet A₁ := S A₀;\nlet A₂ := S A₁;\nA₂ = ⋂ (n ≥ 2), S^[n] A₀ := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have a sequence a_n of positive numbers, and the sum from n=1 to infinity of 1/a_n goes to some limit. For each n, let b_n count how many terms in the a_n sequence are at most n. Show that b_n / n approaches 0 as n gets really big.",
-    "formal_statement": "theorem limit_of_count_ratio (a : ℕ → ℝ) (ha : ∀ n, 0 < a n) (hsum : ∃ L, Tendsto (fun N ↦ ∑ n in Finset.range N, 1 / a n) atTop (𝓝 L)) (b : ℕ → ℕ) (hb : ∀ n, b n = Finset.card (Finset.filter (fun k ↦ a k ≤ n) (Finset.range (n + 1)))) : Tendsto (fun n ↦ ↑(b n) / ↑n) atTop (𝓝 0) := sorry",
+    "informal_statement": "So we've got these six points A1 through A6, all different, just somewhere in the plane. Let D be the biggest distance you can get between any two of them, and d the smallest distance. Show that D/d is at least sqrt 3.",
+    "formal_statement": "theorem min_max_distance_ratio (A1 A2 A3 A4 A5 A6 : ℝ × ℝ) (h_distinct : Pairwise fun i j => A1 ≠ A2 ∧ A1 ≠ A3 ∧ A1 ≠ A4 ∧ A1 ≠ A5 ∧ A1 ≠ A6 ∧ A2 ≠ A3 ∧ A2 ≠ A4 ∧ A2 ≠ A5 ∧ A2 ≠ A6 ∧ A3 ≠ A4 ∧ A3 ≠ A5 ∧ A3 ≠ A6 ∧ A4 ≠ A5 ∧ A4 ≠ A6 ∧ A5 ≠ A6) : ∃ D d, (∀ i j, dist (A1) (A2) ≤ D ∧ dist (A1) (A3) ≤ D ∧ dist (A1) (A4) ≤ D ∧ dist (A1) (A5) ≤ D ∧ dist (A1) (A6) ≤ D ∧ dist (A2) (A3) ≤ D ∧ dist (A2) (A4) ≤ D ∧ dist (A2) (A5) ≤ D ∧ dist (A2) (A6) ≤ D ∧ dist (A3) (A4) ≤ D ∧ dist (A3) (A5) ≤ D ∧ dist (A3) (A6) ≤ D ∧ dist (A4) (A5) ≤ D ∧ dist (A4) (A6) ≤ D ∧ dist (A5) (A6) ≤ D) ∧ (∀ i j, dist (A1) (A2) ≥ d ∧ dist (A1) (A3) ≥ d ∧ dist (A1) (A4) ≥ d ∧ dist (A1) (A5) ≥ d ∧ dist (A1) (A6) ≥ d ∧ dist (A2) (A3) ≥ d ∧ dist (A2) (A4) ≥ d ∧ dist (A2) (A5) ≥ d ∧ dist (A2) (A6) ≥ d ∧ dist (A3) (A4) ≥ d ∧ dist (A3) (A5) ≥ d ∧ dist (A3) (A6) ≥ d ∧ dist (A4) (A5) ≥ d ∧ dist (A4) (A6) ≥ d ∧ dist (A5) (A6) ≥ d) ∧ D / d ≥ Real.sqrt 3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\nfailed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\nfailed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\nfailed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\nfailed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\ndon't know how to synthesize implicit argument\n  @Pairwise ((?m.3633 : ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → Type ?u.26) A1 A2 A3 A4 A5 A6)\n    fun (i j : (?m.3633 : ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → ℝ × ℝ → Type ?u.26) A1 A2 A3 A4 A5 A6) =>\n    A1 ≠ A2 ∧\n      A1 ≠ A3 ∧\n        A1 ≠ A4 ∧\n          A1 ≠ A5 ∧\n            A1 ≠ A6 ∧ A2 ≠ A3 ∧ A2 ≠ A4 ∧ A2 ≠ A5 ∧ A2 ≠ A6 ∧ A3 ≠ A4 ∧ A3 ≠ A5 ∧ A3 ≠ A6 ∧ A4 ≠ A5 ∧ A4 ≠ A6 ∧ A5 ≠ A6\ncontext:\nA1 A2 A3 A4 A5 A6 : ℝ × ℝ\n⊢ Type ?u.26\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed\nfailed to infer binder type\nwhen the resulting type of a declaration is explicitly provided, all holes (e.g., `_`) in the header are resolved before the declaration body is processed",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got this real number alpha, and we're looking for continuous functions f from [0,1] to (0,∞) that satisfy three conditions. First, the integral from 0 to 1 of f(x) dx equals 1. Next, the integral from 0 to 1 of x f(x) dx equals alpha. And finally, the integral from 0 to 1 of x^2 f(x) dx equals alpha^2. The task is to show that no such function actually exists.",
+    "formal_statement": "theorem no_continuous_function_satisfies_conditions (α : ℝ) (f : ℝ → ℝ) (hf : ContinuousOn f (Set.Icc 0 1)) (hpos : ∀ x ∈ Set.Icc 0 1, f x > 0) (h1 : ∫ x in 0..1, f x = 1) (h2 : ∫ x in 0..1, x * f x = α) (h3 : ∫ x in 0..1, x^2 * f x = α^2) : False := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\n(kernel) declaration has metavariables 'no_continuous_function_satisfies_conditions'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got these points x_n all over (0,1), like everywhere dense. Whenever you take a number n, the earlier points x_1 up to x_{n-1} split the interval into n pieces, and x_n lands in one of them. That piece gets split by x_n into two smaller bits, call their lengths a_n and b_n. Show that if you sum up a_n * b_n * (a_n + b_n) from n=1 to infinity, it goes to 1/3.",
+    "formal_statement": "theorem dense_points_split_interval_sum (x : ℕ → ℝ) (h_dense : Dense (range x)) (h_mem : ∀ n, x n ∈ Set.Ioo 0 1) (h_split : ∀ n, ∃ (a b : ℝ), x n ∈ Set.Ioo (x (n-1)) (x (n+1)) ∧ a = x n - x (n-1) ∧ b = x (n+1) - x n) : ∑' n, (x n - x (n-1)) * (x (n+1) - x n) * (x (n+1) - x (n-1)) = 1/3 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem does not accurately capture the mathematical intent of the natural language statement. The natural language describes a process where points are added densely in the interval (0,1), and each new point splits an existing subinterval into two parts, with lengths a_n and b_n. The sum involves a_n * b_n * (a_n + b_n). However, the Lean theorem incorrectly assumes a specific splitting condition involving x(n-1) and x(n+1), which is not mentioned in the natural language statement. Additionally, the Lean theorem's summand does not match the described a_n * b_n * (a_n + b_n)."
+  },
+  {
+    "informal_statement": "So we've got this sequence u_n, it's like a bunch of whole numbers that don't go off to infinity or anything, and it follows this rule:\n\nu_n = (u_{n-1} + u_{n-2} + u_{n-3} * u_{n-4}) / (u_{n-1} * u_{n-2} + u_{n-3} + u_{n-4})\n\nBasically, each term is made from the four before it. Show that after a while, the sequence just starts repeating itself.",
+    "formal_statement": "theorem sequence_eventually_periodic (u : ℕ → ℤ) (h_bounded : ∃ M, ∀ n, |u n| ≤ M) (h_rec : ∀ n ≥ 4, u n = (u (n-1) + u (n-2) + u (n-3) * u (n-4)) / (u (n-1) * u (n-2) + u (n-3) + u (n-4))) : ∃ N p, p > 0 ∧ ∀ n ≥ N, u (n + p) = u n := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It specifies a sequence of integers (u : ℕ → ℤ) that is bounded (h_bounded) and follows a given recurrence relation (h_rec). The conclusion asserts that the sequence eventually becomes periodic (∃ N p, p > 0 ∧ ∀ n ≥ N, u (n + p) = u n), which matches the English statement's requirement to show that the sequence starts repeating itself after a while."
   },
   {
-    "informal_statement": "Okay so we've got this finite set S. There's a collection P of some of its subsets, and any two subsets in P share at least one element. Also, you can't add any more subsets to P without breaking that rule. Show that P actually has exactly half of all the subsets of S.",
-    "formal_statement": "theorem maximal_intersecting_family_size {S : Type*} [Fintype S] (P : Set (Set S)) (hP₁ : ∀ A B ∈ P, (A ∩ B).Nonempty) (hP₂ : ∀ A ∉ P, ∃ B ∈ P, (A ∩ B).Empty) : Nat.card P = 2 ^ (Nat.card S - 1) := sorry",
+    "informal_statement": "So like, we gotta show there's some fixed number k so that whenever you pick a sequence a_i of positive numbers, the sum from n=1 to infinity of n divided by (a1 + a2 + ... + an) is always less than or equal to k times the sum from n=1 to infinity of 1 over a_n. Basically, show it works for any such sequence.",
+    "formal_statement": "theorem exists_uniform_bound_for_series_inequality : ∃ (k : ℝ), ∀ (a : ℕ → ℝ), (∀ n, a n > 0) → (∑' n, (n : ℝ) / (∑ i in Finset.range n, a i)) ≤ k * (∑' n, 1 / a n) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "application type mismatch\n  Finset.range n\nargument\n  n\nhas type\n  ℝ : Type\nbut is expected to have type\n  ℕ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got this bunch of points S all on a straight line, and it's a finite set. Let k be the biggest gap between any two points in S. Now, if you pick any two points from S that are some distance d apart, and d is less than k, then you can always find another pair of points in S that are also exactly d apart. Show that if you have two pairs of points with distances a and b between them, then a/b is a rational number.",
+    "formal_statement": "theorem distance_ratio_rational (S : Finset ℝ) (hS : ∀ (x y : ℝ), x ∈ S → y ∈ S → ∃ (t : ℝ), y = x + t) (k : ℝ) (hk : k = iSup (fun (p : ℝ × ℝ) ↦ if p.1 ∈ S ∧ p.2 ∈ S then ‖p.2 - p.1‖ else 0)) (a b : ℝ) (ha : ∃ (x y : ℝ), x ∈ S ∧ y ∈ S ∧ ‖y - x‖ = a) (hb : ∃ (x y : ℝ), x ∈ S ∧ y ∈ S ∧ ‖y - x‖ = b) (h : ∀ (d : ℝ), (∃ (x y : ℝ), x ∈ S ∧ y ∈ S ∧ ‖y - x‖ = d) → d < k → ∀ (z w : ℝ), z ∈ S ∧ w ∈ S ∧ ‖w - z‖ = d → ∃ (u v : ℝ), u ∈ S ∧ v ∈ S ∧ ‖v - u‖ = d ∧ (u ≠ z ∨ v ≠ w))) : ∃ (m n : ℤ), b ≠ 0 → a = (m / n) * b := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ')'; expected ':'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose we have a sequence a_n of positive numbers, and the sum from n=1 to infinity of 1/a_n goes to some finite value. For each n, let b_n count how many terms in the a_n sequence are at most n. Show that b_n over n approaches 0 as n gets really big.",
+    "formal_statement": "theorem limit_of_bn_over_n (a : ℕ → ℝ) (ha : ∀ n, a n > 0) (hsum : ∃ L : ℝ, HasSum (λ n, 1 / a n) L) (b : ℕ → ℕ) (hb : ∀ n, b n = Finset.card (Finset.filter (λ k, a k ≤ n) Finset.univ)) : Filter.Tendsto (λ n, (b n : ℝ) / n) Filter.atTop (nhds 0) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token ','; expected '↦', '=>'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got this finite set S, right? And there's this collection P of some of its subsets. The deal is, any two subsets you pick from P have at least one thing in common, and you can't add any more subsets to P without messing that up. Show that P ends up containing exactly half of all the possible subsets of S.",
+    "formal_statement": "theorem maximal_intersecting_family_has_half_power_set (S : Type*) [Fintype S] (P : Set (Set S)) (hP₁ : ∀ A B ∈ P, (A ∩ B).Nonempty) (hP₂ : ∀ Q : Set (Set S), Q ⊃ P → ∃ A B ∈ Q, (A ∩ B).Empty) : P.card = 2^(Fintype.card S - 1) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have this continuous function f from the reals to the reals, and whenever α > 0, the values f(nα) go to 0 as n gets huge. Show that it works that f(x) actually approaches 0 as x goes to infinity.",
-    "formal_statement": "theorem continuous_tendsto_zero_at_infinity (f : ℝ → ℝ) (hf : Continuous f) (h : ∀ α > 0, Filter.Tendsto (fun n ↦ f (↑n * α)) Filter.atTop (nhds 0)) : Filter.Tendsto f Filter.atTop (nhds 0) := sorry",
+    "informal_statement": "Okay so suppose we have this continuous function f from the reals to the reals, and whenever alpha is greater than 0, the limit as n goes to infinity of f(n*alpha) approaches 0. Show that it works for any x going to infinity, like prove that the limit as x goes to infinity of f(x) is also 0.",
+    "formal_statement": "theorem limit_at_infty_of_limit_n_alpha (f : ℝ → ℝ) (hf : Continuous f) (h : ∀ α > 0, Filter.Tendsto (fun n ↦ f (n * α)) Filter.atTop (nhds 0)) : Filter.Tendsto f Filter.atTop (nhds 0) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got n great circles on a sphere, and they're in general position, meaning like, at most two of them go through any two points on the sphere. The question is, how many regions do they split the sphere into? It turns out it's n^2 - n + 2.",
-    "formal_statement": "theorem sphere_regions_from_great_circles (n : ℕ) : Fintype.card {r : Set (Sphere (3 : ℕ)) | ∃ (C : Finset (GreatCircle (3 : ℕ))), Finset.card C = n ∧ GeneralPosition C ∧ r ∈ ConnectedComponents (Sphere (3 : ℕ) \\ ⋃ c ∈ C, c)} = n^2 - n + 2 := sorry",
+    "informal_statement": "So if you've got a sphere and you draw n great circles on it, and they're in general position—like, no more than two of them ever cross at the same two points—then how many pieces does the sphere get split into? It turns out it's n^2 - n + 2.",
+    "formal_statement": "theorem sphere_partition_by_great_circles (n : ℕ) : \n  Fintype.card {s : Set (Sphere (Fin 3) ℝ) | ∃ (C : Finset (GreatCircle (Fin 3) ℝ)), \n  Finset.card C = n ∧ GeneralPosition C ∧ s ∈ ConnectedComponents (Sphere (Fin 3) ℝ \\ ⋃ c ∈ C, c)} = n^2 - n + 2 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'Sphere'\nunknown identifier 'GreatCircle'\nunknown identifier 'GeneralPosition'\nunknown identifier 'Sphere'\nfailed to synthesize instance\n  SDiff (Type ?u.78)",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have this sequence a_n that's always going up and it's made of positive numbers. And then we define b_n as the LCM of the first n terms a_1, a_2, ..., a_n. Show that the sum from n=1 to infinity of 1/b_n goes to some finite number.",
-    "formal_statement": "theorem sum_inv_lcm_of_increasing_pos_seq (a : ℕ → ℕ) (ha : StrictMono a) (hpos : ∀ n, 0 < a n) : \n    Summable fun n => 1 / (Nat.lcm (Finset.range n).sup (fun k => a (k + 1))) := sorry",
+    "informal_statement": "So we’ve got this sequence a_n that’s strictly going up and all positive integers. Then b_n is like the LCM of the first n terms of a_n. Show that the sum from n=1 to infinity of 1/b_n goes to some finite number.",
+    "formal_statement": "theorem sum_inv_lcm_of_strictly_increasing_positive_sequence (a : ℕ → ℕ) (ha_strict_mono : StrictMono a) (ha_pos : ∀ n, a n > 0) : Summable fun n => 1 / (Nat.lcm (Finset.range (n + 1)).sup a) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  Nat.lcm (Finset.range n).sup\nargument\n  (Finset.range n).sup\nhas type\n  (ℕ → (?m.770 : Type ?u.762)) → (?m.770 : Type ?u.762) : Type ?u.762\nbut is expected to have type\n  ℕ : Type",
+    "syntactic_evaluation_log": "application type mismatch\n  Nat.lcm (Finset.range (n + (1 : ℕ))).sup\nargument\n  (Finset.range (n + (1 : ℕ))).sup\nhas type\n  (ℕ → (?m.830 : Type ?u.822)) → (?m.830 : Type ?u.822) : Type ?u.822\nbut is expected to have type\n  ℕ : Type",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we got this unit disk D in the plane. The problem is like, show you can't split D into two disjoint sets A and B that are congruent. Like, A and B have to be the same shape and size, they don't overlap, and together they make up the whole disk D.",
-    "formal_statement": "theorem unit_disk_not_congruent_partition : ¬∃ (A B : Set (ℝ × ℝ)), A ∪ B = Metric.ball (0, 0) 1 ∧ A ∩ B = ∅ ∧ ∃ (f : ℝ × ℝ → ℝ × ℝ), Isometry f ∧ f '' A = B := sorry",
+    "informal_statement": "So we got this unit disk D in the plane. The problem is like, show you can't split D into two disjoint sets A and B that are congruent. Like, A and B are the same shape, they don't overlap, and together they make up the whole disk D.",
+    "formal_statement": "theorem no_partition_of_unit_disk_into_congruent_disjoint_sets : ¬∃ (A B : Set (ℝ × ℝ)), A ⊆ Metric.ball (0, 0) 1 ∧ B ⊆ Metric.ball (0, 0) 1 ∧ A ∪ B = Metric.ball (0, 0) 1 ∧ A ∩ B = ∅ ∧ ∃ (f : (ℝ × ℝ) → (ℝ × ℝ)), Isometry f ∧ f '' A = B := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we got triangle ABC where angle CAB is less than angle BCA, and that's less than a right angle, but angle ABC is bigger than a right angle. Now, if you take the external angle at A and draw its bisector, it hits line BC at point P. Do the same for the external angle at B—its bisector hits line CA at Q. They tell us AP = BQ = AB. With all that, we need to find angle CAB. You're supposed to show it ends up being pi/15.",
-    "formal_statement": "theorem find_angle_CAB (A B C P Q : ℝ × ℝ) (hABC : AffineIndependent ℝ ![A, B, C]) (hCAB : ∠ C A B < ∠ B C A) (hBCA : ∠ B C A < Real.pi / 2) (hABC_gt : ∠ A B C > Real.pi / 2) (hAP : P ∈ line[ℝ, B, C]) (hAQ : Q ∈ line[ℝ, C, A]) (hAP_eq : dist A P = dist A B) (hBQ_eq : dist B Q = dist A B) (hAB_eq : dist A B = dist B Q) : ∠ C A B = Real.pi / 15 := sorry",
+    "informal_statement": "Suppose we have triangle ABC where angle CAB is less than angle BCA, and that's less than pi/2, which is less than angle ABC. Now, if we take the external angle bisector at A and it hits line BC at P, and the external angle bisector at B hits line CA at Q, and we know AP = BQ = AB, then figure out what angle CAB is. Show that it works out to pi/15.",
+    "formal_statement": "theorem angle_CAB_is_pi_over_15 (A B C : ℝ × ℝ) (h_triangle : AffineIndependent ℝ ![A, B, C]) \n  (h_angle_CAB_lt_angle_BCA : ∠ C A B < ∠ B C A) \n  (h_angle_BCA_lt_pi_div_2 : ∠ B C A < π / 2) \n  (h_pi_div_2_lt_angle_ABC : π / 2 < ∠ A B C) \n  (P : ℝ × ℝ) (hP : P ∈ affineSpan ℝ ![B, C]) \n  (hAP_is_ext_bisector : ∃ (AP : Ray ℝ (ℝ × ℝ)), AP.source = A ∧ P ∈ AP.toDirLine ∧ AP.toDirLine = (Angle.extAngleBisector (∠ C A B)).toDirLine) \n  (Q : ℝ × ℝ) (hQ : Q ∈ affineSpan ℝ ![C, A]) \n  (hBQ_is_ext_bisector : ∃ (BQ : Ray ℝ (ℝ × ℝ)), BQ.source = B ∧ Q ∈ BQ.toDirLine ∧ BQ.toDirLine = (Angle.extAngleBisector (∠ A B C)).toDirLine) \n  (h_AP_eq_AB : dist A P = dist A B) \n  (h_BQ_eq_AB : dist B Q = dist A B) : ∠ C A B = π / 15 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "expected token",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, show that whenever n is a number, the sum from r=0 to floor((n-1)/2) of ((n - 2r)/n * C(n, r))^2 equals (1/n) * C(2n - 2, n - 1).",
-    "formal_statement": "theorem sum_square_binomial_coefficient (n : ℕ) : ∑ r in Finset.range (Nat.floor ((n - 1) / 2) + 1), ((↑(n - 2 * r) / ↑n * Nat.choose n r)^2) = ↑(1 / n) * Nat.choose (2 * n - 2) (n - 1) := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It accurately represents the sum from r=0 to floor((n-1)/2) of the squared binomial coefficient term, and equates it to the right-hand side expression involving another binomial coefficient. The types and constraints are appropriately handled, and the logical implication flows correctly from the hypothesis to the conclusion."
+    "informal_statement": "So we gotta show that whenever n is a number, the sum from r=0 to floor((n-1)/2) of ((n - 2r)/n * C(n, r))^2 equals (1/n) * C(2n - 2, n - 1). Like, suppose we have n, then that sum works out to that binomial thing.",
+    "formal_statement": "theorem sum_binomial_identity (n : ℕ) : ∑ r in Finset.range (Nat.floor ((n - 1)/2) + 1), ((↑(n - 2 * r) / ↑n * Nat.choose n r : ℝ))^2 = ↑(1 / n) * ↑(Nat.choose (2 * n - 2) (n - 1)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℝ ℕ ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, suppose we have some sequence of numbers a1, a2, ... and some number alpha. Show that it works: the average of e^(i a_k) for k=1 to n goes to alpha as n gets big, if and only if the average of e^(i a_{k^2}) for k=1 to n^2 also goes to alpha when n gets big.",
-    "formal_statement": "theorem exp_avg_convergence_iff_squares_convergence (a : ℕ → ℝ) (α : ℂ) : \n  Filter.Tendsto (fun n : ℕ ↦ (Finset.sum (Finset.range n) (fun k ↦ Complex.exp (Complex.I * ↑(a k))) / ↑n)) Filter.atTop (nhds α) ↔ \n  Filter.Tendsto (fun n : ℕ ↦ (Finset.sum (Finset.range (n^2)) (fun k ↦ Complex.exp (Complex.I * ↑(a k))) / ↑(n^2))) Filter.atTop (nhds α) := sorry",
+    "informal_statement": "Suppose we have some sequence of numbers a1, a2, ... and some number α. Show that it works: the average of e^(i a_k) for k up to n goes to α as n gets large, if and only if the average of e^(i a_{k^2}) for k up to n, but divided by n^2 instead of n, also approaches α.",
+    "formal_statement": "theorem exp_avg_equiv (a : ℕ → ℝ) (α : ℂ) : \n    (Filter.Tendsto (λ n ↦ (∑ k in Finset.range n, Complex.exp (Complex.I * ↑(a k))) / ↑n) Filter.atTop (nhds α)) ↔ \n    (Filter.Tendsto (λ n ↦ (∑ k in Finset.range n, Complex.exp (Complex.I * ↑(a (k^2)))) / ↑(n^2)) Filter.atTop (nhds α)) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℕ ℕ ℂ",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So at this party, no guy dances with all the girls, but every girl dances with at least one guy. Show that we can find two girls, call them g and h, and two guys, b and c, where g dances with b and h dances with c, but h doesn't dance with b and g doesn't dance with c.",
-    "formal_statement": "theorem dance_party {G H : Type*} [Fintype G] [Fintype H] (Dances : G → H → Prop) \n  (h1 : ∀ (b : G), ¬ ∀ (h : H), Dances b h) \n  (h2 : ∀ (h : H), ∃ (b : G), Dances b h) : \n  ∃ (g h : H) (b c : G), Dances b g ∧ Dances c h ∧ ¬ Dances b h ∧ ¬ Dances c g := sorry",
+    "informal_statement": "So at this party, no guy dances with all the girls, but every girl dances with at least one guy. Show that there’s gotta be two girls, call them g and h, and two guys, b and c, where g dances with b and h dances with c, but h doesn’t dance with b and g doesn’t dance with c.",
+    "formal_statement": "theorem dance_party {Guy Girl : Type*} [Fintype Guy] [Fintype Girl] (Dances : Guy → Girl → Prop) (h₁ : ∀ (b : Guy), ¬ ∀ (g : Girl), Dances b g) (h₂ : ∀ (g : Girl), ∃ (b : Guy), Dances b g) : ∃ (g h : Girl) (b c : Guy), Dances b g ∧ Dances c h ∧ ¬ Dances b h ∧ ¬ Dances c g := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we’ve got numbers 1 through n in some order. The rule is: for each number i (except the first one), there has to be some earlier number in the order that’s exactly 1 away from i. Like, if i is 5, earlier in the list you need either 4 or 6. Show that it works for any n, and the total number of such orderings is 2^(n-1).",
-    "formal_statement": "theorem count_valid_orderings (n : ℕ) : Fintype.card {l : List ℕ // l.length = n ∧ l.Nodup ∧ ∀ (i : ℕ) (hi : i ∈ l.tail), ∃ j ∈ l.take (l.indexOf i), j = i - 1 ∨ j = i + 1} = 2 ^ (n - 1) := sorry",
+    "informal_statement": "So we've got numbers from 1 to n, right? And we're lining them up in some order. The rule is: for every number i except the first one in line, there's gotta be some earlier number in the order that's just one away from i—like i-1 or i+1. Show that it works. Turns out there are 2^(n-1) ways to do this.",
+    "formal_statement": "theorem count_valid_permutations (n : ℕ) : Fintype.card {f : Fin n → Fin n | Function.Bijective f ∧ ∀ (i : Fin n), i ≠ 0 → ∃ (j : Fin n), j < i ∧ (f j = f i - 1 ∨ f j = f i + 1)} = 2 ^ (n - 1) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype\n    { l : List ℕ //\n      l.length = n ∧ l.Nodup ∧ ∀ i ∈ l.tail, ∃ j ∈ List.take (List.indexOf i l) l, j = i - (1 : ℕ) ∨ j = i + (1 : ℕ) }",
+    "syntactic_evaluation_log": "failed to synthesize instance\n  OfNat (Fin n) (nat_lit 0)\nfailed to synthesize instance\n  OfNat (Fin n) (nat_lit 1)\nfailed to synthesize instance\n  OfNat (Fin n) (nat_lit 1)",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, we've got this line ux + vy = 1, where u and v are both at least zero. And there's this curve x^m + y^m = 1, with m being bigger than 1. Show that the line is just touching the curve (tangent) exactly when u^n + v^n = 1 for some number n, and the relationship between m and n is that 1/m + 1/n = 1. Basically, if that condition holds, it's tangent, and if it's tangent, that condition has to be true.",
-    "formal_statement": "theorem tangent_condition (u v : ℝ) (hu : 0 ≤ u) (hv : 0 ≤ v) (m : ℝ) (hm : 1 < m) (x y : ℝ) (hline : u * x + v * y = 1) (hcurve : x^m + y^m = 1) : (∃ n : ℝ, u^(n:ℝ) + v^(n:ℝ) = 1 ∧ 1/m + 1/n = 1) ↔ ∃ (t : ℝ), x = t * u^(1/(m-1)) ∧ y = t * v^(1/(m-1)) ∧ t^(m:ℝ) * (u^(m/(m-1)) + v^(m/(m-1))) = 1 := sorry",
+    "informal_statement": "So we've got this line ux + vy = 1, with u and v both non-negative, and it's supposed to be tangent to the curve x^m + y^m = 1, where m is bigger than 1. Show that this tangent thing happens exactly when u^n + v^n = 1 for some number n, but n has to satisfy 1/m + 1/n = 1.",
+    "formal_statement": "theorem tangent_condition (m : ℝ) (hm : 1 < m) (u v : ℝ) (hu : 0 ≤ u) (hv : 0 ≤ v) : \n(∃ x y : ℝ, 0 < x ∧ 0 < y ∧ u * x + v * y = 1 ∧ x^m + y^m = 1 ∧ u = m * x^(m - 1) ∧ v = m * y^(m - 1)) ↔ \n(∃ n : ℝ, u^n + v^n = 1 ∧ 1 / m + 1 / n = 1) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
+    "semantic_evaluation_reason": "The generated Lean theorem accurately captures the mathematical intent of the natural language statement. It correctly specifies the conditions for the line ux + vy = 1 to be tangent to the curve x^m + y^m = 1, including the constraints on u, v, and m, and the relationship between m and n. The logical implication flows correctly from the hypotheses to the conclusion, and the types are appropriately matched."
   },
   {
-    "informal_statement": "So we’ve got this thing where you take n variables x1, x2, ..., xn, each between 0 and 1, and you look at cos^2(pi/(2n) * (x1 + x2 + ... + xn)). Then you integrate over each x from 0 to 1, and you want to see what happens when n gets huge. Show that it goes to 1/2.",
-    "formal_statement": "theorem integral_cos_squared_limit (n : ℕ) : \n  Filter.Tendsto (fun n ↦ ∫ (x : Fin n → ℝ) in (Set.pi Set.univ fun _ ↦ Set.Icc 0 1), Real.cos (Real.pi / (2 * ↑n) * (∑ i, x i)) ^ 2) \n  Filter.atTop (nhds (1/2)) := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
+    "informal_statement": "So we've got this thing where you take n numbers, each between 0 and 1, and you look at cos squared of (pi/(2n)) times their sum, then integrate each x from 0 to 1. Then you let n get huge and see what the whole mess approaches. Show it ends up being 1/2.",
+    "formal_statement": "theorem limit_of_integral_sum (n : ℕ) (hn : n > 0) (f : ℕ → ℝ → ℝ) (hf : ∀ k, ∀ x, 0 ≤ f k x ∧ f k x ≤ 1) :\n  Tendsto (fun n ↦ ∫ x in 0..1, (Real.cos (π / (2 * ↑n))) ^ 2 * (∑ k in Finset.range n, f k x)) atTop (𝓝 (1/2)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  π : ℕ → ℕ\n  \n  π : ℝ\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So there's this round-robin thing with n players, call them P1, P2, up to Pn, where n is bigger than 1. They all play each other once, and every game has a winner and a loser. If you let w_r be how many wins player r gets, and l_r be how many losses they get, then you're supposed to show that the sum of w_r squared from r=1 to n equals the sum of l_r squared over the same players.",
-    "formal_statement": "theorem round_robin_wins_losses (n : ℕ) (hn : n > 1) (players : Fin n → Type*) (games : ∀ (i j : Fin n), i ≠ j → Type*) (wins losses : Fin n → ℕ) (hgames : ∀ (i j : Fin n) (h : i ≠ j), (wins i = wins j + 1 ∧ losses j = losses i + 1) ∨ (wins j = wins i + 1 ∧ losses i = losses j + 1)) : ∑ r : Fin n, (wins r)^2 = ∑ r : Fin n, (losses r)^2 := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem accurately captures the mathematical intent of the natural language statement. It correctly formalizes the scenario of a round-robin tournament with n players, where each player plays every other player once, and every game has a winner and a loser. The theorem states that the sum of the squares of the wins for each player equals the sum of the squares of the losses for each player, which matches the English statement. The types and constraints are appropriately set, including the condition that n is greater than 1 and the logical flow from hypotheses to conclusion is correct."
+    "informal_statement": "So there's this round-robin thing with n players, call them P1 through Pn, where n is more than 1. They all play each other once, and every game has a winner and a loser. Let wr be how many wins player Pr gets, and lr be how many losses. Show that the sum of wr squared for all players equals the sum of lr squared.",
+    "formal_statement": "theorem sum_win_loss_squared_eq (n : ℕ) (hn : n > 1) (P : Fin n → Type*) (game : ∀ i j : Fin n, i ≠ j → P i × P j → Bool) (wr lr : Fin n → ℕ) (hwr : ∀ r, wr r = Finset.card (Finset.univ.filter (λ j => game r j (Ne.symm (Fin.ne_of_ne_of_eq (by simp) (by simp))) (P r, P j)))) (hlr : ∀ r, lr r = Finset.card (Finset.univ.filter (λ j => ¬game j r (Fin.ne_of_ne_of_eq (by simp) (by simp)) (P j, P r)))) : ∑ i : Fin n, (wr i)^2 = ∑ i : Fin n, (lr i)^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown constant 'Fin.ne_of_ne_of_eq'\napplication type mismatch\n  Prod.mk (P r)\nargument\n  P r\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  P r : Type u_1\nunknown constant 'Fin.ne_of_ne_of_eq'\napplication type mismatch\n  Prod.mk (P j)\nargument\n  P j\nhas type\n  Type u_1 : Type (u_1 + 1)\nbut is expected to have type\n  P j : Type u_1",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we're supposed to show that there are only three right triangles (like, ignoring how they're rotated or moved around) where all the side lengths are integers and the area equals two times the perimeter.",
-    "formal_statement": "theorem right_triangles_with_area_eq_twice_perimeter : ∃ (T : Finset (ℕ × ℕ × ℕ)), T.card = 3 ∧ ∀ (a b c : ℕ) (h : a^2 + b^2 = c^2) (h_area : a * b / 2 = 2 * (a + b + c)), (a, b, c) ∈ T ∨ (b, a, c) ∈ T := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It specifies the existence of a finite set of right triangles with integer side lengths where the area equals twice the perimeter, and it correctly accounts for permutations of the side lengths (a, b, c) and (b, a, c) by including them in the set T. The theorem also correctly states that there are exactly three such triangles, ignoring rotations and translations, by asserting that the cardinality of T is 3."
+    "informal_statement": "So we gotta show there's only three right triangles, like ignoring how they're rotated or moved around, where the sides are whole numbers and the area is exactly two times the perimeter.",
+    "formal_statement": "theorem exists_three_right_triangles_with_area_double_perimeter : \n  ∃! (T : Finset { t : ℕ × ℕ × ℕ // t.1^2 + t.2^2 = t.3^2 ∧ t.1 * t.2 = 2 * (t.1 + t.2 + t.3) }), \n  T.card = 3 ∧ ∀ (t : { t : ℕ × ℕ × ℕ // t.1^2 + t.2^2 = t.3^2 ∧ t.1 * t.2 = 2 * (t.1 + t.2 + t.3) }), \n  t ∈ T ∨ (∃ (k : ℕ), t = ⟨(k * t.1.1, k * t.1.2, k * t.1.3), _⟩) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid projection, structure has only 2 field(s)\n  t\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  t\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  t\nhas type\n  ℕ × ℕ × ℕ\ninvalid projection, structure has only 2 field(s)\n  t\nhas type\n  ℕ × ℕ × ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So there's this function f(x, n) that looks like (C(n,0) + C(n,2)x + C(n,4)x^2 + ...) over (C(n,1) + C(n,3)x + C(n,5)x^2 + ...), where n is just some number and x is any real number. Suppose we want to figure out f(x, n+1) in terms of f(x, n) and x. Show that it works out to be (f + x)/(f + 1). Then, whenever x is such that the limit actually goes to something, find what f(x, n) approaches as n gets huge. Turns out, if x is at least 0, the limit goes to sqrt(x), otherwise it just doesn't settle down.",
-    "formal_statement": "theorem f_limit_neg (x : ℝ) (hx : x < 0) : ¬∃ (L : ℝ), Filter.Tendsto (fun n => f x n) Filter.atTop (nhds L) := sorry",
+    "informal_statement": "Suppose we have this function f(x, n) = (C(n,0) + C(n,2)x + C(n,4)x^2 + ...) / (C(n,1) + C(n,3)x + C(n,5)x^2 + ...) for any number n and whenever x is a real number. Show that it works that f(x, n+1) = (f(x, n) + x) / (f(x, n) + 1). Also, as n gets really big, f(x, n) goes to sqrt(x) for all x >= 0, but if x is negative it just doesn't approach anything.",
+    "formal_statement": "theorem f_limit_neg (x : ℝ) (hx : x < 0) : ¬∃ (L : ℝ), Filter.Tendsto (fun n ↦ f x n) Filter.atTop (nhds L) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'f'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, if you have a number V of vertices and E edges, and 4E is less than or equal to V^2, then you can always find some graph with those E edges and V vertices that doesn't have any triangles. Show that it works.",
-    "formal_statement": "theorem exists_triangle_free_graph (V E : ℕ) (h : 4 * E ≤ V^2) : ∃ (G : SimpleGraph (Fin V)), G.edgeFinset.card = E ∧ ¬SimpleGraph.CliqueFree G 3 := sorry",
+    "informal_statement": "So like, if you've got some number E and V, and 4E is less than or equal to V squared, then you can find a graph with E edges and V vertices that doesn't have any triangles in it. Show that it works.",
+    "formal_statement": "theorem exists_triangle_free_graph (E V : ℕ) (h : 4 * E ≤ V ^ 2) : ∃ (G : SimpleGraph (Fin V)), G.edgeFinset.card = E ∧ ¬SimpleGraph.CliqueFree G 3 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype ↑G.edgeSet",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we got these four points A, B, C, D, all different. And it's like, whenever you take any circle going through A and B, and any circle going through C and D, they always intersect somewhere. Show that then A, B, C, D either all lie on one line, or they're all on the same circle.",
-    "formal_statement": "theorem four_points_collinear_or_concyclic (A B C D : ℝ × ℝ) (hdistinct : A ≠ B ∧ A ≠ C ∧ A ≠ D ∧ B ≠ C ∧ B ≠ D ∧ C ≠ D) (hintersect : ∀ (C1 : ℝ × ℝ) (r1 : ℝ), dist A C1 = r1 ∧ dist B C1 = r1 → ∀ (C2 : ℝ × ℝ) (r2 : ℝ), dist C C2 = r2 ∧ dist D C2 = r2 → ∃ p, dist p C1 = r1 ∧ dist p C2 = r2) : (∃ (l : ℝ × ℝ → ℝ × ℝ → Prop), Collinear l A B C D) ∨ (∃ (c : ℝ × ℝ) (r : ℝ), dist A c = r ∧ dist B c = r ∧ dist C c = r ∧ dist D c = r) := sorry",
+    "informal_statement": "So we've got four points A, B, C, D, all different. And the deal is, if you take any circle going through A and B, and any circle going through C and D, they always cross each other. Show that A, B, C, D are either all on one line or all on the same circle.",
+    "formal_statement": "theorem four_points_collinear_or_concyclic (A B C D : EuclideanSpace ℝ (Fin 2)) (h₁ : A ≠ B) (h₂ : A ≠ C) (h₃ : A ≠ D) (h₄ : B ≠ C) (h₅ : B ≠ D) (h₆ : C ≠ D) (h : ∀ (γ₁ γ₂ : Set (EuclideanSpace ℝ (Fin 2))), IsCircle γ₁ → A ∈ γ₁ → B ∈ γ₁ → IsCircle γ₂ → C ∈ γ₂ → D ∈ γ₂ → ∃ p, p ∈ γ₁ ∧ p ∈ γ₂) : Collinear ℝ ({A, B, C, D} : Set (EuclideanSpace ℝ (Fin 2))) ∨ ∃ (γ : Set (EuclideanSpace ℝ (Fin 2))), IsCircle γ ∧ A ∈ γ ∧ B ∈ γ ∧ C ∈ γ ∧ D ∈ γ := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  @Collinear l\nargument\n  l\nhas type\n  ℝ × ℝ → ℝ × ℝ → Prop : Type\nbut is expected to have type\n  Type ?u.3956 : Type (?u.3956 + 1)",
+    "syntactic_evaluation_log": "unknown identifier 'IsCircle'\nunknown identifier 'IsCircle'\nunknown identifier 'IsCircle'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So there's this sequence a_n that goes 0, 1, 1, 2, 2, 3, ... and basically if n is even it's n/2, if it's odd it's (n-1)/2. Then f(n) is just adding up the first n terms of that sequence.\n\nNow, suppose we have numbers x and y, with x bigger than y. Show that whenever you multiply them, xy, it's the same as f(x+y) minus f(x-y).",
-    "formal_statement": "theorem fib_sum_diff (a : ℕ → ℕ) (ha : ∀ n, a n = if n % 2 = 0 then n / 2 else (n - 1) / 2) (f : ℕ → ℕ) (hf : ∀ n, f n = ∑ k in Finset.range n, a k) (x y : ℕ) (hxy : x > y) : x * y = f (x + y) - f (x - y) := sorry",
+    "informal_statement": "So there's this sequence a_n that goes 0, 1, 1, 2, 2, 3, ... and basically a_n is n/2 if n is even, and (n-1)/2 if it's odd. Then we have f(n), which is just adding up the first n terms of that sequence. The thing to show is that whenever you pick numbers x and y, with x bigger than y, then the product x*y equals f(x+y) minus f(x-y).",
+    "formal_statement": "theorem product_relation (a : ℕ → ℕ) (h_a : ∀ n, a n = if n % 2 = 0 then n / 2 else (n - 1) / 2) (f : ℕ → ℕ) (h_f : ∀ n, f n = ∑ k in Finset.range n, a k) (x y : ℕ) (h_xy : x > y) : x * y = f (x + y) - f (x - y) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "Suppose we have a triangle with sides a, b, and c, and its inradius is r. Let p be (a+b+c)/2. Show that it works that 1/(p-a)^2 + 1/(p-b)^2 + 1/(p-c)^2 is at least 1/r^2.",
-    "formal_statement": "theorem inradius_inequality (a b c r : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hr : r > 0) (h : a + b > c ∧ b + c > a ∧ c + a > b) (h_area : r * (a + b + c) / 2 = Real.sqrt ((a + b + c) / 2 * ((a + b + c) / 2 - a) * ((a + b + c) / 2 - b) * ((a + b + c) / 2 - c))) : let p := (a + b + c) / 2; 1 / (p - a)^2 + 1 / (p - b)^2 + 1 / (p - c)^2 ≥ 1 / r^2 := sorry",
+    "informal_statement": "Suppose we have a triangle with sides a, b, c and an inradius r. Let p be half the sum of the sides, so p = (a+b+c)/2. Then we need to show that 1/(p-a)^2 + 1/(p-b)^2 + 1/(p-c)^2 is at least 1/r^2.",
+    "formal_statement": "theorem inradius_inequality (a b c r : ℝ) (ha : a > 0) (hb : b > 0) (hc : c > 0) (hr : r > 0) \n  (triangle_ineq : a + b > c ∧ b + c > a ∧ c + a > b) \n  (area_formula : r * (a + b + c) / 2 = Real.sqrt (((a + b + c) / 2) * ((a + b + c) / 2 - a) * ((a + b + c) / 2 - b) * ((a + b + c) / 2 - c))) : \n  let p := (a + b + c) / 2;\n  1 / (p - a)^2 + 1 / (p - b)^2 + 1 / (p - c)^2 ≥ 1 / r^2 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this sequence where x1 is between 0 and 1, and then each next term is like x_{n+1} = x_n(1 - x_n). Show that as n gets huge, n times x_n goes to 1.",
-    "formal_statement": "theorem sequence_limit (x : ℕ → ℝ) (h₀ : x 0 ∈ Set.Ioo 0 1) (h_rec : ∀ n, x (n + 1) = x n * (1 - x n)) : Filter.Tendsto (fun n => ↑n * x n) Filter.atTop (nhds 1) := sorry",
+    "informal_statement": "So we've got this sequence where x1 is between 0 and 1, and then each next term is x_{n+1} = x_n(1 - x_n) for any number n. Show that as n gets really big, the product n * x_n approaches 1.",
+    "formal_statement": "theorem limit_product_sequence (x : ℕ → ℝ) (h₀ : x 1 ∈ Set.Ioo 0 1) (h_rec : ∀ n, x (n + 1) = x n * (1 - x n)) : Filter.Tendsto (fun n ↦ ↑n * x n) Filter.atTop (nhds 1) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this list of numbers that aren't perfect squares, right? Like 2, 3, 5, 6, 7, 8, 10, and so on, in order. Show that whenever you pick some number n, the nth thing in that list is just n plus the closest integer to sqrt(n). So it's like n + round(sqrt(n)).",
-    "formal_statement": "theorem nth_non_square_eq_n_plus_round_sqrt (n : ℕ) : \n  (List.filter (fun k => ¬∃ m, m * m = k) (List.range (n + (Nat.sqrt n + 1) ^ 2))).get ⟨n, sorry⟩ = n + Nat.round (Real.sqrt n) := sorry",
+    "informal_statement": "So like, show that if you take the list of all positive numbers that aren't perfect squares and sort them, the nth one in that list is basically n plus whatever integer is closest to the square root of n. You know, for any number n.",
+    "formal_statement": "theorem nth_non_square (n : ℕ) : ∃ k : ℤ, List.get (List.sort (· ≤ ·) (List.filter (fun m => ¬∃ p : ℕ, p * p = m) (List.range (n + (Nat.sqrt n + 1)^2 + 1)))) ⟨n, sorry⟩ = n + k ∧ |k - Nat.sqrt n| ≤ 1 := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown constant 'Nat.round'\ntype mismatch\n  ¬∃ (m : ℕ), m * m = k\nhas type\n  Prop : Type\nbut is expected to have type\n  Bool : Type",
+    "syntactic_evaluation_log": "unknown constant 'List.sort'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we’ve got C as all continuous functions from R to R, and T is a map from C to C. It satisfies two things:\n\n1. Linearity: T(a f + b g) = a T(f) + b T(g) for any numbers a, b and any f, g in C.\n2. Locality: If f and g in C match on some interval I, then T(f) and T(g) also match on I.\n\nWe need to show there’s some function f in C such that T(g(x)) = f(x) g(x) for all g in C.",
-    "formal_statement": "theorem exists_continuous_function_representation (T : (ℝ → ℝ) → (ℝ → ℝ)) (hT_linear : ∀ (a b : ℝ) (f g : ℝ → ℝ), T (a • f + b • g) = a • T f + b • T g) (hT_local : ∀ (f g : ℝ → ℝ) (I : Set ℝ), (∀ x ∈ I, f x = g x) → ∀ x ∈ I, T f x = T g x) : ∃ (f : ℝ → ℝ), Continuous f ∧ ∀ (g : ℝ → ℝ), Continuous g → ∀ x, T g x = f x * g x := sorry",
+    "informal_statement": "So we've got this set C of all the continuous functions from the reals to the reals. And there's this operator T that goes from C to C, and it satisfies two things. First, it's linear, meaning T(a f + b g) = a T(f) + b T(g) for any numbers a, b and any functions f, g in C. Second, it has this locality property: if two functions f and g in C are the same on some interval I, then T(f) and T(g) are also the same on that interval I.\n\nNow, the problem is to show that there exists some function f in C such that for any g in C, T(g(x)) = f(x) g(x). Basically, T just multiplies by some fixed continuous function.",
+    "formal_statement": "theorem exists_multiplier_for_linear_local_operator (T : (ℝ → ℝ) → (ℝ → ℝ)) (hT_linear : ∀ (a b : ℝ) (f g : ℝ → ℝ), Continuous f → Continuous g → T (a • f + b • g) = a • T f + b • T g) (hT_local : ∀ (f g : ℝ → ℝ), Continuous f → Continuous g → (∀ x ∈ I, f x = g x) → ∀ x ∈ I, T f x = T g x) (hT_cont : ∀ f, Continuous f → Continuous (T f)) : ∃ (f : ℝ → ℝ), Continuous f ∧ ∀ (g : ℝ → ℝ), Continuous g → ∀ x, T g x = f x * g x := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'I'\nunknown identifier 'I'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So like, you gotta show that sqrt(1 + 2 * sqrt(1 + 3 * sqrt(1 + 4 * sqrt(1 + 5 * sqrt(...))))) eventually goes to 3. Suppose we have this infinite nested thing, and we want to check that it works out to be exactly 3.",
+    "formal_statement": "theorem nested_sqrt_converges_to_three : Filter.Tendsto (fun n => Real.sqrt (1 + (n + 1) * Real.sqrt (1 + (n + 2) * Real.sqrt (1 + (n + 3) * Real.sqrt (1 + (n + 4) * Real.sqrt (1 + (n + 5) * (1 : ℝ))))))) Filter.atTop (nhds 3) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we gotta show that sqrt(1 + 2*sqrt(1 + 3*sqrt(1 + 4*sqrt(1 + 5*sqrt(...))))) eventually goes to 3. Like, suppose we have this infinite nested thing, and we want to check that it works out to exactly 3.",
-    "formal_statement": "theorem nested_sqrt_converges_to_three : Filter.Tendsto (fun n => Real.sqrt (1 + (n + 1) * Real.sqrt (1 + (n + 2) * Real.sqrt (1 + (n + 3) * Real.sqrt (1 + (n + 4) * Real.sqrt (1 + (n + 5) * Real.sqrt (1 + (n + 6) * Real.sqrt (1 + (n + 7) * Real.sqrt (1 + (n + 8) * Real.sqrt (1 + (n + 9) * Real.sqrt (1 + (n + 10) * Real.sqrt 1))))))))))) Filter.atTop (nhds 3) := sorry",
+    "informal_statement": "So, like, if you've got some convex shape L that fits inside a 1-by-1 square, then show that if you square all its side lengths and add them up, the total can't be bigger than 4.",
+    "formal_statement": "theorem sum_of_squared_lengths_bounded (L : Set (ℝ × ℝ)) (h_convex : Convex ℝ L) (h_subset : L ⊆ Icc (0, 0) (1, 1)) : \n∀ (s : Finset (ℝ × ℝ)) (h : ∀ p ∈ s, p ∈ L), ∑ p in s, ‖p‖^2 ≤ 4 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the English statement, which is to show that the infinite nested square root expression converges to 3. The theorem uses `Filter.Tendsto` to formalize the convergence of the sequence defined by the nested square roots to the limit 3. The types and logical flow are appropriate, and the theorem does not simplify the problem or change the mathematical fact."
-  },
-  {
-    "informal_statement": "So like, you've got this convex shape L that fits inside a 1 by 1 square. Show that if you take all its sides, square each one, and add them up, that total can't be bigger than 4.",
-    "formal_statement": "theorem sum_of_squares_of_sides_le_four (L : Set ℝ × ℝ) (hL : Convex ℝ L) (hL_subset : L ⊆ Set.Icc 0 1 ×ˢ Set.Icc 0 1) : ∑ x in (boundary L).toFinset, (sideLength x)^2 ≤ 4 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "type mismatch\n  Set.Icc (0 : (?m.1313 : Sort ?u.1312)) (1 : (?m.1313 : Sort ?u.1312)) ×ˢ\n    Set.Icc (0 : (?m.1409 : Sort ?u.1408)) (1 : (?m.1409 : Sort ?u.1408))\nhas type\n  Set ((?m.1313 : Sort ?u.1312) × (?m.1409 : Sort ?u.1408)) : outParam Type\nbut is expected to have type\n  Set ℝ × ℝ : Type\nfailed to synthesize instance\n  HasSubset (Set ℝ × ℝ)\nunknown identifier 'sideLength'\nunknown identifier 'boundary'\napplication type mismatch\n  Convex ℝ L\nargument\n  L\nhas type\n  Set ℝ × ℝ : Type\nbut is expected to have type\n  Set (?m.9 : Type ?u.8) : Type",
     "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+    "semantic_evaluation_reason": "The Lean theorem does not accurately capture the mathematical intent of the natural language statement. The English statement refers to 'side lengths' of a convex shape, which implies lengths of edges or boundaries, but the Lean theorem uses points in a set and sums their squared norms, which is a different concept. Additionally, the English statement suggests a property of the shape itself, not a property of arbitrary finite subsets of points within the shape."
   },
   {
-    "informal_statement": "So like, take any ten numbers in a row. Show that at least one of them doesn't share any factors with the rest.",
-    "formal_statement": "theorem consecutive_ten_has_coprime (n : ℕ) : ∃ (k : ℕ), k ∈ Set.Icc n (n + 9) ∧ ∀ (m : ℕ), m ∈ Set.Icc n (n + 9) → m ≠ k → Nat.coprime k m := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown constant 'Nat.coprime'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "Suppose we have a bunch of positive numbers p1, p2, and so on. If the sum of 1/p_n from n=1 to infinity goes to some finite value, then you gotta show that the sum of (n^2 * p_n) / (p1 + p2 + ... + p_n)^2 also approaches something finite.",
-    "formal_statement": "theorem sum_condition_convergence (p : ℕ → ℝ) (hp : ∀ n, p n > 0) (hsum : Summable fun n => 1 / p n) : \n  Summable fun n => (n^2 * p n) / (∑ k in Finset.range (n + 1), p k)^2 := sorry",
+    "informal_statement": "So like, take any ten numbers in a row. You gotta show at least one of them doesn’t share any factors with the rest.",
+    "formal_statement": "theorem consecutive_ten_contains_coprime (n : ℕ) : ∃ k ∈ Finset.Icc n (n + 9), ∀ m ∈ Finset.Icc n (n + 9), m ≠ k → Nat.Coprime k m := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So you've got this increasing list of mn+1 positive numbers. Show that either you can pick m+1 of them where none of them goes into any other, or you can pick n+1 of them where each one (except the biggest) goes into the next one in line.",
-    "formal_statement": "theorem exists_increasing_or_decreasing_subsequence {m n : ℕ} (l : List ℕ) (hl : List.Sorted (· ≤ ·) l) (hpos : ∀ x ∈ l, 0 < x) : \n(∃ s ⊆ l, s.length = m + 1 ∧ ∀ a ∈ s, ∀ b ∈ s, a ≠ b → ¬(a ∣ b)) ∨ \n(∃ s ⊆ l, s.length = n + 1 ∧ List.Sorted (· ∣ ·) s) := sorry",
+    "informal_statement": "Suppose we have a bunch of positive numbers p1, p2, and so on. If the sum of 1/p_n from n=1 to infinity goes to some finite value, then you gotta show that the sum of (n^2 * p_n) divided by (p1 + p2 + ... + p_n) squared, also like, approaches something and doesn’t blow up to infinity.",
+    "formal_statement": "theorem sum_condition (p : ℕ → ℝ) (hp : ∀ n, p n > 0) (hsum : Summable fun n => 1 / p n) : \n  Summable fun n => (n^2 * p n) / (∑ i in Finset.range (n + 1), p i)^2 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So like, if you've got some number n of points in the plane, where n is at least 3, and no three of them line up, then you can always connect them to make a simple closed shape without the lines crossing. Show that it works.",
-    "formal_statement": "theorem exists_simple_closed_polygon (n : ℕ) (hn : n ≥ 3) (points : Finset (ℝ × ℝ)) \n(h_no_collinear : ∀ (p q r : ℝ × ℝ), p ∈ points → q ∈ points → r ∈ points → p ≠ q → p ≠ r → q ≠ r → ¬Collinear ℝ ![p, q, r]) :\n∃ (polygon : List (ℝ × ℝ)), polygon.Nodup ∧ polygon.length = n ∧ (∀ p ∈ polygon, p ∈ points) ∧ \nSimplePolygon (mkPolygon polygon (by simp [hn])) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  Matrix.vecCons p\nargument\n  p\nhas type\n  ℝ × ℝ : Type\nbut is expected to have type\n  Prop : Type\napplication type mismatch\n  Matrix.vecCons q\nargument\n  q\nhas type\n  ℝ × ℝ : Type\nbut is expected to have type\n  Prop : Type\napplication type mismatch\n  Matrix.vecCons r\nargument\n  r\nhas type\n  ℝ × ℝ : Type\nbut is expected to have type\n  Prop : Type\nfailed to synthesize instance\n  Module ℝ (Fin (succ (0 : ℕ)).succ.succ)\nunknown identifier 'SimplePolygon'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So like, suppose we have some function y(x) that solves y'' + e^x * y = 0. Show that it works: whenever x gets really big, y(x) stays bounded and doesn't blow up.",
-    "formal_statement": "theorem bounded_solution_of_ode (y : ℝ → ℝ) (h : ∀ x, (deriv (deriv y) x) + Real.exp x * y x = 0) : ∃ M : ℝ, ∃ N : ℝ, ∀ x ≥ N, |y x| ≤ M := sorry",
+    "informal_statement": "So we've got this increasing list of numbers, call 'em a1, a2, ..., and there's mn + 1 of 'em. Show that either you can pick m + 1 of these numbers where none of 'em goes into any of the others, or you can pick n + 1 of them where each one (except the biggest) goes into the next one in line.",
+    "formal_statement": "theorem increasing_list_property (m n : ℕ) (a : ℕ → ℕ) (h : StrictMono a) (k : ℕ) (hk : k = m * n + 1) : (∃ s : Finset ℕ, s.card = m + 1 ∧ ∀ i ∈ s, ∀ j ∈ s, i ≠ j → ¬(a i ∣ a j)) ∨ (∃ s : Finset ℕ, s.card = n + 1 ∧ ∀ i ∈ s, ∀ j ∈ s, i < j → a i ∣ a j) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we got this function f(x) = a1 sin x + a2 sin 2x + ... + an sin nx, where a1, a2, ..., an are just numbers and n is some number. Suppose that whenever x is any real number, the absolute value of f(x) is less than or equal to |sin x|. Show that it works out that |a1| + |2a2| + ... + |n an| goes to something less than or equal to 1.",
-    "formal_statement": "theorem fourier_series_coeff_bound (n : ℕ) (a : Fin n → ℝ) (h : ∀ (x : ℝ), |∑ i in Finset.range n, a i * Real.sin ((i + 1) * x)| ≤ |Real.sin x|) : ∑ i in Finset.range n, |(i + 1) * a i| ≤ 1 := sorry",
+    "informal_statement": "So, like, if you've got some number n of points, where n is at least 3, and they're all in the plane, and no three of them line up, then you can always connect them to make a simple closed shape. Show that it works.",
+    "formal_statement": "theorem exists_simple_closed_shape (n : ℕ) (h : n ≥ 3) (points : Finset (Fin n × ℝ × ℝ)) \n  (no_collinear : ∀ (i j k : Fin n), i ≠ j → j ≠ k → i ≠ k → ¬Collinear ({(points i).2.1, (points j).2.1, (points k).2.1} : Set (ℝ × ℝ))) : \n  ∃ (f : Fin n → ℝ × ℝ), Function.Injective f ∧ ∀ i, f i ∈ (points i).2.1 ∧ \n  ∃ (γ : ℝ → ℝ × ℝ), SimpleClosedCurve γ ∧ ∀ i, ∃ t, γ t = f i := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  a i\nargument\n  i\nhas type\n  ℕ : Type\nbut is expected to have type\n  Fin n : Type\napplication type mismatch\n  a i\nargument\n  i\nhas type\n  ℕ : Type\nbut is expected to have type\n  Fin n : Type",
+    "syntactic_evaluation_log": "failed to synthesize instance\n  DivisionRing\n    ↑{(?m.147 : (?m.70 : outParam (Type ?u.69))), (?m.283 : (?m.150 : outParam (Type ?u.149))),\n        (?m.474 : (?m.286 : outParam (Type ?u.285)))}\nunknown identifier 'SimpleClosedCurve'\nfunction expected at\n  points\nterm has type\n  Finset (Fin n × ℝ × ℝ)\nfunction expected at\n  points\nterm has type\n  Finset (Fin n × ℝ × ℝ)\nfunction expected at\n  points\nterm has type\n  Finset (Fin n × ℝ × ℝ)\nfunction expected at\n  points\nterm has type\n  Finset (Fin n × ℝ × ℝ)",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Alright so we’ve got this sequence S_n. Start with S_0 = 1. For any number n ≥ 1, S_n counts the n×n matrices where entries are nonnegative integers, symmetric like a_ij = a_ji, and each column sums to 1 (so sum over i of a_ij = 1 for each j).  \n\nNow we need to show:  \n\n(a) S_{n+1} = S_n + n S_{n-1}  \n\n(b) The exponential generating function sum_{n=0}^∞ S_n * x^n / n! equals exp(x + x^2/2).  \n\nSo basically, suppose we have these matrices, then part (a) is a recurrence, and part (b) says the EGF is that exponential thing.",
-    "formal_statement": "theorem part_b (S : ℕ → ℕ) (hS0 : S 0 = 1) (hS : ∀ n ≥ 1, S n = Nat.card {M : Matrix (Fin n) (Fin n) ℕ // Matrix.IsSymm M ∧ ∀ j, ∑ i, M i j = 1}) : HasSum (fun n => (S n : ℝ) * x^n / n!) (Real.exp (x + x^2 / 2)) := sorry",
+    "informal_statement": "So we've got this diff eq y'' + e^x * y = 0, right? Show that whenever x gets really big, any solution y(x) doesn't blow up to infinity.",
+    "formal_statement": "theorem solution_bounded_at_infinity {y : ℝ → ℝ} (h : ∀ x, y'' x + Real.exp x * y x = 0) : Filter.Tendsto (fun x => ‖y x‖) Filter.atTop (nhds 0) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'x'\nunknown identifier 'n!'\nunknown identifier 'x'\nunknown identifier 'x'",
+    "syntactic_evaluation_log": "unknown identifier 'y'''",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we're looking at stuff like ax^2 - bx + c where a, b, c are just numbers, and it's got two different zeros somewhere between 0 and 1. The thing is, we need to figure out the smallest possible positive number a that can work in a setup like that. Show that it works out so the minimum a you can get is actually 5.",
-    "formal_statement": "theorem min_quadratic_coefficient (a b c : ℝ) (ha : a > 0) (h : ∃ x₁ x₂, x₁ ∈ Set.Ioo (0 : ℝ) 1 ∧ x₂ ∈ Set.Ioo (0 : ℝ) 1 ∧ x₁ ≠ x₂ ∧ a * x₁^2 - b * x₁ + c = 0 ∧ a * x₂^2 - b * x₂ + c = 0) : a ≥ 5 ∧ (∃ b c, a = 5 ∧ ∃ x₁ x₂, x₁ ∈ Set.Ioo (0 : ℝ) 1 ∧ x₂ ∈ Set.Ioo (0 : ℝ) 1 ∧ x₁ ≠ x₂ ∧ 5 * x₁^2 - b * x₁ + c = 0 ∧ 5 * x₂^2 - b * x₂ + c = 0) := sorry",
+    "informal_statement": "So we've got this function f(x) = a1 sin x + a2 sin 2x + ... + an sin nx, where all the a's are just numbers and n is some number. Suppose we have that whenever x is any real number, the absolute value of f(x) is always less than or equal to |sin x|. Show that it works out that |a1| + |2a2| + ... + |n an| ends up being at most 1.",
+    "formal_statement": "theorem sum_abs_coeff_le_one (n : ℕ) (a : Fin n → ℝ) (h : ∀ x : ℝ, |∑ i in Finset.range n, a ⟨i, Nat.lt_succ_of_lt (Finset.mem_range.1 i.2)⟩ * Real.sin ((i + 1) * x)| ≤ |Real.sin x|) : ∑ i in Finset.range n, |(i + 1) * a ⟨i, Nat.lt_succ_of_lt (Finset.mem_range.1 i.2)⟩| ≤ 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "invalid projection, structure expected\n  i\nhas type\n  ℕ\ninvalid projection, structure expected\n  i\nhas type\n  ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we start with S_0 = 1. Then for n ≥ 1, S_n is basically how many n by n matrices you can make where the entries are like 0,1,2,... and the matrix is symmetric (so a_ij = a_ji for all i,j) and also each column adds up to exactly 1 (so sum over i of a_ij = 1 for each j). Show that:\n\n(a) S_{n+1} = S_n + n * S_{n-1}\n\n(b) The exponential generating function sum from n=0 to infinity of S_n * (x^n / n!) equals exp(x + x^2/2), where exp(x) is just e^x.",
+    "formal_statement": "theorem part_b (S : ℕ → ℕ) (hS0 : S 0 = 1) (hS : ∀ n ≥ 1, S n = Fintype.card {M : Matrix (Fin n) (Fin n) ℕ // (∀ i j, M i j = M j i) ∧ (∀ j, ∑ i, M i j = 1)}) : (∑' n, S n * (x^n / n! : ℝ)) = Real.exp (x + x^2 / 2) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype\n    { M : Matrix (Fin n) (Fin n) ℕ // (∀ (i j : Fin n), M i j = M j i) ∧ ∀ (j : Fin n), ∑ i : Fin n, M i j = (1 : ℕ) }\nunknown identifier 'x'\nunknown identifier 'n!'\nunknown identifier 'x'\nunknown identifier 'x'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we’re looking at stuff like ax^2 - bx + c where a, b, c are whole numbers, and it’s got two different zeros somewhere between 0 and 1 (not including the endpoints). The thing is, we want the smallest positive a that makes this happen. Show that the smallest a you can get is actually 5, and explain why.",
+    "formal_statement": "theorem smallest_quadratic_coefficient_with_two_roots_in_01 : \n  ∃ a : ℕ, a = 5 ∧ (∀ b c : ℤ, ∃ x₁ x₂ : ℝ, x₁ ∈ Set.Ioo 0 1 ∧ x₂ ∈ Set.Ioo 0 1 ∧ x₁ ≠ x₂ ∧ \n    ∀ x : ℝ, x = x₁ ∨ x = x₂ → a * x^2 - b * x + c = 0) ∧ \n  (∀ a' : ℕ, a' < 5 → ¬ ∀ b c : ℤ, ∃ x₁ x₂ : ℝ, x₁ ∈ Set.Ioo 0 1 ∧ x₂ ∈ Set.Ioo 0 1 ∧ x₁ ≠ x₂ ∧ \n    ∀ x : ℝ, x = x₁ ∨ x = x₂ → a' * x^2 - b * x + c = 0) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
+    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It asserts the existence of a smallest positive natural number 'a' (which is 5) such that for any integers 'b' and 'c', the quadratic equation a*x^2 - b*x + c = 0 has two distinct roots in the open interval (0,1). It also correctly states that no smaller natural number 'a' satisfies this condition. The types and constraints match the original statement, and the logical implication flows correctly from the hypothesis to the conclusion."
   },
   {
-    "informal_statement": "So like, show that if lambda > 1/2, you can't find any real function u such that whenever x is between 0 and 1, we have u(x) = 1 + lambda * integral from x to 1 of u(y)u(y-x) dy.",
+    "informal_statement": "So like, show that if λ > 1/2, you can't find any real function u such that whenever x is between 0 and 1, we have u(x) = 1 + λ ∫ from x to 1 of u(y) u(y-x) dy.",
     "formal_statement": "theorem no_solution_for_lambda_gt_half (λ : ℝ) (hλ : λ > 1/2) : ¬∃ (u : ℝ → ℝ), ∀ (x : ℝ), x ∈ Set.Icc 0 1 → u x = 1 + λ * ∫ y in Set.Icc x 1, u y * u (y - x) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token 'λ'; expected '_' or identifier",
@@ -480,199 +480,199 @@
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So like, if you've got some convex shape in the plane, and its area is bigger than pi/4, then you can always find two points in it that are exactly 1 unit apart. Show that it works.",
-    "formal_statement": "theorem convex_set_area_gt_pi_div_four_has_points_one_apart {S : Set ℝ²} (hConv : Convex ℝ S) (hArea : volume S > π / 4) : ∃ x y ∈ S, dist x y = 1 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "expected token",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we’ve got these numbers a1,a2,a3,a4 and b1,b2,b3,b4, all real, and it’s given that a1b2 - a2b1 isn’t zero. Now look at the system:\n\na1 x1 + a2 x2 + a3 x3 + a4 x4 = 0  \nb1 x1 + b2 x2 + b3 x3 + b4 x4 = 0  \n\nWe only care about solutions (x1,x2,x3,x4) where none of the x’s are zero. For each such solution, you can write down the signs of the x’s as a 4-tuple of plus/minus. The question is: what’s the max number of different sign patterns you can get from all possible solutions? Show that the max is actually 8.",
-    "formal_statement": "theorem max_sign_patterns (a1 a2 a3 a4 b1 b2 b3 b4 : ℝ) (h : a1 * b2 - a2 * b1 ≠ 0) : \n  Fintype.card {s : Fin 4 → SignType // ∃ (x : Fin 4 → ℝ), (∀ i, x i ≠ 0) ∧ \n  (a1 * x 0 + a2 * x 1 + a3 * x 2 + a4 * x 3 = 0) ∧ \n  (b1 * x 0 + b2 * x 1 + b3 * x 2 + b4 * x 3 = 0) ∧ \n  (∀ i, SignType.sign (x i) = s i)} ≤ 8 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  Fintype\n    { s : Fin (4 : ℕ) → SignType //\n      ∃ (x : Fin (4 : ℕ) → ℝ),\n        (∀ (i : Fin (4 : ℕ)), x i ≠ (0 : ℝ)) ∧\n          a1 * x (0 : Fin (4 : ℕ)) + a2 * x (1 : Fin (4 : ℕ)) + a3 * x (2 : Fin (4 : ℕ)) + a4 * x (3 : Fin (4 : ℕ)) =\n              (0 : ℝ) ∧\n            b1 * x (0 : Fin (4 : ℕ)) + b2 * x (1 : Fin (4 : ℕ)) + b3 * x (2 : Fin (4 : ℕ)) + b4 * x (3 : Fin (4 : ℕ)) =\n                (0 : ℝ) ∧\n              ∀ (i : Fin (4 : ℕ)), SignType.sign (x i) = s i }",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So there's this hexagon ABCDEF inside a circle with radius r. Suppose we have AB = CD = EF = r. Show that if you take the midpoints of BC, DE, and FA, they make an equilateral triangle.",
-    "formal_statement": "theorem hexagon_midpoints_equilateral {r : ℝ} (h : 0 < r) (A B C D E F : ℝ × ℝ) (h_circ : ∀ (p : ℝ × ℝ), p ∈ {A, B, C, D, E, F} → ‖p‖ = r) (h_AB : ‖A - B‖ = r) (h_CD : ‖C - D‖ = r) (h_EF : ‖E - F‖ = r) : let M := (B + C) / 2; let N := (D + E) / 2; let P := (F + A) / 2; ‖M - N‖ = ‖N - P‖ ∧ ‖N - P‖ = ‖P - M‖ := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "typeclass instance problem is stuck, it is often due to metavariables\n  Insert (ℝ × ℝ) ((?m.655 : ℝ × ℝ → Type ?u.89) p)",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "Suppose we have numbers p and r between 0 and 1, and look at these two things:\n\n(a) (p x + (1-p) y)^2 = A x^2 + B x y + C y^2  \n(b) (p x + (1-p) y)(r x + (1-r) y) = α x^2 + β x y + γ y^2  \n\nYou need to show that, depending on p and r:  \n(a) the biggest of A, B, C is at least 4/9,  \n(b) the biggest of α, β, γ is also at least 4/9.",
-    "formal_statement": "theorem max_coeff_b (p r : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (hr : 0 ≤ r ∧ r ≤ 1) :\n  max (max (p * r) (p * (1 - r) + r * (1 - p))) ((1 - p) * (1 - r)) ≥ 4/9 := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of part (b) of the English statement. It formalizes the condition that the maximum of the coefficients α, β, γ (represented as p * r, p * (1 - r) + r * (1 - p), and (1 - p) * (1 - r)) is at least 4/9, given that p and r are between 0 and 1. The types and constraints match, and the logical implication flows correctly."
-  },
-  {
-    "informal_statement": "So like, suppose we have two functions f and g that are continuous and repeat every 1, then if you take the limit as n goes to infinity of the integral from 0 to 1 of f(x) * g(nx) dx, it basically becomes just the product of their separate integrals from 0 to 1. So you get (∫_0^1 f(x) dx) times (∫_0^1 g(x) dx).",
-    "formal_statement": "theorem limit_of_integral_product_periodic {f g : ℝ → ℝ} (hf : Continuous f) (hg : Continuous g) (hf_per : ∀ x, f (x + 1) = f x) (hg_per : ∀ x, g (x + 1) = g x) : Tendsto (fun n ↦ ∫ x in 0..1, f x * g (n * x)) atTop (𝓝 (∫ x in 0..1, f x * ∫ x in 0..1, g x)) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So there's this locker room with a bunch of lockers, numbered 1, 2, 3, all the way up to some number n. They all start locked. Then this attendant goes through a bunch of steps T_1, T_2, ..., T_n. For step T_k (where k is just any number from 1 to n), he flips the lock—so locked becomes unlocked and unlocked becomes locked—but only for the lockers whose numbers are multiples of k. Like, if k is 3, he messes with lockers 3, 6, 9, etc. After he's done all n steps, you notice something: the only lockers left open are the ones whose numbers are perfect squares (like 1, 4, 9, 16...). All the others are locked. Show that this is always true, no matter what n is.",
-    "formal_statement": "theorem locker_problem (n : ℕ) : ∀ (k : ℕ), k ∈ Finset.Icc 1 n → (Nat.sqrt k ^ 2 = k ↔ ∃ (m : ℕ), m ∈ Finset.Icc 1 n ∧ ∃ (t : ℕ), t ∈ Finset.Icc 1 n ∧ k = m * t ∧ (Finset.card (Finset.filter (fun d => d ∣ k) (Finset.Icc 1 k))).natMod 2 = 1)) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unexpected token ')'; expected ':=', 'where' or '|'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "Whenever you've got some number n, show that if you add up the first n bits from expanding out (2 - 1)^(-n) (starting with the biggest power of 2), it always ends up being 1/2.",
-    "formal_statement": "theorem sum_first_n_bits (n : ℕ) : ∑ k in Finset.range n, (1/2 : ℝ) ^ (k + 1) = 1/2 := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "Suppose we have this function f that's defined for all points where x^2 + y^2 ≤ 1, and its absolute value is always at most 1. It also has partial derivatives. Show that somewhere inside the unit circle, there's a point (x0, y0) where the sum of the squares of its partial derivatives, like (∂f/∂x)^2 + (∂f/∂y)^2, is ≤ 16.",
-    "formal_statement": "theorem exists_point_with_gradient_bound (f : ℝ → ℝ → ℝ) (h_def : ∀ x y, x^2 + y^2 ≤ 1 → ∃ fxy, f x y = fxy) (h_bdd : ∀ x y (h : x^2 + y^2 ≤ 1), |f x y| ≤ 1) (h_diff : ∀ x y (h : x^2 + y^2 ≤ 1), DifferentiableAt ℝ (fun p : ℝ × ℝ => f p.1 p.2) (x, y)) : ∃ x₀ y₀, x₀^2 + y₀^2 ≤ 1 ∧ ((deriv (fun x => f x y₀) x₀)^2 + (deriv (fun y => f x₀ y) y₀)^2) ≤ 16 := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "So, like, we gotta show that 22/7 minus pi equals this integral from 0 to 1 of x^4(1-x)^4 over (1+x^2) dx. Suppose we have this thing, and we need to check that it works out.",
-    "formal_statement": "theorem twenty_two_sevenths_minus_pi_eq_integral : (22 : ℝ) / 7 - Real.pi = ∫ x in (0 : ℝ)..1, x^4 * (1 - x)^4 / (1 + x^2) := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "Whenever you've got some integers a, b, c, d, e, f with ad not equal to bc, and any positive epsilon, show that you can find rational numbers r and s so that both |ra + sb - e| and |rc + sd - f| are positive but less than epsilon.",
-    "formal_statement": "theorem exists_rational_approximation (a b c d e f : ℤ) (h : a * d ≠ b * c) (ε : ℝ) (hε : ε > 0) : ∃ (r s : ℚ), |(↑r * ↑a + ↑s * ↑b - ↑e)| > 0 ∧ |(↑r * ↑a + ↑s * ↑b - ↑e)| < ε ∧ |(↑r * ↑c + ↑s * ↑d - ↑f)| > 0 ∧ |(↑r * ↑c + ↑s * ↑d - ↑f)| < ε := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  HMul ℚ ℤ ((?m.4194 : ℚ → ℚ → Type ?u.172) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4195 : ℚ → ℚ → Type ?u.171) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4212 : ℚ → ℚ → Type ?u.1307) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4213 : ℚ → ℚ → Type ?u.1306) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4233 : ℚ → ℚ → Type ?u.2152) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4234 : ℚ → ℚ → Type ?u.2151) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4251 : ℚ → ℚ → Type ?u.3287) r s)\nfailed to synthesize instance\n  HMul ℚ ℤ ((?m.4252 : ℚ → ℚ → Type ?u.3286) r s)",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got some finite set S. The task is to come up with a list of all its subsets, but in a specific order. First thing in the list should be the empty set. Then, every possible subset of S shows up exactly once. And the tricky part: each next subset in the list is made by either adding one element to the previous subset or taking one element away from it. Show that it works.",
-    "formal_statement": "theorem exists_subset_list_with_transition {α : Type*} [Fintype α] (S : Set α) :\n∃ (l : List (Set α)), l.Nodup ∧ l.head? = some ∅ ∧ ∀ (i : Fin (l.length - 1)),\n(∃ (x : α), l.get i = l.get (i.castSucc) \\ {x}) ∨ (∃ (x : α), l.get i = insert x (l.get (i.castSucc))) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  l.get i\nargument\n  i\nhas type\n  Fin (l.length - (1 : ℕ)) : Type\nbut is expected to have type\n  Fin l.length : Type\napplication type mismatch\n  l.get i.castSucc\nargument\n  i.castSucc\nhas type\n  Fin (l.length - (1 : ℕ) + (1 : ℕ)) : Type\nbut is expected to have type\n  Fin l.length : Type\napplication type mismatch\n  l.get i\nargument\n  i\nhas type\n  Fin (l.length - (1 : ℕ)) : Type\nbut is expected to have type\n  Fin l.length : Type\napplication type mismatch\n  l.get i.castSucc\nargument\n  i.castSucc\nhas type\n  Fin (l.length - (1 : ℕ) + (1 : ℕ)) : Type\nbut is expected to have type\n  Fin l.length : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So like, take any n points on the unit sphere (you know, where x^2 + y^2 + z^2 = 1). Show that if you add up the squares of the distances between all of them, it's never more than n^2.",
-    "formal_statement": "theorem sum_sq_distances_le_nsq (n : ℕ) (points : Fin n → EuclideanSpace ℝ (Fin 3)) \n  (h : ∀ i, ‖points i‖ = 1) : ∑ i j, ‖points i - points j‖^2 ≤ n^2 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unexpected identifier; expected ',' or 'in'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got this set V of all quadratics with real coefficients, and whenever x is between 0 and 1, the absolute value of P(x) is at most 1. The question is: what's the biggest possible value for |P'(0)| you can get from these polynomials? Turns out the supremum is 8.",
-    "formal_statement": "theorem supremum_of_derivative_at_zero : \n  sSup {c : ℝ | ∃ (P : ℝ → ℝ), (∀ x, P x = P.coeff 0 + P.coeff 1 * x + P.coeff 2 * x^2) ∧ \n  (∀ x ∈ Set.Icc (0 : ℝ) 1, |P x| ≤ 1) ∧ c = |deriv P 0|} = 8 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "invalid field notation, type is not of the form (C ...) where C is a constant\n  P\nhas type\n  ℝ → ℝ\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  P\nhas type\n  ℝ → ℝ\ninvalid field notation, type is not of the form (C ...) where C is a constant\n  P\nhas type\n  ℝ → ℝ",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So like, we're supposed to find all those polynomials that look like sum from 0 to n of a_i * x^(n-i), where n is some number at least 1, and each a_i is either 1 or -1. The catch is all the roots have to be real numbers. The answer set they gave is basically just these, up to a sign: (x-1), (x+1), (x^2 + x - 1), (x^2 - x - 1), (x^3 + x^2 - x - 1), and (x^3 - x^2 - x + 1).",
-    "formal_statement": "theorem real_root_polynomials_with_coeff_1_or_neg1 :\n  ∀ (n : ℕ) (p : Polynomial ℝ), n ≥ 1 →\n  (∃ (a : ℕ → ℤ), (∀ i, a i = 1 ∨ a i = -1) ∧ p = ∑ i in Finset.range (n + 1), Polynomial.C (↑(a i)) * Polynomial.X ^ (n - i)) →\n  (∀ (x : ℝ), Polynomial.IsRoot p x → Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 1 - Polynomial.C (1)) x ∨\n   Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 1 + Polynomial.C (1)) x ∨\n   Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 2 + Polynomial.C (1) * Polynomial.X - Polynomial.C (1)) x ∨\n   Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 2 - Polynomial.C (1) * Polynomial.X - Polynomial.C (1)) x ∨\n   Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 3 + Polynomial.C (1) * Polynomial.X ^ 2 - Polynomial.C (1) * Polynomial.X - Polynomial.C (1)) x ∨\n   Polynomial.IsRoot (Polynomial.C (1) * Polynomial.X ^ 3 - Polynomial.C (1) * Polynomial.X ^ 2 - Polynomial.C (1) * Polynomial.X + Polynomial.C (1)) x) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "typeclass instance problem is stuck, it is often due to metavariables\n  HMul (Polynomial ℤ) ((?m.63179 : ℕ → Polynomial ℝ → (ℕ → ℤ) → ℕ → Type ?u.196) n p a i) (Polynomial ℝ)",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got these two random things X and Y, each can be a few different whole numbers, but they might depend on each other. Suppose we want the chance that the smaller one equals some number k. You can write that using p1 = prob(X = k), p2 = prob(Y = k), and p3 = prob(the bigger one equals k). Turns out it's just p1 + p2 - p3. Show that it works.",
-    "formal_statement": "theorem prob_min_eq_k (X Y : Ω → ℕ) [ProbabilitySpace Ω] (k : ℕ) : \n  ℙ (fun ω ↦ min (X ω) (Y ω) = k) = ℙ (X = k) + ℙ (Y = k) - ℙ (fun ω ↦ max (X ω) (Y ω) = k) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'Ω'\nunknown identifier 'Ω'\nunknown identifier 'ProbabilitySpace'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got this group G, it's finite and has multiplication, and there's a subset A inside G that's got more than half of the elements. Show that whenever you pick any element from G, you can always find two things in A that multiply to give it.",
-    "formal_statement": "theorem subset_covering_property (G : Type*) [Group G] [Fintype G] (A : Set G) (hA : Fintype.card A > Fintype.card G / 2) (g : G) : ∃ a b ∈ A, a * b = g := sorry",
+    "informal_statement": "So like, if you've got some convex shape in the plane, and its area is bigger than pi/4, then you can always find two points inside it that are exactly 1 unit apart. Show that it works.",
+    "formal_statement": "theorem exists_points_distance_one_of_area_gt_pi_div_four (S : Set (ℝ × ℝ)) (h_convex : Convex ℝ S) (h_area : volume S > Real.pi / 4) : ∃ x y ∈ S, dist x y = 1 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have this continuous function f from all reals to all reals, and the integral from negative infinity to infinity of f(x) dx exists. Show that it works: the integral from negative infinity to infinity of f(x - 1/x) dx equals the integral from negative infinity to infinity of f(x) dx.",
-    "formal_statement": "theorem integral_transform (f : ℝ → ℝ) (hf : Continuous f) (hint : Integrable f) : ∫ (x : ℝ), f (x - 1 / x) = ∫ (x : ℝ), f x := sorry",
+    "informal_statement": "So we've got these numbers a1, a2, a3, a4 and b1, b2, b3, b4, and they're real. The only important thing is that a1*b2 - a2*b1 isn't zero. Then we look at the equations:\n\na1*x1 + a2*x2 + a3*x3 + a4*x4 = 0\nb1*x1 + b2*x2 + b3*x3 + b4*x4 = 0\n\nWe only care about solutions (x1, x2, x3, x4) where none of the x's are zero. For each solution, you can write down the signs of the x's, like (+, -, +, +) or whatever. The question is: what's the maximum number of different sign patterns you can get from these solutions? Show that the max is actually 8.",
+    "formal_statement": "theorem max_sign_patterns (a1 a2 a3 a4 b1 b2 b3 b4 : ℝ) (h : a1 * b2 - a2 * b1 ≠ 0) :\n  ∃ (x : ℝ × ℝ × ℝ × ℝ), x.1 ≠ 0 ∧ x.2.1 ≠ 0 ∧ x.2.2.1 ≠ 0 ∧ x.2.2.2 ≠ 0 ∧\n  a1 * x.1 + a2 * x.2.1 + a3 * x.2.2.1 + a4 * x.2.2.2 = 0 ∧\n  b1 * x.1 + b2 * x.2.1 + b3 * x.2.2.1 + b4 * x.2.2.2 = 0 ∧\n  Fintype.card (Finset.univ : Finset (Fin 8 → Bool)) = 8 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem does not accurately capture the mathematical intent of the natural language statement. The English statement asks for the maximum number of different sign patterns (like (+, -, +, +)) that can be obtained from solutions where none of the x's are zero. The Lean theorem instead asserts the existence of a solution with non-zero components and a condition about the cardinality of a set of functions from Fin 8 to Bool, which does not correspond to counting sign patterns of solutions."
+  },
+  {
+    "informal_statement": "So there's this hexagon ABCDEF inside a circle with radius r. Suppose we have AB = CD = EF = r. Show that if you take the midpoints of BC, DE, and FA, they make an equilateral triangle.",
+    "formal_statement": "theorem hexagon_midpoints_equilateral {r : ℝ} (h : 0 < r) (A B C D E F : ℝ × ℝ) (h_circle : ∀ (P : ℝ × ℝ), P ∈ [A, B, C, D, E, F] → dist P (0, 0) = r) (h_sides : dist A B = r ∧ dist C D = r ∧ dist E F = r) : let M := midpoint ℝ B C; let N := midpoint ℝ D E; let P := midpoint ℝ F A; dist M N = dist N P ∧ dist N P = dist P M := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Suppose we've got numbers p and r, both between 0 and 1. Look at these two things:\n\n(a) (px + (1-p)y)^2 = A x^2 + B x y + C y^2  \n(b) (px + (1-p)y)(rx + (1-r)y) = α x^2 + β x y + γ y^2  \n\nNow, for each one, you need to check that the biggest coefficient is at least 4/9. So for part (a), show that max{A,B,C} ≥ 4/9, and for part (b), show that max{α,β,γ} ≥ 4/9. Basically, whatever p and r are, one of those coefficients always ends up being 4/9 or bigger.",
+    "formal_statement": "theorem part_b (p r : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (hr : 0 ≤ r ∧ r ≤ 1) (x y : ℝ) :\n  (p * x + (1 - p) * y) * (r * x + (1 - r) * y) = α * x^2 + β * x * y + γ * y^2 →\n  max (max α β) γ ≥ 4/9 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'α'\nunknown identifier 'β'\nunknown identifier 'γ'\nunknown identifier 'α'\nunknown identifier 'β'\nunknown identifier 'γ'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose we have two functions f and g that are continuous and repeat every 1 on the real line. Then, as n goes to infinity, the integral from 0 to 1 of f(x) times g(nx) dx approaches the product of the integral from 0 to 1 of f(x) dx and the integral from 0 to 1 of g(x) dx.",
+    "formal_statement": "theorem integral_limit_of_periodic_products (f g : ℝ → ℝ) (hf : Continuous f) (hg : Continuous g) (hf_per : ∀ x, f (x + 1) = f x) (hg_per : ∀ x, g (x + 1) = g x) : Filter.Tendsto (fun (n : ℕ) => ∫ x in 0..1, f x * g (n * x)) Filter.atTop (nhds (∫ x in 0..1, f x * ∫ x in 0..1, g x)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So there's this locker room with a bunch of lockers, like n of them, numbered 1, 2, 3, all the way up to n. They all start locked. Then this attendant does a bunch of steps, call them T1, T2, up to Tn. In step Tk, for any k from 1 to n, he flips the lock (so locked becomes unlocked or unlocked becomes locked) for all the lockers whose numbers are multiples of k. After he's done all n steps, you notice that only the lockers with perfect square numbers (like 1, 4, 9, etc.) are left open. Show that it works.",
+    "formal_statement": "theorem locker_problem (n : ℕ) : ∀ (k : ℕ), k ∈ Finset.range (n + 1) → (Nat.sqrt k) ^ 2 = k ↔ ∃ (m : ℕ), m * m = k := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "The Lean theorem does not accurately capture the mathematical intent of the natural language statement. The English statement describes a process involving flipping locker states based on multiples of step numbers and concludes that only lockers with perfect square numbers remain open. The Lean theorem, however, states a condition about the existence of a natural number m such that m * m equals k, which is a definition of a perfect square, but it does not relate this to the locker flipping process described in the English statement. The theorem should instead relate the final state of the lockers to the process of flipping them based on multiples of step numbers."
+  },
+  {
+    "informal_statement": "So like, take any number n, and suppose we have this thing (2 - 1)^(-n). If you look at its binomial expansion, starting with the biggest power of 2, and you add up the first n terms of that, it should just be 1/2. Show that it works.",
+    "formal_statement": "theorem binomial_expansion_sum (n : ℕ) : ∑ k in Finset.range n, (2 - 1) ^ (-(n - k)) * Nat.choose n k = 1 / 2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "failed to synthesize instance\n  Neg ℕ",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "Suppose we have this function f that's defined for x^2 + y^2 ≤ 1, and its absolute value is always at most 1. It also has partial derivatives. Show that there's some point (x0, y0) inside the unit circle where (∂f/∂x at that point)^2 + (∂f/∂y at that point)^2 is less than or equal to 16.",
+    "formal_statement": "theorem exists_point_with_gradient_bound (f : ℝ → ℝ → ℝ) (h₁ : ∀ x y, x^2 + y^2 ≤ 1 → ∃ fxy, f x y = fxy) (h₂ : ∀ x y, x^2 + y^2 ≤ 1 → |f x y| ≤ 1) (h₃ : ∀ x y, x^2 + y^2 ≤ 1 → DifferentiableAt ℝ (fun x' ↦ f x' y) x) (h₄ : ∀ x y, x^2 + y^2 ≤ 1 → DifferentiableAt ℝ (fun y' ↦ f x y') y) : ∃ x₀ y₀, x₀^2 + y₀^2 < 1 ∧ ((deriv (fun x' ↦ f x' y₀) x₀)^2 + (deriv (fun y' ↦ f x₀ y') y₀)^2 ≤ 16) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So, like, we're supposed to show that 22/7 minus pi is actually this integral from 0 to 1 of x^4(1 - x)^4 all over (1 + x^2) dx. Suppose we have that integral, and you work it out, it should approach that difference.",
+    "formal_statement": "theorem integral_representation : (↑22 / ↑7 - Real.pi) = ∫ x in (0:ℝ)..1, (x^4 * (1 - x)^4) / (1 + x^2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So like, you've got these numbers a, b, c, d, e, f, all integers, and also ad isn't equal to bc. And then you pick any tiny positive epsilon. Show that you can find some rational numbers r and s so that both |ra + sb - e| and |rc + sd - f| are positive but also less than epsilon.",
+    "formal_statement": "theorem exists_rational_approximation (a b c d e f : ℤ) (h : a * d ≠ b * c) (ε : ℝ) (hε : ε > 0) : ∃ (r s : ℚ), |(r * ↑a + s * ↑b) - ↑e| > 0 ∧ |(r * ↑a + s * ↑b) - ↑e| < ε ∧ |(r * ↑c + s * ↑d) - ↑f| > 0 ∧ |(r * ↑c + s * ↑d) - ↑f| < ε := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "The generated Lean theorem correctly captures the mathematical intent of the natural language statement. It includes all specified variables as integers, the condition that ad is not equal to bc, and the requirement for epsilon to be positive. The conclusion correctly states the existence of rational numbers r and s that satisfy the given inequalities for both expressions involving a, b, c, d, e, and f. The types and logical flow are accurate, and the theorem does not simplify or alter the original problem."
+  },
+  {
+    "informal_statement": "So we've got this finite set S, right? Show that you can make a list of all its subsets where:\n\n1. The list starts with the empty set,\n2. Every subset of S shows up exactly once in the list, and\n3. Whenever you go from one subset to the next, you're just adding or removing one element from S.",
+    "formal_statement": "theorem exists_subset_list (S : Finset α) : ∃ (l : List (Finset α)), \n  l.head? = some ∅ ∧ \n  List.Nodup l ∧ \n  ∀ t ∈ l, t ⊆ S ∧ \n  ∀ i : Fin (l.length - 1), \n    (l.get i).1 ⊆ (l.get (i + 1)).1 ∧ Finset.card ((l.get (i + 1)).1 \\ (l.get i).1) = 1 ∨ \n    (l.get (i + 1)).1 ⊆ (l.get i).1 ∧ Finset.card ((l.get i).1 \\ (l.get (i + 1)).1) = 1 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'α'\nunknown identifier 'α'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So like, take any n points on the unit sphere, you know, where x^2 + y^2 + z^2 = 1. Show that if you add up the squares of the distances between all of them, it's at most n^2.",
+    "formal_statement": "theorem sum_sq_distances_le_n_sq (n : ℕ) (points : Fin n → {x : ℝ × ℝ × ℝ | x.1^2 + x.2.1^2 + x.2.2^2 = 1}) : \n∑ i j : Fin n, ‖(points i).val - (points j).val‖^2 ≤ n^2 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected identifier; expected ',' or 'in'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got this set V of all quadratics with real numbers in them, and whenever x is between 0 and 1, the absolute value of P(x) is at most 1. Suppose we have such a P. The question is, what's the biggest possible value for the absolute value of its derivative at 0? It turns out the supremum, or the least upper bound, is 8.",
+    "formal_statement": "theorem supremum_derivative_at_zero : \n  sSup {c : ℝ | ∃ (P : ℝ → ℝ) (a b : ℝ), (∀ x, P x = a * x^2 + b * x + (1 - a - b)) ∧ (∀ x ∈ Set.Icc 0 1, |P x| ≤ 1) ∧ |deriv P 0| = c} = 8 := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we’re supposed to find all polynomials that look like sum from i=0 to n of a_i x^(n-i), where n is at least 1 and each a_i is either +1 or -1, and all the roots are real. Turns out the only ones that work are like ±(x-1), ±(x+1), ±(x^2+x-1), ±(x^2-x-1), ±(x^3+x^2-x-1), and ±(x^3-x^2-x+1). That’s the whole set.",
+    "formal_statement": "theorem real_root_polynomials_with_coeffs_pm1 :\n  ∀ (n : ℕ) (p : ℝ[X]), n ≥ 1 → \n  (∃ (a : ℕ → ℤ), (∀ i, i ≤ n → a i = 1 ∨ a i = -1) ∧ \n  p = ∑ i in Finset.range (n + 1), Polynomial.C (↑(a i)) * Polynomial.X ^ (n - i)) → \n  Polynomial.Splits (RingHom.id ℝ) p → \n  p ∈ {Polynomial.C 1 * (Polynomial.X - 1), Polynomial.C (-1) * (Polynomial.X - 1),\n       Polynomial.C 1 * (Polynomial.X + 1), Polynomial.C (-1) * (Polynomial.X + 1),\n       Polynomial.C 1 * (Polynomial.X^2 + Polynomial.X - 1), Polynomial.C (-1) * (Polynomial.X^2 + Polynomial.X - 1),\n       Polynomial.C 1 * (Polynomial.X^2 - Polynomial.X - 1), Polynomial.C (-1) * (Polynomial.X^2 - Polynomial.X - 1),\n       Polynomial.C 1 * (Polynomial.X^3 + Polynomial.X^2 - Polynomial.X - 1), Polynomial.C (-1) * (Polynomial.X^3 + Polynomial.X^2 - Polynomial.X - 1),\n       Polynomial.C 1 * (Polynomial.X^3 - Polynomial.X^2 - Polynomial.X + 1), Polynomial.C (-1) * (Polynomial.X^3 - Polynomial.X^2 - Polynomial.X + 1)} := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'X'\nfailed to synthesize instance\n  HSub (Polynomial ((?m.108919 : (n : ℕ) → ℝ[sorryAx ((?m.108878 : ℕ → Type ?u.6) n) true] → Type ?u.4883) n p)) ℕ\n    (Polynomial ℕ)\nfailed to synthesize instance\n  HSub (Polynomial ((?m.109027 : (n : ℕ) → ℝ[sorryAx ((?m.108878 : ℕ → Type ?u.6) n) true] → Type ?u.21152) n p)) ℕ\n    (Polynomial ℕ)\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nn : ℕ\n⊢ (?m.108879 : (n : ℕ) → outParam (Type → (?m.108878 : ℕ → Type ?u.6) n → Prop)) n ℝ\n    (sorryAx ((?m.108878 : ℕ → Type ?u.6) n) true)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got these two random things X and Y, they can be a few integer values, not necessarily independent. Suppose we want prob(min(X,Y) = k). You can write it using p1 = prob(X = k), p2 = prob(Y = k), and p3 = prob(max(X,Y) = k). It turns out that prob(min(X,Y) = k) = p1 + p2 - p3. Show that it works.",
+    "formal_statement": "theorem min_prob_eq_sum_diff_max_prob (X Y : Ω → ℤ) [ProbabilitySpace Ω] (k : ℤ) (p1 := ℙ (X = k)) (p2 := ℙ (Y = k)) (p3 := ℙ (max X Y = k)) : ℙ (min X Y = k) = p1 + p2 - p3 := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'Ω'\nunknown identifier 'Ω'\nunknown identifier 'ProbabilitySpace'",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So like, you've got this group G, it's finite and has multiplication, and there's a subset A inside G that has more than half of the stuff from G. Show that any element g in the group can be written as the product of two things from A.",
+    "formal_statement": "theorem product_of_two_in_large_subset {G : Type*} [Group G] [Fintype G] (A : Set G) (hA : Fintype.card A > Fintype.card G / 2) (g : G) : ∃ a b ∈ A, g = a * b := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unexpected token '∈'; expected ','",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So like, suppose we have this function f that's continuous everywhere, and the integral from negative infinity to infinity of f(x) dx exists. Show that it works that the integral from negative infinity to infinity of f(x - 1/x) dx is actually the same as the integral from negative infinity to infinity of f(x) dx.",
+    "formal_statement": "theorem integral_substitution {f : ℝ → ℝ} (hf : Continuous f) (hint : Integrable f) : ∫ (x : ℝ), f (x - 1 / x) = ∫ (x : ℝ), f x := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'Integrable'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this prime p, right? And we're looking at all those 2x2 matrices like (a b; c d) where each entry is from 0 up to p-1. The conditions are that a+d is congruent to 1 mod p, and also ad - bc is congruent to 0 mod p. The claim is there are p^2 + p of them.",
-    "formal_statement": "theorem count_special_matrices (p : ℕ) [Nat.Prime p] : Fintype.card {M : Matrix (Fin 2) (Fin 2) (ZMod p) | ∃ a b c d : ZMod p, M = !![a, b; c, d] ∧ a + d = 1 ∧ a * d - b * c = 0} = p^2 + p := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "invalid binder annotation, type is not a class instance\n  p.Prime\nuse the command `set_option checkBinderAnnotations false` to disable the check",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So like, suppose we have some list of sets K_n, where each one is just a compact bunch of rationals (so closed and bounded, you know). The thing is, you can't have it so that any compact set of rationals you can think of is just sitting inside at least one of those K_n's. Show that it works.",
-    "formal_statement": "theorem not_all_compact_sets_contained {ι : Type*} (K : ι → Set ℚ) (hK : ∀ n, IsCompact (K n)) : ¬ ∀ (C : Set ℚ), IsCompact C → ∃ n, C ⊆ K n := sorry",
+    "informal_statement": "So we've got this prime p, right? Suppose we have all those 2x2 matrices with entries from 0 up to p-1. You know, like (a b; c d). The condition is that a+d is congruent to 1 mod p, and also ad - bc is congruent to 0 mod p. We want to count how many different ones there are. Turns out it's p^2 + p. Show that it works.",
+    "formal_statement": "theorem count_special_matrices (p : ℕ) [Fact (Nat.Prime p)] : \n  Fintype.card {M : Matrix (Fin 2) (Fin 2) (ZMod p) | M 0 0 + M 1 1 = 1 ∧ M 0 0 * M 1 1 - M 0 1 * M 1 0 = 0} = p^2 + p := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So if you've got some polynomial f(x, y) with real coefficients, what can its range actually be? Like, if you plug in all real x and y, what values can f spit out? Show that it's either just one single number, or it's something like all numbers greater than some value (maybe including that value, maybe not), or it's all real numbers.",
-    "formal_statement": "theorem polynomial_range_cases (f : ℝ × ℝ → ℝ) (hf : ∃ (p : ℝ[X][Y]), ∀ (x y : ℝ), f (x, y) = Polynomial.eval₂ (Polynomial.eval x) p y) : (∃ (c : ℝ), ∀ (x y : ℝ), f (x, y) = c) ∨ (∃ (a : ℝ), (∀ (x y : ℝ), f (x, y) ≥ a) ∧ ((∀ (b > a), ∃ (x y : ℝ), f (x, y) = b) ∨ (∀ (b ≥ a), ∃ (x y : ℝ), f (x, y) = b))) ∨ (∀ (b : ℝ), ∃ (x y : ℝ), f (x, y) = b) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unexpected token '>'; expected ')'",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got this matrix that's n by n, and the entry in the i-th row and j-th spot is just |i - j|. Call its determinant D_n. The thing is, you're supposed to show that D_n equals (-1)^(n-1) times (n-1) times (2^(n-2)). Like, suppose we have a number n, show that it works out.",
-    "formal_statement": "theorem matrix_det_formula (n : ℕ) : Matrix.det (Matrix.of (fun i j : Fin n => ↑|(i : ℕ) - (j : ℕ)|)) = (-1) ^ (n - 1) * (n - 1) * 2 ^ (n - 2) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  Neg ℕ\nfailed to synthesize instance\n  AddGroup ℕ\nfailed to synthesize instance\n  CommRing ℕ",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So like, we wanna check that the integral from 0 to 1 of x^x dx is the same as the sum from n=1 to infinity of (-1)^(n+1) * n^(-n). Suppose we have this number n, and whenever x is between 0 and 1, x^x approaches something. Show that it works—basically, the integral goes to that infinite sum.",
-    "formal_statement": "theorem integral_x_pow_x_eq_sum (n : ℕ) (hx : x ∈ Set.Ioo (0 : ℝ) 1) : \n  ∫ (x : ℝ) in 0..1, x^x = ∑' (n : ℕ), (-1 : ℝ)^(n + 1) * (n : ℝ)^(-(n : ℝ)) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'x'\ntype mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got these two equations: dx/dt = -2y + u(t) and dy/dt = -2x + u(t), where u(t) is just some continuous function. Show that if x(0) and y(0) aren't equal, then no matter what u(t) you pick, the solution will never hit the point (0,0). But if they start out equal, then for any T > 0, you can find some u(t) that makes the system land exactly at (0,0) at time T.",
-    "formal_statement": "theorem differential_equation_property (u : ℝ → ℝ) (hu : Continuous u) (x y : ℝ → ℝ) (hx : ∀ t, HasDerivAt (x t) (deriv x t) t) (hy : ∀ t, HasDerivAt (y t) (deriv y t) t) (hdx : ∀ t, deriv x t = -2 * y t + u t) (hdy : ∀ t, deriv y t = -2 * x t + u t) : (x 0 ≠ y 0 → ∀ t, ¬(x t = 0 ∧ y t = 0)) ∧ (x 0 = y 0 → ∀ T > 0, ∃ u : ℝ → ℝ, Continuous u ∧ (∀ t, HasDerivAt (x t) (deriv x t) t) ∧ (∀ t, HasDerivAt (y t) (deriv y t) t) ∧ (∀ t, deriv x t = -2 * y t + u t) ∧ (∀ t, deriv y t = -2 * x t + u t) ∧ x T = 0 ∧ y T = 0) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  HasDerivAt (y t)\nargument\n  y t\nhas type\n  ℝ : Type\nbut is expected to have type\n  ℝ → ℝ : Type",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
-  },
-  {
-    "informal_statement": "So we've got this sequence (x_n), and for any n that's at least 2, we define y_n = x_{n-1} + 2*x_n. Now, if the y_n's approach some limit, then you gotta show that the x_n's also go to something.",
-    "formal_statement": "theorem seq_convergence (x : ℕ → ℝ) (y : ℕ → ℝ) (hy : ∀ n ≥ 2, y n = x (n - 1) + 2 • x n) (L : ℝ) (hlim : Filter.Tendsto y Filter.atTop (nhds L)) : ∃ M : ℝ, Filter.Tendsto x Filter.atTop (nhds M) := sorry",
+    "informal_statement": "So like, suppose we have some list of sets K_n, where each one is compact (so closed and bounded) and they're all just made of rational numbers. The claim is that no matter what list you pick, you can't have it so that every compact set of rationals is contained in at least one of those K_n. Basically, you can't cover all the possible compact rational sets with just one sequence of them. Show that it works.",
+    "formal_statement": "theorem not_countable_cover_of_compact_rational_sets (K : ℕ → Set ℚ) (h_compact : ∀ n, IsCompact (K n)) : ¬ ∀ (C : Set ℚ), IsCompact C → ∃ n, C ⊆ K n := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "Suppose we have some number n, and n+1 goes into 24 evenly. Show that it works: if you add up all the divisors of n, that total also goes into 24.",
+    "informal_statement": "So like, if you’ve got some polynomial f(x, y) with real coefficients, what can its range actually be? Show that it’s either just a single point, or maybe a half-open or half-closed interval that goes to infinity in one direction, or it could just be all real numbers.",
+    "formal_statement": "theorem polynomial_range_cases (f : ℝ × ℝ → ℝ) (hf : ∃ (p : ℝ[X] × ℝ[X]), ∀ (xy : ℝ × ℝ), f xy = p.1 xy.1 + p.2 xy.2) : Set.range f = {f (0, 0)} ∨ (∃ (a : ℝ), Set.range f = Set.Ici a) ∨ (∃ (a : ℝ), Set.range f = Set.Iic a) ∨ Set.range f = Set.univ := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "unknown identifier 'X'\nunknown identifier 'X'\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nf : ℝ × ℝ → ℝ\n⊢ (?m.20 : outParam ((?m.16 : Type ?u.15) → (?m.17 : Type ?u.14) → Prop)) ℝ (sorryAx (?m.17 : Type ?u.14) true)\nfailed to prove index is valid, possible solutions:\n  - Use `have`-expressions to prove the index is valid\n  - Use `a[i]!` notation instead, runtime check is perfomed, and 'Panic' error message is produced if index is not valid\n  - Use `a[i]?` notation instead, result is an `Option` type\n  - Use `a[i]'h` notation instead, where `h` is a proof that index is valid\nf : ℝ × ℝ → ℝ\n⊢ (?m.58 : outParam ((?m.54 : Type ?u.53) → (?m.55 : Type ?u.52) → Prop)) ℝ (sorryAx (?m.55 : Type ?u.52) true)",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got this matrix that's n by n, and the entry in the i-th row and j-th spot is just |i - j|. Let's call its determinant D_n. Show that D_n equals (-1)^(n-1) times (n-1) times (2^(n-2)).",
+    "formal_statement": "theorem determinant_special_matrix (n : ℕ) : Matrix.det (Matrix.of (fun (i j : Fin n) => ↑|(i : ℤ) - (j : ℤ)|)) = (-1 : ℤ) ^ (n - 1) * (n - 1) * 2 ^ (n - 2) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So like, we've got this integral from 0 to 1 of x^x dx, and you're supposed to show it's the same as this sum from n=1 to infinity of (-1)^(n+1) times n^(-n). Basically, whenever you plug in numbers, it works out.",
+    "formal_statement": "theorem integral_eq_sum : ∫ (x : ℝ) in 0..1, x^x = ∑' (n : ℕ), (-1)^(n+1) * (n : ℝ)^(-(n : ℝ)) := sorry",
+    "is_syntactically_correct": false,
+    "syntactic_evaluation_log": "type mismatch\n  Float.val 0.\nhas type\n  floatSpec.float : Type\nbut is expected to have type\n  Set ℝ : Type",
+    "is_semantically_correct": false,
+    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+  },
+  {
+    "informal_statement": "So we've got these two diff eqs: dx/dt = -2y + u(t) and dy/dt = -2x + u(t), where u(t) is just some continuous function. Show that if x(0) and y(0) aren't equal, then no matter what u(t) you pick, the solution never hits (0,0). But if they start the same, then for any T > 0 you can find some u(t) that makes it go to (0,0) at time T.",
+    "formal_statement": "theorem diff_eq_solution_behavior (u : ℝ → ℝ) (hu : Continuous u) (x y : ℝ → ℝ) (hx : ∀ t, HasDerivAt (x ·) (-2 * y t + u t) t) (hy : ∀ t, HasDerivAt (y ·) (-2 * x t + u t) t) : (x 0 ≠ y 0 → ∀ t, x t ≠ 0 ∨ y t ≠ 0) ∧ (x 0 = y 0 → ∀ T > 0, ∃ u₀ : ℝ → ℝ, Continuous u₀ ∧ (∀ t, HasDerivAt (x ·) (-2 * y t + u₀ t) t) ∧ (∀ t, HasDerivAt (y ·) (-2 * x t + u₀ t) t) ∧ x T = 0 ∧ y T = 0) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we've got this sequence (x_n), and for n at least 2, we set y_n = x_{n-1} + 2*x_n. Now, if the y_n's approach some limit, we need to show that the x_n's also go to something.",
+    "formal_statement": "theorem seq_limit {X : Type*} [NormedAddCommGroup X] {x : ℕ → X} {y : ℕ → X} (h : ∀ n ≥ 2, y n = x (n - 1) + 2 • x n) {L : X} (hy : Filter.Tendsto y Filter.atTop (nhds L)) : ∃ M : X, Filter.Tendsto x Filter.atTop (nhds M) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "Suppose we have some number n, and n+1 goes into 24 evenly. Show that if you add up all the things that go into n, that total also goes into 24.",
     "formal_statement": "theorem sum_divisors_divides_24 (n : ℕ) (h : (n + 1) ∣ 24) : (∑ d in Nat.divisors n, d) ∣ 24 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
@@ -680,15 +680,15 @@
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So like, show that a group with a finite number of elements can't be made up of just two of its smaller subgroups. Does this still work if we say three smaller subgroups instead of two? Actually, show that it doesn't work anymore when you swap 'two' for 'three'.",
-    "formal_statement": "theorem three_subgroups_can_cover_finite_group : ∃ (G : Type*) [Group G] [Fintype G] (H K L : Subgroup G), Fintype.card (↥H) < Fintype.card G ∧ Fintype.card (↥K) < Fintype.card G ∧ Fintype.card (↥L) < Fintype.card G ∧ ↑H ∪ ↑K ∪ ↑L = (⊤ : Set G) := sorry",
+    "informal_statement": "So like, show that if you have a finite group, it can't be made up of just two of its smaller subgroups. Does that still work if we swap \"two\" for \"three\"? Actually, show that it stops being true when you use three instead of two.",
+    "formal_statement": "theorem three_subgroups_can_cover_finite_group : ∃ (G : Type*) [Group G] [Fintype G] (H K L : Subgroup G), H ≠ ⊤ ∧ K ≠ ⊤ ∧ L ≠ ⊤ ∧ (∀ x : G, x ∈ H ∨ x ∈ K ∨ x ∈ L) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unexpected token '['; expected ','",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "Suppose we have this sequence T, and it works like T_n * T_{n+1} = n for any number n >= 1. Also, the ratio T_n / T_{n+1} goes to 1 as n gets huge. Show that it works out so that pi * T_1^2 = 2.",
+    "informal_statement": "Suppose we have this sequence T, and it works out that T_n times T_{n+1} equals n whenever n is at least 1. Also, as n gets huge, T_n over T_{n+1} goes to 1. Show that it works out that pi times T_1 squared equals 2.",
     "formal_statement": "theorem sequence_limit_condition (T : ℕ → ℝ) (h_rec : ∀ n ≥ 1, T n * T (n + 1) = n) (h_lim : Tendsto (fun n => T n / T (n + 1)) atTop (𝓝 1)) : Real.pi * (T 1)^2 = 2 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
@@ -696,106 +696,106 @@
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we got this curve Γ in the plane, and its length is exactly 1. Show that you can always find some closed rectangle with area 1/4 that covers the whole curve.",
-    "formal_statement": "theorem exists_rectangle_covering_curve (Γ : Set (ℝ × ℝ)) (hΓ : IsConnected Γ) (hl : arcLength Γ = 1) : ∃ (R : Set (ℝ × ℝ)), IsRectangle R ∧ IsClosed R ∧ Γ ⊆ R ∧ area R = 1/4 := sorry",
+    "informal_statement": "So we've got this curve Γ in the plane, and its length is exactly 1. Show that you can always find some closed rectangle with area 1/4 that covers the whole curve.",
+    "formal_statement": "theorem exists_rectangle_covering_curve (Γ : Set (ℝ × ℝ)) (hΓ : IsConnected Γ) (hlength : arcLength Γ = 1) : ∃ (R : Set (ℝ × ℝ)), IsRectangle R ∧ IsClosed R ∧ Γ ⊆ R ∧ area R = 1/4 := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "unknown identifier 'arcLength'\nunknown identifier 'IsRectangle'\nunknown identifier 'area'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this increasing sequence a1 < a2 < a3 < ... where they're all numbers. Suppose the sum from i=1 to infinity of 1/(a n) goes to some limit. For any x, let k(x) be how many a_n's are less than or equal to x. Show that as x gets huge, k(x)/x approaches 0.",
-    "formal_statement": "theorem limit_of_count_ratio (a : ℕ → ℝ) (h_mono : StrictMono a) (h_sum : ∃ L : ℝ, Tendsto (fun n ↦ ∑ i in Finset.range n, (1 / a i)) atTop (𝓝 L)) (k : ℝ → ℕ) (hk : ∀ x, k x = Nat.card {n | a n ≤ x}) : Tendsto (fun x ↦ (k x : ℝ) / x) atTop (𝓝 0) := sorry",
+    "informal_statement": "Suppose we have these numbers a1 < a2 < a3 < ... that keep going up, and they're all positive. Also, the sum from i=1 to infinity of 1/(a n) is convergent. Now, for any x, let k(x) be how many of those a_n's are less than or equal to x. Show that as x gets huge, k(x)/x goes to 0.",
+    "formal_statement": "theorem k_over_x_tends_to_zero {a : ℕ → ℝ} (ha_pos : ∀ n, a n > 0) (ha_mono : StrictMono a) (ha_sum : Summable fun n ↦ 1 / a n) : ∀ ε > 0, ∃ x₀ > 0, ∀ x ≥ x₀, |(Nat.card {n | a n ≤ x}) / x| < ε := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this matrix A that's 3 by 2, and another matrix B that's 2 by 3. They multiply together to give this 3x3 matrix:\n\nAB =\n(8, 2, -2;\n 2, 5, 4;\n -2, 4, 5)\n\nNow, the thing to show is that when you flip them and do B times A, you end up with a 2x2 matrix that looks like (9, 0; 0, 9). Basically, show that BA = 9 times the identity thing for a 2x2.",
-    "formal_statement": "theorem matrix_mult_inverse {A : Matrix (Fin 3) (Fin 2) ℝ} {B : Matrix (Fin 2) (Fin 3) ℝ} (hAB : A * B = !![8, 2, -2; 2, 5, 4; -2, 4, 5]) : B * A = 9 • (1 : Matrix (Fin 2) (Fin 2) ℝ) := sorry",
+    "informal_statement": "Suppose we have some matrix A that's 3 by 2 and another matrix B that's 2 by 3, and they multiply to give AB =  \n8 2 -2  \n2 5 4  \n-2 4 5  \n\nShow that it works out so BA ends up being  \n9 0  \n0 9",
+    "formal_statement": "theorem matrix_mult_inverse {A : Matrix (Fin 3) (Fin 2) ℝ} {B : Matrix (Fin 2) (Fin 3) ℝ} \n  (hAB : A * B = !![8, 2, -2; 2, 5, 4; -2, 4, 5]) : B * A = !![9, 0; 0, 9] := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So, like, we've got this thing where a and b are both positive numbers, right? Show that if you take the power series for e^(a x) times cos(b x) in terms of x, then the coefficients you get are either all zero (which is weird) or there's, like, an infinite bunch of them that are zero.",
-    "formal_statement": "theorem power_series_coefficients (a b : ℝ) (ha : a > 0) (hb : b > 0) : (∀ n, (PowerSeries.mk fun n => (a ^ n / Nat.factorial n) * Real.cos (b * ↑n)) n = 0) ∨ (Infinite {n | (PowerSeries.mk fun n => (a ^ n / Nat.factorial n) * Real.cos (b * ↑n)) n = 0}) := sorry",
+    "informal_statement": "So like, suppose we have some numbers a and b that are both bigger than zero. Show that whenever you write out the power series for e^(a*x) * cos(b*x) in terms of x, then the coefficients you get are either all zero (which obviously they aren't) or there's actually infinitely many of them that are zero. Basically, it can't be just a few zero coefficients and then the rest are non-zero.",
+    "formal_statement": "theorem power_series_coefficients_nonzero_or_infinitely_many_zero (a b : ℝ) (ha : a > 0) (hb : b > 0) : \n(∀ n : ℕ, (Function.update (fun n => if Even n then (-1) ^ (n / 2) * b ^ n else 0) 0 (1 : ℝ)) n * a ^ n / n.factorial ≠ 0) ∨ \n(∃ infinite_set : Set ℕ, Set.Infinite infinite_set ∧ ∀ n ∈ infinite_set, (Function.update (fun n => if Even n then (-1) ^ (n / 2) * b ^ n else 0) 0 (1 : ℝ)) n * a ^ n / n.factorial = 0) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "The Lean theorem correctly captures the mathematical intent of the natural language statement. It specifies that for positive real numbers a and b, the power series coefficients of e^(a x) times cos(b x) are either all zero or there are infinitely many zero coefficients. The types and constraints match, and the logical implication flows correctly."
-  },
-  {
-    "informal_statement": "Suppose we have some numbers A, B, C, D, E, F, G, all real, and we know B^2 - 4AC is negative. Show that we can pick a small enough delta > 0 so that whenever we take a point (x, y) inside a tiny circle around the origin (but not exactly at the origin), meaning 0 < x^2 + y^2 < delta, the expression Ax^2 + Bxy + Cy^2 + Dx^3 + Ex^2y + Fxy^2 + Gy^3 never hits zero.",
-    "formal_statement": "theorem nonvanishing_expression (A B C D E F G : ℝ) (h : B^2 - 4 * A * C < 0) : ∃ δ > 0, ∀ (x y : ℝ), 0 < x^2 + y^2 ∧ x^2 + y^2 < δ → A * x^2 + B * x * y + C * y^2 + D * x^3 + E * x^2 * y + F * x * y^2 + G * y^3 ≠ 0 := sorry",
-    "is_syntactically_correct": true,
-    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
-    "is_semantically_correct": true,
-    "semantic_evaluation_reason": "Correct"
-  },
-  {
-    "informal_statement": "So, like, we’re trying to figure out how many equal nonzero digits in a row a perfect square can end with in base 10. Basically, what’s the longest tail of repeating digits that’s not zero? And then also find the smallest square that actually does that.\n\nTurns out the max you can get is 3 repeating digits at the end. And the smallest square that works is 38 squared, which is 1444.",
-    "formal_statement": "theorem smallest_square_with_three_equal_nonzero_trailing_digits : Nat.find (fun n => ∃ (d : Fin 10) (h : d ≠ 0), Nat.pow n 2 % 1000 = d * 111) = 38 ∧ Nat.pow 38 2 = 1444 := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "application type mismatch\n  Nat.find fun (n : ℕ) => ∃ (d : Fin (10 : ℕ)) (_ : d ≠ (0 : Fin (10 : ℕ))), n.pow (2 : ℕ) % (1000 : ℕ) = ↑d * (111 : ℕ)\nargument\n  fun (n : ℕ) => ∃ (d : Fin (10 : ℕ)) (_ : d ≠ (0 : Fin (10 : ℕ))), n.pow (2 : ℕ) % (1000 : ℕ) = ↑d * (111 : ℕ)\nhas type\n  ℕ → Prop : Type\nbut is expected to have type\n  ∃ (n : ℕ), (?m.3 : ℕ → Prop) n : Prop",
     "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+    "semantic_evaluation_reason": "The Lean theorem attempts to formalize the statement about the power series coefficients of e^(a*x) * cos(b*x). However, the formalization is incorrect because it does not accurately represent the coefficients of the product of the power series for e^(a*x) and cos(b*x). The function used in the Lean theorem does not correctly model the multiplication of these two power series. Additionally, the theorem does not properly capture the condition that the coefficients are either all non-zero or there are infinitely many zero coefficients. The formalization should instead focus on the coefficients obtained from the product of the two power series, ensuring that the logical structure of the original statement is preserved."
   },
   {
-    "informal_statement": "Suppose we have a sequence x_n where the difference between x_n and x_{n-2} goes to zero as n gets huge. Show that it works that (x_n - x_{n-1})/n also approaches 0 when n goes to infinity.",
-    "formal_statement": "theorem seq_diff_converges (x : ℕ → ℝ) (h : Filter.Tendsto (fun n ↦ x n - x (n - 2)) Filter.atTop (nhds 0)) : Filter.Tendsto (fun n ↦ (x n - x (n - 1)) / ↑n) Filter.atTop (nhds 0) := sorry",
+    "informal_statement": "Suppose we have these numbers A, B, C, D, E, F, G, all real, and we know B^2 - 4AC is negative. Show that there's some small positive delta so that whenever you pick a point (x, y) inside a little circle around the origin (but not exactly at the origin), meaning 0 < x^2 + y^2 < delta, the expression Ax^2 + Bxy + Cy^2 + Dx^3 + Ex^2y + Fxy^2 + Gy^3 never equals zero.",
+    "formal_statement": "theorem exists_delta_for_nonzero_expression (A B C D E F G : ℝ) (h : B^2 - 4 * A * C < 0) :\n    ∃ δ > 0, ∀ (x y : ℝ), 0 < x^2 + y^2 ∧ x^2 + y^2 < δ → A * x^2 + B * x * y + C * y^2 + D * x^3 + E * x^2 * y + F * x * y^2 + G * y^3 ≠ 0 := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this thing where you take a number n, and as n gets huge, you look at (1/n^4) times the product from i=1 to 2n of (n^2 + i^2) raised to the 1/n. Show that it approaches e^(2 log(5) - 4 + 2 arctan(2)).",
-    "formal_statement": "theorem limit_expression (n : ℕ) : Filter.Tendsto (fun n : ℕ => (1 / (n : ℝ) ^ 4) * (∏ i in Finset.range (2 * n + 1), (n^2 + i^2) ^ (1 / (n : ℝ)))) Filter.atTop (nhds (Real.exp (2 * Real.log 5 - 4 + 2 * Real.arctan 2))) := sorry",
-    "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "failed to synthesize instance\n  HPow ℕ ℝ ℝ",
-    "is_semantically_correct": false,
-    "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
+    "informal_statement": "So, like, we’re trying to figure out the longest run of the same nonzero digit you can have at the end of a perfect square, in base 10. And also find the smallest square that actually does it.\n\nSuppose we have some number n, and n^2 ends in a bunch of the same digit that isn’t zero. What’s the max length of that run? Turns out it’s 3. And the smallest square that works is 38 squared = 1444.",
+    "formal_statement": "theorem max_trailing_nonzero_digit_run_in_squares : \n  (∃ (n : ℕ), n ≠ 0 ∧ ∃ (d : ℕ), d ∈ Set.Ioo 0 10 ∧ ∀ k ∈ Set.Icc 1 3, (n^2 / 10^(k-1)) % 10 = d) ∧ \n  (¬∃ (n : ℕ), n ≠ 0 ∧ ∃ (d : ℕ), d ∈ Set.Ioo 0 10 ∧ ∀ k ∈ Set.Icc 1 4, (n^2 / 10^(k-1)) % 10 = d) ∧ \n  (IsLeast {n : ℕ | n ≠ 0 ∧ ∃ (d : ℕ), d ∈ Set.Ioo 0 10 ∧ ∀ k ∈ Set.Icc 1 3, (n^2 / 10^(k-1)) % 10 = d} 38) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this polynomial H, like up to degree 3, and some positive number T. You gotta show that if you average H(t) from -T to T, it's the same as just averaging H(-T/sqrt(3)) and H(T/sqrt(3)).",
-    "formal_statement": "theorem polynomial_average_eq_endpoints (H : Polynomial ℝ) (hdeg : H.natDegree ≤ 3) (T : ℝ) (hT : T > 0) : (∫ t in -T..T, H t) / (2 * T) = (H (-T / Real.sqrt 3) + H (T / Real.sqrt 3)) / 2 := sorry",
+    "informal_statement": "Suppose we have a sequence x_n where the difference x_n - x_{n-2} goes to 0 as n gets large. Show that it works out so that (x_n - x_{n-1})/n also approaches 0.",
+    "formal_statement": "theorem diff_convergence_implies_normalized_convergence (x : ℕ → ℝ) (h : Tendsto (fun n ↦ x n - x (n - 2)) atTop (𝓝 0)) : Tendsto (fun n ↦ (x n - x (n - 1)) / ↑n) atTop (𝓝 0) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we've got this limit thing with a product, like when n gets huge, look at (1/n^4) times the product from i=1 to 2n of (n^2 + i^2) to the power 1/n. You're supposed to show it goes to e raised to the stuff: 2 log(5) minus 4 plus 2 arctan(2).",
+    "formal_statement": "theorem limit_product_expression : Filter.Tendsto (fun (n : ℕ) => (1 / (n : ℝ)^4) * ∏ i in Finset.range (2 * n), (n^2 + i^2 : ℝ)^(1 / (n : ℝ))) Filter.atTop (nhds (Real.exp (2 * Real.log 5 - 4 + 2 * Real.arctan 2))) := sorry",
+    "is_syntactically_correct": true,
+    "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
+    "is_semantically_correct": true,
+    "semantic_evaluation_reason": "Correct"
+  },
+  {
+    "informal_statement": "So we've got this polynomial H, like up to degree 3, and some positive number T. Show that the average of H(t) from -T to T is just the average of H(-T/sqrt(3)) and H(T/sqrt(3)).",
+    "formal_statement": "theorem polynomial_average_eq (H : Polynomial ℝ) (hdeg : H.degree ≤ 3) (T : ℝ) (hT : T > 0) : \n    (1 / (2 * T)) * ∫ (t : ℝ) in -T..T, H t = (1 / 2) * (H (-T / Real.sqrt 3) + H (T / Real.sqrt 3)) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "function expected at\n  H\nterm has type\n  Polynomial ℝ\nfunction expected at\n  H\nterm has type\n  Polynomial ℝ\nfunction expected at\n  H\nterm has type\n  Polynomial ℝ",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this closed set S in R^2, and it's stuck between a and b on the x-axis, like a < x < b. Show that if you squish it down onto the y-axis, that squished version is still closed.",
-    "formal_statement": "theorem projection_of_closed_set_is_closed {S : Set (ℝ × ℝ)} (hS : IsClosed S) {a b : ℝ} (hab : a < b) (h : ∀ (p : ℝ × ℝ), p ∈ S → a < p.1 ∧ p.1 < b) : IsClosed (Prod.snd '' S) := sorry",
+    "informal_statement": "So we've got this set S in R^2 that's closed, and it's stuck between two vertical lines, like a < x < b. Show that if you squish it down onto the y-axis, that squished version is still closed.",
+    "formal_statement": "theorem projection_of_closed_set_is_closed {S : Set (ℝ × ℝ)} (hS : IsClosed S) (a b : ℝ) (hab : a < b) (hS_bounded : ∀ (p : ℝ × ℝ), p ∈ S → a < p.1 ∧ p.1 < b) : IsClosed (Prod.snd '' S) := sorry",
     "is_syntactically_correct": true,
     "syntactic_evaluation_log": "warning: declaration uses 'sorry'",
     "is_semantically_correct": true,
     "semantic_evaluation_reason": "Correct"
   },
   {
-    "informal_statement": "So we've got this function x(t) that's smooth enough to have two derivatives, and it's defined for real numbers, mapping to reals. The conditions are: x(1) minus x(0) equals 1, the derivative at the endpoints is zero, so x'(0) = x'(1) = 0, and the absolute value of the derivative is at most 3/2 for all t between 0 and 1. Show that there's some point t in [0,1] where the second derivative's absolute value is at least 9/2.",
-    "formal_statement": "theorem exists_second_deriv_large (x : ℝ → ℝ) (hx : ContDiff ℝ 2 x) (hx0 : x 1 - x 0 = 1) (hx'0 : deriv x 0 = 0) (hx'1 : deriv x 1 = 0) (hx'bdd : ∀ t ∈ Icc 0 1, |deriv x t| ≤ 3/2) : ∃ t ∈ Icc 0 1, |deriv^[2] x t| ≥ 9/2 := sorry",
+    "informal_statement": "So we got this function x(t) that's smooth enough to have a second derivative, and it's defined for real numbers from 0 to 1. The conditions are: x(1) minus x(0) equals 1, the derivative at the ends is zero, so x'(0) = x'(1) = 0, and the absolute value of the first derivative is always less than or equal to 3/2 for t between 0 and 1. Show that at some point t in [0,1], the absolute value of the second derivative x''(t) is at least 9/2.",
+    "formal_statement": "theorem second_derivative_lower_bound (x : ℝ → ℝ) (hx : ContDiffOn ℝ 2 x (Set.Icc 0 1)) (hx0 : x 1 - x 0 = 1) (hx'0 : HasDerivAt x (x' 0) 0 ∧ x' 0 = 0) (hx'1 : HasDerivAt x (x' 1) 1 ∧ x' 1 = 0) (hx'bdd : ∀ t ∈ Set.Icc 0 1, |x' t| ≤ 3/2) : ∃ t ∈ Set.Icc 0 1, |x'' t| ≥ 9/2 := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "ambiguous, possible interpretations \n  Set.Icc (0 : (?m.541 : Sort ?u.540)) (1 : (?m.541 : Sort ?u.540)) : Set (?m.541 : Sort ?u.540)\n  \n  Finset.Icc (0 : (?m.810 : Sort ?u.809)) (1 : (?m.810 : Sort ?u.809)) : Finset (?m.810 : Sort ?u.809)\nambiguous, possible interpretations \n  Set.Icc (0 : (?m.1744 : Sort ?u.1743)) (1 : (?m.1744 : Sort ?u.1743)) : Set (?m.1744 : Sort ?u.1743)\n  \n  Finset.Icc (0 : (?m.2013 : Sort ?u.2012)) (1 : (?m.2013 : Sort ?u.2012)) : Finset (?m.2013 : Sort ?u.2012)",
+    "syntactic_evaluation_log": "unknown identifier 'x''\nunknown identifier 'x''\nunknown identifier 'x''\nunknown identifier 'x''\nunknown identifier 'x''\nunknown identifier 'x'''\nfailed to synthesize instance\n  AddGroup ℕ\nfailed to synthesize instance\n  AddGroup ℕ",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So we've got this sequence of functions u_n, where u_n(x) is basically -n when x is less than or equal to -n, just x if x is between -n and n, and n otherwise. And there's some function F on the reals. Show that F is continuous exactly when u_n composed with F is continuous for every natural number n.",
-    "formal_statement": "theorem continuous_iff_compose_with_cutoff (F : ℝ → ℝ) : Continuous F ↔ ∀ (n : ℕ), Continuous (fun x ↦ if x ≤ -↑n then -↑n else if x ≤ ↑n then x else ↑n ∘ F) := sorry",
+    "informal_statement": "So we've got this function u_n, where u_n(x) equals -n when x is less than or equal to -n, just x if x is between -n and n, and then n if x is bigger than n. And there's some function F on the real numbers. Show that F is continuous exactly when u_n(F(x)) is continuous for every natural number n.",
+    "formal_statement": "theorem continuous_iff_continuous_u_n_comp (F : ℝ → ℝ) : Continuous F ↔ ∀ (n : ℕ), Continuous (fun x ↦ if x ≤ -↑n then -↑n else if x ≤ ↑n then x else ↑n ∘ F) := sorry",
     "is_syntactically_correct": false,
     "syntactic_evaluation_log": "type mismatch\n  n\nhas type\n  ℕ : Type\nbut is expected to have type\n  ℝ → (?m.3243 : ℕ → Sort ?u.1883) n : Sort (imax 1 ?u.1883)",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   },
   {
-    "informal_statement": "So there's this quadrilateral with sides a, b, c, d and its area is sqrt(abcd). Suppose we have a circle that can be inscribed inside it, meaning all sides are tangent to the circle. Show that it works, and then the quadrilateral must also be cyclic, so you can put a circle around it too.",
-    "formal_statement": "theorem quadrilateral_inscribed_and_circumscribed {a b c d : ℝ} (h₁ : a > 0) (h₂ : b > 0) (h₃ : c > 0) (h₄ : d > 0) (h₅ : ∃ (quad : ConvexQuadrilateral ℝ), quad.side_lengths = (a, b, c, d) ∧ quad.area = Real.sqrt (a * b * c * d)) (h₆ : ∃ (C : Circle ℝ), TangentToAllSides C quad) : ∃ (C' : Circle ℝ), CircumscribedAbout quad C' := sorry",
+    "informal_statement": "So like, if you've got this four-sided shape with sides a, b, c, d and its area is sqrt(abcd), and you can fit a circle inside it (like, it's tangential), then you gotta show it's also cyclic, meaning you can draw a circle around it too.",
+    "formal_statement": "theorem quadrilateral_tangential_implies_cyclic {a b c d : ℝ} (h₁ : a > 0 ∧ b > 0 ∧ c > 0 ∧ d > 0) (h₂ : ∃ (K : ℝ), K = Real.sqrt (a * b * c * d)) (h₃ : ∃ (r : ℝ), ∀ (x : ℝ), x ∈ {a, b, c, d} → r = (K / x)) : ∃ (R : ℝ), ∀ (x : ℝ), x ∈ {a, b, c, d} → R = (a * b * c * d) / (4 * K) := sorry",
     "is_syntactically_correct": false,
-    "syntactic_evaluation_log": "unknown identifier 'ConvexQuadrilateral'\nunknown identifier 'Circle'\nunknown identifier 'TangentToAllSides'\nunknown identifier 'Circle'\nunknown identifier 'CircumscribedAbout'",
+    "syntactic_evaluation_log": "unknown identifier 'K'\nunknown identifier 'K'",
     "is_semantically_correct": false,
     "semantic_evaluation_reason": "Skipped semantic eval because syntactic check failed."
   }
